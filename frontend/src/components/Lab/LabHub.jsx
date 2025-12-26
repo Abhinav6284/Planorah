@@ -1,0 +1,67 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+
+export default function LabHub() {
+    const labs = [
+        {
+            id: 'code',
+            title: 'Code Studio',
+            description: 'A professional environment for mastering algorithms and building software.',
+            icon: (
+                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+            ),
+            color: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+            link: '/lab/code'
+        },
+        {
+            id: 'resources',
+            title: 'Resource Hub',
+            description: 'Curated collection of learning tools, simulations, and references.',
+            icon: (
+                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            ),
+            color: 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
+            link: '/lab/resources'
+        }
+    ];
+
+    return (
+        <div className="min-h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+            <div className="p-6 md:p-10 max-w-7xl mx-auto font-sans">
+                <header className="mb-12">
+                    <h1 className="text-4xl font-serif font-medium text-gray-900 dark:text-white mb-2">Zen Lab</h1>
+                    <p className="text-gray-500 dark:text-gray-400">Your virtual playground for experimentation and discovery.</p>
+                </header>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {labs.map((lab) => (
+                        <Link key={lab.id} to={lab.link} className="group">
+                            <motion.div
+                                whileHover={{ y: -5 }}
+                                className="bg-white dark:bg-gray-800 p-8 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col"
+                            >
+                                <div className={`w-20 h-20 rounded-2xl ${lab.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                                    {lab.icon}
+                                </div>
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{lab.title}</h2>
+                                <p className="text-gray-500 dark:text-gray-400 leading-relaxed flex-1">{lab.description}</p>
+
+                                <div className="mt-8 flex items-center gap-2 font-medium text-sm uppercase tracking-widest opacity-60 group-hover:opacity-100 transition-opacity text-gray-900 dark:text-gray-300">
+                                    Enter Lab
+                                    <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                    </svg>
+                                </div>
+                            </motion.div>
+                        </Link>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}

@@ -1,0 +1,228 @@
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useTheme } from "../../context/ThemeContext";
+import { userService } from "../../api/userService";
+
+const Header = () => {
+    const location = useLocation();
+    const { theme, toggleTheme } = useTheme();
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 50);
+        };
+
+        const fetchProfile = async () => {
+            try {
+                const profileData = await userService.getProfile();
+                setUser(profileData);
+            } catch (error) {
+                console.error("Failed to load header profile", error);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        fetchProfile();
+
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const navGroups = [
+        {
+            label: "Dashboard",
+            path: "/dashboard",
+            type: "link"
+        },
+        {
+            label: "Career",
+            type: "dropdown",
+            items: [
+                { path: "/resume", label: "Resume Builder" },
+                { path: "/ats", label: "Find Your Fit" },
+                { path: "/jobs", label: "Job Finder" },
+                { path: "/interview", label: "Mock Interview" },
+            ]
+        },
+        {
+            label: "Productivity",
+            type: "dropdown",
+            items: [
+                { path: "/tasks", label: "Tasks" },
+                { path: "/scheduler", label: "Calendar" },
+            ]
+        },
+        {
+            label: "Learning",
+            type: "dropdown",
+            items: [
+                { path: "/lab", label: "Virtual Lab" },
+                { path: "/roadmap/list", label: "Learning Path" },
+            ]
+        },
+        {
+            label: "AI Help",
+            path: "/assistant",
+            type: "link",
+            icon: true
+        }
+    ];
+
+    // Helper to get display name
+    const displayName = user ? (user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.username) : "Student";
+    const userRole = user?.role || "Student";
+    // Backend now returns full avatar URL via serializer
+    const userAvatar = user?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?fit=crop&w=100&h=100";
+
+    return (
+        <header className={`flex items-center justify-between px-8 py-4 sticky top-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isScrolled ? 'bg-transparent pointer-events-none' : 'bg-transparent'}`}>
+            {/* Logo - hides on scroll */}
+            <div className={`flex items-center gap-2 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isScrolled ? 'opacity-0 -translate-x-8 pointer-events-none' : 'opacity-100 translate-x-0'}`}>
+                <Link to="/dashboard" className="text-2xl font-serif font-bold text-gray-900 dark:text-white tracking-tight whitespace-nowrap">
+                    Planorah<span className="text-gray-400">.</span>
+                </Link>
+            </div>
+
+            {/* Navigation - Always centered using absolute positioning */}
+            <nav className="hidden md:flex items-center bg-white dark:bg-gray-800 rounded-full px-2 py-1.5 shadow-sm border border-gray-100 dark:border-gray-700 absolute left-1/2 -translate-x-1/2 pointer-events-auto">
+                {navGroups.map((group, index) => {
+                    const isActive = group.type === 'link'
+                        ? location.pathname === group.path
+                        : group.items.some(item => location.pathname.startsWith(item.path));
+
+                    if (group.type === 'link') {
+                        return (
+                            <Link
+                                key={index}
+                                to={group.path}
+                                className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${isActive
+                                    ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-md"
+                                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200"
+                                    }`}
+                            >
+                                {group.icon && (
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                    </svg>
+                                )}
+                                {group.label}
+                            </Link>
+                        );
+                    }
+
+                    return (
+                        <div key={index} className="relative group px-2">
+                            <button
+                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-1 ${isActive
+                                    ? "text-gray-900 dark:text-white font-bold"
+                                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200"
+                                    }`}
+                            >
+                                {group.label}
+                                <span className="text-[10px] opacity-50">▼</span>
+                            </button>
+
+                            {/* Dropdown Menu */}
+                            <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left z-50">
+                                {group.items.map((item) => (
+                                    <Link
+                                        key={item.path}
+                                        to={item.path}
+                                        className="block px-4 py-2 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-black dark:hover:text-white transition-colors"
+                                    >
+                                        {item.label}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })}
+            </nav>
+
+            {/* Right Side Icons - hides on scroll */}
+            <div className={`flex items-center gap-3 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isScrolled ? 'opacity-0 translate-x-8 pointer-events-none absolute right-8' : 'opacity-100 translate-x-0 relative'}`}>
+                {/* Settings Dropdown */}
+                <div className="relative group">
+                    <button className="w-12 h-12 rounded-full bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:scale-105 transition-transform hover:text-gray-900 dark:hover:text-white shadow-sm" title="Settings">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </button>
+
+                    {/* Dropdown Menu */}
+                    <div className="absolute top-full right-0 mt-3 w-60 bg-white dark:bg-[#1C1C1E] rounded-2xl shadow-xl border border-gray-100 dark:border-white/10 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right z-50">
+                        <div className="px-4 py-3 border-b border-gray-100 dark:border-white/5 mb-1">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{displayName}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email || "student@planorah.com"}</p>
+                        </div>
+                        <Link
+                            to="/profile"
+                            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition-colors"
+                        >
+                            <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center">👤</span>
+                            <span>My Profile</span>
+                        </Link>
+                        <button
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition-colors"
+                        >
+                            <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center">🔔</span>
+                            <span>Notifications</span>
+                        </button>
+                        <Link
+                            to="/support"
+                            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition-colors"
+                        >
+                            <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center">✉️</span>
+                            <span>Contact Support</span>
+                        </Link>
+                        <div className="my-2 border-t border-gray-100 dark:border-white/5"></div>
+                        <button
+                            onClick={toggleTheme}
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition-colors"
+                        >
+                            <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center">{theme === 'light' ? '🌙' : '☀️'}</span>
+                            <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
+                        </button>
+                        <div className="my-2 border-t border-gray-100 dark:border-white/5"></div>
+                        <button
+                            onClick={() => {
+                                localStorage.removeItem('access_token');
+                                localStorage.removeItem('refresh_token');
+                                window.location.href = '/login';
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        >
+                            <span className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/20 flex items-center justify-center">🚪</span>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Profile Section (Dynamic Data) */}
+                <div className="flex items-center gap-4 pl-4 border-l border-gray-200 dark:border-white/10">
+                    <div className="text-right hidden lg:block">
+                        <h4 className="text-sm font-bold text-gray-900 dark:text-white leading-tight">{displayName}</h4>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{userRole}</span>
+                    </div>
+                    <Link to="/profile" className="relative group cursor-pointer">
+                        <div className="w-12 h-12 rounded-full p-[2px] bg-gradient-to-tr from-indigo-500 to-purple-500 hover:shadow-lg transition-all">
+                            <div className="w-full h-full rounded-full bg-white dark:bg-black p-[2px]">
+                                <img
+                                    src={userAvatar}
+                                    alt="Profile"
+                                    className="w-full h-full rounded-full object-cover"
+                                />
+                            </div>
+                        </div>
+                        {/* Status Indicator */}
+                        <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-white dark:border-black"></div>
+                    </Link>
+                </div>
+            </div>
+        </header>
+    );
+};
+
+export default Header;

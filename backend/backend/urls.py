@@ -1,0 +1,28 @@
+"""
+URL configuration for backend project.
+"""
+from django.contrib import admin
+from django.urls import path, include
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/', include('api.urls')),
+    path('api/users/', include('users.urls')),
+    path('api/resume/', include('resume.urls')),
+    path('api/ats/', include('ats.urls')),
+    path('api/interview/', include('interview.urls')),
+    path('api/dashboard/', include('dashboard.urls')),
+    path('api/roadmap/', include('roadmap_ai.urls')),
+    path('api/scheduler/', include('scheduler.urls')),
+    path('api/', include('tasks.urls')),  # Tasks and Notes API
+    path('api/assistant/', include('assistant.urls')),  # AI Assistant Chat
+    path('api/music/', include('music.urls')),  # Music Integration (Spotify/YouTube)
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
