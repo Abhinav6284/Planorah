@@ -6,27 +6,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Roadmap, Milestone, Project
 from .serializers import RoadmapSerializer, RoadmapDetailSerializer
-# pyright: reportPrivateImportUsage=false
-# pyright: reportPrivateImportUsage=false
-try:
-    from google.generativeai.types import GenerationConfig
-except (ImportError, TypeError):
-    GenerationConfig = None
-
-
-
-# Import with proper type hints to avoid Pylance warnings
-try:
-    import google.generativeai as genai
-    GENAI_AVAILABLE = True
-except (ImportError, TypeError):
-    GENAI_AVAILABLE = False
-
-# Configure Gemini at module level
-if GENAI_AVAILABLE:
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if api_key:
-        genai.configure(api_key=api_key)  # type: ignore
 
 
 @api_view(['POST'])
@@ -34,7 +13,11 @@ if GENAI_AVAILABLE:
 def generate_roadmap(request):
     """Generate AI-powered roadmap using Gemini"""
 
-    if not GENAI_AVAILABLE:
+    # Lazy import - only load when function is called
+    try:
+        import google.generativeai as genai
+        from google.generativeai.types import GenerationConfig
+    except (ImportError, TypeError):
         return Response({
             "error": "Gemini AI is not available. Please install google-generativeai package."
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

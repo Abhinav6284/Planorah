@@ -7,13 +7,6 @@ from rest_framework import status
 from .models import ATSAnalysis
 from .serializers import ATSAnalysisSerializer
 
-try:
-    import google.generativeai as genai
-    from google.generativeai.types import GenerationConfig
-    GENAI_AVAILABLE = True
-except (ImportError, TypeError):
-    GENAI_AVAILABLE = False
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -21,7 +14,10 @@ def analyze_resume(request):
     """
     Analyze resume against a JD using Gemini.
     """
-    if not GENAI_AVAILABLE:
+    # Lazy import - only load when function is called
+    try:
+        import google.generativeai as genai
+    except (ImportError, TypeError):
         return Response({"error": "AI Service unavailable"}, status=503)
 
     user = request.user

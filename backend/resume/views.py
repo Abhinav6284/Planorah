@@ -7,14 +7,6 @@ from rest_framework import status
 from .models import Resume
 from .serializers import ResumeSerializer
 
-# Safe import for Gemini
-try:
-    import google.generativeai as genai
-    from google.generativeai.types import GenerationConfig
-    GENAI_AVAILABLE = True
-except (ImportError, TypeError):
-    GENAI_AVAILABLE = False
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -22,7 +14,10 @@ def generate_resume(request):
     """
     Generate a resume content using Gemini based on provided data.
     """
-    if not GENAI_AVAILABLE:
+    # Lazy import - only load when function is called
+    try:
+        import google.generativeai as genai
+    except (ImportError, TypeError):
         return Response({"error": "AI Service unavailable"}, status=503)
 
     user = request.user
@@ -199,7 +194,10 @@ def import_resume(request):
     """
     Import a resume file (PDF/DOCX) and parse it using AI.
     """
-    if not GENAI_AVAILABLE:
+    # Lazy import - only load when function is called
+    try:
+        import google.generativeai as genai
+    except (ImportError, TypeError):
         return Response({"error": "AI Service unavailable"}, status=503)
     
     if 'file' not in request.FILES:
@@ -339,7 +337,10 @@ def analyze_ats(request):
     """
     Analyze a resume for ATS compatibility and provide a score.
     """
-    if not GENAI_AVAILABLE:
+    # Lazy import - only load when function is called
+    try:
+        import google.generativeai as genai
+    except (ImportError, TypeError):
         return Response({"error": "AI Service unavailable"}, status=503)
     
     resume_id = request.data.get('resume_id')
