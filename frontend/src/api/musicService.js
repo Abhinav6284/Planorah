@@ -1,7 +1,7 @@
 import api from './axios';
 
 const SPOTIFY_CLIENT_ID = '244db40885bb40859d6ad806f50a1e24';
-const SPOTIFY_REDIRECT_URI = 'http://127.0.0.1:3000/auth/spotify/callback';
+const SPOTIFY_REDIRECT_URI = `${window.location.origin}/auth/spotify/callback`;
 const SPOTIFY_SCOPES = [
     'user-read-playback-state',
     'user-modify-playback-state',
@@ -14,7 +14,7 @@ const SPOTIFY_SCOPES = [
 ].join(' ');
 
 const YOUTUBE_CLIENT_ID = '305687655162-e2nqn2noa76q516mka9ri9j1gtgr8dtk.apps.googleusercontent.com';
-const YOUTUBE_REDIRECT_URI = 'http://localhost:3000/auth/youtube/callback';
+const YOUTUBE_REDIRECT_URI = `${window.location.origin}/auth/youtube/callback`;
 const YOUTUBE_SCOPES = 'https://www.googleapis.com/auth/youtube.readonly';
 
 export const musicService = {
