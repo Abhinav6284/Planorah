@@ -1,53 +1,64 @@
-import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import axios from "axios";
+import PlanoraLogo from "../assets/Planora.svg";
 
 export default function VerifyOTP() {
   const location = useLocation();
   const navigate = useNavigate();
+  const inputRefs = useRef([]);
 
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState({ text: "", type: "" });
   const [loading, setLoading] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
-  const [isVisible, setIsVisible] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [countdown, setCountdown] = useState(0);
 
   useEffect(() => {
-    setIsVisible(true);
     if (location.state && location.state.email) {
       setEmail(location.state.email);
     } else {
-      setMessage("⚠️ Email not provided. Please register again.");
+      setMessage({ text: "Email not provided. Redirecting to register...", type: "error" });
       setTimeout(() => navigate("/register"), 2000);
     }
-
-    const handleMouseMove = (e) => {
-      setMousePosition({
-        x: (e.clientX / window.innerWidth) * 100,
-        y: (e.clientY / window.innerHeight) * 100,
-      });
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [location, navigate]);
 
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
+
   const handleOtpChange = (index, value) => {
-    if (value.length > 1) return;
+    // Only allow digits
+    const digit = value.replace(/\D/g, "").slice(-1);
 
     const newOtp = [...otp];
-    newOtp[index] = value;
+    newOtp[index] = digit;
     setOtp(newOtp);
 
     // Auto focus next input
-    if (value && index < 5) {
-      document.getElementById(`otp-${index + 1}`).focus();
+    if (digit && index < 5) {
+      inputRefs.current[index + 1]?.focus();
     }
   };
 
   const handleKeyDown = (index, e) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
-      document.getElementById(`otp-${index - 1}`).focus();
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (pastedData.length === 6) {
+      const newOtp = pastedData.split("");
+      setOtp(newOtp);
+      inputRefs.current[5]?.focus();
     }
   };
 
@@ -56,12 +67,12 @@ export default function VerifyOTP() {
     const otpString = otp.join("");
 
     if (otpString.length !== 6) {
-      setMessage("⚠️ Please enter all 6 digits.");
+      setMessage({ text: "Please enter all 6 digits", type: "error" });
       return;
     }
 
     setLoading(true);
-    setMessage("");
+    setMessage({ text: "", type: "" });
 
     try {
       const response = await axios.post("http://142.93.214.77/api/users/verify-otp/", {
@@ -70,133 +81,153 @@ export default function VerifyOTP() {
       });
 
       if (response.status === 201) {
-        setMessage("✅ OTP verified successfully! Redirecting...");
+        setMessage({ text: "Email verified successfully! Redirecting to login...", type: "success" });
         setTimeout(() => navigate("/login"), 2000);
       }
     } catch (error) {
-      const errorMsg = error.response?.data?.message || "❌ Invalid OTP or expired.";
-      setMessage(errorMsg);
+      const errorMsg = error.response?.data?.message || "Invalid OTP. Please try again.";
+      setMessage({ text: errorMsg, type: "error" });
+      // Clear OTP on error
+      setOtp(["", "", "", "", "", ""]);
+      inputRefs.current[0]?.focus();
     } finally {
       setLoading(false);
     }
   };
 
   const handleResend = async () => {
+    if (countdown > 0) return;
+
+    setResending(true);
+    setMessage({ text: "", type: "" });
+
     try {
       await axios.post("http://142.93.214.77/api/users/resend-otp/", { email });
-      setMessage("✅ A new OTP has been sent to your email.");
+      setMessage({ text: "A new OTP has been sent to your email", type: "success" });
+      setCountdown(60); // 60 second cooldown
+      setOtp(["", "", "", "", "", ""]);
+      inputRefs.current[0]?.focus();
     } catch (err) {
-      setMessage("❌ Error resending OTP.");
+      setMessage({ text: "Failed to resend OTP. Please try again.", type: "error" });
+    } finally {
+      setResending(false);
     }
   };
 
   return (
-    <div className="relative min-h-screen bg-white overflow-hidden flex items-center justify-center">
-      {/* Animated gradient */}
-      <div
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
-        style={{
-          background: `radial-gradient(circle 600px at ${mousePosition.x}% ${mousePosition.y}%, black, transparent)`,
-        }}
-      />
-
-      {/* Floating shapes */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(10)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute border border-black/5"
-            style={{
-              width: `${60 + i * 25}px`,
-              height: `${60 + i * 25}px`,
-              left: `${(i * 15) % 100}%`,
-              top: `${(i * 20) % 100}%`,
-              animation: `float-random ${7 + i}s ease-in-out infinite`,
-              animationDelay: `${i * 0.4}s`,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Corner brackets */}
-      <div className="absolute top-8 left-8 w-16 h-16 border-t-2 border-l-2 border-black/20" />
-      <div className="absolute top-8 right-8 w-16 h-16 border-t-2 border-r-2 border-black/20" />
-      <div className="absolute bottom-8 left-8 w-16 h-16 border-b-2 border-l-2 border-black/20" />
-      <div className="absolute bottom-8 right-8 w-16 h-16 border-b-2 border-r-2 border-black/20" />
-
-      {/* Main content */}
-      <div
-        className={`relative z-10 bg-white border-4 border-black p-12 w-full max-w-md transition-all duration-1000 ${isVisible ? "opacity-100 scale-100" : "opacity-0 scale-90"
-          }`}
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 font-sans">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white w-full max-w-md p-8 md:p-10 rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100"
       >
-        <h2 className="text-5xl font-black text-center mb-2 tracking-tighter">
-          VERIFY OTP
-        </h2>
-        <div className="h-1 w-20 bg-black mx-auto mb-4" />
-
-        {email && (
-          <p className="text-center text-xs font-mono mb-8 text-black/60">
-            CODE SENT TO: <span className="font-black text-black">{email}</span>
+        {/* Logo and Header */}
+        <div className="text-center mb-8">
+          <Link to="/" className="inline-flex items-center gap-2 mb-6">
+            <img src={PlanoraLogo} alt="Planorah" className="h-8 w-auto" />
+            <span className="text-xl font-serif font-bold text-gray-900">Planorah.</span>
+          </Link>
+          <h2 className="text-2xl font-serif font-medium text-gray-900 mb-2">Verify Your Email</h2>
+          <p className="text-gray-500 text-sm">
+            We've sent a 6-digit code to
           </p>
-        )}
+          {email && (
+            <p className="text-gray-900 font-medium mt-1">{email}</p>
+          )}
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* OTP Input Boxes */}
-          <div className="flex justify-center gap-3">
+          <div className="flex justify-center gap-2 sm:gap-3">
             {otp.map((digit, index) => (
               <input
                 key={index}
-                id={`otp-${index}`}
+                ref={(el) => (inputRefs.current[index] = el)}
                 type="text"
                 inputMode="numeric"
                 maxLength={1}
                 value={digit}
-                onChange={(e) => handleOtpChange(index, e.target.value.replace(/\D/g, ""))}
+                onChange={(e) => handleOtpChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
-                className="w-14 h-14 border-4 border-black text-center text-2xl font-black focus:bg-black focus:text-white outline-none transition-all duration-300"
+                onPaste={index === 0 ? handlePaste : undefined}
+                className="w-12 h-14 sm:w-14 sm:h-16 border-2 border-gray-200 rounded-xl text-center text-xl sm:text-2xl font-bold text-gray-900 focus:border-black focus:ring-2 focus:ring-black/5 outline-none transition-all bg-gray-50 focus:bg-white"
+                autoFocus={index === 0}
               />
             ))}
           </div>
 
+          {/* Message */}
+          {message.text && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`p-4 rounded-xl text-center text-sm ${message.type === "success"
+                  ? "bg-green-50 text-green-700 border border-green-200"
+                  : "bg-red-50 text-red-700 border border-red-200"
+                }`}
+            >
+              {message.type === "success" ? "✓ " : "✕ "}
+              {message.text}
+            </motion.div>
+          )}
+
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={loading}
-            className={`w-full py-4 bg-black text-white font-black text-lg tracking-widest uppercase transition-all duration-300 ${loading ? "opacity-50 cursor-not-allowed" : "hover:bg-white hover:text-black hover:border-4 hover:border-black"
+            disabled={loading || otp.join("").length !== 6}
+            className={`w-full py-4 rounded-xl font-semibold text-base transition-all duration-300 ${loading || otp.join("").length !== 6
+                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                : "bg-black text-white hover:bg-gray-800 active:scale-[0.98]"
               }`}
           >
-            {loading ? "VERIFYING..." : "VERIFY OTP"}
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Verifying...
+              </span>
+            ) : (
+              "Verify Email"
+            )}
           </button>
 
-          {/* Resend Button */}
-          <button
-            type="button"
-            onClick={handleResend}
-            disabled={loading}
-            className="w-full py-3 border-2 border-black bg-white text-black font-black text-sm tracking-widest uppercase hover:bg-black hover:text-white transition-all duration-300"
-          >
-            RESEND OTP
-          </button>
+          {/* Resend Section */}
+          <div className="text-center">
+            <p className="text-gray-500 text-sm mb-2">
+              Didn't receive the code?
+            </p>
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={resending || countdown > 0}
+              className={`text-sm font-medium transition-colors ${countdown > 0
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-black hover:text-gray-600"
+                }`}
+            >
+              {resending ? (
+                "Sending..."
+              ) : countdown > 0 ? (
+                `Resend in ${countdown}s`
+              ) : (
+                "Resend OTP"
+              )}
+            </button>
+          </div>
         </form>
 
-        {/* Message */}
-        {message && (
-          <div
-            className={`mt-6 p-3 border-2 text-center font-mono text-sm ${message.includes("✅")
-              ? "border-black bg-black text-white"
-              : "border-black bg-white text-black"
-              }`}
-          >
-            {message}
-          </div>
-        )}
-
-        {/* Decorative corners */}
-        <div className="absolute -top-2 -left-2 w-4 h-4 bg-white border-2 border-black" />
-        <div className="absolute -top-2 -right-2 w-4 h-4 bg-white border-2 border-black" />
-        <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-white border-2 border-black" />
-        <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-white border-2 border-black" />
-      </div>
+        {/* Back to Register Link */}
+        <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+          <p className="text-sm text-gray-500">
+            Wrong email?{" "}
+            <Link to="/register" className="font-medium text-black hover:text-gray-600 transition-colors">
+              Go back to register
+            </Link>
+          </p>
+        </div>
+      </motion.div>
     </div>
   );
 }
