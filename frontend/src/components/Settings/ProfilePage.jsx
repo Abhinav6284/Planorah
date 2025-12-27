@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from "../../api/axios";
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
@@ -53,7 +54,7 @@ export default function ProfilePage() {
             setUser(userData);
 
             if (profile.avatar) {
-                setPreview(profile.avatar.startsWith('http') ? profile.avatar : `http://142.93.214.77${profile.avatar}`);
+                setPreview(profile.avatar.startsWith('http') ? profile.avatar : `${API_BASE_URL}${profile.avatar}`);
             }
 
             setStats(statisticsData);

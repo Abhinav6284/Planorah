@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import axios from "axios";
+import { API_BASE_URL } from "../../api/axios";
 import CircularGauge from "../common/CircularGauge";
 
 export default function ATSScanner() {
@@ -23,7 +23,7 @@ export default function ATSScanner() {
     const fetchResumes = async () => {
         try {
             const token = localStorage.getItem("access_token");
-            const res = await axios.get("http://142.93.214.77/api/resume/", {
+            const res = await axios.get(`${API_BASE_URL}/api/resume/`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMyResumes(res.data);
@@ -59,7 +59,7 @@ export default function ATSScanner() {
 
         try {
             const token = localStorage.getItem("access_token");
-            const response = await axios.post("http://142.93.214.77/api/ats/analyze/", formData, {
+            const response = await axios.post(`${API_BASE_URL}/api/ats/analyze/`, formData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setResult(response.data);

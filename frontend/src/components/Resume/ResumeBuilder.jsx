@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import axios from "axios";
+import { API_BASE_URL } from "../../api/axios";
 import { getTemplateById } from "./templates";
 import TemplateModal from "./TemplateModal";
 
@@ -94,7 +94,7 @@ export default function ResumeBuilder() {
     const fetchResume = async () => {
         try {
             const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
-            const response = await axios.get(`http://142.93.214.77/api/resume/${id}/`, {
+            const response = await axios.get(`${API_BASE_URL}/api/resume/${id}/`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const resume = response.data;
@@ -177,11 +177,11 @@ export default function ResumeBuilder() {
             };
 
             if (isEditing) {
-                await axios.put(`http://142.93.214.77/api/resume/${id}/update/`, payload, {
+                await axios.put(`${API_BASE_URL}/api/resume/${id}/update/`, payload, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
             } else {
-                const response = await axios.post("http://142.93.214.77/api/resume/generate/", payload, {
+                const response = await axios.post(`${API_BASE_URL}/api/resume/generate/`, payload, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 navigate(`/resume/${response.data.id}`);

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from "../api/axios";
 
 export default function GitHubCallback() {
     const [searchParams] = useSearchParams();
@@ -19,7 +20,7 @@ export default function GitHubCallback() {
 
         const handleGitHubLogin = async () => {
             try {
-                const res = await axios.post('http://142.93.214.77/api/users/github/login/', {
+                const res = await axios.post(`${API_BASE_URL}/api/users/github/login/`, {
                     code: code
                 });
 

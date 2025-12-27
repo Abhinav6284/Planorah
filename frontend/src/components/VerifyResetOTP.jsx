@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { API_BASE_URL } from "../api/axios";
 import { useLocation, useNavigate } from "react-router-dom";
 
 export default function VerifyResetOTP() {
@@ -62,7 +62,7 @@ export default function VerifyResetOTP() {
 
         try {
             const res = await axios.post(
-                "http://142.93.214.77/api/users/verify-reset-otp/",
+                `${API_BASE_URL}/api/users/verify-reset-otp/`,
                 { email, otp: otpString }
             );
             setMessage("✅ " + res.data.message);
@@ -76,7 +76,7 @@ export default function VerifyResetOTP() {
 
     const handleResend = async () => {
         try {
-            await axios.post("http://142.93.214.77/api/users/request-password-reset/", { email });
+            await axios.post(`${API_BASE_URL}/api/users/request-password-reset/`, { email });
             setMessage("✅ A new OTP has been sent to your email.");
         } catch (err) {
             setMessage("❌ Error resending OTP.");

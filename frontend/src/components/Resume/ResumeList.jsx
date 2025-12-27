@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
+import { API_BASE_URL } from "../../api/axios";
 
 // Semi-circular Score Gauge Component
 const ScoreGauge = ({ score, size = 120 }) => {
@@ -80,8 +81,8 @@ const ResumeCard = ({ resume, onEdit, onDelete, onPreview, onAnalyze }) => {
                         </div>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded-full ${resume.ats_score >= 80 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                            resume.ats_score >= 60 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                                'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                        resume.ats_score >= 60 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                            'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
                         }`}>
                         {resume.ats_score ? 'Analyzed' : 'Not Analyzed'}
                     </span>
@@ -160,7 +161,7 @@ const JobMatchModal = ({ isOpen, onClose, resume, onMatch }) => {
 
         try {
             const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-            const response = await axios.post('http://142.93.214.77/api/resume/analyze-ats/', {
+            const response = await axios.post(`${API_BASE_URL}/api/resume/analyze-ats/`, {
                 resume_id: resume.id,
                 job_description: jobDescription
             }, {
@@ -232,7 +233,7 @@ const JobMatchModal = ({ isOpen, onClose, resume, onMatch }) => {
                             {/* Match Score */}
                             <div className="text-center p-6 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl">
                                 <div className={`text-5xl font-bold ${result.overall_score >= 80 ? 'text-green-500' :
-                                        result.overall_score >= 60 ? 'text-yellow-500' : 'text-red-500'
+                                    result.overall_score >= 60 ? 'text-yellow-500' : 'text-red-500'
                                     }`}>
                                     {result.overall_score}%
                                 </div>
@@ -315,7 +316,7 @@ const ImportAnalyzeModal = ({ isOpen, onClose, onSuccess }) => {
 
         try {
             // First analyze
-            const atsResponse = await axios.post('http://142.93.214.77/api/resume/analyze-ats/', formData, {
+            const atsResponse = await axios.post(`${API_BASE_URL}/api/resume/analyze-ats/`, formData, {
                 headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
             });
             setResult(atsResponse.data);
@@ -334,7 +335,7 @@ const ImportAnalyzeModal = ({ isOpen, onClose, onSuccess }) => {
         formData.append('file', file);
 
         try {
-            const response = await axios.post('http://142.93.214.77/api/resume/import/', formData, {
+            const response = await axios.post(`${API_BASE_URL}/api/resume/import/`, formData, {
                 headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
             });
             onSuccess(response.data);
@@ -438,7 +439,7 @@ const ImportAnalyzeModal = ({ isOpen, onClose, onSuccess }) => {
                             {/* Score */}
                             <div className="text-center p-6 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
                                 <div className={`text-5xl font-bold ${result.overall_score >= 80 ? 'text-green-500' :
-                                        result.overall_score >= 60 ? 'text-yellow-500' : 'text-red-500'
+                                    result.overall_score >= 60 ? 'text-yellow-500' : 'text-red-500'
                                     }`}>
                                     {result.overall_score}
                                 </div>
@@ -492,7 +493,7 @@ export default function ResumeList() {
     const fetchResumes = async () => {
         try {
             const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-            const response = await axios.get('http://142.93.214.77/api/resume/list/', {
+            const response = await axios.get(`${API_BASE_URL}/api/resume/list/`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // Add mock ATS scores for demo
@@ -515,7 +516,7 @@ export default function ResumeList() {
         if (!window.confirm('Delete this resume?')) return;
         try {
             const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-            await axios.delete(`http://142.93.214.77/api/resume/${id}/delete/`, {
+            await axios.delete(`${API_BASE_URL}/api/resume/${id}/delete/`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setResumes(resumes.filter(r => r.id !== id));

@@ -56,7 +56,7 @@ export default function ImportResumeModal({ isOpen, onClose, onSuccess }) {
         formData.append('file', file);
 
         try {
-            const response = await axios.post('http://142.93.214.77/api/resume/import/', formData, {
+            const response = await axios.post(`${API_BASE_URL}/api/resume/import/`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'
@@ -87,7 +87,7 @@ export default function ImportResumeModal({ isOpen, onClose, onSuccess }) {
         formData.append('file', file);
 
         try {
-            const response = await axios.post('http://142.93.214.77/api/resume/analyze-ats/', formData, {
+            const response = await axios.post(`${API_BASE_URL}/api/resume/analyze-ats/`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'
@@ -174,10 +174,10 @@ export default function ImportResumeModal({ isOpen, onClose, onSuccess }) {
                                     onDrop={handleDrop}
                                     onClick={() => fileInputRef.current?.click()}
                                     className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${dragActive
+                                        ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                                        : file
                                             ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                                            : file
-                                                ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                                                : 'border-gray-300 dark:border-gray-600 hover:border-green-400'
+                                            : 'border-gray-300 dark:border-gray-600 hover:border-green-400'
                                         }`}
                                 >
                                     <input

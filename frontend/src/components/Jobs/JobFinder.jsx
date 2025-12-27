@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import axios from "axios";
+import { API_BASE_URL } from "../../api/axios";
 
 export default function JobFinder() {
     const [role, setRole] = useState("");
@@ -10,7 +10,7 @@ export default function JobFinder() {
         const fetchProfile = async () => {
             try {
                 const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
-                const response = await axios.get("http://142.93.214.77/api/users/profile/", {
+                const response = await axios.get(`${API_BASE_URL}/api/users/profile/`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 if (response.data.profile) {
@@ -95,8 +95,8 @@ export default function JobFinder() {
                             transition={{ delay: index * 0.03 }}
                             onClick={(e) => !role && e.preventDefault()}
                             className={`flex items-center justify-between p-5 rounded-2xl border transition-all duration-200 group ${role
-                                    ? 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md cursor-pointer bg-white dark:bg-gray-800'
-                                    : 'border-gray-100 dark:border-gray-800 opacity-50 cursor-not-allowed bg-gray-50 dark:bg-gray-800/50'
+                                ? 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md cursor-pointer bg-white dark:bg-gray-800'
+                                : 'border-gray-100 dark:border-gray-800 opacity-50 cursor-not-allowed bg-gray-50 dark:bg-gray-800/50'
                                 }`}
                         >
                             <div className="flex items-center gap-4">
@@ -116,8 +116,8 @@ export default function JobFinder() {
 
                             {/* Arrow */}
                             <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${role
-                                    ? 'bg-gray-100 dark:bg-gray-700 group-hover:bg-green-500 group-hover:text-white text-gray-400'
-                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-300'
+                                ? 'bg-gray-100 dark:bg-gray-700 group-hover:bg-green-500 group-hover:text-white text-gray-400'
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-300'
                                 }`}>
                                 →
                             </div>

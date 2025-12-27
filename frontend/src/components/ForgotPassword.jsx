@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { API_BASE_URL } from "../api/axios";
 import { useNavigate } from "react-router-dom";
 
 export default function ForgotPassword() {
@@ -35,7 +35,7 @@ export default function ForgotPassword() {
 
         try {
             const res = await axios.post(
-                "http://142.93.214.77/api/users/request-password-reset/",
+                `${API_BASE_URL}/api/users/request-password-reset/`,
                 { email }
             );
 
@@ -127,8 +127,8 @@ export default function ForgotPassword() {
                         type="submit"
                         disabled={loading}
                         className={`group relative w-full py-4 bg-black text-white font-black text-lg tracking-widest uppercase overflow-hidden transition-all duration-300 ${loading
-                                ? "opacity-50 cursor-not-allowed"
-                                : "hover:bg-white hover:text-black hover:border-4 hover:border-black"
+                            ? "opacity-50 cursor-not-allowed"
+                            : "hover:bg-white hover:text-black hover:border-4 hover:border-black"
                             }`}
                     >
                         <span className="relative z-10">
@@ -141,10 +141,10 @@ export default function ForgotPassword() {
                 {message && (
                     <div
                         className={`mt-6 p-3 border-2 text-center font-mono text-sm ${message.includes("✅")
-                                ? "border-black bg-black text-white"
-                                : message.includes("⚠️")
-                                    ? "border-black bg-yellow-100 text-black"
-                                    : "border-black bg-white text-black"
+                            ? "border-black bg-black text-white"
+                            : message.includes("⚠️")
+                                ? "border-black bg-yellow-100 text-black"
+                                : "border-black bg-white text-black"
                             }`}
                     >
                         {message}
