@@ -3,8 +3,13 @@ Custom email service using Brevo API (formerly Sendinblue)
 HTTP-based email sending that bypasses SMTP restrictions
 """
 import os
+from pathlib import Path
 import requests
 
+# Load environment variables from .env file
+from dotenv import load_dotenv
+env_path = Path(__file__).resolve().parent.parent / '.env'
+load_dotenv(env_path)
 
 BREVO_API_URL = "https://api.brevo.com/v3/smtp/email"
 
