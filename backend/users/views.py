@@ -524,18 +524,24 @@ def google_oauth_login(request):
         )
         
         if userinfo_response.status_code != 200:
-            return Response({"error": "Invalid Google token"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                "error": "Invalid Google token",
+                "details": userinfo_response.text
+            }, status=status.HTTP_400_BAD_REQUEST)
             
         idinfo = userinfo_response.json()
         
         # Extract user info
         email = idinfo.get('email')
-        email_verified = idinfo.get('email_verified', False)
+        # Google API can return email_verified as string "true" or boolean True
+        email_verified = idinfo.get('email_verified')
+        if isinstance(email_verified, str):
+            email_verified = email_verified.lower() == 'true'
         name = idinfo.get('name', '')
         picture = idinfo.get('picture', '')
         
-        if not email or not email_verified:
-            return Response({"error": "Email not verified by Google"}, status=status.HTTP_400_BAD_REQUEST)
+        if not email:
+            return Response({"error": "No email received from Google"}, status=status.HTTP_400_BAD_REQUEST)
         
         # Normalize email
         email = email.lower().strip()
