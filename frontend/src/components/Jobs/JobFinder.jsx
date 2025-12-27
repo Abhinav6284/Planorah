@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import axios from "axios";
 import { API_BASE_URL } from "../../api/axios";
 
 export default function JobFinder() {
