@@ -227,7 +227,7 @@ export default function Register() {
             {/* GitHub Button */}
             <button
               onClick={() => {
-                const clientId = 'Ov23liVToka1aLne9uVb';
+                const clientId = 'Ov23ctPC9ZlwUvXMuyWM';
                 const redirectUri = encodeURIComponent(window.location.origin + '/auth/github/callback');
                 const scope = encodeURIComponent('read:user user:email');
                 window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
