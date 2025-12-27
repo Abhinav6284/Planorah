@@ -20,6 +20,8 @@ urlpatterns = [
     path('github/login/', views.github_oauth_login, name='github-oauth-login'),
     # Statistics
     path('statistics/', views.get_user_statistics, name='user-statistics'),
+    # Delete Account
+    path('delete-account/', views.delete_account, name='delete-account'),
 ]
 
 

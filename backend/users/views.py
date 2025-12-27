@@ -450,6 +450,42 @@ def logout_view(request):
         return Response({"error": "Failed to logout", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+# ---------------- DELETE ACCOUNT ----------------
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def delete_account(request):
+    """
+    Permanently delete the user's account and all associated data.
+    Requires password confirmation for security.
+    """
+    password = request.data.get('password')
+    
+    if not password:
+        return Response({"error": "Password is required to confirm account deletion"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    user = request.user
+    
+    # Verify password (skip for OAuth users who don't have passwords)
+    if user.has_usable_password():
+        if not user.check_password(password):
+            return Response({"error": "Incorrect password"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        # Delete user profile if exists
+        if hasattr(user, 'profile'):
+            user.profile.delete()
+        
+        # Delete all OTP records for this email
+        OTPVerification.objects.filter(email=user.email).delete()
+        
+        # Delete the user (this will cascade delete related objects)
+        user.delete()
+        
+        return Response({"message": "Account deleted successfully"}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": f"Failed to delete account: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 # ---------------- GOOGLE OAUTH LOGIN ----------------
 @api_view(['POST'])
 @permission_classes([AllowAny])

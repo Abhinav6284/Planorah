@@ -23,6 +23,10 @@ export default function ProfilePage() {
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deletePassword, setDeletePassword] = useState('');
+    const [deleteError, setDeleteError] = useState('');
+    const [deleting, setDeleting] = useState(false);
 
     useEffect(() => {
         fetchData();
@@ -106,6 +110,28 @@ export default function ProfilePage() {
             setMessage({ type: 'error', text: 'Failed to update profile.' });
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleDeleteAccount = async () => {
+        if (!deletePassword.trim()) {
+            setDeleteError('Please enter your password to confirm deletion');
+            return;
+        }
+
+        setDeleting(true);
+        setDeleteError('');
+
+        try {
+            await userService.deleteAccount(deletePassword);
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            navigate('/login', { state: { message: 'Account deleted successfully' } });
+        } catch (error) {
+            console.error("Failed to delete account", error);
+            setDeleteError(error.response?.data?.error || 'Failed to delete account. Please try again.');
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -260,6 +286,83 @@ export default function ProfilePage() {
                                     className="px-8 py-3 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-semibold hover:opacity-90 disabled:opacity-50 transition-all"
                                 >
                                     {saving ? 'Saving...' : 'Save Changes'}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Delete Account Confirmation Modal */}
+            <AnimatePresence>
+                {showDeleteModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                        onClick={() => { setShowDeleteModal(false); setDeletePassword(''); setDeleteError(''); }}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-white dark:bg-[#1C1C1E] rounded-2xl border border-gray-200 dark:border-gray-800 w-full max-w-md shadow-2xl overflow-hidden"
+                        >
+                            {/* Modal Header */}
+                            <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+                                <h2 className="text-xl font-bold text-red-600 dark:text-red-400 flex items-center gap-2">
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                    Delete Account
+                                </h2>
+                            </div>
+
+                            {/* Modal Body */}
+                            <div className="p-6">
+                                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 rounded-xl p-4 mb-6">
+                                    <p className="text-red-700 dark:text-red-400 text-sm font-medium mb-2">⚠️ This action is permanent!</p>
+                                    <p className="text-red-600/80 dark:text-red-400/80 text-sm">
+                                        All your data including roadmaps, tasks, progress, and settings will be permanently deleted and cannot be recovered.
+                                    </p>
+                                </div>
+
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        Enter your password to confirm
+                                    </label>
+                                    <input
+                                        type="password"
+                                        value={deletePassword}
+                                        onChange={(e) => setDeletePassword(e.target.value)}
+                                        placeholder="••••••••"
+                                        className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 focus:border-red-400 dark:focus:border-red-600 outline-none transition-all text-gray-900 dark:text-white"
+                                    />
+                                </div>
+
+                                {deleteError && (
+                                    <div className="text-red-600 dark:text-red-400 text-sm mb-4 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
+                                        {deleteError}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Modal Footer */}
+                            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800 flex justify-end gap-3">
+                                <button
+                                    onClick={() => { setShowDeleteModal(false); setDeletePassword(''); setDeleteError(''); }}
+                                    className="px-5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleDeleteAccount}
+                                    disabled={deleting}
+                                    className="px-5 py-2.5 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 disabled:opacity-50 transition-all"
+                                >
+                                    {deleting ? 'Deleting...' : 'Delete My Account'}
                                 </button>
                             </div>
                         </motion.div>
@@ -473,22 +576,33 @@ export default function ProfilePage() {
                             </div>
                         </motion.div>
 
-                        {/* Logout */}
+                        {/* Logout & Delete Account */}
                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6">
                             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">🚪 Account</h2>
-                            <button
-                                onClick={() => {
-                                    localStorage.removeItem('access_token');
-                                    localStorage.removeItem('refresh_token');
-                                    navigate('/login');
-                                }}
-                                className="w-full px-4 py-3 rounded-xl border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 font-medium hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2"
-                            >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                </svg>
-                                Logout
-                            </button>
+                            <div className="space-y-3">
+                                <button
+                                    onClick={() => {
+                                        localStorage.removeItem('access_token');
+                                        localStorage.removeItem('refresh_token');
+                                        navigate('/login');
+                                    }}
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
+                                    Logout
+                                </button>
+                                <button
+                                    onClick={() => setShowDeleteModal(true)}
+                                    className="w-full px-4 py-3 rounded-xl border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 font-medium hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    Delete Account
+                                </button>
+                            </div>
                         </motion.div>
                     </div>
                 </div>

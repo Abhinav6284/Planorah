@@ -19,4 +19,9 @@ export const userService = {
         const response = await api.get('/api/users/statistics/');
         return response.data;
     },
+
+    deleteAccount: async (password) => {
+        const response = await api.post('/api/users/delete-account/', { password });
+        return response.data;
+    },
 };
