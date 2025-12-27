@@ -505,11 +505,10 @@ def delete_account(request):
 @permission_classes([AllowAny])
 def google_oauth_login(request):
     """
-    Handle Google OAuth login. Accepts a Google ID token from the frontend,
-    verifies it, and creates/logs in the user.
+    Handle Google OAuth login. Accepts a Google Access Token from the frontend,
+    verifies it via Google's userinfo endpoint, and creates/logs in the user.
     """
-    from google.oauth2 import id_token
-    from google.auth.transport import requests as google_requests
+    import requests as http_requests
     
     token = request.data.get('token')
     
@@ -518,9 +517,9 @@ def google_oauth_login(request):
     
     try:
         # Verify the Google Access Token via UserInfo Endpoint
-        import requests as http_requests
         userinfo_response = http_requests.get(
-            f'https://www.googleapis.com/oauth2/v3/userinfo?access_token={token}'
+            f'https://www.googleapis.com/oauth2/v3/userinfo',
+            headers={'Authorization': f'Bearer {token}'}
         )
         
         if userinfo_response.status_code != 200:
