@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://142.93.214.77';
+// Auto-detect API URL based on environment
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://127.0.0.1:8000'  // Local development
+    : 'http://142.93.214.77'; // Production
 
 // Create axios instance
 const axiosInstance = axios.create({

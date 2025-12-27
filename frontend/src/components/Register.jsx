@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { GoogleLogin } from '@react-oauth/google';
+import { API_BASE_URL } from "../api/axios";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("http://142.93.214.77/api/users/register/", formData);
+      const res = await axios.post(`${API_BASE_URL}/api/users/register/`, formData);
       setMessage("success:" + (res.data.message || "OTP sent successfully!"));
       if (res.data.message.includes("OTP")) {
         setTimeout(() => navigate("/verify-otp", { state: { ...formData } }), 1500);
@@ -40,7 +41,7 @@ export default function Register() {
     setLoading(true);
     setMessage("");
     try {
-      const res = await axios.post("http://142.93.214.77/api/users/google/login/", {
+      const res = await axios.post(`${API_BASE_URL}/api/users/google/login/`, {
         token: credentialResponse.credential
       });
       localStorage.setItem("access_token", res.data.access);
@@ -237,8 +238,8 @@ export default function Register() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className={`p-3 rounded-xl text-center text-sm ${message.startsWith("success:")
-                    ? "bg-green-50 text-green-700 border border-green-200"
-                    : "bg-red-50 text-red-700 border border-red-200"
+                  ? "bg-green-50 text-green-700 border border-green-200"
+                  : "bg-red-50 text-red-700 border border-red-200"
                   }`}
               >
                 {message.replace("success:", "")}

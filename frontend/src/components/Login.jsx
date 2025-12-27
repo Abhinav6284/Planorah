@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { GoogleLogin } from '@react-oauth/google';
+import { API_BASE_URL } from "../api/axios";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ export default function Login() {
     setMessage("");
     try {
       const payload = { identifier: identifier.trim(), password };
-      const res = await axios.post("http://142.93.214.77/api/users/login/", payload);
+      const res = await axios.post(`${API_BASE_URL}/api/users/login/`, payload);
       localStorage.setItem("access_token", res.data.access);
       localStorage.setItem("refresh_token", res.data.refresh);
       setMessage("success:Welcome back!");
@@ -43,7 +44,7 @@ export default function Login() {
     setLoading(true);
     setMessage("");
     try {
-      const res = await axios.post("http://142.93.214.77/api/users/google/login/", {
+      const res = await axios.post(`${API_BASE_URL}/api/users/google/login/`, {
         token: credentialResponse.credential
       });
       localStorage.setItem("access_token", res.data.access);
@@ -216,8 +217,8 @@ export default function Login() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className={`p-3 rounded-xl text-center text-sm ${message.startsWith("success:")
-                    ? "bg-green-50 text-green-700 border border-green-200"
-                    : "bg-red-50 text-red-700 border border-red-200"
+                  ? "bg-green-50 text-green-700 border border-green-200"
+                  : "bg-red-50 text-red-700 border border-red-200"
                   }`}
               >
                 {message.replace("success:", "")}

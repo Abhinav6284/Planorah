@@ -3,6 +3,7 @@ import { useLocation, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
 import PlanoraLogo from "../assets/Planora.svg";
+import { API_BASE_URL } from "../api/axios";
 
 export default function VerifyOTP() {
   const location = useLocation();
@@ -75,7 +76,7 @@ export default function VerifyOTP() {
     setMessage({ text: "", type: "" });
 
     try {
-      const response = await axios.post("http://142.93.214.77/api/users/verify-otp/", {
+      const response = await axios.post(`${API_BASE_URL}/api/users/verify-otp/`, {
         email: email.trim(),
         otp: otpString,
       });
@@ -102,7 +103,7 @@ export default function VerifyOTP() {
     setMessage({ text: "", type: "" });
 
     try {
-      await axios.post("http://142.93.214.77/api/users/resend-otp/", { email });
+      await axios.post(`${API_BASE_URL}/api/users/resend-otp/`, { email });
       setMessage({ text: "A new OTP has been sent to your email", type: "success" });
       setCountdown(60); // 60 second cooldown
       setOtp(["", "", "", "", "", ""]);
@@ -162,8 +163,8 @@ export default function VerifyOTP() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               className={`p-4 rounded-xl text-center text-sm ${message.type === "success"
-                  ? "bg-green-50 text-green-700 border border-green-200"
-                  : "bg-red-50 text-red-700 border border-red-200"
+                ? "bg-green-50 text-green-700 border border-green-200"
+                : "bg-red-50 text-red-700 border border-red-200"
                 }`}
             >
               {message.type === "success" ? "✓ " : "✕ "}
@@ -176,8 +177,8 @@ export default function VerifyOTP() {
             type="submit"
             disabled={loading || otp.join("").length !== 6}
             className={`w-full py-4 rounded-xl font-semibold text-base transition-all duration-300 ${loading || otp.join("").length !== 6
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                : "bg-black text-white hover:bg-gray-800 active:scale-[0.98]"
+              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+              : "bg-black text-white hover:bg-gray-800 active:scale-[0.98]"
               }`}
           >
             {loading ? (
@@ -203,8 +204,8 @@ export default function VerifyOTP() {
               onClick={handleResend}
               disabled={resending || countdown > 0}
               className={`text-sm font-medium transition-colors ${countdown > 0
-                  ? "text-gray-400 cursor-not-allowed"
-                  : "text-black hover:text-gray-600"
+                ? "text-gray-400 cursor-not-allowed"
+                : "text-black hover:text-gray-600"
                 }`}
             >
               {resending ? (
