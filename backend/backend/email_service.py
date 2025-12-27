@@ -172,7 +172,7 @@ def send_email_via_brevo(to_email, subject, html_content, text_content=None):
     payload = {
         "sender": {
             "name": "Planorah",
-            "email": "noreply@planorah.com"  # You can change this to your verified domain email
+            "email": "abhinav@planorah.me"
         },
         "to": [{"email": to_email}],
         "subject": subject,
