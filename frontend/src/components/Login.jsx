@@ -27,7 +27,7 @@ export default function Login() {
 
     try {
       const payload = { identifier: identifier.trim(), password };
-      const res = await axios.post("http://127.0.0.1:8000/api/users/login/", payload);
+      const res = await axios.post("http://142.93.214.77/api/users/login/", payload);
 
       if (rememberMe) {
         localStorage.setItem("access_token", res.data.access);
@@ -57,7 +57,7 @@ export default function Login() {
     setLoading(true);
     setMessage("");
     try {
-      const res = await axios.post("http://127.0.0.1:8000/api/users/google/login/", {
+      const res = await axios.post("http://142.93.214.77/api/users/google/login/", {
         token: credentialResponse.credential
       });
 

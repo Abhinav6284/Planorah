@@ -74,7 +74,7 @@ export default function StepForm() {
                 };
 
                 const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
-                await axios.post("http://127.0.0.1:8000/api/users/update-profile/", payload, {
+                await axios.post("http://142.93.214.77/api/users/update-profile/", payload, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 

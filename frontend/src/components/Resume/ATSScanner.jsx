@@ -151,7 +151,7 @@ export default function ATSScanner() {
         }
 
         try {
-            const response = await axios.post('http://127.0.0.1:8000/api/resume/analyze-ats/', formData, {
+            const response = await axios.post('http://142.93.214.77/api/resume/analyze-ats/', formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'

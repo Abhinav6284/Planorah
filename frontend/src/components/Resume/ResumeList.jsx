@@ -160,7 +160,7 @@ const JobMatchModal = ({ isOpen, onClose, resume, onMatch }) => {
 
         try {
             const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-            const response = await axios.post('http://127.0.0.1:8000/api/resume/analyze-ats/', {
+            const response = await axios.post('http://142.93.214.77/api/resume/analyze-ats/', {
                 resume_id: resume.id,
                 job_description: jobDescription
             }, {
@@ -315,7 +315,7 @@ const ImportAnalyzeModal = ({ isOpen, onClose, onSuccess }) => {
 
         try {
             // First analyze
-            const atsResponse = await axios.post('http://127.0.0.1:8000/api/resume/analyze-ats/', formData, {
+            const atsResponse = await axios.post('http://142.93.214.77/api/resume/analyze-ats/', formData, {
                 headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
             });
             setResult(atsResponse.data);
@@ -334,7 +334,7 @@ const ImportAnalyzeModal = ({ isOpen, onClose, onSuccess }) => {
         formData.append('file', file);
 
         try {
-            const response = await axios.post('http://127.0.0.1:8000/api/resume/import/', formData, {
+            const response = await axios.post('http://142.93.214.77/api/resume/import/', formData, {
                 headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
             });
             onSuccess(response.data);
@@ -492,7 +492,7 @@ export default function ResumeList() {
     const fetchResumes = async () => {
         try {
             const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-            const response = await axios.get('http://127.0.0.1:8000/api/resume/list/', {
+            const response = await axios.get('http://142.93.214.77/api/resume/list/', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // Add mock ATS scores for demo
@@ -515,7 +515,7 @@ export default function ResumeList() {
         if (!window.confirm('Delete this resume?')) return;
         try {
             const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-            await axios.delete(`http://127.0.0.1:8000/api/resume/${id}/delete/`, {
+            await axios.delete(`http://142.93.214.77/api/resume/${id}/delete/`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setResumes(resumes.filter(r => r.id !== id));

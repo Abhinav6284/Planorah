@@ -10,7 +10,7 @@ export default function JobFinder() {
         const fetchProfile = async () => {
             try {
                 const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
-                const response = await axios.get("http://127.0.0.1:8000/api/users/profile/", {
+                const response = await axios.get("http://142.93.214.77/api/users/profile/", {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 if (response.data.profile) {

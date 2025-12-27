@@ -5,7 +5,7 @@ export default function SchedulerSection() {
     const [events, setEvents] = useState([]);
 
     useEffect(() => {
-        axios.get("http://127.0.0.1:8000/api/scheduler/events/")
+        axios.get("http://142.93.214.77/api/scheduler/events/")
             .then((res) => setEvents(res.data))
             .catch((err) => console.error(err));
     }, []);

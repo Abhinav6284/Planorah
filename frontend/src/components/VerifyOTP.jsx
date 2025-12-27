@@ -64,7 +64,7 @@ export default function VerifyOTP() {
     setMessage("");
 
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/users/verify-otp/", {
+      const response = await axios.post("http://142.93.214.77/api/users/verify-otp/", {
         email: email.trim(),
         otp: otpString,
       });
@@ -83,7 +83,7 @@ export default function VerifyOTP() {
 
   const handleResend = async () => {
     try {
-      await axios.post("http://127.0.0.1:8000/api/users/resend-otp/", { email });
+      await axios.post("http://142.93.214.77/api/users/resend-otp/", { email });
       setMessage("✅ A new OTP has been sent to your email.");
     } catch (err) {
       setMessage("❌ Error resending OTP.");

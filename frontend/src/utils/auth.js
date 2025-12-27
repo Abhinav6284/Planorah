@@ -1,7 +1,7 @@
 // simple auth helper: get token, clear tokens, and logout (call backend to blacklist refresh)
 import axios from "axios";
 
-const API_BASE = process.env.REACT_APP_API_BASE || "http://127.0.0.1:8000";
+const API_BASE = process.env.REACT_APP_API_BASE || "http://142.93.214.77";
 
 export function getAccessToken() {
     return localStorage.getItem("access_token") || sessionStorage.getItem("access_token");

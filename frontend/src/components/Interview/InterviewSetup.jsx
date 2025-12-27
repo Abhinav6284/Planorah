@@ -14,7 +14,7 @@ export default function InterviewSetup() {
         setLoading(true);
         try {
             const token = localStorage.getItem("access_token");
-            const res = await axios.post("http://127.0.0.1:8000/api/interview/start/", {
+            const res = await axios.post("http://142.93.214.77/api/interview/start/", {
                 job_role: jobRole,
                 topic: topic
             }, {

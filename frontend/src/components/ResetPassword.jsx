@@ -54,7 +54,7 @@ export default function ResetPassword() {
 
         try {
             const res = await axios.post(
-                "http://127.0.0.1:8000/api/users/reset-password/",
+                "http://142.93.214.77/api/users/reset-password/",
                 { email, new_password: password }
             );
 

@@ -49,7 +49,7 @@ export default function ProfilePage() {
             setUser(userData);
 
             if (profile.avatar) {
-                setPreview(profile.avatar.startsWith('http') ? profile.avatar : `http://127.0.0.1:8000${profile.avatar}`);
+                setPreview(profile.avatar.startsWith('http') ? profile.avatar : `http://142.93.214.77${profile.avatar}`);
             }
 
             setStats(statisticsData);

@@ -16,7 +16,7 @@ export default function InterviewChat() {
         const fetchSession = async () => {
             try {
                 const token = localStorage.getItem("access_token");
-                const res = await axios.get(`http://127.0.0.1:8000/api/interview/${sessionId}/`, {
+                const res = await axios.get(`http://142.93.214.77/api/interview/${sessionId}/`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setSessionData(res.data);
@@ -45,7 +45,7 @@ export default function InterviewChat() {
 
         try {
             const token = localStorage.getItem("access_token");
-            const res = await axios.post(`http://127.0.0.1:8000/api/interview/${sessionId}/message/`, {
+            const res = await axios.post(`http://142.93.214.77/api/interview/${sessionId}/message/`, {
                 content: newMsg.content
             }, {
                 headers: { Authorization: `Bearer ${token}` }

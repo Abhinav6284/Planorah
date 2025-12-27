@@ -26,7 +26,7 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("http://127.0.0.1:8000/api/users/register/", formData);
+      const res = await axios.post("http://142.93.214.77/api/users/register/", formData);
       setMessage(res.data.message || "✅ OTP sent successfully!");
       if (res.data.message.includes("OTP")) {
         setTimeout(() => navigate("/verify-otp", { state: { ...formData } }), 1500);
@@ -43,7 +43,7 @@ export default function Register() {
     setLoading(true);
     setMessage("");
     try {
-      const res = await axios.post("http://127.0.0.1:8000/api/users/google/login/", {
+      const res = await axios.post("http://142.93.214.77/api/users/google/login/", {
         token: credentialResponse.credential
       });
 
