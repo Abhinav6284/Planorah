@@ -70,50 +70,82 @@ export default function Login() {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Visual Panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-sky-400 via-blue-500 to-blue-600">
         {/* Animated Background Elements */}
         <div className="absolute inset-0">
-          {/* Floating Circles */}
+          {/* Soft glowing orbs */}
           <motion.div
-            animate={{ y: [0, -30, 0], x: [0, 20, 0] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-20 left-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"
+            animate={{ y: [0, -25, 0], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-16 left-16 w-72 h-72 bg-white/20 rounded-full blur-3xl"
           />
           <motion.div
-            animate={{ y: [0, 40, 0], x: [0, -30, 0] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute bottom-40 right-20 w-80 h-80 bg-white/10 rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{ y: [0, 20, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/2 left-1/3 w-40 h-40 bg-white/20 rounded-full blur-2xl"
+            animate={{ y: [0, 35, 0], opacity: [0.2, 0.4, 0.2] }}
+            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-32 right-16 w-64 h-64 bg-white/15 rounded-full blur-3xl"
           />
 
-          {/* Grid Pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="h-full w-full" style={{
-              backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-              backgroundSize: '50px 50px'
-            }} />
-          </div>
+          {/* Mountain Peak SVG */}
+          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 800" fill="none" preserveAspectRatio="xMidYMid slice">
+            {/* Mountain outline */}
+            <motion.path
+              d="M 0 600 L 120 350 L 200 450 L 300 200 L 400 400 L 400 800 L 0 800 Z"
+              fill="rgba(255,255,255,0.08)"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.5, ease: "easeOut" }}
+            />
+            {/* Second mountain layer */}
+            <motion.path
+              d="M 50 650 L 180 400 L 280 500 L 380 300 L 400 350 L 400 800 L 0 800 L 0 700 Z"
+              fill="rgba(255,255,255,0.05)"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.5, ease: "easeOut", delay: 0.3 }}
+            />
+            {/* Success flag at peak */}
+            <motion.g
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 1.5, duration: 0.5 }}
+            >
+              <line x1="300" y1="200" x2="300" y2="150" stroke="rgba(255,255,255,0.6)" strokeWidth="3" />
+              <motion.polygon
+                points="300,150 340,165 300,180"
+                fill="rgba(255,255,255,0.4)"
+                animate={{ x: [0, 3, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              />
+            </motion.g>
+          </svg>
 
-          {/* Floating Shapes */}
+          {/* Floating diamond shape */}
           <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute top-32 right-32 w-24 h-24 border-4 border-white/20 rounded-xl"
-          />
-          <motion.div
-            animate={{ rotate: -360 }}
-            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-            className="absolute bottom-32 left-32 w-32 h-32 border-4 border-white/20 rounded-full"
-          />
-          <motion.div
-            animate={{ y: [0, -20, 0], rotate: [0, 10, 0] }}
+            animate={{ rotate: 45, y: [0, -15, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/3 right-1/4 w-16 h-16 bg-white/20 rounded-lg backdrop-blur-sm"
+            className="absolute top-28 right-28 w-16 h-16 border-2 border-white/30 rounded-lg backdrop-blur-sm"
           />
+
+          {/* Floating circle */}
+          <motion.div
+            animate={{ scale: [1, 1.15, 1], opacity: [0.2, 0.4, 0.2] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-1/3 left-1/4 w-24 h-24 border-2 border-white/20 rounded-full"
+          />
+
+          {/* Sparkle dots */}
+          {[...Array(12)].map((_, i) => (
+            <motion.div
+              key={i}
+              animate={{ opacity: [0.2, 0.9, 0.2], scale: [1, 1.4, 1] }}
+              transition={{ duration: 2.5 + i * 0.4, repeat: Infinity, ease: "easeInOut", delay: i * 0.15 }}
+              className="absolute w-1.5 h-1.5 bg-white rounded-full"
+              style={{
+                left: `${12 + (i * 6) % 76}%`,
+                top: `${8 + (i * 5) % 84}%`,
+              }}
+            />
+          ))}
         </div>
 
         {/* Logo & Text */}

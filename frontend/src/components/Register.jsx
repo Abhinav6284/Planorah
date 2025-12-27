@@ -66,60 +66,99 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Side - Visual Panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-600">
+      {/* Left Side - Visual Panel with Road to Success */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-sky-400 via-blue-500 to-blue-600">
         {/* Animated Background Elements */}
         <div className="absolute inset-0">
-          {/* Cloud-like shapes */}
+          {/* Soft glowing orbs */}
           <motion.div
-            animate={{ y: [0, -20, 0], scale: [1, 1.05, 1] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-20 left-10 w-96 h-64 bg-white/20 rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{ y: [0, 30, 0], scale: [1, 0.95, 1] }}
-            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-40 right-0 w-80 h-80 bg-white/30 rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{ y: [0, -40, 0] }}
+            animate={{ y: [0, -20, 0], opacity: [0.3, 0.5, 0.3] }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute bottom-20 left-1/4 w-72 h-72 bg-white/20 rounded-full blur-3xl"
-          />
-
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-blue-600/50 to-transparent" />
-
-          {/* Grid Pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="h-full w-full" style={{
-              backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-              backgroundSize: '60px 60px'
-            }} />
-          </div>
-
-          {/* Floating elements */}
-          <motion.div
-            animate={{ rotate: 360, y: [0, -10, 0] }}
-            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            className="absolute top-1/4 right-1/4 w-20 h-20 border-4 border-white/30 rounded-2xl backdrop-blur-sm"
+            className="absolute top-20 left-10 w-64 h-64 bg-white/20 rounded-full blur-3xl"
           />
           <motion.div
-            animate={{ rotate: -360, scale: [1, 1.1, 1] }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute bottom-1/3 left-1/4 w-16 h-16 border-4 border-white/20 rounded-full"
+            animate={{ y: [0, 30, 0], opacity: [0.2, 0.4, 0.2] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-40 right-10 w-80 h-80 bg-white/15 rounded-full blur-3xl"
           />
 
-          {/* Stars/Dots */}
-          {[...Array(20)].map((_, i) => (
+          {/* Road/Path SVG */}
+          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 800" fill="none" preserveAspectRatio="xMidYMid slice">
+            {/* Winding path */}
+            <motion.path
+              d="M 350 800 Q 300 700 200 650 Q 100 600 150 500 Q 200 400 100 350 Q 50 300 150 200 Q 250 100 200 0"
+              stroke="rgba(255,255,255,0.2)"
+              strokeWidth="40"
+              strokeLinecap="round"
+              fill="none"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 3, ease: "easeInOut" }}
+            />
+            {/* Center line of path */}
+            <motion.path
+              d="M 350 800 Q 300 700 200 650 Q 100 600 150 500 Q 200 400 100 350 Q 50 300 150 200 Q 250 100 200 0"
+              stroke="rgba(255,255,255,0.4)"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeDasharray="20 10"
+              fill="none"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 2.5, ease: "easeInOut", delay: 0.5 }}
+            />
+          </svg>
+
+          {/* Milestone markers on the path */}
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 1, duration: 0.5 }}
+            className="absolute bottom-24 right-20 w-10 h-10 bg-white/30 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/40"
+          >
+            <span className="text-white text-xs font-bold">1</span>
+          </motion.div>
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 1.3, duration: 0.5 }}
+            className="absolute top-1/2 left-16 w-10 h-10 bg-white/30 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/40"
+          >
+            <span className="text-white text-xs font-bold">2</span>
+          </motion.div>
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 1.6, duration: 0.5 }}
+            className="absolute top-1/4 right-1/3 w-12 h-12 bg-white/40 rounded-full flex items-center justify-center backdrop-blur-sm border-2 border-white/50"
+          >
+            <span className="text-white text-sm font-bold">🎯</span>
+          </motion.div>
+
+          {/* Floating diamond shape */}
+          <motion.div
+            animate={{ rotate: 45, y: [0, -10, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-32 right-24 w-16 h-16 border-2 border-white/30 rounded-lg backdrop-blur-sm"
+          />
+
+          {/* Floating circle */}
+          <motion.div
+            animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-1/3 left-1/3 w-20 h-20 border-2 border-white/20 rounded-full"
+          />
+
+          {/* Sparkle dots */}
+          {[...Array(15)].map((_, i) => (
             <motion.div
               key={i}
-              animate={{ opacity: [0.3, 1, 0.3], scale: [1, 1.2, 1] }}
-              transition={{ duration: 2 + i * 0.5, repeat: Infinity, ease: "easeInOut" }}
+              animate={{ opacity: [0.2, 0.8, 0.2], scale: [1, 1.3, 1] }}
+              transition={{ duration: 2 + i * 0.3, repeat: Infinity, ease: "easeInOut", delay: i * 0.1 }}
               className="absolute w-1.5 h-1.5 bg-white rounded-full"
               style={{
-                left: `${10 + (i * 4.5) % 80}%`,
-                top: `${15 + (i * 3.7) % 70}%`,
+                left: `${15 + (i * 5.5) % 70}%`,
+                top: `${10 + (i * 4.2) % 80}%`,
               }}
             />
           ))}
