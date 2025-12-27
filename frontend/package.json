@@ -1,6 +1,7 @@
 {
   "name": "frontend",
   "version": "0.1.0",
+  "homepage": "https://planorah.me",
   "private": true,
   "proxy": "http://127.0.0.1:8000",
   "dependencies": {
