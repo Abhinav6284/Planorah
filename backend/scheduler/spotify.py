@@ -10,7 +10,8 @@ SPOTIFY_API_BASE_URL = "https://api.spotify.com/v1"
 
 CLIENT_ID = os.environ.get("SPOTIFY_CLIENT_ID")
 CLIENT_SECRET = os.environ.get("SPOTIFY_CLIENT_SECRET")
-REDIRECT_URI = "http://127.0.0.1:8000/api/scheduler/spotify/callback/"
+# Use the one from settings or env, fallback to production for now
+REDIRECT_URI = os.environ.get("SPOTIFY_REDIRECT_URI", "https://planorah.me/auth/spotify/callback")
 
 def get_auth_url(state=None):
     scope = "user-read-playback-state user-modify-playback-state user-read-currently-playing"

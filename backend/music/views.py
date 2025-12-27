@@ -17,7 +17,7 @@ from .models import SpotifyToken, YouTubeToken, MusicPreferences
 # Spotify OAuth Configuration
 SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID', '')
 SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET', '')
-SPOTIFY_REDIRECT_URI = os.getenv('SPOTIFY_REDIRECT_URI', 'http://127.0.0.1:3000/auth/spotify/callback')
+SPOTIFY_REDIRECT_URI = os.getenv('SPOTIFY_REDIRECT_URI', 'https://planorah.me/auth/spotify/callback')
 
 SPOTIFY_AUTH_URL = 'https://accounts.spotify.com/authorize'
 SPOTIFY_TOKEN_URL = 'https://accounts.spotify.com/api/token'
@@ -37,7 +37,7 @@ SPOTIFY_SCOPES = [
 # YouTube/Google OAuth Configuration
 YOUTUBE_CLIENT_ID = os.getenv('YOUTUBE_CLIENT_ID', '')
 YOUTUBE_CLIENT_SECRET = os.getenv('YOUTUBE_CLIENT_SECRET', '')
-YOUTUBE_REDIRECT_URI = os.getenv('YOUTUBE_REDIRECT_URI', 'http://localhost:3000/auth/youtube/callback')
+YOUTUBE_REDIRECT_URI = os.getenv('YOUTUBE_REDIRECT_URI', 'https://planorah.me/auth/youtube/callback')
 
 YOUTUBE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth'
 YOUTUBE_TOKEN_URL = 'https://oauth2.googleapis.com/token'

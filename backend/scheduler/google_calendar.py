@@ -10,7 +10,7 @@ from .models import GoogleCredential
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
 # Redirect URI (must match Google Console)
-REDIRECT_URI = 'http://localhost:3000/google-callback'
+REDIRECT_URI = os.environ.get("GOOGLE_OAUTH_REDIRECT_URI", 'https://planorah.me/google-callback')
 
 
 class GoogleCalendarService:
