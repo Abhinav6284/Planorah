@@ -517,19 +517,22 @@ def google_oauth_login(request):
         return Response({"error": "Google token is required"}, status=status.HTTP_400_BAD_REQUEST)
     
     try:
-        # Verify the Google ID token
-        idinfo = id_token.verify_oauth2_token(
-            token,
-            google_requests.Request(),
-            settings.GOOGLE_OAUTH_CLIENT_ID
+        # Verify the Google Access Token via UserInfo Endpoint
+        import requests as http_requests
+        userinfo_response = http_requests.get(
+            f'https://www.googleapis.com/oauth2/v3/userinfo?access_token={token}'
         )
         
-        # Extract user info from the token
+        if userinfo_response.status_code != 200:
+            return Response({"error": "Invalid Google token"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        idinfo = userinfo_response.json()
+        
+        # Extract user info
         email = idinfo.get('email')
         email_verified = idinfo.get('email_verified', False)
         name = idinfo.get('name', '')
         picture = idinfo.get('picture', '')
-        google_id = idinfo.get('sub')
         
         if not email or not email_verified:
             return Response({"error": "Email not verified by Google"}, status=status.HTTP_400_BAD_REQUEST)

@@ -188,15 +188,7 @@ export default function Login() {
               <span className="text-lg font-medium text-gray-700">Sign in with Gmail Account</span>
             </button>
 
-            {/* Hidden Real Google Button */}
-            <div className="hidden">
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={handleGoogleError}
-                data-google-login
-                useOneTap
-              />
-            </div>
+
 
             {/* GitHub Button */}
             <button
