@@ -1,6 +1,5 @@
 from datetime import timedelta
 import random
-from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 from django.db import IntegrityError
@@ -13,6 +12,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.exceptions import TokenError
 
+# Brevo email service
+from backend.email_service import send_otp_email, send_password_reset_email
 
 from .models import CustomUser, OTPVerification, UserProfile
 from .serializers import UserSerializer, UserProfileSerializer
@@ -81,17 +82,12 @@ def register_user(request):
     # Create new OTP record in the database
     OTPVerification.objects.create(email=email, otp=otp)
 
-    # Send OTP via email (fail_silently=True to prevent crash when SMTP is blocked)
+    # Send OTP via Brevo email service
     try:
-        send_mail(
-            "Your OTP Code",
-            f"Your verification code is {otp}. It is valid for 10 minutes.",
-            settings.DEFAULT_FROM_EMAIL,
-            [email],
-            fail_silently=True,  # Temporarily set to True while SMTP is blocked on server
-        )
+        email_sent = send_otp_email(email, otp, username)
+        if not email_sent:
+            print(f"Failed to send OTP email to {email}")
     except Exception as e:
-        # Log the error but don't fail registration
         print(f"Email sending failed: {e}")
 
     return Response({"message": "OTP sent successfully to email"})
@@ -269,15 +265,14 @@ def resend_otp(request):
     OTPVerification.objects.create(
         email=email, otp=otp, is_used=False, created_at=timezone.now())
 
-    # send mail
-    send_mail(
-        "Hello, Welcome to Planorah",
-        f"Please enter this {otp} for verification. It is valid for 5 minutes.",
-        '''Well Regards
-        Planorah''',
-        [email],
-        fail_silently=False,
-    )
+    # Send OTP via Brevo
+    try:
+        email_sent = send_otp_email(email, otp, user.username)
+        if not email_sent:
+            return Response({"message": "Failed to send OTP email"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+        print(f"Resend OTP email failed: {e}")
+        return Response({"message": "Failed to send OTP email"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({"message": "New OTP sent successfully"}, status=status.HTTP_200_OK)
 
@@ -302,13 +297,14 @@ def request_password_reset(request):
     OTPVerification.objects.create(
         email=email, otp=otp, is_used=False, created_at=timezone.now())
 
-    send_mail(
-        "Planorah Password Reset OTP",
-        f"Your OTP for password reset is {otp}. It will expire in 5 minutes.",
-        "no-reply@planorah.com",
-        [email],
-        fail_silently=False,
-    )
+    # Send password reset OTP via Brevo
+    try:
+        email_sent = send_password_reset_email(email, otp, user.username)
+        if not email_sent:
+            return Response({"message": "Failed to send password reset email"}, status=500)
+    except Exception as e:
+        print(f"Password reset email failed: {e}")
+        return Response({"message": "Failed to send password reset email"}, status=500)
 
     return Response({"message": "Password reset OTP sent to your email."}, status=200)
 
