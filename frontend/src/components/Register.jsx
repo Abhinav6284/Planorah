@@ -66,28 +66,20 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Side - Visual Panel with Road to Success */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-sky-400 via-blue-500 to-blue-600">
+      {/* Left Side - Visual Panel (White/Black Theme) */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-white border-r border-gray-100">
         {/* Animated Background Elements */}
         <div className="absolute inset-0">
-          {/* Soft glowing orbs */}
-          <motion.div
-            animate={{ y: [0, -20, 0], opacity: [0.3, 0.5, 0.3] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-20 left-10 w-64 h-64 bg-white/20 rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{ y: [0, 30, 0], opacity: [0.2, 0.4, 0.2] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute bottom-40 right-10 w-80 h-80 bg-white/15 rounded-full blur-3xl"
-          />
+          {/* Subtle gradient overlays */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-50 to-transparent rounded-full blur-3xl opacity-60" />
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-gray-100 to-transparent rounded-full blur-3xl opacity-80" />
 
           {/* Road/Path SVG */}
           <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 800" fill="none" preserveAspectRatio="xMidYMid slice">
             {/* Winding path */}
             <motion.path
               d="M 350 800 Q 300 700 200 650 Q 100 600 150 500 Q 200 400 100 350 Q 50 300 150 200 Q 250 100 200 0"
-              stroke="rgba(255,255,255,0.2)"
+              stroke="rgba(0,0,0,0.06)"
               strokeWidth="40"
               strokeLinecap="round"
               fill="none"
@@ -98,7 +90,7 @@ export default function Register() {
             {/* Center line of path */}
             <motion.path
               d="M 350 800 Q 300 700 200 650 Q 100 600 150 500 Q 200 400 100 350 Q 50 300 150 200 Q 250 100 200 0"
-              stroke="rgba(255,255,255,0.4)"
+              stroke="rgba(59, 130, 246, 0.4)"
               strokeWidth="4"
               strokeLinecap="round"
               strokeDasharray="20 10"
@@ -114,39 +106,39 @@ export default function Register() {
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 1, duration: 0.5 }}
-            className="absolute bottom-24 right-20 w-10 h-10 bg-white/30 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/40"
+            className="absolute bottom-24 right-20 w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center border border-blue-200"
           >
-            <span className="text-white text-xs font-bold">1</span>
+            <span className="text-blue-600 text-xs font-bold">1</span>
           </motion.div>
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 1.3, duration: 0.5 }}
-            className="absolute top-1/2 left-16 w-10 h-10 bg-white/30 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/40"
+            className="absolute top-1/2 left-16 w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center border border-blue-200"
           >
-            <span className="text-white text-xs font-bold">2</span>
+            <span className="text-blue-600 text-xs font-bold">2</span>
           </motion.div>
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 1.6, duration: 0.5 }}
-            className="absolute top-1/4 right-1/3 w-12 h-12 bg-white/40 rounded-full flex items-center justify-center backdrop-blur-sm border-2 border-white/50"
+            className="absolute top-1/4 right-1/3 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center border-2 border-blue-300"
           >
-            <span className="text-white text-sm font-bold">🎯</span>
+            <span className="text-sm font-bold">🎯</span>
           </motion.div>
 
           {/* Floating diamond shape */}
           <motion.div
             animate={{ rotate: 45, y: [0, -10, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-32 right-24 w-16 h-16 border-2 border-white/30 rounded-lg backdrop-blur-sm"
+            className="absolute top-32 right-24 w-16 h-16 border-2 border-gray-200 rounded-lg"
           />
 
           {/* Floating circle */}
           <motion.div
             animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute bottom-1/3 left-1/3 w-20 h-20 border-2 border-white/20 rounded-full"
+            className="absolute bottom-1/3 left-1/3 w-20 h-20 border-2 border-blue-200 rounded-full"
           />
 
           {/* Sparkle dots */}
@@ -155,7 +147,7 @@ export default function Register() {
               key={i}
               animate={{ opacity: [0.2, 0.8, 0.2], scale: [1, 1.3, 1] }}
               transition={{ duration: 2 + i * 0.3, repeat: Infinity, ease: "easeInOut", delay: i * 0.1 }}
-              className="absolute w-1.5 h-1.5 bg-white rounded-full"
+              className="absolute w-2 h-2 bg-blue-400 rounded-full"
               style={{
                 left: `${15 + (i * 5.5) % 70}%`,
                 top: `${10 + (i * 4.2) % 80}%`,
@@ -165,9 +157,9 @@ export default function Register() {
         </div>
 
         {/* Logo & Text */}
-        <div className="relative z-10 flex flex-col justify-between p-12 text-white h-full">
+        <div className="relative z-10 flex flex-col justify-between p-12 h-full">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Planorah</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">Planorah</h1>
           </div>
 
           <div className="space-y-4">
@@ -176,14 +168,14 @@ export default function Register() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <h2 className="text-4xl md:text-5xl font-bold leading-tight">
+              <h2 className="text-4xl md:text-5xl font-bold leading-tight text-gray-900">
                 Struggling on<br />projects?
               </h2>
-              <p className="text-xl text-white/80 mt-4">Let us help you succeed ✨</p>
+              <p className="text-xl text-gray-500 mt-4">Let us help you succeed ✨</p>
             </motion.div>
           </div>
 
-          <div className="text-white/60 text-sm">
+          <div className="text-gray-400 text-sm">
             © 2024 Planorah. All rights reserved.
           </div>
         </div>

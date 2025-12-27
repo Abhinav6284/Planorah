@@ -69,28 +69,21 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Side - Visual Panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-sky-400 via-blue-500 to-blue-600">
+      {/* Left Side - Visual Panel (White/Black Theme) */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-white border-r border-gray-100">
         {/* Animated Background Elements */}
         <div className="absolute inset-0">
-          {/* Soft glowing orbs */}
-          <motion.div
-            animate={{ y: [0, -25, 0], opacity: [0.3, 0.5, 0.3] }}
-            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-16 left-16 w-72 h-72 bg-white/20 rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{ y: [0, 35, 0], opacity: [0.2, 0.4, 0.2] }}
-            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute bottom-32 right-16 w-64 h-64 bg-white/15 rounded-full blur-3xl"
-          />
+          {/* Subtle gradient overlays */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-50 to-transparent rounded-full blur-3xl opacity-60" />
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-gray-100 to-transparent rounded-full blur-3xl opacity-80" />
+
 
           {/* Mountain Peak SVG */}
           <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 800" fill="none" preserveAspectRatio="xMidYMid slice">
             {/* Mountain outline */}
             <motion.path
               d="M 0 600 L 120 350 L 200 450 L 300 200 L 400 400 L 400 800 L 0 800 Z"
-              fill="rgba(255,255,255,0.08)"
+              fill="rgba(0,0,0,0.03)"
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.5, ease: "easeOut" }}
@@ -98,7 +91,7 @@ export default function Login() {
             {/* Second mountain layer */}
             <motion.path
               d="M 50 650 L 180 400 L 280 500 L 380 300 L 400 350 L 400 800 L 0 800 L 0 700 Z"
-              fill="rgba(255,255,255,0.05)"
+              fill="rgba(0,0,0,0.02)"
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.5, ease: "easeOut", delay: 0.3 }}
@@ -109,10 +102,10 @@ export default function Login() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 1.5, duration: 0.5 }}
             >
-              <line x1="300" y1="200" x2="300" y2="150" stroke="rgba(255,255,255,0.6)" strokeWidth="3" />
+              <line x1="300" y1="200" x2="300" y2="150" stroke="rgba(59, 130, 246, 0.6)" strokeWidth="3" />
               <motion.polygon
                 points="300,150 340,165 300,180"
-                fill="rgba(255,255,255,0.4)"
+                fill="rgba(59, 130, 246, 0.5)"
                 animate={{ x: [0, 3, 0] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               />
@@ -123,14 +116,14 @@ export default function Login() {
           <motion.div
             animate={{ rotate: 45, y: [0, -15, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-28 right-28 w-16 h-16 border-2 border-white/30 rounded-lg backdrop-blur-sm"
+            className="absolute top-28 right-28 w-16 h-16 border-2 border-gray-200 rounded-lg"
           />
 
           {/* Floating circle */}
           <motion.div
             animate={{ scale: [1, 1.15, 1], opacity: [0.2, 0.4, 0.2] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute bottom-1/3 left-1/4 w-24 h-24 border-2 border-white/20 rounded-full"
+            className="absolute bottom-1/3 left-1/4 w-24 h-24 border-2 border-blue-200 rounded-full"
           />
 
           {/* Sparkle dots */}
@@ -139,7 +132,7 @@ export default function Login() {
               key={i}
               animate={{ opacity: [0.2, 0.9, 0.2], scale: [1, 1.4, 1] }}
               transition={{ duration: 2.5 + i * 0.4, repeat: Infinity, ease: "easeInOut", delay: i * 0.15 }}
-              className="absolute w-1.5 h-1.5 bg-white rounded-full"
+              className="absolute w-2 h-2 bg-blue-400 rounded-full"
               style={{
                 left: `${12 + (i * 6) % 76}%`,
                 top: `${8 + (i * 5) % 84}%`,
@@ -149,9 +142,9 @@ export default function Login() {
         </div>
 
         {/* Logo & Text */}
-        <div className="relative z-10 flex flex-col justify-between p-12 text-white h-full">
+        <div className="relative z-10 flex flex-col justify-between p-12 h-full">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Planorah</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">Planorah</h1>
           </div>
 
           <div className="space-y-4">
@@ -160,14 +153,14 @@ export default function Login() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <h2 className="text-4xl md:text-5xl font-bold leading-tight">
+              <h2 className="text-4xl md:text-5xl font-bold leading-tight text-gray-900">
                 Good to see<br />you again
               </h2>
-              <p className="text-xl text-white/80 mt-4">Let's grind together 🚀</p>
+              <p className="text-xl text-gray-500 mt-4">Let's grind together 🚀</p>
             </motion.div>
           </div>
 
-          <div className="text-white/60 text-sm">
+          <div className="text-gray-400 text-sm">
             © 2024 Planorah. All rights reserved.
           </div>
         </div>
