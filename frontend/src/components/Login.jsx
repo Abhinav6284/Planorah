@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { GoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
 import { API_BASE_URL } from "../api/axios";
 
 export default function Login() {
@@ -39,6 +39,35 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+  const login = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setLoading(true);
+      setMessage("");
+      try {
+        const res = await axios.post(`${API_BASE_URL}/api/users/google/login/`, {
+          token: tokenResponse.access_token
+        });
+        localStorage.setItem("access_token", res.data.access);
+        localStorage.setItem("refresh_token", res.data.refresh);
+        setMessage("success:Google login successful!");
+        if (res.data.onboarding_complete) {
+          setTimeout(() => navigate("/dashboard"), 1500);
+        } else {
+          setTimeout(() => navigate("/onboarding"), 1500);
+        }
+      } catch (err) {
+        const serverMsg = err.response?.data?.error || err.response?.data?.message;
+        setMessage(serverMsg || "Google login failed.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: () => {
+      setMessage("Google login failed. Please try again.");
+      setLoading(false);
+    }
+  });
 
   const handleGoogleSuccess = async (credentialResponse) => {
     setLoading(true);
@@ -171,10 +200,7 @@ export default function Login() {
           <div className="flex-1 w-full space-y-4 flex flex-col justify-center">
             {/* Google Button */}
             <button
-              onClick={() => {
-                const btn = document.querySelector('[data-google-login]');
-                if (btn) btn.click();
-              }}
+              onClick={() => login()}
               className="w-full py-4 px-8 rounded-full border border-gray-200 hover:bg-gray-50 transition-all flex items-center justify-start gap-4 group bg-white shadow-sm hover:shadow-md"
             >
               <div className="p-2 bg-gray-50 rounded-full group-hover:scale-110 transition-transform">
