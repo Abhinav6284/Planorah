@@ -1,12 +1,9 @@
 import axios from "axios";
 
-// Use the current hostname for network access, fallback to localhost
-const API_HOST = window.location.hostname === 'localhost'
-  ? '127.0.0.1'
-  : window.location.hostname;
+const API_BASE_URL = 'http://142.93.214.77';
 
 const axiosInstance = axios.create({
-  baseURL: `http://${API_HOST}:8000`, // Django backend URL
+  baseURL: API_BASE_URL, // Django backend URL
   headers: {
     "Content-Type": "application/json",
   },
