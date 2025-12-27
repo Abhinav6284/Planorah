@@ -82,8 +82,12 @@ export default function VerifyOTP() {
       });
 
       if (response.status === 201) {
-        setMessage({ text: "Email verified successfully! Redirecting to login...", type: "success" });
-        setTimeout(() => navigate("/login"), 2000);
+        // Auto-login: Save tokens
+        localStorage.setItem("access_token", response.data.access);
+        localStorage.setItem("refresh_token", response.data.refresh);
+
+        setMessage({ text: "Verified! Setting up profile...", type: "success" });
+        setTimeout(() => navigate("/complete-profile"), 1500);
       }
     } catch (error) {
       const errorMsg = error.response?.data?.message || "Invalid OTP. Please try again.";

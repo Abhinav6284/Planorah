@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import OnboardingLayout from "./OnboardingLayout";
+import { API_BASE_URL } from "../../api/axios";
 
 const STEPS = [
     {
@@ -74,7 +75,7 @@ export default function StepForm() {
                 };
 
                 const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
-                await axios.post("http://142.93.214.77/api/users/update-profile/", payload, {
+                await axios.patch(`${API_BASE_URL}/api/users/update-profile/`, payload, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 

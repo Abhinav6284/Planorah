@@ -4,6 +4,7 @@ import WelcomePage from "./components/WelcomePage";
 import LandingPage from "./components/LandingPage";
 import Login from "./components/Login";
 import Register from "./components/Register";
+import CompleteProfile from "./components/CompleteProfile";
 import VerifyOtp from "./components/VerifyOTP";
 import Dashboard from "./components/Dashboard/Dashboard";
 import Scheduler from "./components/Scheduler/Scheduler";
@@ -44,6 +45,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/onboarding" element={<StepForm />} />
+          <Route path="/complete-profile" element={<CompleteProfile />} />
           <Route path="/verify-otp" element={<VerifyOtp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/verify-reset-otp" element={<VerifyResetOTP />} />

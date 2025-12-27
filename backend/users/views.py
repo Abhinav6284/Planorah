@@ -158,7 +158,14 @@ def verify_otp(request):
     except Exception:
         otp_record.delete()
 
-    return Response({"message": "Registration successful!"}, status=status.HTTP_201_CREATED)
+    # Generate tokens for auto-login
+    refresh = RefreshToken.for_user(user)
+    
+    return Response({
+        "message": "Registration successful!",
+        "access": str(refresh.access_token),
+        "refresh": str(refresh)
+    }, status=status.HTTP_201_CREATED)
 
 
 # ---------------- LOGIN USER ----------------
@@ -385,7 +392,18 @@ def update_user_profile(request):
         parts = full_name.split(' ', 1)
         user.first_name = parts[0]
         user.last_name = parts[1] if len(parts) > 1 else ''
-        user.save()
+    
+    # Update phone and DOB on User model
+    phone = request.data.get('phone_number')
+    if phone:
+        user.phone_number = phone
+        
+    dob = request.data.get('date_of_birth')
+    if dob:
+        # Ensure regex or format validation in frontend, or try/except here if strict
+        user.date_of_birth = dob
+
+    user.save()
 
     # Update UserProfile fields using serializer
     serializer = UserProfileSerializer(profile, data=request.data, partial=True)

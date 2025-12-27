@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
+
+# Trigger reload for .env update
 from dotenv import load_dotenv
 from datetime import timedelta
 
