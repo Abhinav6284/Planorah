@@ -86,7 +86,7 @@ export default function VerifyOTP() {
         otp: otpString,
       });
 
-      if (response.status === 201) {
+      if (response.status === 200 || response.status === 201) {
         // Auto-login: Save tokens
         localStorage.setItem("access_token", response.data.access);
         localStorage.setItem("refresh_token", response.data.refresh);
