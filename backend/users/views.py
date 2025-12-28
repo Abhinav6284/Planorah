@@ -508,9 +508,17 @@ def google_oauth_login(request):
     Handle Google OAuth login. Accepts a Google Access Token from the frontend,
     verifies it via Google's userinfo endpoint, and creates/logs in the user.
     """
-    import requests as http_requests
+    print(f"[GOOGLE_OAUTH_DEBUG] === Google OAuth Login Called ===")
+    print(f"[GOOGLE_OAUTH_DEBUG] Request data keys: {list(request.data.keys())}")
+    
+    try:
+        import requests as http_requests
+    except ImportError as e:
+        print(f"[GOOGLE_OAUTH_DEBUG] Failed to import requests: {e}")
+        return Response({"error": "Server configuration error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     token = request.data.get('token')
+    print(f"[GOOGLE_OAUTH_DEBUG] Token present: {bool(token)}")
     
     if not token:
         return Response({"error": "Google token is required"}, status=status.HTTP_400_BAD_REQUEST)
