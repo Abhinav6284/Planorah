@@ -570,10 +570,12 @@ def google_oauth_login(request):
             
             # If user exists but was inactive (e.g. from abandoned registration), activate them
             # because Google has verified this email.
+            # because Google has verified this email.
             if not user.is_active or not user.is_verified:
-                print(f"[GOOGLE_OAUTH] Activating existing inactive user")
+                print(f"[GOOGLE_OAUTH] Activating existing inactive user and clearing legacy password")
                 user.is_active = True
                 user.is_verified = True
+                user.set_unusable_password()  # Clear any old password from previous life
                 user.save()
                 
         except CustomUser.DoesNotExist:
@@ -765,9 +767,11 @@ def github_oauth_login(request):
             
             # If user exists but was inactive (e.g. from abandoned registration), activate them
             # because GitHub has verified this email.
+            # because GitHub has verified this email.
             if not user.is_active or not user.is_verified:
                 user.is_active = True
                 user.is_verified = True
+                user.set_unusable_password()  # Clear any old password from previous life
                 user.save()
                 
         except CustomUser.DoesNotExist:
