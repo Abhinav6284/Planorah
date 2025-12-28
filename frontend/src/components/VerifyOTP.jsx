@@ -100,7 +100,7 @@ export default function VerifyOTP() {
         }
       }
     } catch (error) {
-      const errorMsg = error.response?.data?.message || "Invalid OTP. Please try again.";
+      const errorMsg = error.response?.data?.message || error.response?.data?.error || "Invalid OTP. Please try again.";
       setMessage({ text: errorMsg, type: "error" });
       // Clear OTP on error
       setOtp(["", "", "", "", "", ""]);

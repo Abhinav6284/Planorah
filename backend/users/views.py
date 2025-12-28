@@ -904,31 +904,44 @@ def verify_social_otp(request):
     email = request.data.get("email")
     otp_in = request.data.get("otp")
 
+    print(f"\n{'='*80}")
+    print(f"[SOCIAL_OTP] Step 1: Verification request")
+    print(f"[SOCIAL_OTP] Email: {email}")
+    print(f"[SOCIAL_OTP] OTP input: {otp_in}")
+    
     if not email or not otp_in:
-        return Response({"error": "Email and OTP are required"}, status=status.HTTP_400_BAD_REQUEST)
+        print(f"[SOCIAL_OTP] ERROR: Missing email or OTP")
+        return Response({"message": "Email and OTP are required"}, status=status.HTTP_400_BAD_REQUEST)
 
     email = email.lower().strip()
     otp = str(otp_in).strip()
 
     # Find unused OTPs for this email (case-insensitive)
     otp_qs = OTPVerification.objects.filter(email__iexact=email)
+    print(f"[SOCIAL_OTP] OTPs found: {otp_qs.count()}")
+    
     if not otp_qs.exists():
-        return Response({"error": "Invalid OTP or email"}, status=status.HTTP_400_BAD_REQUEST)
+        print(f"[SOCIAL_OTP] ERROR: No OTP record found for {email}")
+        return Response({"message": "Invalid OTP or email"}, status=status.HTTP_400_BAD_REQUEST)
 
     # Prefer the latest unused OTP record
     otp_record = otp_qs.filter(is_used=False).order_by('-created_at').first()
 
     if not otp_record:
-        return Response({"error": "Invalid OTP or it has been used"}, status=status.HTTP_400_BAD_REQUEST)
+        print(f"[SOCIAL_OTP] ERROR: All OTPs used or none available")
+        return Response({"message": "Invalid OTP or it has been used"}, status=status.HTTP_400_BAD_REQUEST)
 
     # Compare values
+    print(f"[SOCIAL_OTP] Comparing DB '{str(otp_record.otp).strip()}' vs Input '{otp}'")
     if str(otp_record.otp).strip() != otp:
-        return Response({"error": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
+        print(f"[SOCIAL_OTP] ERROR: Mismatch")
+        return Response({"message": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
 
     # Check expiry
     if hasattr(otp_record, "is_expired") and otp_record.is_expired():
+        print(f"[SOCIAL_OTP] ERROR: OTP Expired")
         otp_record.delete()
-        return Response({"error": "OTP expired, please request a new one"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "OTP expired, please request a new one"}, status=status.HTTP_400_BAD_REQUEST)
 
     # Mark OTP as used
     if hasattr(otp_record, "is_used"):
@@ -940,8 +953,10 @@ def verify_social_otp(request):
     # Retrieve User
     try:
         user = CustomUser.objects.get(email=email)
+        print(f"[SOCIAL_OTP] User found: {user.username}")
     except CustomUser.DoesNotExist:
-        return Response({"error": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        print(f"[SOCIAL_OTP] ERROR: User not found in DB")
+        return Response({"message": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
     # Generate tokens
     try:
@@ -949,7 +964,8 @@ def verify_social_otp(request):
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
     except Exception as e:
-        return Response({"error": "Failed to generate tokens"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        print(f"[SOCIAL_OTP] ERROR generating tokens: {e}")
+        return Response({"message": "Failed to generate tokens"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     # Check onboarding status
     onboarding_complete = hasattr(user, 'profile') and user.profile.onboarding_complete
