@@ -18,10 +18,13 @@ export default function GitHubCallback() {
             return;
         }
 
+
         const handleGitHubLogin = async () => {
             try {
+                const redirectUri = window.location.origin + '/auth/github/callback';
                 const res = await axios.post(`${API_BASE_URL}/api/users/github/login/`, {
-                    code: code
+                    code: code,
+                    redirect_uri: redirectUri
                 });
 
                 // Store tokens

@@ -618,6 +618,8 @@ def github_oauth_login(request):
     import requests as http_requests
     
     code = request.data.get('code')
+    # Get redirect_uri from request, fallback to settings for backwards compatibility
+    redirect_uri = request.data.get('redirect_uri', settings.GITHUB_OAUTH_REDIRECT_URI)
     
     if not code:
         return Response({"error": "GitHub authorization code is required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -630,12 +632,18 @@ def github_oauth_login(request):
                 'client_id': settings.GITHUB_OAUTH_CLIENT_ID,
                 'client_secret': settings.GITHUB_OAUTH_CLIENT_SECRET,
                 'code': code,
-                'redirect_uri': settings.GITHUB_OAUTH_REDIRECT_URI,
+                'redirect_uri': redirect_uri,
             },
             headers={'Accept': 'application/json'}
         )
         
         token_data = token_response.json()
+        
+        # Debug logging
+        print(f"[GITHUB_OAUTH_DEBUG] Client ID: {settings.GITHUB_OAUTH_CLIENT_ID}")
+        print(f"[GITHUB_OAUTH_DEBUG] Redirect URI used: {redirect_uri}")
+        print(f"[GITHUB_OAUTH_DEBUG] Token response status: {token_response.status_code}")
+        print(f"[GITHUB_OAUTH_DEBUG] Token data: {token_data}")
         
         if 'error' in token_data:
             return Response({
