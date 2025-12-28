@@ -222,3 +222,147 @@ def send_password_reset_email(to_email, otp_code, username=None):
     text_content = f"Your Planorah password reset code is: {otp_code}. It expires in 5 minutes. Verify here: https://planorah.me/verify-reset-otp?email={to_email}&otp={otp_code}"
     
     return send_email_via_brevo(to_email, subject, html_content, text_content)
+
+
+def get_welcome_template(username=None):
+    """
+    Returns a professional HTML email template for new user welcome
+    """
+    name = username or "Planorah User"
+    return f'''
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f5f5f5; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 480px; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="padding: 40px 40px 24px; text-align: center; border-bottom: 1px solid #f0f0f0;">
+                            <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #000000; letter-spacing: -0.5px;">Planorah</h1>
+                        </td>
+                    </tr>
+                    
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 32px 40px;">
+                            <h2 style="margin: 0 0 16px; font-size: 20px; font-weight: 600; color: #1a1a1a;">Welcome to Planorah! 🎉</h2>
+                            <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.6; color: #4a4a4a;">
+                                Hi {name},<br><br>
+                                We're thrilled to have you on board! You've taken the first step towards mastering your productivity and planning your future.
+                            </p>
+                            
+                            <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.6; color: #4a4a4a;">
+                                <strong>What's next?</strong><br>
+                                • Create your first roadmap<br>
+                                • Track your daily tasks<br>
+                                • Build your professional resume
+                            </p>
+                            
+                            <!-- Call to Action -->
+                            <div style="text-align: center; margin: 32px 0;">
+                                <a href="https://planorah.me/dashboard" style="background-color: #000000; color: #ffffff; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 15px; display: inline-block;">Go to Dashboard</a>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 24px 40px 32px; border-top: 1px solid #f0f0f0;">
+                            <p style="margin: 0; font-size: 13px; color: #999999; text-align: center;">
+                                © 2024 Planorah. All rights reserved.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+'''
+
+
+def get_account_deleted_template(username=None):
+    """
+    Returns a professional HTML email template for account deletion confirmation
+    """
+    name = username or "User"
+    return f'''
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f5f5f5; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 480px; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="padding: 40px 40px 24px; text-align: center; border-bottom: 1px solid #f0f0f0;">
+                            <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #000000; letter-spacing: -0.5px;">Planorah</h1>
+                        </td>
+                    </tr>
+                    
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 32px 40px;">
+                            <h2 style="margin: 0 0 16px; font-size: 20px; font-weight: 600; color: #dc2626;">Account Deleted</h2>
+                            <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.6; color: #4a4a4a;">
+                                Hi {name},<br><br>
+                                This email confirms that your Planorah account has been successfully deleted.
+                            </p>
+                            <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.6; color: #4a4a4a;">
+                                All your data, including roadmaps and personal settings, has been removed from our active systems.
+                            </p>
+                            <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.6; color: #4a4a4a;">
+                                We're sorry to see you go. If you change your mind, you are always welcome to create a new account in the future.
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 24px 40px 32px; border-top: 1px solid #f0f0f0;">
+                            <p style="margin: 0; font-size: 13px; color: #999999; text-align: center;">
+                                © 2024 Planorah. All rights reserved.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+'''
+
+
+def send_welcome_email(to_email, username=None):
+    """
+    Send welcome email to new user
+    """
+    subject = "Welcome to Planorah! 🚀"
+    html_content = get_welcome_template(username)
+    text_content = f"Welcome to Planorah, {username or 'User'}! We're thrilled to have you."
+    
+    return send_email_via_brevo(to_email, subject, html_content, text_content)
+
+
+def send_account_deleted_email(to_email, username=None):
+    """
+    Send account deletion confirmation email
+    """
+    subject = "Planorah Account Deleted"
+    html_content = get_account_deleted_template(username)
+    text_content = f"Your Planorah account ({username}) has been successfully deleted. We're sorry to see you go."
+    
+    return send_email_via_brevo(to_email, subject, html_content, text_content)

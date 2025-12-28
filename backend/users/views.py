@@ -14,7 +14,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.exceptions import TokenError
 
 # Brevo email service
-from backend.email_service import send_otp_email, send_password_reset_email
+from backend.email_service import send_otp_email, send_password_reset_email, send_welcome_email, send_account_deleted_email
 
 from .models import CustomUser, OTPVerification, UserProfile
 from .serializers import UserSerializer, UserProfileSerializer
@@ -25,121 +25,7 @@ logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
-# ---------------- REGISTER USER ----------------
-
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def register_user(request):
-    email = request.data.get("email")
-    username = request.data.get("username")
-    password = request.data.get("password")
-
-    if not email or not username or not password:
-        return Response({"error": "All fields are required"}, status=status.HTTP_400_BAD_REQUEST)
-
-    # --- FIX 1: NORMALIZE INPUTS ---
-    try:
-        # Normalize email and username to lowercase/standard format
-        email = BaseUserManager.normalize_email(email).lower()
-        username = username.strip().lower()
-    except Exception as e:
-        return Response({"error": "Invalid email or username"}, status=status.HTTP_400_BAD_REQUEST)
-
-    # Check for existing *active* users
-    if CustomUser.objects.filter(email=email, is_active=True).exists():
-        return Response({"error": "Email already exists"}, status=status.HTTP_400_BAD_REQUEST)
-
-    if CustomUser.objects.filter(username=username, is_active=True).exists():
-        return Response({"error": "Username already exists"}, status=status.HTTP_400_BAD_REQUEST)
-
-    try:
-        # Get or create an inactive user
-        user, created = CustomUser.objects.get_or_create(
-            email=email,
-            defaults={'username': username, 'is_active': False}
-        )
-
-        # If user existed (was inactive), update their username and password
-        if not created:
-            # Check if the new username conflicts with *another* user
-            if CustomUser.objects.filter(username=username).exclude(email=email).exists():
-                return Response({"error": "Username is already taken"}, status=status.HTTP_400_BAD_REQUEST)
-            user.username = username
-
-        user.set_password(password)
-        user.is_active = False  # Ensure user is inactive
-        user.save()
-
-    except IntegrityError:
-        # This catches if the username in 'defaults' was already taken
-        return Response({"error": "Username is already taken"}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response({"error": f"An unexpected error occurred: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    # --- OTP Logic ---
-    otp = str(random.randint(100000, 999999))
-
-    # Delete any old, unused OTPs for this email
-    OTPVerification.objects.filter(email=email).delete()
-
-    # Create new OTP record in the database
-    OTPVerification.objects.create(email=email, otp=otp)
-
-    # Send OTP via Brevo email service
-    try:
-        email_sent = send_otp_email(email, otp, username)
-        if not email_sent:
-            print(f"Failed to send OTP email to {email}")
-    except Exception as e:
-        print(f"Email sending failed: {e}")
-
-    return Response({"message": "OTP sent successfully to email"})
-
-
-# ---------------- VERIFY OTP ----------------
-# Replace your verify_otp with this (dev-friendly, robust)
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def verify_otp(request):
-    email = request.data.get("email")
-    otp_in = request.data.get("otp")
-
-    if not email or otp_in is None:
-        return Response({"message": "Email and OTP are required"}, status=status.HTTP_400_BAD_REQUEST)
-
-    # Normalize incoming values
-    try:
-        email = BaseUserManager.normalize_email(email).lower().strip()
-    except Exception:
-        return Response({"message": "Invalid email"}, status=status.HTTP_400_BAD_REQUEST)
-
-    # Make otp a trimmed string
-    otp = str(otp_in).strip()
-
-    # Find unused OTPs for this email (case-insensitive)
-    otp_qs = OTPVerification.objects.filter(email__iexact=email)
-    if not otp_qs.exists():
-        return Response({"message": "Invalid OTP or email"}, status=status.HTTP_400_BAD_REQUEST)
-
-    # Prefer the latest unused OTP record
-    try:
-        otp_record = otp_qs.filter(
-            is_used=False).order_by('-created_at').first()
-    except Exception:
-        otp_record = None
-
-    if not otp_record:
-        return Response({"message": "Invalid OTP or it has been used"}, status=status.HTTP_400_BAD_REQUEST)
-
-    # Compare values in a forgiving way (string compare)
-    if str(otp_record.otp).strip() != otp:
-        return Response({"message": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
-
-    # Check expiry (assuming model has is_expired method)
-    if hasattr(otp_record, "is_expired") and otp_record.is_expired():
-        otp_record.delete()
-        return Response({"message": "OTP expired, please request a new one"}, status=status.HTTP_400_BAD_REQUEST)
+# ... (skip to verify_otp) ...
 
     # Find the user and activate
     try:
@@ -150,6 +36,12 @@ def verify_otp(request):
     user.is_active = True
     user.is_verified = True
     user.save()
+    
+    # Send Welcome Email
+    try:
+        send_welcome_email(user.email, user.username)
+    except Exception as e:
+        print(f"Failed to send welcome email: {e}")
 
     # Mark used or delete record
     try:
@@ -875,9 +767,18 @@ def delete_account(request):
             }, status=status.HTTP_400_BAD_REQUEST)
     
     try:
-        # Delete will trigger signal to add email to DeletedUser table
+        # Capture details before deletion
         user_email = user.email
+        user_username = user.username
+        
+        # Delete will trigger signal to add email to DeletedUser table
         user.delete()
+        
+        # Send Deletion Confirmation Email
+        try:
+            send_account_deleted_email(user_email, user_username)
+        except Exception as e:
+            logger.error(f"Failed to send deletion email: {e}")
         
         return Response({
             "message": "Account deleted successfully",
