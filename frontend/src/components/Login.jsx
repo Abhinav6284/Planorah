@@ -57,8 +57,10 @@ export default function Login() {
           setTimeout(() => navigate("/onboarding"), 1500);
         }
       } catch (err) {
+        console.error('Google OAuth Error:', err.response?.data);
         const serverMsg = err.response?.data?.error || err.response?.data?.message;
-        setMessage(serverMsg || "Google login failed.");
+        const details = err.response?.data?.details ? ` (${err.response.data.details})` : '';
+        setMessage(serverMsg ? `${serverMsg}${details}` : "Google login failed.");
       } finally {
         setLoading(false);
       }
