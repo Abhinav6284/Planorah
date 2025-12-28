@@ -552,12 +552,14 @@ def google_oauth_login(request):
         
         # Normalize email
         email = email.lower().strip()
+        print(f"[GOOGLE_OAUTH_DEBUG] Processing email: {email}")
         
         # Check if user exists
         try:
             user = CustomUser.objects.get(email=email)
             # User exists, log them in
             created = False
+            print(f"[GOOGLE_OAUTH_DEBUG] Existing user found: {user.username}")
         except CustomUser.DoesNotExist:
             # Create new user
             # Generate a unique username from email
@@ -567,6 +569,8 @@ def google_oauth_login(request):
             while CustomUser.objects.filter(username=username).exists():
                 username = f"{base_username}{counter}"
                 counter += 1
+            
+            print(f"[GOOGLE_OAUTH_DEBUG] Creating new user with username: {username}")
             
             # Create user without password (OAuth user)
             user = CustomUser.objects.create(
@@ -578,20 +582,28 @@ def google_oauth_login(request):
             user.set_unusable_password()  # OAuth users don't have passwords
             
             # Set name
-            name_parts = name.split(' ', 1)
-            user.first_name = name_parts[0] if name_parts else ''
-            user.last_name = name_parts[1] if len(name_parts) > 1 else ''
+            if name:
+                name_parts = name.split(' ', 1)
+                user.first_name = name_parts[0] if name_parts else ''
+                user.last_name = name_parts[1] if len(name_parts) > 1 else ''
             user.save()
             
             created = True
+            print(f"[GOOGLE_OAUTH_DEBUG] New user created successfully")
         
         # Generate JWT tokens
+        print(f"[GOOGLE_OAUTH_DEBUG] Generating JWT tokens...")
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
         
-        # Check onboarding status
-        onboarding_complete = hasattr(user, 'profile') and user.profile.onboarding_complete
+        # Check onboarding status (safely)
+        try:
+            onboarding_complete = hasattr(user, 'profile') and user.profile.onboarding_complete
+        except Exception:
+            onboarding_complete = False
+        
+        print(f"[GOOGLE_OAUTH_DEBUG] Login successful, onboarding_complete: {onboarding_complete}")
         
         return Response({
             "refresh": refresh_token,
@@ -601,8 +613,8 @@ def google_oauth_login(request):
                 "id": user.id,
                 "username": user.username,
                 "email": user.email,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
+                "first_name": user.first_name or '',
+                "last_name": user.last_name or '',
             },
             "onboarding_complete": onboarding_complete,
             "created": created
@@ -610,8 +622,12 @@ def google_oauth_login(request):
         
     except ValueError as e:
         # Invalid token
+        print(f"[GOOGLE_OAUTH_DEBUG] ValueError: {e}")
         return Response({"error": "Invalid Google token", "details": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
+        print(f"[GOOGLE_OAUTH_DEBUG] Exception: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
         return Response({"error": "Google authentication failed", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
