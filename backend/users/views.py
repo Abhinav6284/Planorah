@@ -25,7 +25,31 @@ logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
-# ... (skip to verify_otp) ...
+# ---------------- VERIFY OTP ----------------
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def verify_otp(request):
+    data = request.data
+    email = data.get('email')
+    otp = data.get('otp')
+
+    if not email or not otp:
+        return Response({
+            'error': 'Email and OTP are required'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Check against OTPVerification model
+        otp_record = OTPVerification.objects.filter(email=email, is_used=False).latest('created_at')
+        
+        if otp_record.is_expired():
+            return Response({'error': 'OTP has expired'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if otp_record.otp != otp:
+             return Response({'error': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
+
+    except OTPVerification.DoesNotExist:
+         return Response({'error': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
 
     # Find the user and activate
     try:
