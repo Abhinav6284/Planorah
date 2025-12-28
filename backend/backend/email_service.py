@@ -79,11 +79,12 @@ def get_otp_email_template(otp_code, username=None):
 '''
 
 
-def get_password_reset_template(otp_code, username=None):
+def get_password_reset_template(otp_code, username=None, email=None):
     """
     Returns a professional HTML email template for password reset
     """
     name = username or "there"
+    email_param = email or ""
     return f'''
 <!DOCTYPE html>
 <html>
@@ -121,6 +122,11 @@ def get_password_reset_template(otp_code, username=None):
                             <p style="margin: 24px 0 0; font-size: 14px; color: #888888; text-align: center;">
                                 ⏱️ This code expires in <strong style="color: #1a1a1a;">5 minutes</strong>
                             </p>
+
+                            <!-- Verification Link Button -->
+                            <div style="text-align: center; margin-top: 32px;">
+                                <a href="https://planorah.me/verify-reset-otp?email={email}&otp={otp_code}" style="background-color: #1a1a1a; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">Verify Password Reset</a>
+                            </div>
                         </td>
                     </tr>
                     
@@ -212,7 +218,7 @@ def send_password_reset_email(to_email, otp_code, username=None):
     Send password reset OTP email
     """
     subject = f"Reset Your Planorah Password - Code: {otp_code}"
-    html_content = get_password_reset_template(otp_code, username)
-    text_content = f"Your Planorah password reset code is: {otp_code}. It expires in 5 minutes."
+    html_content = get_password_reset_template(otp_code, username, email=to_email)
+    text_content = f"Your Planorah password reset code is: {otp_code}. It expires in 5 minutes. Verify here: https://planorah.me/verify-reset-otp?email={to_email}&otp={otp_code}"
     
     return send_email_via_brevo(to_email, subject, html_content, text_content)

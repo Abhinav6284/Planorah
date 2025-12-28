@@ -190,6 +190,16 @@ def login_user(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+    # Check for deleted user (only for email logins mainly, or attempt to resolve)
+    from .models import DeletedUser
+    check_email = identifier.strip().lower() # Assuming identifier is email for checking, or we check if it looks like email
+    if "@" in check_email: 
+        if DeletedUser.objects.filter(email=check_email).exists():
+            return Response({
+                "error": "Account previously deleted",
+                "details": "This account was deleted. You can re-register if you wish to create a new account."
+            }, status=status.HTTP_403_FORBIDDEN)
+
     # Find the user by email or username
     User = get_user_model()
     try:
@@ -549,14 +559,7 @@ def google_oauth_login(request):
         email = email.lower().strip()
         logger.error(f"[GOOGLE_OAUTH] Step 8: Email normalized to: {email}")
         
-        # Check if this email belongs to a deleted account
-        from .models import DeletedUser
-        if DeletedUser.objects.filter(email=email).exists():
-            logger.error(f"[GOOGLE_OAUTH] ERROR: Email belongs to deleted account")
-            return Response({
-                "error": "Account previously deleted",
-                "details": "This account was permanently deleted and cannot be restored. Please contact support if you believe this is an error."
-            }, status=status.HTTP_403_FORBIDDEN)
+        # REMOVED DeletedUser check to allow re-registration
         
         # Check if user exists
         logger.error(f"[GOOGLE_OAUTH] Step 9: Checking if user exists")
@@ -753,13 +756,7 @@ def github_oauth_login(request):
         name = github_user.get('name', '') or github_user.get('login', '')
         github_username = github_user.get('login', '')
         
-        # Check if this email belongs to a deleted account
-        from .models import DeletedUser
-        if DeletedUser.objects.filter(email=email).exists():
-            return Response({
-                "error": "Account previously deleted",
-                "details": "This account was permanently deleted and cannot be restored. Please contact support if you believe this is an error."
-            }, status=status.HTTP_403_FORBIDDEN)
+        # REMOVED DeletedUser check to allow re-registration
         
         # Check if user exists
         try:
