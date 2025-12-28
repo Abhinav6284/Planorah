@@ -20,7 +20,18 @@ export default function OnboardingLayout({ children, title, subtitle }) {
                     className="w-full max-w-2xl"
                 >
                     <div className="mb-10 text-center">
-                        <h1 className="text-3xl md:text-4xl font-serif font-medium text-gray-900 mb-4">{title}</h1>
+                        {/* Support for Badge */}
+                        {title.badge && (
+                            <div className="flex justify-center mb-4">
+                                <span className="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                                    {title.badge}
+                                </span>
+                            </div>
+                        )}
+
+                        <h1 className="text-3xl md:text-4xl font-serif font-medium text-gray-900 mb-4">
+                            {title.text || title}
+                        </h1>
                         {subtitle && <p className="text-gray-500 text-lg">{subtitle}</p>}
                     </div>
 

@@ -7,22 +7,12 @@ import { API_BASE_URL } from "../../api/axios";
 
 const STEPS = [
     {
-        id: "personal",
-        title: "Tell us about yourself",
-        subtitle: "Let's get to know you better.",
-        fields: [
-            { name: "name", label: "Full Name", placeholder: "John Doe" },
-            { name: "phone_number", label: "Phone Number", placeholder: "+1234567890" },
-            { name: "date_of_birth", label: "Date of Birth", type: "date" }
-        ]
-    },
-    {
         id: "field",
         title: "What's your field of study?",
         subtitle: "We'll tailor your career path based on this.",
         fields: [
-            { name: "field_of_study", label: "Field (e.g. CS, Business)", placeholder: "Computer Science" },
-            { name: "role", label: "Current Status", options: ["Student", "Graduate", "Professional"] }
+            { name: "field_of_study", label: "Field (e.g. CS, Business)", placeholder: "Computer Science", colSpan: 2 },
+            { name: "role", label: "Current Status", options: ["Student", "Graduate", "Professional"], colSpan: 2 }
         ]
     },
     {
@@ -30,8 +20,8 @@ const STEPS = [
         title: "What are you aiming for?",
         subtitle: "Tell us about your dream role.",
         fields: [
-            { name: "target_role", label: "Target Role", placeholder: "Full Stack Developer" },
-            { name: "experience_level", label: "Your Level", options: ["Beginner", "Intermediate", "Advanced"] }
+            { name: "target_role", label: "Target Role", placeholder: "Full Stack Developer", colSpan: 2 },
+            { name: "experience_level", label: "Your Level", options: ["Beginner", "Intermediate", "Advanced"], colSpan: 2 }
         ]
     },
     {
@@ -39,7 +29,7 @@ const STEPS = [
         title: "What are your skills?",
         subtitle: "Add skills you already know or are learning.",
         fields: [
-            { name: "skills", label: "Skills (comma separated)", placeholder: "Python, React, Django" }
+            { name: "skills", label: "Skills (comma separated)", placeholder: "Python, React, Django", colSpan: 2 }
         ]
     },
     {
@@ -47,7 +37,30 @@ const STEPS = [
         title: "What is your main goal?",
         subtitle: "How can we help you best?",
         fields: [
-            { name: "career_intent", label: "Goal", options: ["Get a Job", "Find Internship", "Build Portfolio", "Learn Skills"] }
+            { name: "career_intent", label: "Goal", options: ["Get a Job", "Find Internship", "Build Portfolio", "Learn Skills"], colSpan: 2 }
+        ]
+    },
+    {
+        id: "personal",
+        title: {
+            text: (
+                <>
+                    Complete Your <br />
+                    <span className="relative inline-block z-10">
+                        Profile
+                        <svg className="absolute w-full h-3 -bottom-1 left-0 text-yellow-300 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
+                            <path d="M0 5 Q 50 12 100 5" stroke="currentColor" strokeWidth="8" fill="none" opacity="0.8" />
+                        </svg>
+                    </span>
+                </>
+            ),
+            badge: "One last step"
+        },
+        subtitle: "Help us personalize your experience by providing a few more details.",
+        fields: [
+            { name: "name", label: "Full Name", placeholder: "e.g. John Doe", colSpan: 2 },
+            { name: "date_of_birth", label: "Date of Birth", type: "date", colSpan: 1 },
+            { name: "phone_number", label: "Phone Number", placeholder: "+1 (555) 000-0000", colSpan: 1 }
         ]
     }
 ];
@@ -181,32 +194,33 @@ export default function StepForm() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.3 }}
-                    className="space-y-6"
                 >
-                    {stepData.fields.map((field) => (
-                        <div key={field.name}>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">{field.label}</label>
-                            {field.options ? (
-                                <select
-                                    name={field.name}
-                                    value={formData[field.name]}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-black focus:ring-1 focus:ring-black outline-none bg-gray-50 focus:bg-white"
-                                >
-                                    {field.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                                </select>
-                            ) : (
-                                <input
-                                    type={field.type || "text"}
-                                    name={field.name}
-                                    value={formData[field.name]}
-                                    onChange={handleChange}
-                                    placeholder={field.placeholder}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-black focus:ring-1 focus:ring-black outline-none bg-gray-50 focus:bg-white"
-                                />
-                            )}
-                        </div>
-                    ))}
+                    <div className="grid grid-cols-2 gap-6">
+                        {stepData.fields.map((field) => (
+                            <div key={field.name} className={field.colSpan === 2 ? "col-span-2" : "col-span-2 md:col-span-1"}>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{field.label}</label>
+                                {field.options ? (
+                                    <select
+                                        name={field.name}
+                                        value={formData[field.name]}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-black focus:ring-1 focus:ring-black outline-none bg-gray-50 focus:bg-white"
+                                    >
+                                        {field.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
+                                ) : (
+                                    <input
+                                        type={field.type || "text"}
+                                        name={field.name}
+                                        value={formData[field.name]}
+                                        onChange={handleChange}
+                                        placeholder={field.placeholder}
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-black focus:ring-1 focus:ring-black outline-none bg-gray-50 focus:bg-white"
+                                    />
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 </motion.div>
             </AnimatePresence>
 
