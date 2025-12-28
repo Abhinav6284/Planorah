@@ -27,6 +27,17 @@ export default function GitHubCallback() {
                     redirect_uri: redirectUri
                 });
 
+                // Check for 2FA
+                if (res.data.two_factor_required) {
+                    navigate("/verify-otp", {
+                        state: {
+                            email: res.data.email,
+                            isLogin: true
+                        }
+                    });
+                    return;
+                }
+
                 // Store tokens
                 localStorage.setItem('access_token', res.data.access);
                 localStorage.setItem('refresh_token', res.data.refresh);
@@ -38,6 +49,7 @@ export default function GitHubCallback() {
                     navigate('/onboarding');
                 }
             } catch (err) {
+                console.error("GitHub Login Error:", err);
                 const serverMsg = err.response?.data?.error || err.response?.data?.message;
                 setError(serverMsg || 'GitHub login failed. Please try again.');
                 setLoading(false);
