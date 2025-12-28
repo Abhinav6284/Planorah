@@ -342,9 +342,22 @@ export default function ProfilePage() {
                                 </div>
 
                                 <div className="mb-4">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {isOAuth ? 'Type DELETE to confirm' : 'Enter your password to confirm'}
-                                    </label>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            {isOAuth ? 'Type DELETE to confirm' : 'Enter your password to confirm'}
+                                        </label>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setIsOAuth(!isOAuth);
+                                                setDeletePassword('');
+                                                setDeleteError('');
+                                            }}
+                                            className="text-xs text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                                        >
+                                            {isOAuth ? "Using Password?" : "Login via Google/GitHub?"}
+                                        </button>
+                                    </div>
                                     <input
                                         type={isOAuth ? "text" : "password"}
                                         value={deletePassword}
