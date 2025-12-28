@@ -613,41 +613,39 @@ def google_oauth_login(request):
                 print(f"[GOOGLE_OAUTH] ERROR creating user: {type(create_err).__name__}: {create_err}")
                 raise
         
-        # Generate JWT tokens
-        print(f"[GOOGLE_OAUTH] Step 11: Generating JWT tokens")
-        try:
-            refresh = RefreshToken.for_user(user)
-            access_token = str(refresh.access_token)
-            refresh_token = str(refresh)
-            print(f"[GOOGLE_OAUTH] Tokens generated successfully")
-        except Exception as token_err:
-            print(f"[GOOGLE_OAUTH] ERROR generating tokens: {type(token_err).__name__}: {token_err}")
-            raise
         
-        # Check onboarding status (safely)
-        print(f"[GOOGLE_OAUTH] Step 12: Checking onboarding status")
+        # --- 2FA ENFORCEMENT START ---
+        print(f"[GOOGLE_OAUTH] Step 11: 2FA Enforcement - Generating OTP")
         try:
-            onboarding_complete = hasattr(user, 'profile') and user.profile.onboarding_complete
-            print(f"[GOOGLE_OAUTH] Onboarding complete: {onboarding_complete}")
-        except Exception as onboard_err:
-            print(f"[GOOGLE_OAUTH] Warning: Error checking onboarding: {onboard_err}")
-            onboarding_complete = False
-        
-        print(f"[GOOGLE_OAUTH] Step 13: Preparing response")
-        response_data = {
-            "refresh": refresh_token,
-            "access": access_token,
-            "message": "Google login successful",
-            "user": {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-                "first_name": user.first_name or '',
-                "last_name": user.last_name or '',
-            },
-            "onboarding_complete": onboarding_complete,
-            "created": created
-        }
+            # Generate OTP
+            otp = str(random.randint(100000, 999999))
+            
+            # Delete old OTPs
+            OTPVerification.objects.filter(email=email).delete()
+            
+            # Create new OTP
+            OTPVerification.objects.create(email=email, otp=otp)
+            
+            # Send Email
+            print(f"[GOOGLE_OAUTH] Sending OTP email to {email}")
+            send_otp_email(email, otp, user.username)
+            
+            response_data = {
+                "message": "Please verify OTP sent to your email",
+                "two_factor_required": True,
+                "email": email
+            }
+            print(f"[GOOGLE_OAUTH] 2FA required. Returning 200 OK")
+            print(f"{'='*80}\n")
+            return Response(response_data, status=status.HTTP_200_OK)
+            
+        except Exception as otp_err:
+             print(f"[GOOGLE_OAUTH] ERROR in 2FA step: {otp_err}")
+             return Response({"error": "Failed to send 2FA OTP"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # --- 2FA ENFORCEMENT END ---
+
+        # (Original Token Generation Code is effectively replaced/bypassed)
+        # To keep code clean, I am removing the old token generation block below.
         print(f"[GOOGLE_OAUTH] SUCCESS: Returning 200 OK")
         print(f"{'='*80}\n")
         return Response(response_data, status=status.HTTP_200_OK)
@@ -801,28 +799,36 @@ def github_oauth_login(request):
             
             created = True
         
-        # Generate JWT tokens
-        refresh = RefreshToken.for_user(user)
-        access_token_jwt = str(refresh.access_token)
-        refresh_token = str(refresh)
         
-        # Check onboarding status
-        onboarding_complete = hasattr(user, 'profile') and user.profile.onboarding_complete
-        
-        return Response({
-            "refresh": refresh_token,
-            "access": access_token_jwt,
-            "message": "GitHub login successful",
-            "user": {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-            },
-            "onboarding_complete": onboarding_complete,
-            "created": created
-        }, status=status.HTTP_200_OK)
+        # --- 2FA ENFORCEMENT START ---
+        print(f"[GITHUB_OAUTH] 2FA Enforcement - Generating OTP")
+        try:
+            # Generate OTP
+            otp = str(random.randint(100000, 999999))
+            
+            # Delete old OTPs
+            OTPVerification.objects.filter(email=email).delete()
+            
+            # Create new OTP
+            OTPVerification.objects.create(email=email, otp=otp)
+            
+            # Send Email
+            print(f"[GITHUB_OAUTH] Sending OTP email to {email}")
+            send_otp_email(email, otp, user.username)
+            
+            response_data = {
+                "message": "Please verify OTP sent to your email",
+                "two_factor_required": True,
+                "email": email
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+            
+        except Exception as otp_err:
+             print(f"[GITHUB_OAUTH] ERROR in 2FA step: {otp_err}")
+             return Response({"error": "Failed to send 2FA OTP"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # --- 2FA ENFORCEMENT END ---
+
+        # (Original Token Generation Code is effectively replaced/bypassed)
         
     except Exception as e:
         return Response({"error": "GitHub authentication failed", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -884,6 +890,81 @@ def delete_account(request):
             "error": "Account deletion failed",
             "details": str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+# ---------------- VERIFY SOCIAL OTP ----------------
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def verify_social_otp(request):
+    """
+    Verify OTP sent during social login (Google/GitHub).
+    If valid, issue JWT tokens.
+    """
+    email = request.data.get("email")
+    otp_in = request.data.get("otp")
+
+    if not email or not otp_in:
+        return Response({"error": "Email and OTP are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    email = email.lower().strip()
+    otp = str(otp_in).strip()
+
+    # Find unused OTPs for this email (case-insensitive)
+    otp_qs = OTPVerification.objects.filter(email__iexact=email)
+    if not otp_qs.exists():
+        return Response({"error": "Invalid OTP or email"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Prefer the latest unused OTP record
+    otp_record = otp_qs.filter(is_used=False).order_by('-created_at').first()
+
+    if not otp_record:
+        return Response({"error": "Invalid OTP or it has been used"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Compare values
+    if str(otp_record.otp).strip() != otp:
+        return Response({"error": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Check expiry
+    if hasattr(otp_record, "is_expired") and otp_record.is_expired():
+        otp_record.delete()
+        return Response({"error": "OTP expired, please request a new one"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Mark OTP as used
+    if hasattr(otp_record, "is_used"):
+        otp_record.is_used = True
+        otp_record.save()
+    else:
+        otp_record.delete()
+
+    # Retrieve User
+    try:
+        user = CustomUser.objects.get(email=email)
+    except CustomUser.DoesNotExist:
+        return Response({"error": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Generate tokens
+    try:
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
+    except Exception as e:
+        return Response({"error": "Failed to generate tokens"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    # Check onboarding status
+    onboarding_complete = hasattr(user, 'profile') and user.profile.onboarding_complete
+
+    return Response({
+        "message": "Login verification successful",
+        "access": access_token,
+        "refresh": refresh_token,
+        "onboarding_complete": onboarding_complete,
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+        }
+    }, status=status.HTTP_200_OK)
 
 
 # ---------------- CHECK AUTH TYPE ----------------

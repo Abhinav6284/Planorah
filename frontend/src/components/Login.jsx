@@ -48,6 +48,17 @@ export default function Login() {
         const res = await axios.post(`${API_BASE_URL}/api/users/google/login/`, {
           token: tokenResponse.access_token
         });
+        if (res.data.two_factor_required) {
+          // Redirect to OTP verification page
+          navigate("/verify-otp", {
+            state: {
+              email: res.data.email,
+              isLogin: true
+            }
+          });
+          return;
+        }
+
         localStorage.setItem("access_token", res.data.access);
         localStorage.setItem("refresh_token", res.data.refresh);
         setMessage("success:Google login successful!");
@@ -62,7 +73,7 @@ export default function Login() {
         const details = err.response?.data?.details ? ` (${err.response.data.details})` : '';
         setMessage(serverMsg ? `${serverMsg}${details}` : "Google login failed.");
       } finally {
-        setLoading(false);
+        if (!loading) setLoading(false);
       }
     },
     onError: () => {

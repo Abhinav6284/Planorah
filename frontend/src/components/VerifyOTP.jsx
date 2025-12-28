@@ -76,7 +76,12 @@ export default function VerifyOTP() {
     setMessage({ text: "", type: "" });
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/users/verify-otp/`, {
+      let endpoint = `${API_BASE_URL}/api/users/verify-otp/`;
+      if (location.state && location.state.isLogin) {
+        endpoint = `${API_BASE_URL}/api/users/verify-social-otp/`;
+      }
+
+      const response = await axios.post(endpoint, {
         email: email.trim(),
         otp: otpString,
       });
@@ -86,8 +91,13 @@ export default function VerifyOTP() {
         localStorage.setItem("access_token", response.data.access);
         localStorage.setItem("refresh_token", response.data.refresh);
 
-        setMessage({ text: "Verified! Setting up profile...", type: "success" });
-        setTimeout(() => navigate("/complete-profile"), 1500);
+        if (location.state && location.state.isLogin) {
+          setMessage({ text: "Login verified! Redirecting...", type: "success" });
+          setTimeout(() => navigate("/dashboard"), 1500);
+        } else {
+          setMessage({ text: "Verified! Setting up profile...", type: "success" });
+          setTimeout(() => navigate("/complete-profile"), 1500);
+        }
       }
     } catch (error) {
       const errorMsg = error.response?.data?.message || "Invalid OTP. Please try again.";
