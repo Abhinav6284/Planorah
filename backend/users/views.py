@@ -508,68 +508,84 @@ def google_oauth_login(request):
     Handle Google OAuth login. Accepts a Google Access Token from the frontend,
     verifies it via Google's userinfo endpoint, and creates/logs in the user.
     """
-    print(f"[GOOGLE_OAUTH_DEBUG] === Google OAuth Login Called ===")
-    print(f"[GOOGLE_OAUTH_DEBUG] Request data keys: {list(request.data.keys())}")
+    print(f"\n{'='*80}")
+    print(f"[GOOGLE_OAUTH] Step 1: Function called")
+    print(f"[GOOGLE_OAUTH] Request method: {request.method}")
+    print(f"[GOOGLE_OAUTH] Request data keys: {list(request.data.keys())}")
+    print(f"[GOOGLE_OAUTH] Request content type: {request.content_type}")
     
     try:
         import requests as http_requests
+        print(f"[GOOGLE_OAUTH] Step 2: requests library imported successfully")
     except ImportError as e:
-        print(f"[GOOGLE_OAUTH_DEBUG] Failed to import requests: {e}")
-        return Response({"error": "Server configuration error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        print(f"[GOOGLE_OAUTH] FATAL: Failed to import requests: {e}")
+        return Response({"error": "Server configuration error", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     token = request.data.get('token')
-    print(f"[GOOGLE_OAUTH_DEBUG] Token present: {bool(token)}")
+    print(f"[GOOGLE_OAUTH] Step 3: Token extraction")
+    print(f"[GOOGLE_OAUTH] Token present: {bool(token)}")
+    print(f"[GOOGLE_OAUTH] Token length: {len(token) if token else 0}")
+    print(f"[GOOGLE_OAUTH] Token preview: {str(token)[:30] if token else 'None'}...")
     
     if not token:
+        print(f"[GOOGLE_OAUTH] ERROR: No token provided in request")
         return Response({"error": "Google token is required"}, status=status.HTTP_400_BAD_REQUEST)
     
     try:
+        print(f"[GOOGLE_OAUTH] Step 4: Calling Google UserInfo API")
         # Verify the Google Access Token via UserInfo Endpoint
         userinfo_response = http_requests.get(
             f'https://www.googleapis.com/oauth2/v3/userinfo',
-            headers={'Authorization': f'Bearer {token}'}
+            headers={'Authorization': f'Bearer {token}'},
+            timeout=10
         )
         
-        # Debug logging (safe)
-        try:
-            print(f"[GOOGLE_OAUTH_DEBUG] Token received: {str(token)[:20] if token else 'None'}...")
-            print(f"[GOOGLE_OAUTH_DEBUG] UserInfo response status: {userinfo_response.status_code}")
-            print(f"[GOOGLE_OAUTH_DEBUG] UserInfo response: {str(userinfo_response.text)[:500]}")
-        except Exception as log_err:
-            print(f"[GOOGLE_OAUTH_DEBUG] Logging error: {log_err}")
+        print(f"[GOOGLE_OAUTH] Step 5: Google API response received")
+        print(f"[GOOGLE_OAUTH] Response status: {userinfo_response.status_code}")
+        print(f"[GOOGLE_OAUTH] Response headers: {dict(userinfo_response.headers)}")
+        print(f"[GOOGLE_OAUTH] Response body preview: {userinfo_response.text[:500]}")
         
         if userinfo_response.status_code != 200:
+            print(f"[GOOGLE_OAUTH] ERROR: Google API returned non-200 status")
             return Response({
                 "error": "Invalid Google token",
-                "details": userinfo_response.text
+                "details": f"Google API returned status {userinfo_response.status_code}: {userinfo_response.text}"
             }, status=status.HTTP_400_BAD_REQUEST)
             
+        print(f"[GOOGLE_OAUTH] Step 6: Parsing JSON response")
         idinfo = userinfo_response.json()
+        print(f"[GOOGLE_OAUTH] UserInfo keys: {list(idinfo.keys())}")
         
         # Extract user info
         email = idinfo.get('email')
-        # Google API can return email_verified as string "true" or boolean True
         email_verified = idinfo.get('email_verified')
         if isinstance(email_verified, str):
             email_verified = email_verified.lower() == 'true'
         name = idinfo.get('name', '')
         picture = idinfo.get('picture', '')
         
+        print(f"[GOOGLE_OAUTH] Step 7: Extracted user info")
+        print(f"[GOOGLE_OAUTH] Email: {email}")
+        print(f"[GOOGLE_OAUTH] Email verified: {email_verified}")
+        print(f"[GOOGLE_OAUTH] Name: {name}")
+        print(f"[GOOGLE_OAUTH] Picture: {bool(picture)}")
+        
         if not email:
-            return Response({"error": "No email received from Google"}, status=status.HTTP_400_BAD_REQUEST)
+            print(f"[GOOGLE_OAUTH] ERROR: No email in Google response")
+            return Response({"error": "No email received from Google", "details": f"Response: {idinfo}"}, status=status.HTTP_400_BAD_REQUEST)
         
         # Normalize email
         email = email.lower().strip()
-        print(f"[GOOGLE_OAUTH_DEBUG] Processing email: {email}")
+        print(f"[GOOGLE_OAUTH] Step 8: Email normalized to: {email}")
         
         # Check if user exists
+        print(f"[GOOGLE_OAUTH] Step 9: Checking if user exists")
         try:
             user = CustomUser.objects.get(email=email)
-            # User exists, log them in
             created = False
-            print(f"[GOOGLE_OAUTH_DEBUG] Existing user found: {user.username}")
+            print(f"[GOOGLE_OAUTH] User found: {user.username} (ID: {user.id})")
         except CustomUser.DoesNotExist:
-            # Create new user
+            print(f"[GOOGLE_OAUTH] User not found, creating new user")
             # Generate a unique username from email
             base_username = email.split('@')[0].lower()
             username = base_username
@@ -578,42 +594,53 @@ def google_oauth_login(request):
                 username = f"{base_username}{counter}"
                 counter += 1
             
-            print(f"[GOOGLE_OAUTH_DEBUG] Creating new user with username: {username}")
+            print(f"[GOOGLE_OAUTH] Step 10: Creating user with username: {username}")
             
-            # Create user without password (OAuth user)
-            user = CustomUser.objects.create(
-                email=email,
-                username=username,
-                is_active=True,
-                is_verified=True,
-            )
-            user.set_unusable_password()  # OAuth users don't have passwords
-            
-            # Set name
-            if name:
-                name_parts = name.split(' ', 1)
-                user.first_name = name_parts[0] if name_parts else ''
-                user.last_name = name_parts[1] if len(name_parts) > 1 else ''
-            user.save()
-            
-            created = True
-            print(f"[GOOGLE_OAUTH_DEBUG] New user created successfully")
+            try:
+                # Create user without password (OAuth user)
+                user = CustomUser.objects.create(
+                    email=email,
+                    username=username,
+                    is_active=True,
+                    is_verified=True,
+                )
+                user.set_unusable_password()
+                
+                # Set name
+                if name:
+                    name_parts = name.split(' ', 1)
+                    user.first_name = name_parts[0] if name_parts else ''
+                    user.last_name = name_parts[1] if len(name_parts) > 1 else ''
+                user.save()
+                
+                created = True
+                print(f"[GOOGLE_OAUTH] User created successfully (ID: {user.id})")
+            except Exception as create_err:
+                print(f"[GOOGLE_OAUTH] ERROR creating user: {type(create_err).__name__}: {create_err}")
+                raise
         
         # Generate JWT tokens
-        print(f"[GOOGLE_OAUTH_DEBUG] Generating JWT tokens...")
-        refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token)
-        refresh_token = str(refresh)
+        print(f"[GOOGLE_OAUTH] Step 11: Generating JWT tokens")
+        try:
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+            refresh_token = str(refresh)
+            print(f"[GOOGLE_OAUTH] Tokens generated successfully")
+        except Exception as token_err:
+            print(f"[GOOGLE_OAUTH] ERROR generating tokens: {type(token_err).__name__}: {token_err}")
+            raise
         
         # Check onboarding status (safely)
+        print(f"[GOOGLE_OAUTH] Step 12: Checking onboarding status")
         try:
             onboarding_complete = hasattr(user, 'profile') and user.profile.onboarding_complete
-        except Exception:
+            print(f"[GOOGLE_OAUTH] Onboarding complete: {onboarding_complete}")
+        except Exception as onboard_err:
+            print(f"[GOOGLE_OAUTH] Warning: Error checking onboarding: {onboard_err}")
             onboarding_complete = False
         
-        print(f"[GOOGLE_OAUTH_DEBUG] Login successful, onboarding_complete: {onboarding_complete}")
-        
-        return Response({
+        print(f"[GOOGLE_OAUTH] Step 13: Preparing response")
+        response_data = {
             "refresh": refresh_token,
             "access": access_token,
             "message": "Google login successful",
@@ -626,17 +653,22 @@ def google_oauth_login(request):
             },
             "onboarding_complete": onboarding_complete,
             "created": created
-        }, status=status.HTTP_200_OK)
+        }
+        print(f"[GOOGLE_OAUTH] SUCCESS: Returning 200 OK")
+        print(f"{'='*80}\n")
+        return Response(response_data, status=status.HTTP_200_OK)
         
     except ValueError as e:
-        # Invalid token
-        print(f"[GOOGLE_OAUTH_DEBUG] ValueError: {e}")
+        print(f"[GOOGLE_OAUTH] ValueError: {e}")
+        print(f"{'='*80}\n")
         return Response({"error": "Invalid Google token", "details": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        print(f"[GOOGLE_OAUTH_DEBUG] Exception: {type(e).__name__}: {e}")
+        print(f"[GOOGLE_OAUTH] EXCEPTION: {type(e).__name__}: {e}")
         import traceback
+        print(f"[GOOGLE_OAUTH] Traceback:")
         traceback.print_exc()
-        return Response({"error": "Google authentication failed", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        print(f"{'='*80}\n")
+        return Response({"error": "Google authentication failed", "details": f"{type(e).__name__}: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # ---------------- GITHUB OAUTH LOGIN ----------------
