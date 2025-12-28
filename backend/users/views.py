@@ -1,5 +1,6 @@
 from datetime import timedelta
 import random
+import logging
 from django.conf import settings
 from django.utils import timezone
 from django.db import IntegrityError
@@ -18,6 +19,9 @@ from backend.email_service import send_otp_email, send_password_reset_email
 from .models import CustomUser, OTPVerification, UserProfile
 from .serializers import UserSerializer, UserProfileSerializer
 from .statistics import get_user_statistics
+
+# Configure logger for OAuth debugging
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
