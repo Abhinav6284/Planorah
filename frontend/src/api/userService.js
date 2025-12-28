@@ -20,8 +20,16 @@ export const userService = {
         return response.data;
     },
 
-    deleteAccount: async (password) => {
-        const response = await api.post('/api/users/delete-account/', { password });
+    deleteAccount: async (passwordOrConfirmation, isOAuth = false) => {
+        const payload = isOAuth
+            ? { confirmation: passwordOrConfirmation }
+            : { password: passwordOrConfirmation };
+        const response = await api.post('/api/users/delete-account/', payload);
+        return response.data;
+    },
+
+    checkAuthType: async () => {
+        const response = await api.get('/api/users/check-auth-type/');
         return response.data;
     },
 };

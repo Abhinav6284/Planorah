@@ -7,6 +7,16 @@ import { API_BASE_URL } from "../../api/axios";
 
 const STEPS = [
     {
+        id: "personal",
+        title: "Tell us about yourself",
+        subtitle: "Let's get to know you better.",
+        fields: [
+            { name: "name", label: "Full Name", placeholder: "John Doe" },
+            { name: "phone_number", label: "Phone Number", placeholder: "+1234567890" },
+            { name: "date_of_birth", label: "Date of Birth", type: "date" }
+        ]
+    },
+    {
         id: "field",
         title: "What's your field of study?",
         subtitle: "We'll tailor your career path based on this.",
@@ -47,6 +57,9 @@ export default function StepForm() {
     const [currentStep, setCurrentStep] = useState(0);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
+        name: "",
+        phone_number: "",
+        date_of_birth: "",
         field_of_study: "",
         role: "Student", // Default
         target_role: "",
@@ -54,6 +67,39 @@ export default function StepForm() {
         skills: "",
         career_intent: "Get a Job" // Default
     });
+
+    React.useEffect(() => {
+        // Fetch existing profile data to pre-fill (e.g. name from Google)
+        const fetchProfile = async () => {
+            try {
+                const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+                if (!token) return;
+
+                const response = await axios.get(`${API_BASE_URL}/api/users/profile/`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                const data = response.data.profile || {};
+                const user = response.data;
+
+                setFormData(prev => ({
+                    ...prev,
+                    name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username || "",
+                    phone_number: user.phone_number || "",
+                    date_of_birth: user.date_of_birth || "",
+                    field_of_study: data.field_of_study || "",
+                    target_role: data.target_role || "",
+                    // Keep defaults if empty
+                    role: data.role || prev.role,
+                    experience_level: data.experience_level || prev.experience_level,
+                    career_intent: data.career_intent || prev.career_intent
+                }));
+            } catch (err) {
+                console.log("No existing profile data found/fetched");
+            }
+        };
+        fetchProfile();
+    }, []);
 
     const stepData = STEPS[currentStep];
 
@@ -63,6 +109,19 @@ export default function StepForm() {
 
     const handleNext = async () => {
         if (currentStep < STEPS.length - 1) {
+            // Basic validation for current step
+            const currentFields = STEPS[currentStep].fields;
+            const emptyFields = currentFields.filter(f => !formData[f.name] && f.name !== 'skills'); // Skills can be empty? Maybe not.
+
+            if (emptyFields.length > 0) {
+                // You might want to show an error state here
+                // alert(`Please fill in ${emptyFields.map(f => f.label).join(', ')}`);
+                // For now, let's just proceed or maybe restrict? 
+                // Let's restrict:
+                alert("Please fill in all required fields.");
+                return;
+            }
+
             setCurrentStep(currentStep + 1);
         } else {
             // Submit
@@ -71,7 +130,7 @@ export default function StepForm() {
                 // Parse skills to array
                 const payload = {
                     ...formData,
-                    skills: formData.skills.split(',').map(s => s.trim()).filter(s => s)
+                    skills: formData.skills ? formData.skills.split(',').map(s => s.trim()).filter(s => s) : []
                 };
 
                 const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
@@ -138,7 +197,7 @@ export default function StepForm() {
                                 </select>
                             ) : (
                                 <input
-                                    type="text"
+                                    type={field.type || "text"}
                                     name={field.name}
                                     value={formData[field.name]}
                                     onChange={handleChange}

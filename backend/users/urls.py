@@ -22,6 +22,8 @@ urlpatterns = [
     path('statistics/', views.get_user_statistics, name='user-statistics'),
     # Delete Account
     path('delete-account/', views.delete_account, name='delete-account'),
+    # Check Auth Type
+    path('check-auth-type/', views.check_auth_type, name='check-auth-type'),
 ]
 
 

@@ -469,39 +469,6 @@ def logout_view(request):
 
 
 # ---------------- DELETE ACCOUNT ----------------
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def delete_account(request):
-    """
-    Permanently delete the user's account and all associated data.
-    Requires password confirmation for security.
-    """
-    password = request.data.get('password')
-    
-    if not password:
-        return Response({"error": "Password is required to confirm account deletion"}, status=status.HTTP_400_BAD_REQUEST)
-    
-    user = request.user
-    
-    # Verify password (skip for OAuth users who don't have passwords)
-    if user.has_usable_password():
-        if not user.check_password(password):
-            return Response({"error": "Incorrect password"}, status=status.HTTP_400_BAD_REQUEST)
-    
-    try:
-        # Delete user profile if exists
-        if hasattr(user, 'profile'):
-            user.profile.delete()
-        
-        # Delete all OTP records for this email
-        OTPVerification.objects.filter(email=user.email).delete()
-        
-        # Delete the user (this will cascade delete related objects)
-        user.delete()
-        
-        return Response({"message": "Account deleted successfully"}, status=status.HTTP_200_OK)
-    except Exception as e:
-        return Response({"error": f"Failed to delete account: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # ---------------- GOOGLE OAUTH LOGIN ----------------
@@ -842,4 +809,75 @@ def github_oauth_login(request):
     except Exception as e:
         return Response({"error": "GitHub authentication failed", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+# ---------------- DELETE ACCOUNT ----------------
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def delete_account(request):
+    """
+    Delete user account with different confirmation methods based on account type.
+    - Regular users (with password): must provide password
+    - OAuth users (no password): must type 'DELETE'
+    """
+    user = request.user
+    
+    if user.has_usable_password():
+        # Regular user - require password
+        password = request.data.get('password')
+        if not password:
+            return Response({
+                "error": "Password required",
+                "details": "Please enter your password to confirm account deletion"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not user.check_password(password):
+            return Response({
+                "error": "Invalid password",
+                "details": "The password you entered is incorrect"
+            }, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        # OAuth user - require typing "DELETE"
+        confirmation = request.data.get('confirmation', '')
+        if confirmation != 'DELETE':
+            return Response({
+                "error": "Confirmation required",
+                "details": "Please type DELETE to confirm account deletion"
+            }, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        # Delete will trigger signal to add email to DeletedUser table
+        user_email = user.email
+        user.delete()
+        
+        return Response({
+            "message": "Account deleted successfully",
+            "email": user_email
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        logger.error(f"Error deleting account: {e}")
+        return Response({
+            "error": "Account deletion failed",
+            "details": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ---------------- CHECK AUTH TYPE ----------------
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def check_auth_type(request):
+    """
+    Check if user is OAuth-only or has a password.
+    Returns: {
+        "has_password": true/false,
+        "is_oauth": true/false
+    }
+    """
+    user = request.user
+    has_password = user.has_usable_password()
+    
+    return Response({
+        "has_password": has_password,
+        "is_oauth": not has_password
+    }, status=status.HTTP_200_OK)
 

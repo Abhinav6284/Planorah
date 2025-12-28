@@ -27,10 +27,12 @@ export default function ProfilePage() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deletePassword, setDeletePassword] = useState('');
     const [deleteError, setDeleteError] = useState('');
+    const [isOAuth, setIsOAuth] = useState(false);
     const [deleting, setDeleting] = useState(false);
 
     useEffect(() => {
         fetchData();
+        checkUserAuthType();
     }, []);
 
     const fetchData = async () => {
@@ -62,6 +64,15 @@ export default function ProfilePage() {
             console.error("Failed to fetch profile data", error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const checkUserAuthType = async () => {
+        try {
+            const authData = await userService.checkAuthType();
+            setIsOAuth(authData.is_oauth);
+        } catch (error) {
+            console.error('Failed to check auth type', error);
         }
     };
 
@@ -116,7 +127,7 @@ export default function ProfilePage() {
 
     const handleDeleteAccount = async () => {
         if (!deletePassword.trim()) {
-            setDeleteError('Please enter your password to confirm deletion');
+            setDeleteError(isOAuth ? 'Please type DELETE to confirm' : 'Please enter your password to confirm deletion');
             return;
         }
 
@@ -124,13 +135,13 @@ export default function ProfilePage() {
         setDeleteError('');
 
         try {
-            await userService.deleteAccount(deletePassword);
+            await userService.deleteAccount(deletePassword, isOAuth);
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
             navigate('/login', { state: { message: 'Account deleted successfully' } });
         } catch (error) {
             console.error("Failed to delete account", error);
-            setDeleteError(error.response?.data?.error || 'Failed to delete account. Please try again.');
+            setDeleteError(error.response?.data?.details || error.response?.data?.error || 'Failed to delete account. Please try again.');
         } finally {
             setDeleting(false);
         }
@@ -332,13 +343,13 @@ export default function ProfilePage() {
 
                                 <div className="mb-4">
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Enter your password to confirm
+                                        {isOAuth ? 'Type DELETE to confirm' : 'Enter your password to confirm'}
                                     </label>
                                     <input
-                                        type="password"
+                                        type={isOAuth ? "text" : "password"}
                                         value={deletePassword}
                                         onChange={(e) => setDeletePassword(e.target.value)}
-                                        placeholder="••••••••"
+                                        placeholder={isOAuth ? "DELETE" : "••••••••"}
                                         className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 focus:border-red-400 dark:focus:border-red-600 outline-none transition-all text-gray-900 dark:text-white"
                                     />
                                 </div>
