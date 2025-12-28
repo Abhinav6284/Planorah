@@ -522,6 +522,11 @@ def google_oauth_login(request):
             headers={'Authorization': f'Bearer {token}'}
         )
         
+        # Debug logging
+        print(f"[GOOGLE_OAUTH_DEBUG] Token received: {token[:20]}...")
+        print(f"[GOOGLE_OAUTH_DEBUG] UserInfo response status: {userinfo_response.status_code}")
+        print(f"[GOOGLE_OAUTH_DEBUG] UserInfo response: {userinfo_response.text[:500]}")
+        
         if userinfo_response.status_code != 200:
             return Response({
                 "error": "Invalid Google token",
