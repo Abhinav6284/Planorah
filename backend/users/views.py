@@ -840,18 +840,24 @@ def delete_account(request):
     user = request.user
     
     if user.has_usable_password():
-        # Regular user - require password
+        # Regular user - require password OR 'DELETE' confirmation (fallback)
         password = request.data.get('password')
-        if not password:
+        confirmation = request.data.get('confirmation')
+        
+        if password:
+            if not user.check_password(password):
+                return Response({
+                    "error": "Invalid password",
+                    "details": "The password you entered is incorrect"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        elif confirmation == 'DELETE':
+            # Allow fallback to OAuth-style deletion if user explicitly chooses it
+            # This handles cases where "Hybrid" users forgot their password but are authenticated
+            pass
+        else:
             return Response({
                 "error": "Password required",
                 "details": "Please enter your password to confirm account deletion"
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        if not user.check_password(password):
-            return Response({
-                "error": "Invalid password",
-                "details": "The password you entered is incorrect"
             }, status=status.HTTP_400_BAD_REQUEST)
     else:
         # OAuth user - require typing "DELETE"
