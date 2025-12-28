@@ -580,10 +580,19 @@ def google_oauth_login(request):
         
         # Normalize email
         email = email.lower().strip()
-        print(f"[GOOGLE_OAUTH] Step 8: Email normalized to: {email}")
+        logger.error(f"[GOOGLE_OAUTH] Step 8: Email normalized to: {email}")
+        
+        # Check if this email belongs to a deleted account
+        from .models import DeletedUser
+        if DeletedUser.objects.filter(email=email).exists():
+            logger.error(f"[GOOGLE_OAUTH] ERROR: Email belongs to deleted account")
+            return Response({
+                "error": "Account previously deleted",
+                "details": "This account was permanently deleted and cannot be restored. Please contact support if you believe this is an error."
+            }, status=status.HTTP_403_FORBIDDEN)
         
         # Check if user exists
-        print(f"[GOOGLE_OAUTH] Step 9: Checking if user exists")
+        logger.error(f"[GOOGLE_OAUTH] Step 9: Checking if user exists")
         try:
             user = CustomUser.objects.get(email=email)
             created = False
@@ -767,6 +776,14 @@ def github_oauth_login(request):
         email = email.lower().strip()
         name = github_user.get('name', '') or github_user.get('login', '')
         github_username = github_user.get('login', '')
+        
+        # Check if this email belongs to a deleted account
+        from .models import DeletedUser
+        if DeletedUser.objects.filter(email=email).exists():
+            return Response({
+                "error": "Account previously deleted",
+                "details": "This account was permanently deleted and cannot be restored. Please contact support if you believe this is an error."
+            }, status=status.HTTP_403_FORBIDDEN)
         
         # Check if user exists
         try:

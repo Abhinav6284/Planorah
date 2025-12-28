@@ -101,3 +101,21 @@ class OTPVerification(models.Model):
 
     def __str__(self):
         return f"{self.email} - {self.otp}"
+
+
+class DeletedUser(models.Model):
+    """
+    Track deleted user emails to prevent them from re-registering via OAuth.
+    When a user account is deleted, their email is added to this table.
+    """
+    email = models.EmailField(unique=True, db_index=True)
+    deleted_at = models.DateTimeField(auto_now_add=True)
+    deletion_reason = models.TextField(blank=True, null=True)
+    
+    class Meta:
+        verbose_name = "Deleted User"
+        verbose_name_plural = "Deleted Users"
+        ordering = ['-deleted_at']
+    
+    def __str__(self):
+        return f"{self.email} (deleted {self.deleted_at.strftime('%Y-%m-%d')})"
