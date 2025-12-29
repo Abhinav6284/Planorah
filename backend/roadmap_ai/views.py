@@ -22,10 +22,14 @@ def generate_roadmap(request):
             "error": "Gemini AI is not available. Please install google-generativeai package."
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    if not os.environ.get("GEMINI_API_KEY"):
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
         return Response({
             "error": "GEMINI_API_KEY environment variable is not set."
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # Configure Gemini with API key
+    genai.configure(api_key=api_key)
 
     user = request.user
     goal = request.data.get('goal', '')
