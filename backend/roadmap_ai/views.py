@@ -30,6 +30,7 @@ def generate_roadmap(request):
 
     # Configure Gemini with API key
     genai.configure(api_key=api_key)
+    print(f"🔑 Gemini API configured with key: {api_key[:10]}...{api_key[-4:]}")
 
     user = request.user
     goal = request.data.get('goal', '')
@@ -369,6 +370,7 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
         # Using Gemini 2.5 Flash Lite - lightweight and cost-effective
         model = genai.GenerativeModel(
             'gemini-2.5-flash-lite')  # type: ignore
+        print(f"🤖 Using model: gemini-2.5-flash-lite")
 
         # Use proper GenerationConfig
         generation_config = GenerationConfig(
@@ -378,7 +380,9 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
         )
 
         # Generate content and assign to response variable
+        print(f"📝 Generating roadmap for goal: {goal[:50]}...")
         response = model.generate_content(prompt, generation_config=generation_config)
+        print(f"✅ Response received successfully")
 
         # Safety check: Ensure valid response from AI
         if not response or not hasattr(response, "text") or not response.text:
