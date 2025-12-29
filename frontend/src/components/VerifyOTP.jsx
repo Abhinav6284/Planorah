@@ -91,10 +91,19 @@ export default function VerifyOTP() {
         localStorage.setItem("access_token", response.data.access);
         localStorage.setItem("refresh_token", response.data.refresh);
 
+        // Check if onboarding is complete to decide redirect destination
+        const onboardingComplete = response.data.onboarding_complete;
+
         if (location.state && location.state.isLogin) {
+          // Social login (Google/GitHub) OTP verification
           setMessage({ text: "Login verified! Redirecting...", type: "success" });
-          setTimeout(() => navigate("/dashboard"), 1500);
+          if (onboardingComplete) {
+            setTimeout(() => navigate("/dashboard"), 1500);
+          } else {
+            setTimeout(() => navigate("/onboarding"), 1500);
+          }
         } else {
+          // Email registration OTP verification
           setMessage({ text: "Verified! Setting up profile...", type: "success" });
           setTimeout(() => navigate("/complete-profile"), 1500);
         }

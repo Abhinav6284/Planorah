@@ -25,6 +25,105 @@ logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
+
+# ---------------- REGISTER USER ----------------
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def register_user(request):
+    """
+    Handle user registration with email and password.
+    Creates an inactive user and sends OTP for verification.
+    """
+    data = request.data
+    email = data.get('email')
+    username = data.get('username')
+    password = data.get('password')
+
+    # Validate required fields
+    if not email or not username or not password:
+        return Response({
+            'error': 'Email, username, and password are required'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    # Normalize email
+    email = email.lower().strip()
+    username = username.strip()
+
+    # Clean up DeletedUser record if exists (allow re-registration)
+    from .models import DeletedUser
+    DeletedUser.objects.filter(email=email).delete()
+
+    # Check if email already exists
+    if CustomUser.objects.filter(email__iexact=email).exists():
+        return Response({
+            'error': 'Email already registered'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    # Check if username already exists
+    if CustomUser.objects.filter(username__iexact=username).exists():
+        return Response({
+            'error': 'Username already taken'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Create user (inactive until OTP verification)
+        user = CustomUser.objects.create(
+            email=email,
+            username=username,
+            is_active=False,
+            is_verified=False,
+        )
+        user.set_password(password)
+        user.save()
+
+        # Generate OTP
+        otp = str(random.randint(100000, 999999))
+
+        # Delete any existing OTPs for this email
+        OTPVerification.objects.filter(email__iexact=email).delete()
+
+        # Create new OTP record
+        OTPVerification.objects.create(
+            email=email,
+            otp=otp,
+            is_used=False,
+            created_at=timezone.now()
+        )
+
+        # Send OTP via email
+        try:
+            email_sent = send_otp_email(email, otp, username)
+            if not email_sent:
+                # User created but email failed - they can use resend
+                return Response({
+                    'message': 'Account created but failed to send OTP. Please use resend OTP.',
+                    'email': email
+                }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            logger.error(f"Failed to send registration OTP email: {e}")
+            return Response({
+                'message': 'Account created but failed to send OTP. Please use resend OTP.',
+                'email': email
+            }, status=status.HTTP_201_CREATED)
+
+        return Response({
+            'message': 'Registration initiated. Please verify your email with the OTP sent.',
+            'email': email
+        }, status=status.HTTP_201_CREATED)
+
+    except IntegrityError as e:
+        logger.error(f"IntegrityError during registration: {e}")
+        return Response({
+            'error': 'Registration failed. Email or username may already be in use.'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        logger.error(f"Error during registration: {e}")
+        return Response({
+            'error': 'Registration failed',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 # ---------------- VERIFY OTP ----------------
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -81,10 +180,14 @@ def verify_otp(request):
     # Generate tokens for auto-login
     refresh = RefreshToken.for_user(user)
     
+    # Check onboarding status
+    onboarding_complete = hasattr(user, 'profile') and user.profile.onboarding_complete
+    
     return Response({
         "message": "Registration successful!",
         "access": str(refresh.access_token),
-        "refresh": str(refresh)
+        "refresh": str(refresh),
+        "onboarding_complete": onboarding_complete
     }, status=status.HTTP_201_CREATED)
 
 
@@ -106,15 +209,7 @@ def login_user(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # Check for deleted user (only for email logins mainly, or attempt to resolve)
-    from .models import DeletedUser
-    check_email = identifier.strip().lower() # Assuming identifier is email for checking, or we check if it looks like email
-    if "@" in check_email: 
-        if DeletedUser.objects.filter(email=check_email).exists():
-            return Response({
-                "error": "Account previously deleted",
-                "details": "This account was deleted. You can re-register if you wish to create a new account."
-            }, status=status.HTTP_403_FORBIDDEN)
+    # Note: DeletedUser check removed to allow re-registered users to log in normally
 
     # Find the user by email or username
     User = get_user_model()
@@ -495,39 +590,48 @@ def google_oauth_login(request):
                 user.save()
                 
         except CustomUser.DoesNotExist:
-            print(f"[GOOGLE_OAUTH] User not found, creating new user")
-            # Generate a unique username from email
-            base_username = email.split('@')[0].lower()
-            username = base_username
-            counter = 1
-            while CustomUser.objects.filter(username=username).exists():
-                username = f"{base_username}{counter}"
-                counter += 1
+            # Check if this is a signup or login attempt
+            mode = request.data.get('mode', 'login')  # Default to login for backwards compatibility
             
-            print(f"[GOOGLE_OAUTH] Step 10: Creating user with username: {username}")
-            
-            try:
-                # Create user without password (OAuth user)
-                user = CustomUser.objects.create(
-                    email=email,
-                    username=username,
-                    is_active=True,
-                    is_verified=True,
-                )
-                user.set_unusable_password()
+            if mode == 'signup':
+                print(f"[GOOGLE_OAUTH] User not found, creating new user (signup mode)")
+                # Generate a unique username from email
+                base_username = email.split('@')[0].lower()
+                username = base_username
+                counter = 1
+                while CustomUser.objects.filter(username=username).exists():
+                    username = f"{base_username}{counter}"
+                    counter += 1
                 
-                # Set name
-                if name:
-                    name_parts = name.split(' ', 1)
-                    user.first_name = name_parts[0] if name_parts else ''
-                    user.last_name = name_parts[1] if len(name_parts) > 1 else ''
-                user.save()
-                
-                created = True
-                print(f"[GOOGLE_OAUTH] User created successfully (ID: {user.id})")
-            except Exception as create_err:
-                print(f"[GOOGLE_OAUTH] ERROR creating user: {type(create_err).__name__}: {create_err}")
-                raise
+                try:
+                    # Create user without password (OAuth user)
+                    user = CustomUser.objects.create(
+                        email=email,
+                        username=username,
+                        is_active=True,
+                        is_verified=True,
+                    )
+                    user.set_unusable_password()
+                    
+                    # Don't set name from Google - let user fill it during onboarding
+                    user.save()
+                    
+                    print(f"[GOOGLE_OAUTH] User created successfully (ID: {user.id})")
+                except Exception as create_err:
+                    print(f"[GOOGLE_OAUTH] ERROR creating user: {type(create_err).__name__}: {create_err}")
+                    return Response({
+                        "error": "Failed to create account",
+                        "details": str(create_err)
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                # Login mode - user must already exist
+                print(f"[GOOGLE_OAUTH] User not found - signup required (login mode)")
+                return Response({
+                    "error": "Account not found",
+                    "signup_required": True,
+                    "message": "No account exists with this email. Please sign up first.",
+                    "email": email
+                }, status=status.HTTP_404_NOT_FOUND)
         
         
         # --- 2FA ENFORCEMENT START ---
@@ -689,31 +793,48 @@ def github_oauth_login(request):
                 user.save()
                 
         except CustomUser.DoesNotExist:
-            # Create new user
-            # Generate a unique username
-            base_username = github_username.lower() if github_username else email.split('@')[0].lower()
-            username = base_username
-            counter = 1
-            while CustomUser.objects.filter(username=username).exists():
-                username = f"{base_username}{counter}"
-                counter += 1
+            # Check if this is a signup or login attempt
+            mode = request.data.get('mode', 'login')  # Default to login for backwards compatibility
             
-            # Create user without password (OAuth user)
-            user = CustomUser.objects.create(
-                email=email,
-                username=username,
-                is_active=True,
-                is_verified=True,
-            )
-            user.set_unusable_password()
-            
-            # Set name
-            name_parts = name.split(' ', 1) if name else ['', '']
-            user.first_name = name_parts[0] if name_parts else ''
-            user.last_name = name_parts[1] if len(name_parts) > 1 else ''
-            user.save()
-            
-            created = True
+            if mode == 'signup':
+                print(f"[GITHUB_OAUTH] User not found, creating new user (signup mode)")
+                # Generate a unique username
+                base_username = github_username.lower() if github_username else email.split('@')[0].lower()
+                username = base_username
+                counter = 1
+                while CustomUser.objects.filter(username=username).exists():
+                    username = f"{base_username}{counter}"
+                    counter += 1
+                
+                try:
+                    # Create user without password (OAuth user)
+                    user = CustomUser.objects.create(
+                        email=email,
+                        username=username,
+                        is_active=True,
+                        is_verified=True,
+                    )
+                    user.set_unusable_password()
+                    
+                    # Don't set name from GitHub - let user fill it during onboarding
+                    user.save()
+                    
+                    print(f"[GITHUB_OAUTH] User created successfully (ID: {user.id})")
+                except Exception as create_err:
+                    print(f"[GITHUB_OAUTH] ERROR creating user: {type(create_err).__name__}: {create_err}")
+                    return Response({
+                        "error": "Failed to create account",
+                        "details": str(create_err)
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                # Login mode - user must already exist
+                print(f"[GITHUB_OAUTH] User not found - signup required (login mode)")
+                return Response({
+                    "error": "Account not found",
+                    "signup_required": True,
+                    "message": "No account exists with this email. Please sign up first.",
+                    "email": email
+                }, status=status.HTTP_404_NOT_FOUND)
         
         
         # --- 2FA ENFORCEMENT START ---
