@@ -25,6 +25,109 @@ logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
+
+# ---------------- REGISTER USER ----------------
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def register_user(request):
+    """
+    Handle user registration with email and password.
+    Creates an inactive user and sends OTP for verification.
+    """
+    data = request.data
+    email = data.get('email')
+    username = data.get('username')
+    password = data.get('password')
+
+    # Validate required fields
+    if not email or not username or not password:
+        return Response({
+            'error': 'Email, username, and password are required'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    # Normalize email
+    email = email.lower().strip()
+    username = username.strip()
+
+    # Check for deleted user
+    from .models import DeletedUser
+    if DeletedUser.objects.filter(email=email).exists():
+        return Response({
+            "error": "Account previously deleted",
+            "details": "This account was deleted. You can re-register if you wish to create a new account."
+        }, status=status.HTTP_403_FORBIDDEN)
+
+    # Check if email already exists
+    if CustomUser.objects.filter(email__iexact=email).exists():
+        return Response({
+            'error': 'Email already registered'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    # Check if username already exists
+    if CustomUser.objects.filter(username__iexact=username).exists():
+        return Response({
+            'error': 'Username already taken'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Create user (inactive until OTP verification)
+        user = CustomUser.objects.create(
+            email=email,
+            username=username,
+            is_active=False,
+            is_verified=False,
+        )
+        user.set_password(password)
+        user.save()
+
+        # Generate OTP
+        otp = str(random.randint(100000, 999999))
+
+        # Delete any existing OTPs for this email
+        OTPVerification.objects.filter(email__iexact=email).delete()
+
+        # Create new OTP record
+        OTPVerification.objects.create(
+            email=email,
+            otp=otp,
+            is_used=False,
+            created_at=timezone.now()
+        )
+
+        # Send OTP via email
+        try:
+            email_sent = send_otp_email(email, otp, username)
+            if not email_sent:
+                # User created but email failed - they can use resend
+                return Response({
+                    'message': 'Account created but failed to send OTP. Please use resend OTP.',
+                    'email': email
+                }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            logger.error(f"Failed to send registration OTP email: {e}")
+            return Response({
+                'message': 'Account created but failed to send OTP. Please use resend OTP.',
+                'email': email
+            }, status=status.HTTP_201_CREATED)
+
+        return Response({
+            'message': 'Registration initiated. Please verify your email with the OTP sent.',
+            'email': email
+        }, status=status.HTTP_201_CREATED)
+
+    except IntegrityError as e:
+        logger.error(f"IntegrityError during registration: {e}")
+        return Response({
+            'error': 'Registration failed. Email or username may already be in use.'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        logger.error(f"Error during registration: {e}")
+        return Response({
+            'error': 'Registration failed',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 # ---------------- VERIFY OTP ----------------
 @api_view(['POST'])
 @permission_classes([AllowAny])
