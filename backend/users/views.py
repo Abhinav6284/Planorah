@@ -49,13 +49,9 @@ def register_user(request):
     email = email.lower().strip()
     username = username.strip()
 
-    # Check for deleted user
+    # Clean up DeletedUser record if exists (allow re-registration)
     from .models import DeletedUser
-    if DeletedUser.objects.filter(email=email).exists():
-        return Response({
-            "error": "Account previously deleted",
-            "details": "This account was deleted. You can re-register if you wish to create a new account."
-        }, status=status.HTTP_403_FORBIDDEN)
+    DeletedUser.objects.filter(email=email).delete()
 
     # Check if email already exists
     if CustomUser.objects.filter(email__iexact=email).exists():
@@ -213,15 +209,7 @@ def login_user(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # Check for deleted user (only for email logins mainly, or attempt to resolve)
-    from .models import DeletedUser
-    check_email = identifier.strip().lower() # Assuming identifier is email for checking, or we check if it looks like email
-    if "@" in check_email: 
-        if DeletedUser.objects.filter(email=check_email).exists():
-            return Response({
-                "error": "Account previously deleted",
-                "details": "This account was deleted. You can re-register if you wish to create a new account."
-            }, status=status.HTTP_403_FORBIDDEN)
+    # Note: DeletedUser check removed to allow re-registered users to log in normally
 
     # Find the user by email or username
     User = get_user_model()
@@ -625,11 +613,7 @@ def google_oauth_login(request):
                     )
                     user.set_unusable_password()
                     
-                    # Set name
-                    if name:
-                        name_parts = name.split(' ', 1)
-                        user.first_name = name_parts[0] if name_parts else ''
-                        user.last_name = name_parts[1] if len(name_parts) > 1 else ''
+                    # Don't set name from Google - let user fill it during onboarding
                     user.save()
                     
                     print(f"[GOOGLE_OAUTH] User created successfully (ID: {user.id})")
@@ -832,10 +816,7 @@ def github_oauth_login(request):
                     )
                     user.set_unusable_password()
                     
-                    # Set name
-                    name_parts = name.split(' ', 1) if name else ['', '']
-                    user.first_name = name_parts[0] if name_parts else ''
-                    user.last_name = name_parts[1] if len(name_parts) > 1 else ''
+                    # Don't set name from GitHub - let user fill it during onboarding
                     user.save()
                     
                     print(f"[GITHUB_OAUTH] User created successfully (ID: {user.id})")
