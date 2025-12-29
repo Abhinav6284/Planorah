@@ -362,9 +362,9 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
 
     try:
         # Call Gemini API with proper error handling
-        # Using Gemini 2.5 Flash model
+        # Using Gemini 2.5 Flash Lite - lightweight and cost-effective
         model = genai.GenerativeModel(
-            'gemini-2.5-flash')  # type: ignore
+            'gemini-2.5-flash-lite')  # type: ignore
 
         # Use proper GenerationConfig
         generation_config = GenerationConfig(
