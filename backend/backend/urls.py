@@ -20,6 +20,14 @@ urlpatterns = [
     path('api/', include('tasks.urls')),  # Tasks and Notes API
     path('api/assistant/', include('assistant.urls')),  # AI Assistant Chat
     path('api/music/', include('music.urls')),  # Music Integration (Spotify/YouTube)
+    # Career execution platform modules
+    path('api/plans/', include('plans.urls')),
+    path('api/subscriptions/', include('subscriptions.urls')),
+    path('api/portfolio/', include('portfolio.urls')),
+    path('api/github/', include('github_integration.urls')),
+    path('api/billing/', include('billing.urls')),
+    path('api/analytics/', include('analytics.urls')),
+    # JWT token endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
