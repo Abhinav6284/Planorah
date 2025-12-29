@@ -362,9 +362,9 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
 
     try:
         # Call Gemini API with proper error handling
-        # Use gemini-1.5-flash for better free tier limits
+        # Use gemini-pro - stable model with good free tier limits
         model = genai.GenerativeModel(
-            'gemini-1.5-flash')  # type: ignore
+            'gemini-pro')  # type: ignore
 
         # Use proper GenerationConfig
         generation_config = GenerationConfig(
