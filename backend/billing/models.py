@@ -211,4 +211,6 @@ class CouponUsage(models.Model):
     used_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ['coupon', 'payment']
+        constraints = [
+            models.UniqueConstraint(fields=['coupon', 'payment'], name='unique_coupon_payment')
+        ]

@@ -140,7 +140,9 @@ class PortfolioProject(models.Model):
 
     class Meta:
         ordering = ['-is_featured', 'order']
-        unique_together = ['portfolio', 'project']
+        constraints = [
+            models.UniqueConstraint(fields=['portfolio', 'project'], name='unique_portfolio_project')
+        ]
 
     def __str__(self):
         return f"{self.portfolio.user.username} - {self.project.title}"
@@ -176,7 +178,9 @@ class PortfolioAnalytics(models.Model):
     referrer_data = models.JSONField(default=dict)
 
     class Meta:
-        unique_together = ['portfolio', 'date']
+        constraints = [
+            models.UniqueConstraint(fields=['portfolio', 'date'], name='unique_portfolio_date')
+        ]
         ordering = ['-date']
 
     def __str__(self):

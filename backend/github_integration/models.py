@@ -73,7 +73,9 @@ class GitHubRepository(models.Model):
 
     class Meta:
         verbose_name_plural = 'GitHub Repositories'
-        unique_together = ['user', 'repo_full_name']
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'repo_full_name'], name='unique_user_repo')
+        ]
 
     def __str__(self):
         return self.repo_full_name

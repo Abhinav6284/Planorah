@@ -87,7 +87,9 @@ class RoadmapProgress(models.Model):
     is_completed = models.BooleanField(default=False)
 
     class Meta:
-        unique_together = ['user', 'roadmap']
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'roadmap'], name='unique_user_roadmap')
+        ]
 
     def __str__(self):
         return f"{self.user.username} - {self.roadmap.title} ({self.completion_percentage}%)"
@@ -148,7 +150,9 @@ class DailyActivity(models.Model):
     login_count = models.IntegerField(default=0)
 
     class Meta:
-        unique_together = ['user', 'date']
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'date'], name='unique_user_date')
+        ]
         ordering = ['-date']
 
     def __str__(self):
