@@ -184,10 +184,14 @@ def verify_otp(request):
     # Generate tokens for auto-login
     refresh = RefreshToken.for_user(user)
     
+    # Check onboarding status
+    onboarding_complete = hasattr(user, 'profile') and user.profile.onboarding_complete
+    
     return Response({
         "message": "Registration successful!",
         "access": str(refresh.access_token),
-        "refresh": str(refresh)
+        "refresh": str(refresh),
+        "onboarding_complete": onboarding_complete
     }, status=status.HTTP_201_CREATED)
 
 
