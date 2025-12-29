@@ -82,6 +82,34 @@ export default function Login() {
     }
   });
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setLoading(true);
+    setMessage("");
+    try {
+      const res = await axios.post(`${API_BASE_URL}/api/users/google/login/`, {
+        token: credentialResponse.credential,
+        mode: "login"
+      });
+      localStorage.setItem("access_token", res.data.access);
+      localStorage.setItem("refresh_token", res.data.refresh);
+      setMessage("success:Google login successful!");
+      if (res.data.onboarding_complete) {
+        setTimeout(() => navigate("/dashboard"), 1500);
+      } else {
+        setTimeout(() => navigate("/onboarding"), 1500);
+      }
+    } catch (err) {
+      const serverMsg = err.response?.data?.error || err.response?.data?.message;
+      setMessage(serverMsg || "Google login failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    setMessage("Google login failed. Please try again.");
+  };
+
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-yellow-100 flex flex-col justify-between p-4 md:p-6 lg:p-12">
       {/* Header */}
