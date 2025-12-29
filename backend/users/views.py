@@ -598,13 +598,52 @@ def google_oauth_login(request):
                 user.save()
                 
         except CustomUser.DoesNotExist:
-            print(f"[GOOGLE_OAUTH] User not found - signup required")
-            return Response({
-                "error": "Account not found",
-                "signup_required": True,
-                "message": "No account exists with this email. Please sign up first.",
-                "email": email
-            }, status=status.HTTP_404_NOT_FOUND)
+            # Check if this is a signup or login attempt
+            mode = request.data.get('mode', 'login')  # Default to login for backwards compatibility
+            
+            if mode == 'signup':
+                print(f"[GOOGLE_OAUTH] User not found, creating new user (signup mode)")
+                # Generate a unique username from email
+                base_username = email.split('@')[0].lower()
+                username = base_username
+                counter = 1
+                while CustomUser.objects.filter(username=username).exists():
+                    username = f"{base_username}{counter}"
+                    counter += 1
+                
+                try:
+                    # Create user without password (OAuth user)
+                    user = CustomUser.objects.create(
+                        email=email,
+                        username=username,
+                        is_active=True,
+                        is_verified=True,
+                    )
+                    user.set_unusable_password()
+                    
+                    # Set name
+                    if name:
+                        name_parts = name.split(' ', 1)
+                        user.first_name = name_parts[0] if name_parts else ''
+                        user.last_name = name_parts[1] if len(name_parts) > 1 else ''
+                    user.save()
+                    
+                    print(f"[GOOGLE_OAUTH] User created successfully (ID: {user.id})")
+                except Exception as create_err:
+                    print(f"[GOOGLE_OAUTH] ERROR creating user: {type(create_err).__name__}: {create_err}")
+                    return Response({
+                        "error": "Failed to create account",
+                        "details": str(create_err)
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                # Login mode - user must already exist
+                print(f"[GOOGLE_OAUTH] User not found - signup required (login mode)")
+                return Response({
+                    "error": "Account not found",
+                    "signup_required": True,
+                    "message": "No account exists with this email. Please sign up first.",
+                    "email": email
+                }, status=status.HTTP_404_NOT_FOUND)
         
         
         # --- 2FA ENFORCEMENT START ---
@@ -766,13 +805,51 @@ def github_oauth_login(request):
                 user.save()
                 
         except CustomUser.DoesNotExist:
-            print(f"[GITHUB_OAUTH] User not found - signup required")
-            return Response({
-                "error": "Account not found",
-                "signup_required": True,
-                "message": "No account exists with this email. Please sign up first.",
-                "email": email
-            }, status=status.HTTP_404_NOT_FOUND)
+            # Check if this is a signup or login attempt
+            mode = request.data.get('mode', 'login')  # Default to login for backwards compatibility
+            
+            if mode == 'signup':
+                print(f"[GITHUB_OAUTH] User not found, creating new user (signup mode)")
+                # Generate a unique username
+                base_username = github_username.lower() if github_username else email.split('@')[0].lower()
+                username = base_username
+                counter = 1
+                while CustomUser.objects.filter(username=username).exists():
+                    username = f"{base_username}{counter}"
+                    counter += 1
+                
+                try:
+                    # Create user without password (OAuth user)
+                    user = CustomUser.objects.create(
+                        email=email,
+                        username=username,
+                        is_active=True,
+                        is_verified=True,
+                    )
+                    user.set_unusable_password()
+                    
+                    # Set name
+                    name_parts = name.split(' ', 1) if name else ['', '']
+                    user.first_name = name_parts[0] if name_parts else ''
+                    user.last_name = name_parts[1] if len(name_parts) > 1 else ''
+                    user.save()
+                    
+                    print(f"[GITHUB_OAUTH] User created successfully (ID: {user.id})")
+                except Exception as create_err:
+                    print(f"[GITHUB_OAUTH] ERROR creating user: {type(create_err).__name__}: {create_err}")
+                    return Response({
+                        "error": "Failed to create account",
+                        "details": str(create_err)
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                # Login mode - user must already exist
+                print(f"[GITHUB_OAUTH] User not found - signup required (login mode)")
+                return Response({
+                    "error": "Account not found",
+                    "signup_required": True,
+                    "message": "No account exists with this email. Please sign up first.",
+                    "email": email
+                }, status=status.HTTP_404_NOT_FOUND)
         
         
         # --- 2FA ENFORCEMENT START ---
