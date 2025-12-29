@@ -373,6 +373,16 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
             max_output_tokens=8192
         )
 
+        # Generate content and assign to response variable
+        response = model.generate_content(prompt, generation_config=generation_config)
+
+        # Safety check: Ensure valid response from AI
+        if not response or not hasattr(response, "text") or not response.text:
+            return Response({
+                "error": "AI did not return a valid response",
+                "details": "The Gemini API returned an empty or invalid response. Please try again."
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         # Parse JSON response
         response_text = response.text.strip()
 

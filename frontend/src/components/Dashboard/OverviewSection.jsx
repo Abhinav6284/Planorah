@@ -71,7 +71,7 @@ export default function OverviewSection() {
     );
 
     return (
-        <div className="p-6 md:p-8 max-w-[1600px] mx-auto font-sans bg-[#F5F5F7] dark:bg-black min-h-screen transition-colors duration-200">
+        <div className="p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto font-sans bg-[#F5F5F7] dark:bg-black min-h-screen transition-colors duration-200">
             {/* Header */}
             <motion.header
                 initial={{ opacity: 0, y: -20 }}
@@ -79,7 +79,7 @@ export default function OverviewSection() {
                 className="mb-8 flex justify-between items-end"
             >
                 <div>
-                    <h1 className="text-4xl md:text-5xl font-light text-gray-900 dark:text-white tracking-tight">
+                    <h1 className="text-2xl md:text-4xl lg:text-5xl font-light text-gray-900 dark:text-white tracking-tight">
                         {new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 17 ? 'Good afternoon' : 'Good evening'}, <span className="font-medium">{userProfile?.first_name || userProfile?.username?.split(/(?=[A-Z])/)[0] || "there"}!</span>
                     </h1>
                     <p className="text-gray-500 dark:text-gray-400 mt-2">Here's your learning overview for today.</p>
@@ -102,19 +102,19 @@ export default function OverviewSection() {
                 <div className="lg:col-span-8 flex flex-col gap-6">
 
                     {/* Top: Task Scheduler (Calendar + Tasks) - NOW MAJOR WIDGET */}
-                    <motion.div variants={itemVariants} className="flex-1 min-h-[500px]">
+                    <motion.div variants={itemVariants} className="flex-1 min-h-[400px] md:min-h-[500px]">
                         <TaskSchedulerWidget tasks={tasks} />
                     </motion.div>
 
                     {/* Middle: Stats & Music Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-[320px]">
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 md:h-[320px]">
                         {/* Stats Widget */}
-                        <motion.div variants={itemVariants} className="md:col-span-4 h-full">
+                        <motion.div variants={itemVariants} className="md:col-span-4 h-auto md:h-full">
                             <StatsWidget completed={stats.completed} pending={stats.pending} />
                         </motion.div>
 
                         {/* Music Widget */}
-                        <motion.div variants={itemVariants} className="md:col-span-8 h-full">
+                        <motion.div variants={itemVariants} className="md:col-span-8 h-auto md:h-full">
                             <MusicWidget />
                         </motion.div>
                     </div>
@@ -126,12 +126,12 @@ export default function OverviewSection() {
 
 
                     {/* Middle: Progress Chart (Moved here) */}
-                    <motion.div variants={itemVariants} className="h-[280px] bg-white dark:bg-[#111] rounded-[32px] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <motion.div variants={itemVariants} className="h-auto md:h-[280px] bg-white dark:bg-[#111] rounded-[32px] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                         <ProgressChartWidget data={tasks} />
                     </motion.div>
 
                     {/* Middle: Clock Widget */}
-                    <motion.div variants={itemVariants} className="h-[260px]">
+                    <motion.div variants={itemVariants} className="h-auto md:h-[260px]">
                         <ClockWidget />
                     </motion.div>
 

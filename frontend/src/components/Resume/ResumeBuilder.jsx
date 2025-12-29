@@ -72,6 +72,7 @@ export default function ResumeBuilder() {
     const [generatedHtml, setGeneratedHtml] = useState("");
     const [selectedTemplate, setSelectedTemplate] = useState("professional");
     const [showTemplateModal, setShowTemplateModal] = useState(false);
+    const [mobileView, setMobileView] = useState("editor"); // "editor" or "preview"
 
     const [formData, setFormData] = useState({
         personal: {
@@ -215,9 +216,31 @@ export default function ResumeBuilder() {
     };
 
     return (
-        <div className="flex h-[calc(100vh-80px)] bg-gray-100 dark:bg-gray-900 overflow-hidden">
+        <div className="flex flex-col md:flex-row h-[calc(100vh-80px)] bg-gray-100 dark:bg-gray-900 overflow-hidden">
+            {/* Mobile View Toggle - only visible on mobile */}
+            <div className="md:hidden flex bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <button
+                    onClick={() => setMobileView("editor")}
+                    className={`flex-1 py-3 text-sm font-medium transition-colors ${mobileView === "editor"
+                        ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900"
+                        : "text-gray-600 dark:text-gray-400"
+                        }`}
+                >
+                    ✏️ Editor
+                </button>
+                <button
+                    onClick={() => setMobileView("preview")}
+                    className={`flex-1 py-3 text-sm font-medium transition-colors ${mobileView === "preview"
+                        ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900"
+                        : "text-gray-600 dark:text-gray-400"
+                        }`}
+                >
+                    👁️ Preview
+                </button>
+            </div>
+
             {/* LEFT PANEL - Editor */}
-            <div className="w-[400px] flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full">
+            <div className={`${mobileView === "editor" ? "flex" : "hidden"} md:flex w-full md:w-[400px] flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-col h-full`}>
                 {/* Header */}
                 <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                     <div className="flex items-center gap-2">
@@ -459,11 +482,11 @@ export default function ResumeBuilder() {
             </div>
 
             {/* RIGHT PANEL - Preview */}
-            <div className="flex-1 bg-gray-200 dark:bg-gray-900 flex flex-col">
+            <div className={`${mobileView === "preview" ? "flex" : "hidden"} md:flex flex-1 bg-gray-200 dark:bg-gray-900 flex-col`}>
                 {/* Top Bar */}
-                <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3 flex items-center justify-between">
+                <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 py-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                     {/* Zoom Controls */}
-                    <div className="flex items-center gap-3 bg-gray-100 dark:bg-gray-700 rounded-lg px-3 py-1">
+                    <div className="flex items-center gap-3 bg-gray-100 dark:bg-gray-700 rounded-lg px-3 py-1 justify-center sm:justify-start">
                         <button onClick={() => setZoom(z => Math.max(25, z - 10))} className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-bold">−</button>
                         <span className="text-sm font-medium text-gray-700 dark:text-gray-300 w-12 text-center">{zoom}%</span>
                         <button onClick={() => setZoom(z => Math.min(150, z + 10))} className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-bold">+</button>
@@ -471,19 +494,19 @@ export default function ResumeBuilder() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center sm:justify-end">
                         <button
                             onClick={() => setShowTemplateModal(true)}
-                            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                         >
-                            Change Template
+                            Template
                         </button>
-                        <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                            Try AI Review
+                        <button className="hidden sm:block px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            AI Review
                         </button>
                         <button
                             onClick={downloadPdf}
-                            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                            className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs sm:text-sm font-medium transition-colors flex items-center gap-1 sm:gap-2"
                         >
                             Download ▾
                         </button>
@@ -491,7 +514,7 @@ export default function ResumeBuilder() {
                 </div>
 
                 {/* Preview Area */}
-                <div className="flex-1 overflow-auto p-8 flex justify-center">
+                <div className="flex-1 overflow-auto p-4 md:p-8 flex justify-center">
                     <div
                         className="bg-white shadow-2xl origin-top transition-transform duration-200"
                         style={{
