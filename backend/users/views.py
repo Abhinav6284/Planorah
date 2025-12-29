@@ -49,9 +49,13 @@ def register_user(request):
     email = email.lower().strip()
     username = username.strip()
 
-    # Clean up DeletedUser record if exists (allow re-registration)
+    # Check for deleted user
     from .models import DeletedUser
-    DeletedUser.objects.filter(email=email).delete()
+    if DeletedUser.objects.filter(email=email).exists():
+        return Response({
+            "error": "Account previously deleted",
+            "details": "This account was deleted. You can re-register if you wish to create a new account."
+        }, status=status.HTTP_403_FORBIDDEN)
 
     # Check if email already exists
     if CustomUser.objects.filter(email__iexact=email).exists():

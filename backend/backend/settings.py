@@ -27,14 +27,12 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS [ 
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://planorah.me",
-    "https://www.planorah.me",
-    "http://142.93.214.77",
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "planorah.me",
+    "www.planorah.me",
+    "142.93.214.77",
 ]
 
 # Application definition
