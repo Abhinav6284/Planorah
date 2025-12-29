@@ -43,8 +43,21 @@ export default function Register() {
       setMessage("");
       try {
         const res = await axios.post(`${API_BASE_URL}/api/users/google/login/`, {
-          token: tokenResponse.access_token
+          token: tokenResponse.access_token,
+          mode: "signup"
         });
+
+        // Handle 2FA if required
+        if (res.data.two_factor_required) {
+          navigate("/verify-otp", {
+            state: {
+              email: res.data.email,
+              isLogin: true
+            }
+          });
+          return;
+        }
+
         localStorage.setItem("access_token", res.data.access);
         localStorage.setItem("refresh_token", res.data.refresh);
         setMessage("success:Google signup successful!");
@@ -73,7 +86,8 @@ export default function Register() {
     setMessage("");
     try {
       const res = await axios.post(`${API_BASE_URL}/api/users/google/login/`, {
-        token: credentialResponse.credential
+        token: credentialResponse.credential,
+        mode: "signup"
       });
       localStorage.setItem("access_token", res.data.access);
       localStorage.setItem("refresh_token", res.data.refresh);
@@ -232,7 +246,8 @@ export default function Register() {
                 const clientId = 'Ov23ctPC9ZlwUvXMuyWM';
                 const redirectUri = encodeURIComponent(window.location.origin + '/auth/github/callback');
                 const scope = encodeURIComponent('read:user user:email');
-                window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
+                const state = encodeURIComponent('signup');
+                window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
               }}
               className="w-full py-4 px-8 rounded-full border border-gray-200 hover:bg-gray-50 transition-all flex items-center justify-start gap-4 group bg-white shadow-sm hover:shadow-md"
             >

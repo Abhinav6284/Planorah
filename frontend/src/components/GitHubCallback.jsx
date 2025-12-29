@@ -22,9 +22,11 @@ export default function GitHubCallback() {
         const handleGitHubLogin = async () => {
             try {
                 const redirectUri = window.location.origin + '/auth/github/callback';
+                const mode = searchParams.get('state') || 'login'; // Get mode from state parameter
                 const res = await axios.post(`${API_BASE_URL}/api/users/github/login/`, {
                     code: code,
-                    redirect_uri: redirectUri
+                    redirect_uri: redirectUri,
+                    mode: mode
                 });
 
                 // Check for 2FA
