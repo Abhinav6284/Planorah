@@ -27,6 +27,16 @@ def create_event(request):
     # Basic creation logic
     return Response({"message": "Not implemented yet"}, status=status.HTTP_501_NOT_IMPLEMENTED)
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_all_events(request):
+    """Delete all calendar events for the current user"""
+    deleted_count, _ = Event.objects.filter(user=request.user).delete()
+    return Response({
+        "message": f"Deleted {deleted_count} events",
+        "deleted_count": deleted_count
+    })
+
 # --- Google Calendar Endpoints ---
 
 @api_view(['GET'])
