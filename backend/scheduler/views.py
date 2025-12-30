@@ -14,8 +14,9 @@ def get_events(request):
     data = [{
         "id": e.id,
         "title": e.title,
-        "start_time": e.start_time,
-        "end_time": e.end_time,
+        "description": e.description,
+        "start_time": e.start_time.isoformat() if e.start_time else None,
+        "end_time": e.end_time.isoformat() if e.end_time else None,
         "is_completed": e.is_completed
     } for e in events]
     return Response(data)
