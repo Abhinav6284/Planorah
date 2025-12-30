@@ -17,7 +17,7 @@ const GitHubWidget = () => {
             
             if (statusData.connected) {
                 const reposData = await githubService.getRepositories();
-                setRepos(reposData.slice(0, 3)); // Show only latest 3
+                setRepos((reposData || []).slice(0, 3)); // Show only latest 3
             }
         } catch (error) {
             console.error('Failed to fetch GitHub status:', error);

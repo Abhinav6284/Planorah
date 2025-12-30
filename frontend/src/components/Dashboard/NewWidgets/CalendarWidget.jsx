@@ -13,7 +13,7 @@ const CalendarWidget = () => {
     const fetchEvents = async () => {
         try {
             const data = await schedulerService.getEvents();
-            setEvents(data.slice(0, 4)); // Show only upcoming 4 events
+            setEvents((data || []).slice(0, 4)); // Show only upcoming 4 events
         } catch (error) {
             console.error('Failed to fetch events:', error);
         } finally {
