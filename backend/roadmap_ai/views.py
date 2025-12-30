@@ -601,7 +601,11 @@ def schedule_roadmap(request, roadmap_id):
     """
     Auto-schedule roadmap milestones starting from a given date.
     Expects 'start_date' in request body (YYYY-MM-DD).
+    Creates calendar Events for each milestone so they appear on the scheduler.
     """
+    from datetime import datetime, timedelta
+    from scheduler.models import Event
+    
     try:
         roadmap = Roadmap.objects.get(id=roadmap_id, user=request.user)
         start_date_str = request.data.get('start_date')
@@ -609,11 +613,11 @@ def schedule_roadmap(request, roadmap_id):
         if not start_date_str:
             return Response({"error": "start_date is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        from datetime import datetime, timedelta
         current_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
 
         milestones = roadmap.milestones.all().order_by('order')
         updated_milestones = []
+        created_events = []
 
         for milestone in milestones:
             # Parse duration (e.g., "2 weeks", "1 month", "3 days")
@@ -644,25 +648,44 @@ def schedule_roadmap(request, roadmap_id):
             milestone.end_date = current_date + timedelta(days=days_to_add)
             milestone.save()
             
+            # Create calendar Event for this milestone
+            start_datetime = datetime.combine(milestone.start_date, datetime.min.time().replace(hour=9, minute=0))
+            end_datetime = datetime.combine(milestone.end_date, datetime.min.time().replace(hour=17, minute=0))
+            
+            event = Event.objects.create(
+                user=request.user,
+                title=f"{roadmap.title}: {milestone.title}",
+                description=milestone.description or f"Milestone from roadmap: {roadmap.title}",
+                start_time=start_datetime,
+                end_time=end_datetime,
+            )
+            created_events.append(event.id)
+            
             updated_milestones.append({
                 "id": milestone.id,
                 "title": milestone.title,
                 "start": milestone.start_date,
-                "end": milestone.end_date
+                "end": milestone.end_date,
+                "event_id": event.id
             })
 
             # Next milestone starts after this one ends
             current_date = milestone.end_date + timedelta(days=1)
 
+        print(f"✅ Scheduled roadmap {roadmap_id} with {len(created_events)} calendar events")
+        
         return Response({
             "message": "Roadmap scheduled successfully",
-            "milestones": updated_milestones
+            "milestones": updated_milestones,
+            "events_created": len(created_events)
         }, status=status.HTTP_200_OK)
 
     except Roadmap.DoesNotExist:
         return Response({"error": "Roadmap not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         print(f"❌ Error scheduling roadmap: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return Response({
             "error": "Failed to schedule roadmap",
             "details": str(e)
