@@ -167,7 +167,7 @@ export default function SubscriptionStatus() {
                         </div>
                     )}
 
-                    {subscription.status === 'grace' && (
+                    {subscription.status === 'grace' && subscription.grace_end_date && (
                         <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-900/50 rounded-xl">
                             <p className="text-sm text-yellow-700 dark:text-yellow-400">
                                 ⚠️ Your subscription has expired. You're in a grace period until {new Date(subscription.grace_end_date).toLocaleDateString()}. 

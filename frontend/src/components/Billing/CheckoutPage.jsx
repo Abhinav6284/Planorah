@@ -54,12 +54,14 @@ export default function CheckoutPage() {
             // Create payment order
             const orderData = await billingService.createOrder(plan.id, couponApplied?.coupon_code);
             
-            // In production, integrate with Razorpay here
-            // For now, simulate a successful payment
-            const mockPaymentId = `pay_${Date.now()}`;
-            const mockSignature = 'mock_signature';
+            // TODO: In production, integrate with Razorpay/Stripe here
+            // This is a placeholder for development - actual payment gateway integration required
+            // The backend should validate payment signatures from the payment provider
+            console.warn('Development mode: Using mock payment. Integrate Razorpay in production.');
+            const mockPaymentId = `dev_pay_${Date.now()}`;
+            const mockSignature = 'dev_signature_replace_in_production';
             
-            // Verify payment
+            // Verify payment - backend should reject invalid signatures in production
             await billingService.verifyPayment(orderData.order_id, mockPaymentId, mockSignature);
             
             // Success - redirect to subscription page

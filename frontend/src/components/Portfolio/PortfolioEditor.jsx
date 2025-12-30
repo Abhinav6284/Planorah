@@ -120,13 +120,19 @@ export default function PortfolioEditor() {
                                     <input
                                         type="text"
                                         value={subdomain}
-                                        onChange={(e) => setSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                                        onChange={(e) => {
+                                            // Sanitize: lowercase, alphanumeric and hyphens only
+                                            // Prevent leading/trailing hyphens and consecutive hyphens
+                                            let value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+                                            value = value.replace(/^-+/, '').replace(/-+$/, '').replace(/--+/g, '-');
+                                            setSubdomain(value);
+                                        }}
                                         placeholder="your-name"
                                         className="flex-1 px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white font-mono"
                                     />
                                     <span className="text-gray-500">.planorah.me</span>
                                 </div>
-                                <p className="text-xs text-gray-400 mb-4">Only lowercase letters, numbers, and hyphens allowed.</p>
+                                <p className="text-xs text-gray-400 mb-4">Only lowercase letters, numbers, and hyphens allowed (no leading/trailing hyphens).</p>
                             </div>
                             <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800 flex justify-end gap-3">
                                 <button

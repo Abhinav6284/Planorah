@@ -47,21 +47,24 @@ export const SubscriptionProvider = ({ children }) => {
         if (!subscription) return false;
         if (subscription.status !== 'active') return false;
 
+        const planDetails = subscription.plan_details;
+        if (!planDetails) return false;
+
         switch (feature) {
             case 'create_roadmap':
-                return subscription.roadmaps_used < subscription.plan_details?.roadmap_limit;
+                return (subscription.roadmaps_used ?? 0) < (planDetails.roadmap_limit ?? 0);
             case 'create_project':
-                return subscription.projects_used < subscription.plan_details?.project_limit_max;
+                return (subscription.projects_used ?? 0) < (planDetails.project_limit_max ?? 0);
             case 'create_resume':
-                return subscription.plan_details?.resume_limit === -1 || 
-                       subscription.resumes_used < subscription.plan_details?.resume_limit;
+                return planDetails.resume_limit === -1 || 
+                       (subscription.resumes_used ?? 0) < (planDetails.resume_limit ?? 0);
             case 'ats_scan':
-                return subscription.plan_details?.ats_scan_limit === -1 || 
-                       subscription.ats_scans_used < subscription.plan_details?.ats_scan_limit;
+                return planDetails.ats_scan_limit === -1 || 
+                       (subscription.ats_scans_used ?? 0) < (planDetails.ats_scan_limit ?? 0);
             case 'portfolio_analytics':
-                return subscription.plan_details?.portfolio_analytics;
+                return Boolean(planDetails.portfolio_analytics);
             case 'custom_subdomain':
-                return subscription.plan_details?.custom_subdomain;
+                return Boolean(planDetails.custom_subdomain);
             default:
                 return true;
         }
