@@ -650,16 +650,13 @@ def schedule_roadmap(request, roadmap_id):
             
             # Create calendar Event for this milestone
             from django.utils import timezone
-            import pytz
             
-            # Create timezone-aware datetimes
-            local_tz = pytz.timezone('Asia/Kolkata')  # IST
-            start_datetime = local_tz.localize(
-                datetime.combine(milestone.start_date, datetime.min.time().replace(hour=9, minute=0))
-            )
-            end_datetime = local_tz.localize(
-                datetime.combine(milestone.end_date, datetime.min.time().replace(hour=17, minute=0))
-            )
+            # Create timezone-aware datetimes using Django's make_aware
+            naive_start = datetime.combine(milestone.start_date, datetime.min.time().replace(hour=9, minute=0))
+            naive_end = datetime.combine(milestone.end_date, datetime.min.time().replace(hour=17, minute=0))
+            
+            start_datetime = timezone.make_aware(naive_start)
+            end_datetime = timezone.make_aware(naive_end)
             
             event = Event.objects.create(
                 user=request.user,
@@ -668,6 +665,7 @@ def schedule_roadmap(request, roadmap_id):
                 start_time=start_datetime,
                 end_time=end_datetime,
             )
+            print(f"  ✅ Created event {event.id}: {event.title}")
             created_events.append(event.id)
             
             updated_milestones.append({
