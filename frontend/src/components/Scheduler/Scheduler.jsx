@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { schedulerService } from "../../api/schedulerService";
 import { roadmapService } from "../../api/roadmapService";
-import { FaGoogle, FaClock, FaPlay, FaPause, FaRedo, FaSync } from "react-icons/fa";
+import { FaGoogle, FaClock, FaPlay, FaPause, FaRedo, FaSync, FaTrash } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import WeeklyCalendar from "../common/WeeklyCalendar";
 
@@ -93,6 +93,20 @@ export default function Scheduler() {
         }
     };
 
+    const clearAllEvents = async () => {
+        if (!window.confirm("Are you sure you want to delete ALL calendar events? You can re-schedule your roadmaps after.")) {
+            return;
+        }
+        try {
+            const result = await schedulerService.deleteAllEvents();
+            setCalendarKey(prev => prev + 1); // Force calendar refresh
+            alert(`Deleted ${result.deleted_count} events. Now re-schedule your roadmap to see tasks on the calendar.`);
+        } catch (err) {
+            console.error("Delete Error", err);
+            alert("Failed to delete events.");
+        }
+    };
+
     const handleScheduleRoadmap = async (roadmapId) => {
         const startDate = prompt("Enter start date (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
         if (startDate) {
@@ -127,9 +141,14 @@ export default function Scheduler() {
 
     const handleEventClick = (event) => {
         console.log("Event clicked:", event);
-        // Navigate to tasks section if this event has a linked task
+        // Navigate to tasks section
         if (event.task_id) {
+            // Navigate to specific task if linked
             navigate(`/tasks?taskId=${event.task_id}`);
+        } else {
+            // Old events without task_id - navigate to tasks page anyway
+            navigate('/tasks');
+            alert('This is an old calendar event without a linked task. Delete all events and re-schedule your roadmap to fix this.');
         }
     };
 
@@ -246,8 +265,17 @@ export default function Scheduler() {
                             onClick={syncCalendar}
                             disabled={syncing}
                             className={`p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-white transition-colors ${syncing ? 'animate-spin' : ''}`}
+                            title="Sync with Google Calendar"
                         >
                             <FaSync />
+                        </button>
+
+                        <button
+                            onClick={clearAllEvents}
+                            className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                            title="Clear All Events"
+                        >
+                            <FaTrash />
                         </button>
                     </div>
                 </div>
