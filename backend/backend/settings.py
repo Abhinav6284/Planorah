@@ -58,6 +58,13 @@ INSTALLED_APPS = [
     'interview',
     'assistant',
     'music',
+    # Career execution platform modules
+    'plans',
+    'subscriptions',
+    'portfolio',
+    'github_integration',
+    'billing',
+    'analytics',
 ]
 
 REST_FRAMEWORK = {
