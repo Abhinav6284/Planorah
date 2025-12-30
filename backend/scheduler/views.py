@@ -17,7 +17,8 @@ def get_events(request):
         "description": e.description,
         "start_time": e.start_time.isoformat() if e.start_time else None,
         "end_time": e.end_time.isoformat() if e.end_time else None,
-        "is_completed": e.is_completed
+        "is_completed": e.is_completed,
+        "task_id": e.linked_task_id  # For navigation to tasks section
     } for e in events]
     return Response(data)
 

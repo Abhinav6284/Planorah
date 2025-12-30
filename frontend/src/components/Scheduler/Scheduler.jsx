@@ -127,6 +127,10 @@ export default function Scheduler() {
 
     const handleEventClick = (event) => {
         console.log("Event clicked:", event);
+        // Navigate to tasks section if this event has a linked task
+        if (event.task_id) {
+            navigate(`/tasks?taskId=${event.task_id}`);
+        }
     };
 
     return (

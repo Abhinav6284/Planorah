@@ -663,6 +663,7 @@ def schedule_roadmap(request, roadmap_id):
                 description=task.description or f"Task from roadmap: {roadmap.title}",
                 start_time=start_datetime,
                 end_time=end_datetime,
+                linked_task=task,  # Link to navigate from calendar to task
             )
             
             print(f"  ✅ Created event {event.id}: {task.title} on {task_date}")
