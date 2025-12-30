@@ -5,6 +5,12 @@
 import api from './axios';
 
 export const subscriptionService = {
+    // Get current active subscription (alias for widget compatibility)
+    getMySubscription: async () => {
+        const response = await api.get('/api/subscriptions/current/');
+        return response.data;
+    },
+
     // Get current active subscription
     getCurrent: async () => {
         const response = await api.get('/api/subscriptions/current/');
