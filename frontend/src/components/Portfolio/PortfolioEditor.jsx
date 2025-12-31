@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 import { portfolioService } from '../../api/portfolioService';
 import { useSubscription } from '../../context/SubscriptionContext';
 
 export default function PortfolioEditor() {
-    const navigate = useNavigate();
-    const { subscription, canAccess } = useSubscription();
+    const { canAccess } = useSubscription();
     const [portfolio, setPortfolio] = useState(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);

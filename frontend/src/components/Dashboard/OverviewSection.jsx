@@ -11,6 +11,10 @@ import TaskSchedulerWidget from "./NewWidgets/TaskSchedulerWidget";
 import StatsWidget from "./NewWidgets/StatsWidget";
 import ProgressChartWidget from "./NewWidgets/ProgressChartWidget";
 import QuickStatsWidget from "./NewWidgets/QuickStatsWidget";
+import GitHubWidget from "./NewWidgets/GitHubWidget";
+import SubscriptionWidget from "./NewWidgets/SubscriptionWidget";
+import PortfolioWidget from "./NewWidgets/PortfolioWidget";
+import CalendarWidget from "./NewWidgets/CalendarWidget";
 
 export default function OverviewSection() {
     const [loading, setLoading] = useState(true);
@@ -76,7 +80,7 @@ export default function OverviewSection() {
             <motion.header
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-8 flex justify-between items-end"
+                className="mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4"
             >
                 <div>
                     <h1 className="text-2xl md:text-4xl lg:text-5xl font-light text-gray-900 dark:text-white tracking-tight">
@@ -118,24 +122,45 @@ export default function OverviewSection() {
                             <MusicWidget />
                         </motion.div>
                     </div>
+
+                    {/* Bottom Row: GitHub & Portfolio Widgets */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                        {/* GitHub Widget */}
+                        <motion.div variants={itemVariants} className="h-auto min-h-[280px]">
+                            <GitHubWidget />
+                        </motion.div>
+
+                        {/* Portfolio Widget */}
+                        <motion.div variants={itemVariants} className="h-auto min-h-[280px]">
+                            <PortfolioWidget />
+                        </motion.div>
+                    </div>
                 </div>
 
                 {/* --- Right Column (Side Panel) - Span 4 --- */}
                 <div className="lg:col-span-4 flex flex-col gap-6">
 
+                    {/* Calendar Widget */}
+                    <motion.div variants={itemVariants} className="h-auto min-h-[280px]">
+                        <CalendarWidget />
+                    </motion.div>
 
-
-                    {/* Middle: Progress Chart (Moved here) */}
+                    {/* Progress Chart */}
                     <motion.div variants={itemVariants} className="h-auto md:h-[280px] bg-white dark:bg-[#111] rounded-[32px] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                         <ProgressChartWidget data={tasks} />
                     </motion.div>
 
-                    {/* Middle: Clock Widget */}
+                    {/* Subscription Widget */}
+                    <motion.div variants={itemVariants} className="h-auto min-h-[220px]">
+                        <SubscriptionWidget />
+                    </motion.div>
+
+                    {/* Clock Widget */}
                     <motion.div variants={itemVariants} className="h-auto md:h-[260px]">
                         <ClockWidget />
                     </motion.div>
 
-                    {/* Bottom: Profile Card */}
+                    {/* Profile Card */}
                     <motion.div variants={itemVariants} className="h-auto">
                         <ProfileCard user={userProfile} />
                     </motion.div>

@@ -45,6 +45,7 @@ const Header = () => {
                 { path: "/ats", label: "Find Your Fit" },
                 { path: "/jobs", label: "Job Finder" },
                 { path: "/interview", label: "Mock Interview" },
+                { path: "/portfolio/edit", label: "Portfolio" },
             ]
         },
         {
@@ -61,6 +62,15 @@ const Header = () => {
             items: [
                 { path: "/lab", label: "Virtual Lab" },
                 { path: "/roadmap/list", label: "Learning Path" },
+            ]
+        },
+        {
+            label: "Account",
+            type: "dropdown",
+            items: [
+                { path: "/subscription", label: "Subscription" },
+                { path: "/pricing", label: "Pricing" },
+                { path: "/billing/history", label: "Billing History" },
             ]
         },
         {

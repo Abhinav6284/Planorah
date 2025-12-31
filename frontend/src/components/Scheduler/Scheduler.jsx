@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { schedulerService } from "../../api/schedulerService";
 import { roadmapService } from "../../api/roadmapService";
@@ -18,30 +18,19 @@ export default function Scheduler() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        fetchData();
-
-        // Handle Google OAuth Callback
-        const params = new URLSearchParams(location.search);
-        const code = params.get('code');
-        if (code) {
-            handleGoogleCallback(code);
+    const handleGoogleCallback = useCallback(async (code) => {
+        setSyncing(true);
+        try {
+            await schedulerService.handleGoogleCallback(code);
+            alert("Google Calendar connected successfully!");
+            navigate('/scheduler', { replace: true });
+        } catch (err) {
+            console.error("Google Auth Error", err);
+            alert("Failed to connect Google Calendar");
+        } finally {
+            setSyncing(false);
         }
-    }, [location]);
-
-    useEffect(() => {
-        let interval = null;
-        if (timerActive && timeLeft > 0) {
-            interval = setInterval(() => {
-                setTimeLeft((prev) => prev - 1);
-            }, 1000);
-        } else if (timeLeft === 0) {
-            setTimerActive(false);
-            // Play sound or notify
-            alert("Focus session complete!");
-        }
-        return () => clearInterval(interval);
-    }, [timerActive, timeLeft]);
+    }, [navigate]);
 
     const fetchData = async () => {
         try {
@@ -56,19 +45,30 @@ export default function Scheduler() {
         }
     };
 
-    const handleGoogleCallback = async (code) => {
-        setSyncing(true);
-        try {
-            await schedulerService.handleGoogleCallback(code);
-            alert("Google Calendar connected successfully!");
-            navigate('/scheduler', { replace: true });
-        } catch (err) {
-            console.error("Google Auth Error", err);
-            alert("Failed to connect Google Calendar");
-        } finally {
-            setSyncing(false);
+    useEffect(() => {
+        fetchData();
+
+        // Handle Google OAuth Callback
+        const params = new URLSearchParams(location.search);
+        const code = params.get('code');
+        if (code) {
+            handleGoogleCallback(code);
         }
-    };
+    }, [location, handleGoogleCallback]);
+
+    useEffect(() => {
+        let interval = null;
+        if (timerActive && timeLeft > 0) {
+            interval = setInterval(() => {
+                setTimeLeft((prev) => prev - 1);
+            }, 1000);
+        } else if (timeLeft === 0) {
+            setTimerActive(false);
+            // Play sound or notify
+            alert("Focus session complete!");
+        }
+        return () => clearInterval(interval);
+    }, [timerActive, timeLeft]);
 
     const connectGoogleCalendar = async () => {
         try {

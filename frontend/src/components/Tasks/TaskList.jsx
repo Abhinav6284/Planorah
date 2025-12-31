@@ -155,7 +155,7 @@ export default function TaskList() {
     // Get selected roadmap name
     const selectedRoadmapName = selectedRoadmap === 'all'
         ? 'All Roadmaps'
-        : roadmaps.find(r => r.id == selectedRoadmap)?.title || 'Roadmap';
+        : roadmaps.find(r => r.id === Number(selectedRoadmap))?.title || 'Roadmap';
 
     if (loading) return <Loader message="Loading your tasks..." />;
 
