@@ -158,7 +158,7 @@ def generate_task_guidance(task_title, task_description, estimated_minutes, mile
     try:
         import google.generativeai as genai
         from google.generativeai.types import GenerationConfig
-    except (ImportError, TypeError):
+    except ImportError:
         # Return fallback guidance if Gemini is not available
         return get_fallback_guidance(task_title, task_description, estimated_minutes)
     

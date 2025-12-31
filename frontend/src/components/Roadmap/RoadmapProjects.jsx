@@ -34,7 +34,7 @@ export default function RoadmapProjects() {
     // Filter projects
     const filteredProjects = projects.filter(project => {
         const statusMatch = filter === 'all' || project.status === filter;
-        const roadmapMatch = roadmapFilter === 'all' || project.roadmap_id === parseInt(roadmapFilter);
+        const roadmapMatch = roadmapFilter === 'all' || project.roadmap_id === parseInt(roadmapFilter, 10);
         return statusMatch && roadmapMatch;
     });
 

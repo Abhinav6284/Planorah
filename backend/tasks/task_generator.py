@@ -316,8 +316,6 @@ def generate_daily_tasks_for_milestone(milestone, difficulty_level, duration_day
     
     # 4. Practice tasks for remaining days
     while current_day < duration_days:
-        practice_day = current_day - (duration_days - min(3, duration_days - current_day))
-        
         practice_types = [
             ("💪 Practice & Apply", "Apply what you've learned through hands-on exercises."),
             ("🔄 Review & Reinforce", "Revisit key concepts and solidify understanding."),
