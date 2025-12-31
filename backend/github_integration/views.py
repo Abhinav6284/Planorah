@@ -129,6 +129,7 @@ class GitHubIntegrationViewSet(viewsets.ViewSet):
         serializer.is_valid(raise_exception=True)
         
         project_id = serializer.validated_data['project_id']
+        project_type = serializer.validated_data.get('project_type', 'roadmap')
         repo_name = serializer.validated_data.get('repo_name')
         is_private = serializer.validated_data.get('is_private', False)
         commit_message = serializer.validated_data.get('commit_message', 'Initial commit from Planorah')
@@ -148,33 +149,79 @@ class GitHubIntegrationViewSet(viewsets.ViewSet):
                 'error': 'GitHub not connected. Please connect your GitHub account first.'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        # Get project
-        from roadmap_ai.models import Project
-        try:
-            project = Project.objects.get(id=project_id)
-        except Project.DoesNotExist:
-            return Response({
-                'error': 'Project not found'
-            }, status=status.HTTP_404_NOT_FOUND)
+        # Get project based on type
+        if project_type == 'roadmap':
+            from roadmap_ai.models import Project
+            try:
+                project = Project.objects.get(id=project_id)
+            except Project.DoesNotExist:
+                return Response({
+                    'error': 'Project not found'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            # Verify project belongs to user
+            if project.milestone.roadmap.user != request.user:
+                return Response({
+                    'error': 'Project not found'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            # Check if repo already exists
+            existing_repo = GitHubRepository.objects.filter(
+                project_type='roadmap',
+                project=project
+            ).first()
+        else:  # student project
+            from roadmap_ai.models import StudentProject
+            try:
+                project = StudentProject.objects.get(id=project_id)
+            except StudentProject.DoesNotExist:
+                return Response({
+                    'error': 'Project not found'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            # Verify project belongs to user
+            if project.user != request.user:
+                return Response({
+                    'error': 'Project not found'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            # Check if repo already exists
+            existing_repo = GitHubRepository.objects.filter(
+                project_type='student',
+                student_project=project
+            ).first()
         
-        # Verify project belongs to user
-        if project.milestone.roadmap.user != request.user:
+        if existing_repo:
             return Response({
-                'error': 'Project not found'
-            }, status=status.HTTP_404_NOT_FOUND)
+                'error': 'Project already published to GitHub',
+                'repo_url': existing_repo.repo_url
+            }, status=status.HTTP_400_BAD_REQUEST)
         
         # Generate repo name if not provided
         if not repo_name:
             repo_name = project.title.lower().replace(' ', '-')
             repo_name = ''.join(c if c.isalnum() or c == '-' else '' for c in repo_name)
         
-        # Check if repo already exists for this project
-        existing_repo = GitHubRepository.objects.filter(project=project).first()
-        if existing_repo:
-            return Response({
-                'error': 'Project already published to GitHub',
-                'repo_url': existing_repo.repo_url
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # Generate README content
+        tech_stack = project.tech_stack if hasattr(project, 'tech_stack') else []
+        tech_stack_str = ', '.join(tech_stack) if isinstance(tech_stack, list) else str(tech_stack)
+        
+        readme_content = f"""# {project.title}
+
+{project.description}
+
+## Tech Stack
+{tech_stack_str}
+
+## About
+This project was created using [Planorah](https://planorah.me) - Your Career Execution Platform.
+
+## Getting Started
+Add your setup instructions here.
+
+## License
+MIT License
+"""
         
         # Create repository on GitHub
         create_response = requests.post(
@@ -187,7 +234,7 @@ class GitHubIntegrationViewSet(viewsets.ViewSet):
                 'name': repo_name,
                 'description': project.description[:200] if project.description else '',
                 'private': is_private,
-                'auto_init': True
+                'auto_init': False  # We'll create README manually
             },
             timeout=30
         )
@@ -200,18 +247,43 @@ class GitHubIntegrationViewSet(viewsets.ViewSet):
             }, status=status.HTTP_400_BAD_REQUEST)
         
         repo_data = create_response.json()
+        repo_full_name = repo_data.get('full_name')
+        
+        # Create README.md file
+        import base64
+        readme_encoded = base64.b64encode(readme_content.encode()).decode()
+        
+        readme_response = requests.put(
+            f'https://api.github.com/repos/{repo_full_name}/contents/README.md',
+            headers={
+                'Authorization': f'Bearer {credential.access_token}',
+                'Accept': 'application/json'
+            },
+            json={
+                'message': commit_message,
+                'content': readme_encoded
+            },
+            timeout=30
+        )
         
         # Save repository reference
-        github_repo = GitHubRepository.objects.create(
-            user=request.user,
-            project=project,
-            repo_name=repo_name,
-            repo_full_name=repo_data.get('full_name'),
-            repo_url=repo_data.get('html_url'),
-            clone_url=repo_data.get('clone_url'),
-            is_private=is_private,
-            last_synced_at=timezone.now()
-        )
+        github_repo_data = {
+            'user': request.user,
+            'project_type': project_type,
+            'repo_name': repo_name,
+            'repo_full_name': repo_full_name,
+            'repo_url': repo_data.get('html_url'),
+            'clone_url': repo_data.get('clone_url'),
+            'is_private': is_private,
+            'last_synced_at': timezone.now()
+        }
+        
+        if project_type == 'roadmap':
+            github_repo_data['project'] = project
+        else:
+            github_repo_data['student_project'] = project
+        
+        github_repo = GitHubRepository.objects.create(**github_repo_data)
         
         # Log the publish action
         GitHubPublishLog.objects.create(
@@ -255,3 +327,87 @@ class GitHubIntegrationViewSet(viewsets.ViewSet):
         
         serializer = GitHubPublishLogSerializer(logs, many=True)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['post'])
+    def sync_stats(self, request):
+        """Sync GitHub stats for user's repositories."""
+        repo_id = request.data.get('repo_id')
+        
+        try:
+            credential = GitHubCredential.objects.get(user=request.user)
+        except GitHubCredential.DoesNotExist:
+            return Response({
+                'error': 'GitHub not connected'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if repo_id:
+            repos = GitHubRepository.objects.filter(id=repo_id, user=request.user)
+        else:
+            repos = GitHubRepository.objects.filter(user=request.user)
+        
+        synced_count = 0
+        errors = []
+        
+        for repo in repos:
+            try:
+                # Fetch repository data from GitHub
+                repo_response = requests.get(
+                    f'https://api.github.com/repos/{repo.repo_full_name}',
+                    headers={
+                        'Authorization': f'Bearer {credential.access_token}',
+                        'Accept': 'application/json'
+                    },
+                    timeout=30
+                )
+                
+                if repo_response.status_code == 200:
+                    repo_data = repo_response.json()
+                    
+                    # Update stats
+                    repo.stars_count = repo_data.get('stargazers_count', 0)
+                    repo.forks_count = repo_data.get('forks_count', 0)
+                    repo.watchers_count = repo_data.get('watchers_count', 0)
+                    
+                    # Fetch latest commit
+                    commits_response = requests.get(
+                        f'https://api.github.com/repos/{repo.repo_full_name}/commits',
+                        headers={
+                            'Authorization': f'Bearer {credential.access_token}',
+                            'Accept': 'application/json'
+                        },
+                        params={'per_page': 1},
+                        timeout=30
+                    )
+                    
+                    if commits_response.status_code == 200:
+                        commits = commits_response.json()
+                        if commits:
+                            latest_commit = commits[0]
+                            from django.utils.dateparse import parse_datetime
+                            commit_date_str = latest_commit.get('commit', {}).get('author', {}).get('date')
+                            if commit_date_str:
+                                repo.last_commit_date = parse_datetime(commit_date_str)
+                            repo.last_commit_message = latest_commit.get('commit', {}).get('message', '')[:200]
+                    
+                    repo.last_synced_at = timezone.now()
+                    repo.sync_error = ''
+                    repo.save()
+                    synced_count += 1
+                else:
+                    error_msg = f"Failed to fetch {repo.repo_name}: {repo_response.status_code}"
+                    repo.sync_error = error_msg
+                    repo.save()
+                    errors.append(error_msg)
+                    
+            except Exception as e:
+                error_msg = f"Error syncing {repo.repo_name}: {str(e)}"
+                repo.sync_error = error_msg
+                repo.save()
+                errors.append(error_msg)
+        
+        return Response({
+            'message': f'Synced {synced_count} repositories',
+            'synced_count': synced_count,
+            'total_repos': repos.count(),
+            'errors': errors
+        })
