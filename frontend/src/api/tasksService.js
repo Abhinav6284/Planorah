@@ -17,6 +17,9 @@ export const tasksService = {
     completeTask: (id) => axios.patch(`/api/tasks/${id}/complete/`),
     rescheduleTask: (id, day, due_date) => axios.patch(`/api/tasks/${id}/reschedule/`, { day, due_date }),
 
+    // AI Guidance - Get step-by-step instructions for a task
+    getTaskGuidance: (id) => axios.get(`/api/tasks/${id}/guidance/`),
+
     // Analytics
     getAnalytics: () => axios.get('/api/tasks/analytics/'),
 };

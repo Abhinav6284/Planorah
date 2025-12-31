@@ -1,20 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { VscVscode } from 'react-icons/vsc';
 
 export default function LabHub() {
     const labs = [
         {
-            id: 'code',
-            title: 'Code Studio',
-            description: 'A professional environment for mastering algorithms and building software.',
-            icon: (
-                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                </svg>
-            ),
+            id: 'codespace',
+            title: 'CodeSpace IDE',
+            description: 'A full VS Code-like IDE experience with file explorer, terminal, extensions marketplace, Git source control, and multi-language code execution.',
+            icon: <VscVscode className="w-12 h-12" />,
             color: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
-            link: '/lab/code'
+            link: '/lab/codespace',
+            badge: 'VS Code'
         },
         {
             id: 'resources',
@@ -38,13 +36,18 @@ export default function LabHub() {
                     <p className="text-gray-500 dark:text-gray-400">Your virtual playground for experimentation and discovery.</p>
                 </header>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {labs.map((lab) => (
                         <Link key={lab.id} to={lab.link} className="group">
                             <motion.div
                                 whileHover={{ y: -5 }}
-                                className="bg-white dark:bg-gray-800 p-8 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col"
+                                className="bg-white dark:bg-gray-800 p-8 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col relative overflow-hidden"
                             >
+                                {lab.badge && (
+                                    <span className="absolute top-4 right-4 px-2 py-1 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs font-bold rounded-full">
+                                        {lab.badge}
+                                    </span>
+                                )}
                                 <div className={`w-20 h-20 rounded-2xl ${lab.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
                                     {lab.icon}
                                 </div>

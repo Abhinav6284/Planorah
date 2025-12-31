@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from datetime import timedelta, datetime
+import os
 from .models import Task, Note
 from .serializers import TaskSerializer, TaskCreateSerializer, NoteSerializer
 
@@ -117,6 +118,182 @@ class TaskViewSet(viewsets.ModelViewSet):
         task.save()
         serializer = self.get_serializer(task)
         return Response(serializer.data)
+    
+    @action(detail=True, methods=['get'])
+    def guidance(self, request, pk=None):
+        """
+        Get AI-generated step-by-step guidance for a task.
+        Uses Gemini API to generate detailed, actionable instructions.
+        """
+        task = self.get_object()
+        
+        # Get milestone and roadmap context
+        milestone_title = task.milestone.title if task.milestone else "General"
+        roadmap_title = task.roadmap.goal if task.roadmap else "Learning"
+        
+        # Generate AI guidance
+        guidance = generate_task_guidance(
+            task_title=task.title,
+            task_description=task.description,
+            estimated_minutes=task.estimated_minutes,
+            milestone=milestone_title,
+            roadmap=roadmap_title,
+            tags=task.tags
+        )
+        
+        return Response(guidance)
+
+
+def generate_task_guidance(task_title, task_description, estimated_minutes, milestone, roadmap, tags):
+    """
+    Generate AI-powered step-by-step guidance for a task.
+    
+    Returns detailed instructions including:
+    - Objective
+    - Step-by-step execution guide
+    - Best practices
+    - Common mistakes to avoid
+    - Expected outcome
+    """
+    try:
+        import google.generativeai as genai
+        from google.generativeai.types import GenerationConfig
+    except ImportError:
+        # Return fallback guidance if Gemini is not available
+        return get_fallback_guidance(task_title, task_description, estimated_minutes)
+    
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        return get_fallback_guidance(task_title, task_description, estimated_minutes)
+    
+    genai.configure(api_key=api_key)
+    
+    # Build prompt for task guidance
+    prompt = f"""You are a friendly, encouraging mentor helping a student complete a learning task.
+
+**Task Information:**
+- Title: {task_title}
+- Description: {task_description}
+- Time Available: {estimated_minutes} minutes
+- Part of Milestone: {milestone}
+- Learning Goal: {roadmap}
+- Tags: {', '.join(tags) if tags else 'general'}
+
+**Your Response Must Include:**
+
+1. **🎯 Objective** (2-3 sentences)
+   Clear statement of what the student will achieve today.
+
+2. **⏱️ Time Breakdown** 
+   How to spend the {estimated_minutes} minutes effectively.
+
+3. **📝 Step-by-Step Guide** (5-8 steps)
+   Clear, actionable steps. Each step should be:
+   - Specific and concrete
+   - Include what to do, not just what to learn
+   - Beginner-friendly language
+
+4. **✅ Best Practices** (3-4 bullets)
+   Pro tips that will help them do this well.
+
+5. **⚠️ Common Mistakes** (2-3 bullets)
+   What beginners often get wrong and how to avoid it.
+
+6. **🏁 Expected Outcome**
+   What success looks like after completing this task.
+
+7. **💡 Quick Tips** (optional)
+   Any shortcuts or tools that could help.
+
+**Tone Guidelines:**
+- Be encouraging and supportive
+- Use simple language
+- Be practical, not theoretical
+- Focus on "doing" not just "understanding"
+
+**Response Format:** Return as JSON with these exact keys:
+{{
+    "objective": "string",
+    "time_breakdown": [
+        {{"duration": "10 min", "activity": "description"}}
+    ],
+    "steps": [
+        {{"step": 1, "title": "Step title", "description": "What to do"}}
+    ],
+    "best_practices": ["tip 1", "tip 2"],
+    "common_mistakes": ["mistake 1", "mistake 2"],
+    "expected_outcome": "string",
+    "quick_tips": ["tip 1"]
+}}
+"""
+    
+    try:
+        model = genai.GenerativeModel('gemini-2.5-flash-lite')
+        
+        generation_config = GenerationConfig(
+            temperature=0.7,
+            top_p=0.95,
+            max_output_tokens=2048
+        )
+        
+        response = model.generate_content(prompt, generation_config=generation_config)
+        
+        if not response or not hasattr(response, "text") or not response.text:
+            return get_fallback_guidance(task_title, task_description, estimated_minutes)
+        
+        # Parse JSON response
+        import json
+        response_text = response.text.strip()
+        
+        # Remove markdown code blocks if present
+        if "```json" in response_text:
+            response_text = response_text.split("```json")[1].split("```")[0]
+        elif "```" in response_text:
+            response_text = response_text.split("```")[1].split("```")[0]
+        
+        guidance_data = json.loads(response_text.strip())
+        guidance_data['generated'] = True
+        guidance_data['task_title'] = task_title
+        
+        return guidance_data
+        
+    except Exception as e:
+        print(f"AI guidance generation error: {str(e)}")
+        return get_fallback_guidance(task_title, task_description, estimated_minutes)
+
+
+def get_fallback_guidance(task_title, task_description, estimated_minutes):
+    """
+    Generate fallback guidance when AI is not available.
+    """
+    return {
+        'generated': False,
+        'task_title': task_title,
+        'objective': f"Complete the task: {task_title}",
+        'time_breakdown': [
+            {'duration': f'{estimated_minutes // 4} min', 'activity': 'Review and understand the task'},
+            {'duration': f'{estimated_minutes // 2} min', 'activity': 'Work on the main activity'},
+            {'duration': f'{estimated_minutes // 4} min', 'activity': 'Review and document your work'}
+        ],
+        'steps': [
+            {'step': 1, 'title': 'Understand the Task', 'description': 'Read through the task description carefully.'},
+            {'step': 2, 'title': 'Gather Resources', 'description': 'Find any materials or tools you need.'},
+            {'step': 3, 'title': 'Start Working', 'description': task_description or 'Begin the main activity.'},
+            {'step': 4, 'title': 'Review Your Work', 'description': 'Check what you have accomplished.'},
+            {'step': 5, 'title': 'Document Progress', 'description': 'Note any learnings or questions.'}
+        ],
+        'best_practices': [
+            'Focus on understanding over rushing',
+            'Take short breaks if needed',
+            'Ask questions when stuck'
+        ],
+        'common_mistakes': [
+            'Skipping the planning phase',
+            'Not taking notes'
+        ],
+        'expected_outcome': f'By the end of this {estimated_minutes}-minute session, you should have made meaningful progress on this task.',
+        'quick_tips': ['Set a timer to stay focused', 'Keep reference materials handy']
+    }
 
 
 class NoteViewSet(viewsets.ModelViewSet):
