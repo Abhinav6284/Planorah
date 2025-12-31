@@ -5,9 +5,12 @@ import {
     FaFolder, FaFolderOpen, FaFile, FaJs, FaPython, FaJava, FaHtml5, FaCss3Alt, 
     FaPlay, FaStop, FaPlus, FaTimes, FaChevronDown, FaChevronRight, 
     FaTerminal, FaCog, FaSearch, FaCode, FaBars, FaDownload,
-    FaCopy, FaTrash, FaExpand, FaCompress, FaSun, FaMoon
+    FaCopy, FaTrash, FaExpand, FaCompress, FaSun, FaMoon, FaCheck, FaGithub,
+    FaReact, FaDocker, FaDatabase, FaMarkdown, FaSyncAlt,
+    FaCodeBranch, FaUndo, FaStar, FaCloudDownloadAlt
 } from 'react-icons/fa';
-import { VscExtensions, VscSourceControl, VscAccount, VscSettingsGear } from 'react-icons/vsc';
+import { VscExtensions, VscSourceControl, VscAccount, VscSettingsGear, VscDebugAlt, VscRemote, VscGitCommit } from 'react-icons/vsc';
+import { SiTypescript, SiPrettier, SiEslint, SiTailwindcss, SiGit } from 'react-icons/si';
 
 // File icons based on extension
 const getFileIcon = (filename) => {
@@ -172,6 +175,142 @@ const pistonLanguages = {
     ruby: { piston: 'ruby', version: '3.0.1' }
 };
 
+// Available extensions
+const availableExtensions = [
+    {
+        id: 'prettier',
+        name: 'Prettier',
+        description: 'Code formatter using prettier',
+        author: 'Prettier',
+        icon: <SiPrettier className="text-[#56b3b4]" />,
+        downloads: '42.5M',
+        rating: 4.8,
+        installed: false,
+        category: 'Formatters'
+    },
+    {
+        id: 'eslint',
+        name: 'ESLint',
+        description: 'Integrates ESLint JavaScript into VS Code',
+        author: 'Microsoft',
+        icon: <SiEslint className="text-[#4b32c3]" />,
+        downloads: '32.1M',
+        rating: 4.7,
+        installed: false,
+        category: 'Linters'
+    },
+    {
+        id: 'tailwindcss',
+        name: 'Tailwind CSS IntelliSense',
+        description: 'Intelligent Tailwind CSS tooling',
+        author: 'Tailwind Labs',
+        icon: <SiTailwindcss className="text-[#38bdf8]" />,
+        downloads: '8.2M',
+        rating: 4.9,
+        installed: false,
+        category: 'CSS'
+    },
+    {
+        id: 'react-snippets',
+        name: 'ES7+ React/Redux/React-Native snippets',
+        description: 'Extensions for React, React-Native and Redux',
+        author: 'dsznajder',
+        icon: <FaReact className="text-[#61dafb]" />,
+        downloads: '12.8M',
+        rating: 4.6,
+        installed: false,
+        category: 'Snippets'
+    },
+    {
+        id: 'gitlens',
+        name: 'GitLens — Git supercharged',
+        description: 'Supercharge Git within VS Code',
+        author: 'GitKraken',
+        icon: <SiGit className="text-[#f05032]" />,
+        downloads: '28.4M',
+        rating: 4.8,
+        installed: false,
+        category: 'Git'
+    },
+    {
+        id: 'docker',
+        name: 'Docker',
+        description: 'Makes it easy to create, manage, and debug containerized applications',
+        author: 'Microsoft',
+        icon: <FaDocker className="text-[#2496ed]" />,
+        downloads: '18.6M',
+        rating: 4.7,
+        installed: false,
+        category: 'DevOps'
+    },
+    {
+        id: 'python-ext',
+        name: 'Python',
+        description: 'IntelliSense, Linting, Debugging, Jupyter Notebooks',
+        author: 'Microsoft',
+        icon: <FaPython className="text-[#3776ab]" />,
+        downloads: '98.2M',
+        rating: 4.8,
+        installed: false,
+        category: 'Languages'
+    },
+    {
+        id: 'typescript',
+        name: 'TypeScript Importer',
+        description: 'Automatic searches for TypeScript definitions',
+        author: 'pmneo',
+        icon: <SiTypescript className="text-[#3178c6]" />,
+        downloads: '2.1M',
+        rating: 4.5,
+        installed: false,
+        category: 'Languages'
+    },
+    {
+        id: 'markdown-preview',
+        name: 'Markdown Preview Enhanced',
+        description: 'Markdown Preview with many features',
+        author: 'Yiyi Wang',
+        icon: <FaMarkdown className="text-gray-400" />,
+        downloads: '4.5M',
+        rating: 4.6,
+        installed: false,
+        category: 'Other'
+    },
+    {
+        id: 'database-client',
+        name: 'Database Client',
+        description: 'Database manager for MySQL, PostgreSQL, SQLite',
+        author: 'Weijan Chen',
+        icon: <FaDatabase className="text-[#ffa500]" />,
+        downloads: '3.2M',
+        rating: 4.4,
+        installed: false,
+        category: 'Database'
+    },
+    {
+        id: 'github-copilot',
+        name: 'GitHub Copilot',
+        description: 'Your AI pair programmer',
+        author: 'GitHub',
+        icon: <FaGithub className="text-white" />,
+        downloads: '15.8M',
+        rating: 4.9,
+        installed: false,
+        category: 'AI'
+    },
+    {
+        id: 'code-runner',
+        name: 'Code Runner',
+        description: 'Run code snippet or code file for multiple languages',
+        author: 'Jun Han',
+        icon: <FaPlay className="text-green-500" />,
+        downloads: '22.1M',
+        rating: 4.7,
+        installed: false,
+        category: 'Other'
+    }
+];
+
 export default function CodeSpace() {
     // State
     const [fileSystem, setFileSystem] = useState(defaultFileSystem);
@@ -188,7 +327,7 @@ export default function CodeSpace() {
     const [isRunning, setIsRunning] = useState(false);
     const [theme, setTheme] = useState('vs-dark');
     const [showSidebar, setShowSidebar] = useState(true);
-    const [sidebarTab, setSidebarTab] = useState('files'); // files, search, git, extensions
+    const [sidebarTab, setSidebarTab] = useState('files'); // files, search, git, extensions, debug
     const [searchQuery, setSearchQuery] = useState('');
     const [showSettings, setShowSettings] = useState(false);
     const [fontSize, setFontSize] = useState(14);
@@ -198,6 +337,20 @@ export default function CodeSpace() {
     const [contextMenu, setContextMenu] = useState(null);
     const [newItemModal, setNewItemModal] = useState(null); // { type: 'file' | 'folder', parentPath: string }
     const [newItemName, setNewItemName] = useState('');
+    
+    // Extensions state
+    const [extensions, setExtensions] = useState(availableExtensions);
+    const [extensionSearchQuery, setExtensionSearchQuery] = useState('');
+    const [extensionCategory, setExtensionCategory] = useState('all');
+    
+    // Git state
+    const [gitChanges, setGitChanges] = useState([
+        { file: 'src/index.js', status: 'modified' },
+        { file: 'src/utils.js', status: 'modified' },
+    ]);
+    const [gitBranch, setGitBranch] = useState('main');
+    const [commitMessage, setCommitMessage] = useState('');
+    const [stagedFiles, setStagedFiles] = useState([]);
     
     const terminalRef = useRef(null);
     const editorRef = useRef(null);
@@ -564,18 +717,306 @@ export default function CodeSpace() {
                 );
             case 'git':
                 return (
-                    <div className="p-4 text-center text-gray-400 text-sm">
-                        <VscSourceControl className="text-4xl mx-auto mb-4 opacity-50" />
-                        <p>Source Control</p>
-                        <p className="text-xs mt-2">Git integration coming soon!</p>
+                    <div className="text-gray-300 h-full overflow-auto">
+                        <div className="flex items-center justify-between px-4 py-2 text-xs uppercase tracking-wider text-gray-500">
+                            Source Control
+                            <div className="flex gap-1">
+                                <button className="hover:text-white p-1" title="Refresh">
+                                    <FaSyncAlt className="text-xs" />
+                                </button>
+                                <button className="hover:text-white p-1" title="Commit All">
+                                    <FaCheck className="text-xs" />
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {/* Branch selector */}
+                        <div className="px-4 py-2 border-b border-[#333]">
+                            <div className="flex items-center gap-2 text-sm">
+                                <FaCodeBranch className="text-gray-500" />
+                                <select 
+                                    value={gitBranch}
+                                    onChange={(e) => setGitBranch(e.target.value)}
+                                    className="bg-[#3c3c3c] border border-[#555] rounded px-2 py-1 text-xs flex-1"
+                                >
+                                    <option value="main">main</option>
+                                    <option value="develop">develop</option>
+                                    <option value="feature/new-feature">feature/new-feature</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        {/* Commit message */}
+                        <div className="px-4 py-2">
+                            <input
+                                type="text"
+                                value={commitMessage}
+                                onChange={(e) => setCommitMessage(e.target.value)}
+                                placeholder="Message (press Enter to commit)"
+                                className="w-full bg-[#3c3c3c] border border-[#555] rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && commitMessage.trim()) {
+                                        addTerminalOutput('system', `Committed: "${commitMessage}"`);
+                                        setCommitMessage('');
+                                        setStagedFiles([]);
+                                        setGitChanges([]);
+                                    }
+                                }}
+                            />
+                        </div>
+                        
+                        {/* Staged Changes */}
+                        {stagedFiles.length > 0 && (
+                            <div className="px-2 py-1">
+                                <div className="flex items-center justify-between px-2 py-1 text-xs text-gray-500">
+                                    <span>STAGED CHANGES ({stagedFiles.length})</span>
+                                    <button 
+                                        onClick={() => {
+                                            setGitChanges([...gitChanges, ...stagedFiles.map(f => ({ file: f, status: 'modified' }))]);
+                                            setStagedFiles([]);
+                                        }}
+                                        className="hover:text-white"
+                                        title="Unstage All"
+                                    >
+                                        <FaUndo className="text-xs" />
+                                    </button>
+                                </div>
+                                {stagedFiles.map((file, idx) => (
+                                    <div key={idx} className="flex items-center gap-2 px-2 py-1 hover:bg-[#2a2d2e] text-sm group">
+                                        <VscGitCommit className="text-green-500 text-xs" />
+                                        <span className="flex-1 truncate">{file}</span>
+                                        <button 
+                                            onClick={() => {
+                                                setStagedFiles(stagedFiles.filter(f => f !== file));
+                                                setGitChanges([...gitChanges, { file, status: 'modified' }]);
+                                            }}
+                                            className="opacity-0 group-hover:opacity-100 hover:text-white"
+                                        >
+                                            <FaUndo className="text-xs" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {/* Changes */}
+                        <div className="px-2 py-1">
+                            <div className="flex items-center justify-between px-2 py-1 text-xs text-gray-500">
+                                <span>CHANGES ({gitChanges.length})</span>
+                                <button 
+                                    onClick={() => {
+                                        setStagedFiles([...stagedFiles, ...gitChanges.map(c => c.file)]);
+                                        setGitChanges([]);
+                                    }}
+                                    className="hover:text-white"
+                                    title="Stage All"
+                                >
+                                    <FaPlus className="text-xs" />
+                                </button>
+                            </div>
+                            {gitChanges.map((change, idx) => (
+                                <div key={idx} className="flex items-center gap-2 px-2 py-1 hover:bg-[#2a2d2e] text-sm group">
+                                    <span className={`text-xs ${change.status === 'modified' ? 'text-yellow-500' : change.status === 'added' ? 'text-green-500' : 'text-red-500'}`}>
+                                        {change.status === 'modified' ? 'M' : change.status === 'added' ? 'A' : 'D'}
+                                    </span>
+                                    <span className="flex-1 truncate">{change.file}</span>
+                                    <div className="opacity-0 group-hover:opacity-100 flex gap-1">
+                                        <button 
+                                            onClick={() => {
+                                                setStagedFiles([...stagedFiles, change.file]);
+                                                setGitChanges(gitChanges.filter(c => c.file !== change.file));
+                                            }}
+                                            className="hover:text-green-400"
+                                            title="Stage"
+                                        >
+                                            <FaPlus className="text-xs" />
+                                        </button>
+                                        <button className="hover:text-red-400" title="Discard">
+                                            <FaUndo className="text-xs" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                            {gitChanges.length === 0 && stagedFiles.length === 0 && (
+                                <div className="text-center text-gray-500 text-xs py-4">
+                                    No changes detected
+                                </div>
+                            )}
+                        </div>
+                        
+                        {/* Recent Commits */}
+                        <div className="px-2 py-1 border-t border-[#333] mt-2">
+                            <div className="px-2 py-1 text-xs text-gray-500">RECENT COMMITS</div>
+                            <div className="text-xs text-gray-400">
+                                <div className="flex items-center gap-2 px-2 py-1.5 hover:bg-[#2a2d2e]">
+                                    <VscGitCommit className="text-blue-400" />
+                                    <div className="flex-1">
+                                        <div className="truncate">Initial commit</div>
+                                        <div className="text-gray-600">2 hours ago</div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 px-2 py-1.5 hover:bg-[#2a2d2e]">
+                                    <VscGitCommit className="text-blue-400" />
+                                    <div className="flex-1">
+                                        <div className="truncate">Add project structure</div>
+                                        <div className="text-gray-600">1 day ago</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 );
             case 'extensions':
+                const filteredExtensions = extensions.filter(ext => {
+                    const matchesSearch = ext.name.toLowerCase().includes(extensionSearchQuery.toLowerCase()) ||
+                                         ext.description.toLowerCase().includes(extensionSearchQuery.toLowerCase());
+                    const matchesCategory = extensionCategory === 'all' || ext.category === extensionCategory;
+                    return matchesSearch && matchesCategory;
+                });
+                
+                const categories = ['all', ...new Set(extensions.map(e => e.category))];
+                const installedCount = extensions.filter(e => e.installed).length;
+                
                 return (
-                    <div className="p-4 text-center text-gray-400 text-sm">
-                        <VscExtensions className="text-4xl mx-auto mb-4 opacity-50" />
-                        <p>Extensions</p>
-                        <p className="text-xs mt-2">Extension marketplace coming soon!</p>
+                    <div className="text-gray-300 h-full overflow-auto">
+                        <div className="px-4 py-2 text-xs uppercase tracking-wider text-gray-500">
+                            Extensions
+                        </div>
+                        
+                        {/* Search */}
+                        <div className="px-4 py-2">
+                            <div className="relative">
+                                <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs" />
+                                <input
+                                    type="text"
+                                    value={extensionSearchQuery}
+                                    onChange={(e) => setExtensionSearchQuery(e.target.value)}
+                                    placeholder="Search extensions..."
+                                    className="w-full bg-[#3c3c3c] border border-[#555] rounded px-8 py-1.5 text-sm focus:outline-none focus:border-blue-500"
+                                />
+                            </div>
+                        </div>
+                        
+                        {/* Category Filter */}
+                        <div className="px-4 py-1">
+                            <select
+                                value={extensionCategory}
+                                onChange={(e) => setExtensionCategory(e.target.value)}
+                                className="w-full bg-[#3c3c3c] border border-[#555] rounded px-2 py-1 text-xs"
+                            >
+                                {categories.map(cat => (
+                                    <option key={cat} value={cat}>
+                                        {cat === 'all' ? 'All Categories' : cat}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        
+                        {/* Installed Section */}
+                        {installedCount > 0 && (
+                            <div className="px-2 py-1 border-b border-[#333]">
+                                <div className="px-2 py-1 text-xs text-gray-500 flex items-center gap-2">
+                                    <FaCheck className="text-green-500" />
+                                    INSTALLED ({installedCount})
+                                </div>
+                                {extensions.filter(e => e.installed).map(ext => (
+                                    <div key={ext.id} className="flex items-start gap-3 px-2 py-2 hover:bg-[#2a2d2e] rounded group">
+                                        <div className="text-2xl mt-0.5">{ext.icon}</div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="font-medium text-sm truncate">{ext.name}</div>
+                                            <div className="text-xs text-gray-500 truncate">{ext.author}</div>
+                                            <div className="text-xs text-gray-400 mt-1 line-clamp-2">{ext.description}</div>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                setExtensions(extensions.map(e => 
+                                                    e.id === ext.id ? { ...e, installed: false } : e
+                                                ));
+                                                addTerminalOutput('system', `Uninstalled: ${ext.name}`);
+                                            }}
+                                            className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded hover:bg-red-600/40 opacity-0 group-hover:opacity-100"
+                                        >
+                                            Uninstall
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {/* Available Extensions */}
+                        <div className="px-2 py-1">
+                            <div className="px-2 py-1 text-xs text-gray-500">
+                                {extensionSearchQuery ? 'SEARCH RESULTS' : 'POPULAR EXTENSIONS'}
+                            </div>
+                            {filteredExtensions.filter(e => !e.installed).map(ext => (
+                                <div key={ext.id} className="flex items-start gap-3 px-2 py-2 hover:bg-[#2a2d2e] rounded group">
+                                    <div className="text-2xl mt-0.5">{ext.icon}</div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium text-sm truncate">{ext.name}</span>
+                                            <span className="text-xs text-gray-500 bg-[#333] px-1.5 py-0.5 rounded">{ext.category}</span>
+                                        </div>
+                                        <div className="text-xs text-gray-500 truncate">{ext.author}</div>
+                                        <div className="text-xs text-gray-400 mt-1 line-clamp-2">{ext.description}</div>
+                                        <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                                            <span className="flex items-center gap-1">
+                                                <FaCloudDownloadAlt /> {ext.downloads}
+                                            </span>
+                                            <span className="flex items-center gap-1">
+                                                <FaStar className="text-yellow-500" /> {ext.rating}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            setExtensions(extensions.map(e => 
+                                                e.id === ext.id ? { ...e, installed: true } : e
+                                            ));
+                                            addTerminalOutput('system', `Installed: ${ext.name}`);
+                                        }}
+                                        className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                                    >
+                                        Install
+                                    </button>
+                                </div>
+                            ))}
+                            {filteredExtensions.filter(e => !e.installed).length === 0 && (
+                                <div className="text-center text-gray-500 text-xs py-4">
+                                    No extensions found
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+            case 'debug':
+                return (
+                    <div className="text-gray-300 h-full overflow-auto">
+                        <div className="px-4 py-2 text-xs uppercase tracking-wider text-gray-500">
+                            Run and Debug
+                        </div>
+                        <div className="p-4">
+                            <button 
+                                onClick={runCode}
+                                disabled={isRunning}
+                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-sm font-medium disabled:bg-gray-600"
+                            >
+                                <FaPlay /> {isRunning ? 'Running...' : 'Run and Debug'}
+                            </button>
+                            <div className="mt-4 text-xs text-gray-500">
+                                <div className="font-medium mb-2">Debug Console</div>
+                                <div className="bg-[#1e1e1e] border border-[#333] rounded p-2 h-32 overflow-auto">
+                                    {terminalOutput.slice(-5).map((line, i) => (
+                                        <div key={i} className={`${line.type === 'error' ? 'text-red-400' : line.type === 'system' ? 'text-blue-400' : 'text-gray-400'}`}>
+                                            {line.text}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="mt-4 text-xs text-gray-500">
+                                <div className="font-medium mb-2">Breakpoints</div>
+                                <div className="text-gray-600 italic">No breakpoints set</div>
+                            </div>
+                        </div>
                     </div>
                 );
             default:
@@ -664,6 +1105,13 @@ export default function CodeSpace() {
                         <VscSourceControl className="text-lg" />
                     </button>
                     <button
+                        onClick={() => { setShowSidebar(true); setSidebarTab('debug'); }}
+                        className={`p-2.5 rounded ${sidebarTab === 'debug' && showSidebar ? 'bg-[#444] text-white' : 'text-gray-500 hover:text-white'}`}
+                        title="Run and Debug"
+                    >
+                        <VscDebugAlt className="text-lg" />
+                    </button>
+                    <button
                         onClick={() => { setShowSidebar(true); setSidebarTab('extensions'); }}
                         className={`p-2.5 rounded ${sidebarTab === 'extensions' && showSidebar ? 'bg-[#444] text-white' : 'text-gray-500 hover:text-white'}`}
                         title="Extensions"
@@ -671,6 +1119,9 @@ export default function CodeSpace() {
                         <VscExtensions className="text-lg" />
                     </button>
                     <div className="flex-1" />
+                    <button className="p-2.5 text-gray-500 hover:text-white" title="Remote Window">
+                        <VscRemote className="text-lg" />
+                    </button>
                     <button className="p-2.5 text-gray-500 hover:text-white" title="Account">
                         <VscAccount className="text-lg" />
                     </button>
