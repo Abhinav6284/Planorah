@@ -954,7 +954,7 @@ setInterval(() => {
         { id: 'view.terminal', label: 'View: Toggle Terminal', icon: <FaTerminal />, action: () => setShowTerminal(!showTerminal) },
         { id: 'view.sidebar', label: 'View: Toggle Sidebar', icon: <FaBars />, action: () => setShowSidebar(!showSidebar) },
         { id: 'view.fullscreen', label: 'View: Toggle Fullscreen', icon: <FaExpand />, action: () => setIsFullscreen(!isFullscreen) },
-        { id: 'code.run', label: 'Run: Execute Code', icon: <FaPlay />, action: runCode },
+        { id: 'code.run', label: 'Run: Execute Code', icon: <FaPlay />, action: () => runCode() },
         { id: 'editor.format', label: 'Format Document', icon: <SiPrettier />, action: () => addTerminalOutput('system', 'Document formatted!') },
         { id: 'theme.toggle', label: 'Preferences: Toggle Theme', icon: theme === 'vs-dark' ? <FaSun /> : <FaMoon />, action: () => setTheme(theme === 'vs-dark' ? 'light' : 'vs-dark') },
         { id: 'settings.open', label: 'Preferences: Open Settings', icon: <FaCog />, action: () => setShowSettings(true) },
