@@ -27,6 +27,7 @@ export default function RoadmapView() {
     useEffect(() => {
         fetchRoadmap();
         fetchTaskProgress();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     const fetchRoadmap = async () => {

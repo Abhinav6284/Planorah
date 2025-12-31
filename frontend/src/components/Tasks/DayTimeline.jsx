@@ -5,12 +5,11 @@ import { format, addDays, startOfToday } from 'date-fns';
 
 export default function DayTimeline() {
     const [tasks, setTasks] = useState([]);
-    const [selectedDate, setSelectedDate] = useState(startOfToday());
     const [selectedDay, setSelectedDay] = useState(1);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchDayTasks();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedDay]);
 
     const fetchDayTasks = async () => {
@@ -19,8 +18,6 @@ export default function DayTimeline() {
             setTasks(response.data);
         } catch (error) {
             console.error('Failed to fetch day tasks:', error);
-        } finally {
-            setLoading(false);
         }
     };
 

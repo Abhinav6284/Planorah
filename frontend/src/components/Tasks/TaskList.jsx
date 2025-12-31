@@ -54,6 +54,7 @@ export default function TaskList() {
         return () => {
             if (undoTimeoutRef.current) clearTimeout(undoTimeoutRef.current);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filter, selectedRoadmap]);
 
     const fetchRoadmaps = async () => {
