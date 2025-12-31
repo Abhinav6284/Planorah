@@ -361,11 +361,98 @@ export default function PortfolioEditor() {
                     </div>
                 </motion.div>
 
-                {/* Save Button */}
+                {/* Projects Section */}
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
+                    className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 mb-6"
+                >
+                    <div className="flex justify-between items-center mb-4">
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Projects</h3>
+                            <p className="text-sm text-gray-500 mt-1">Manage projects displayed on your portfolio</p>
+                        </div>
+                        <a
+                            href="/projects"
+                            className="px-4 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                        >
+                            Manage Projects →
+                        </a>
+                    </div>
+
+                    {portfolio?.portfolio_projects && portfolio.portfolio_projects.length > 0 ? (
+                        <div className="space-y-3">
+                            {portfolio.portfolio_projects.map((portfolioProject, idx) => (
+                                <div 
+                                    key={idx}
+                                    className="p-4 border border-gray-200 dark:border-gray-800 rounded-xl hover:border-gray-300 dark:hover:border-gray-700 transition-all"
+                                >
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex-1">
+                                            <h4 className="font-medium text-gray-900 dark:text-white mb-1">
+                                                {portfolioProject.display_title || portfolioProject.project_title}
+                                            </h4>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
+                                                {portfolioProject.display_description || portfolioProject.project_description}
+                                            </p>
+                                            {portfolioProject.tech_stack && portfolioProject.tech_stack.length > 0 && (
+                                                <div className="flex flex-wrap gap-2">
+                                                    {portfolioProject.tech_stack.slice(0, 3).map((tech, techIdx) => (
+                                                        <span 
+                                                            key={techIdx}
+                                                            className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-lg"
+                                                        >
+                                                            {tech}
+                                                        </span>
+                                                    ))}
+                                                    {portfolioProject.tech_stack.length > 3 && (
+                                                        <span className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-lg">
+                                                            +{portfolioProject.tech_stack.length - 3} more
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center gap-2 ml-4">
+                                            {portfolioProject.github_url && (
+                                                <a
+                                                    href={portfolioProject.github_url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                                                >
+                                                    GitHub →
+                                                </a>
+                                            )}
+                                            {portfolioProject.is_featured && (
+                                                <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 rounded-full">
+                                                    Featured
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-8 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl">
+                            <p className="text-gray-500 dark:text-gray-400 mb-3">No projects added to portfolio yet</p>
+                            <a
+                                href="/projects"
+                                className="inline-block px-4 py-2 text-sm bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-semibold hover:opacity-90 transition-all"
+                            >
+                                Add Your First Project
+                            </a>
+                        </div>
+                    )}
+                </motion.div>
+
+                {/* Save Button */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
                 >
                     <button
                         onClick={handleSave}

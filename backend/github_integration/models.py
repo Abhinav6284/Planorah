@@ -43,16 +43,34 @@ class GitHubCredential(models.Model):
 class GitHubRepository(models.Model):
     """
     Tracks repositories created for user projects.
+    Supports both roadmap and student projects.
     """
+    PROJECT_TYPE_CHOICES = [
+        ('roadmap', 'Roadmap Project'),
+        ('student', 'Student Project'),
+    ]
+    
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='github_repositories'
     )
+    
+    # Project references
+    project_type = models.CharField(max_length=20, choices=PROJECT_TYPE_CHOICES, default='roadmap')
     project = models.OneToOneField(
         'roadmap_ai.Project',
         on_delete=models.CASCADE,
-        related_name='github_repo'
+        related_name='github_repo',
+        null=True,
+        blank=True
+    )
+    student_project = models.OneToOneField(
+        'roadmap_ai.StudentProject',
+        on_delete=models.CASCADE,
+        related_name='github_repo',
+        null=True,
+        blank=True
     )
     
     # Repository info
@@ -63,6 +81,13 @@ class GitHubRepository(models.Model):
     
     # Visibility
     is_private = models.BooleanField(default=False)
+    
+    # GitHub stats
+    stars_count = models.IntegerField(default=0)
+    forks_count = models.IntegerField(default=0)
+    watchers_count = models.IntegerField(default=0)
+    last_commit_date = models.DateTimeField(null=True, blank=True)
+    last_commit_message = models.TextField(blank=True)
     
     # Sync status
     last_synced_at = models.DateTimeField(null=True, blank=True)
@@ -79,6 +104,12 @@ class GitHubRepository(models.Model):
 
     def __str__(self):
         return self.repo_full_name
+    
+    def get_project(self):
+        """Get the linked project."""
+        if self.project_type == 'roadmap':
+            return self.project
+        return self.student_project
 
 
 class GitHubPublishLog(models.Model):

@@ -725,3 +725,44 @@ def schedule_roadmap(request, roadmap_id):
             "details": str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+# Student Projects ViewSet
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from .models import StudentProject
+from .serializers import StudentProjectSerializer, StudentProjectCreateSerializer
+
+
+class StudentProjectViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing student-uploaded projects.
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            return StudentProjectCreateSerializer
+        return StudentProjectSerializer
+    
+    def get_queryset(self):
+        return StudentProject.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+    
+    @action(detail=False, methods=['get'])
+    def stats(self, request):
+        """Get statistics about student projects."""
+        queryset = self.get_queryset()
+        
+        total = queryset.count()
+        with_github = queryset.exclude(github_url__isnull=True).exclude(github_url='').count()
+        public = queryset.filter(visibility='public').count()
+        
+        return Response({
+            'total_projects': total,
+            'projects_on_github': with_github,
+            'public_projects': public,
+            'private_projects': total - public,
+        })
+

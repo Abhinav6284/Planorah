@@ -1,5 +1,9 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from . import views
+
+router = DefaultRouter()
+router.register('student-projects', views.StudentProjectViewSet, basename='student-project')
 
 urlpatterns = [
     # Generate AI roadmap
@@ -21,4 +25,7 @@ urlpatterns = [
 
     # Schedule roadmap
     path('<int:roadmap_id>/schedule/', views.schedule_roadmap, name='schedule_roadmap'),
+    
+    # Student projects router
+    path('', include(router.urls)),
 ]

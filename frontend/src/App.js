@@ -40,7 +40,7 @@ import PricingPage from './components/Subscription/PricingPage';
 import SubscriptionStatus from './components/Subscription/SubscriptionStatus';
 import CheckoutPage from './components/Billing/CheckoutPage';
 import PaymentHistory from './components/Billing/PaymentHistory';
-import PortfolioEditor from './components/Portfolio/PortfolioEditor';
+import { PortfolioEditor, ProjectManager } from './components/Portfolio';
 
 export default function App() {
   return (
@@ -92,6 +92,7 @@ export default function App() {
               <Route path="/billing/checkout" element={<CheckoutPage />} />
               <Route path="/billing/history" element={<PaymentHistory />} />
               <Route path="/portfolio/edit" element={<PortfolioEditor />} />
+              <Route path="/projects" element={<ProjectManager />} />
             </Route>
           </Routes>
         </Router>

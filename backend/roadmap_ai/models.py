@@ -92,3 +92,55 @@ class Project(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class StudentProject(models.Model):
+    """
+    Student-uploaded custom projects.
+    These are separate from roadmap projects and allow students to showcase their own work.
+    """
+    SOURCE_TYPE_CHOICES = [
+        ('upload', 'Upload (ZIP/Folder)'),
+        ('git_url', 'Git Repository URL'),
+        ('manual', 'Manual Entry'),
+    ]
+    
+    VISIBILITY_CHOICES = [
+        ('public', 'Public'),
+        ('private', 'Private'),
+    ]
+    
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='student_projects'
+    )
+    
+    # Basic info
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    tech_stack = models.JSONField(default=list)
+    
+    # Source information
+    source_type = models.CharField(max_length=20, choices=SOURCE_TYPE_CHOICES, default='manual')
+    git_url = models.URLField(blank=True, null=True, help_text='Original Git repository URL')
+    file_path = models.CharField(max_length=500, blank=True, help_text='Path to uploaded files')
+    
+    # Project links
+    github_url = models.URLField(blank=True, null=True, help_text='Published GitHub URL')
+    live_demo_url = models.URLField(blank=True, null=True)
+    
+    # Settings
+    visibility = models.CharField(max_length=20, choices=VISIBILITY_CHOICES, default='public')
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Student Project'
+        verbose_name_plural = 'Student Projects'
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.title}"
