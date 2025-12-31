@@ -8,23 +8,11 @@ export default function LabHub() {
         {
             id: 'codespace',
             title: 'CodeSpace IDE',
-            description: 'A full VS Code-like IDE experience in your browser with file explorer, terminal, and multi-language support.',
+            description: 'A full VS Code-like IDE experience with file explorer, terminal, extensions marketplace, Git source control, and multi-language code execution.',
             icon: <VscVscode className="w-12 h-12" />,
-            color: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400',
-            link: '/lab/codespace',
-            badge: 'NEW'
-        },
-        {
-            id: 'code',
-            title: 'Code Studio',
-            description: 'A professional environment for mastering algorithms and building software.',
-            icon: (
-                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                </svg>
-            ),
             color: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
-            link: '/lab/code'
+            link: '/lab/codespace',
+            badge: 'VS Code'
         },
         {
             id: 'resources',

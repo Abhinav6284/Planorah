@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
 import { SubscriptionProvider } from "./context/SubscriptionContext";
 import WelcomePage from "./components/WelcomePage";
@@ -17,7 +17,6 @@ import RoadmapView from "./components/Roadmap/RoadmapView";
 import RoadmapList from './components/Roadmap/RoadmapList';
 import RoadmapProjects from './components/Roadmap/RoadmapProjects';
 import LabHub from './components/Lab/LabHub';
-import CodeStudio from './components/Lab/CodeStudio';
 import CodeSpace from './components/Lab/CodeSpace';
 import ResourceHub from './components/Lab/ResourceHub';
 import TaskList from './components/Tasks/TaskList';
@@ -79,7 +78,7 @@ export default function App() {
               <Route path="/roadmap/list" element={<RoadmapList />} />
               <Route path="/roadmap/projects" element={<RoadmapProjects />} />
               <Route path="/lab" element={<LabHub />} />
-              <Route path="/lab/code" element={<CodeStudio />} />
+              <Route path="/lab/code" element={<Navigate to="/lab/codespace" replace />} />
               <Route path="/lab/codespace" element={<CodeSpace />} />
               <Route path="/lab/resources" element={<ResourceHub />} />
               <Route path="/tasks" element={<TaskList />} />
