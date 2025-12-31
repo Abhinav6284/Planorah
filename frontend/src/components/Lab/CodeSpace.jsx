@@ -7,9 +7,9 @@ import {
     FaTerminal, FaCog, FaSearch, FaCode, FaBars, FaDownload,
     FaCopy, FaTrash, FaExpand, FaCompress, FaSun, FaMoon, FaCheck, FaGithub,
     FaReact, FaDocker, FaDatabase, FaMarkdown, FaSyncAlt,
-    FaCodeBranch, FaUndo, FaStar, FaCloudDownloadAlt, FaKeyboard, FaColumns,
-    FaGraduationCap, FaTrophy, FaLightbulb, FaRocket, FaUpload, FaEye, FaPalette,
-    FaBookOpen, FaChartLine, FaMedal, FaCheckCircle, FaExclamationCircle
+    FaCodeBranch, FaUndo, FaStar, FaCloudDownloadAlt, FaKeyboard,
+    FaGraduationCap, FaTrophy, FaRocket, FaUpload, FaEye, FaPalette,
+    FaChartLine, FaMedal, FaCheckCircle, FaExclamationCircle
 } from 'react-icons/fa';
 import { VscExtensions, VscSourceControl, VscAccount, VscSettingsGear, VscDebugAlt, VscRemote, VscGitCommit, VscSplitHorizontal } from 'react-icons/vsc';
 import { SiTypescript, SiPrettier, SiEslint, SiTailwindcss, SiGit } from 'react-icons/si';
@@ -364,9 +364,8 @@ export default function CodeSpace() {
     const [activeTerminalTab, setActiveTerminalTab] = useState(1);
     
     // Learning Integration state
-    const [showLearningPanel, setShowLearningPanel] = useState(false);
     const [currentChallenge, setCurrentChallenge] = useState(null);
-    const [challengeProgress, setChallengeProgress] = useState({
+    const [challengeProgress] = useState({
         completed: 3,
         total: 10,
         streak: 5
@@ -954,12 +953,12 @@ setInterval(() => {
         { id: 'view.terminal', label: 'View: Toggle Terminal', icon: <FaTerminal />, action: () => setShowTerminal(!showTerminal) },
         { id: 'view.sidebar', label: 'View: Toggle Sidebar', icon: <FaBars />, action: () => setShowSidebar(!showSidebar) },
         { id: 'view.fullscreen', label: 'View: Toggle Fullscreen', icon: <FaExpand />, action: () => setIsFullscreen(!isFullscreen) },
-        { id: 'code.run', label: 'Run: Execute Code', icon: <FaPlay />, action: runCode },
+        { id: 'code.run', label: 'Run: Execute Code', icon: <FaPlay />, action: () => runCode() },
         { id: 'editor.format', label: 'Format Document', icon: <SiPrettier />, action: () => addTerminalOutput('system', 'Document formatted!') },
         { id: 'theme.toggle', label: 'Preferences: Toggle Theme', icon: theme === 'vs-dark' ? <FaSun /> : <FaMoon />, action: () => setTheme(theme === 'vs-dark' ? 'light' : 'vs-dark') },
         { id: 'settings.open', label: 'Preferences: Open Settings', icon: <FaCog />, action: () => setShowSettings(true) },
         { id: 'keyboard.shortcuts', label: 'Keyboard Shortcuts', icon: <FaKeyboard />, action: () => setShowKeyboardShortcuts(true) },
-        { id: 'learning.challenges', label: 'Learning: Open Challenges', icon: <FaTrophy />, action: () => { setShowLearningPanel(true); setSidebarTab('learning'); setShowSidebar(true); } },
+        { id: 'learning.challenges', label: 'Learning: Open Challenges', icon: <FaTrophy />, action: () => { setSidebarTab('learning'); setShowSidebar(true); } },
         { id: 'portfolio.templates', label: 'Portfolio: Browse Templates', icon: <FaPalette />, action: () => setShowPortfolioTemplates(true) },
         { id: 'portfolio.preview', label: 'Portfolio: Live Preview', icon: <FaEye />, action: () => setShowLivePreview(true) },
     ];
@@ -1016,7 +1015,8 @@ setInterval(() => {
             setShowPortfolioTemplates(false);
             setShowLivePreview(false);
         }
-    }, [theme, splitView]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     
     useEffect(() => {
         window.addEventListener('keydown', handleKeyDown);

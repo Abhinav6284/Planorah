@@ -65,7 +65,6 @@ export default function ResumeBuilder() {
 
     const [activeTab, setActiveTab] = useState("details");
     const [openSections, setOpenSections] = useState(["personal"]);
-    const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
     const [zoom, setZoom] = useState(75);
     const [resumeTitle, setResumeTitle] = useState("Untitled Resume");
@@ -91,6 +90,7 @@ export default function ResumeBuilder() {
         if (isEditing) {
             fetchResume();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     const fetchResume = async () => {

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { tasksService } from '../../api/tasksService';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
 
 export default function Analytics() {

@@ -243,10 +243,10 @@ export default function LandingPage() {
             <span className="text-gray-400 font-serif">Planorah © 2025</span>
           </div>
           <div className="flex gap-8 text-sm text-gray-500 dark:text-gray-400">
-            <a href="#" className="hover:text-black dark:hover:text-white transition-colors">Privacy</a>
-            <a href="#" className="hover:text-black dark:hover:text-white transition-colors">Terms</a>
-            <a href="#" className="hover:text-black dark:hover:text-white transition-colors">Twitter</a>
-            <a href="#" className="hover:text-black dark:hover:text-white transition-colors">Instagram</a>
+            <button type="button" className="hover:text-black dark:hover:text-white transition-colors">Privacy</button>
+            <button type="button" className="hover:text-black dark:hover:text-white transition-colors">Terms</button>
+            <button type="button" className="hover:text-black dark:hover:text-white transition-colors">Twitter</button>
+            <button type="button" className="hover:text-black dark:hover:text-white transition-colors">Instagram</button>
           </div>
         </div>
       </footer>

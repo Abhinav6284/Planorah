@@ -58,8 +58,6 @@ const ScoreGauge = ({ score, size = 120 }) => {
 
 // Resume Card Component
 const ResumeCard = ({ resume, onEdit, onDelete, onPreview, onAnalyze }) => {
-    const [showActions, setShowActions] = useState(false);
-
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}

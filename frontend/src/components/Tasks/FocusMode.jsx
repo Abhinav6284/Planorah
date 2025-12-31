@@ -12,6 +12,7 @@ export default function FocusMode() {
 
     useEffect(() => {
         fetchTodayTasks();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
