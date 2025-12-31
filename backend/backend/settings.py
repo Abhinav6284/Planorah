@@ -38,12 +38,14 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',  # Must be before django.contrib.staticfiles for ASGI
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
     'rest_framework_simplejwt.token_blacklist',
     'api',
     'rest_framework',
@@ -65,7 +67,18 @@ INSTALLED_APPS = [
     'github_integration',
     'billing',
     'analytics',
+    'codespace',  # Real terminal / IDE backend
 ]
+
+# ASGI Application
+ASGI_APPLICATION = 'backend.asgi.application'
+
+# Channel Layers (in-memory for development, use Redis for production)
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
