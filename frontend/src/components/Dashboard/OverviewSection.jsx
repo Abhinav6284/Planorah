@@ -15,6 +15,7 @@ import GitHubWidget from "./NewWidgets/GitHubWidget";
 import SubscriptionWidget from "./NewWidgets/SubscriptionWidget";
 import PortfolioWidget from "./NewWidgets/PortfolioWidget";
 import CalendarWidget from "./NewWidgets/CalendarWidget";
+import RoadmapProgressWidget from "./NewWidgets/RoadmapProgressWidget";
 
 export default function OverviewSection() {
     const [loading, setLoading] = useState(true);
@@ -139,6 +140,11 @@ export default function OverviewSection() {
 
                 {/* --- Right Column (Side Panel) - Span 4 --- */}
                 <div className="lg:col-span-4 flex flex-col gap-6">
+
+                    {/* Roadmap Progress Widget - NEW */}
+                    <motion.div variants={itemVariants} className="h-auto min-h-[240px]">
+                        <RoadmapProgressWidget />
+                    </motion.div>
 
                     {/* Calendar Widget */}
                     <motion.div variants={itemVariants} className="h-auto min-h-[280px]">

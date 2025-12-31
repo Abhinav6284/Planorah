@@ -15,6 +15,7 @@ import ResetPassword from "./components/ResetPassword";
 import RoadmapGenerator from "./components/Roadmap/RoadmapGenerator";
 import RoadmapView from "./components/Roadmap/RoadmapView";
 import RoadmapList from './components/Roadmap/RoadmapList';
+import RoadmapProjects from './components/Roadmap/RoadmapProjects';
 import LabHub from './components/Lab/LabHub';
 import CodeStudio from './components/Lab/CodeStudio';
 import ResourceHub from './components/Lab/ResourceHub';
@@ -75,6 +76,7 @@ export default function App() {
               <Route path="/interview" element={<MockInterviewComingSoon />} />
               <Route path="/roadmap/:id" element={<RoadmapView />} />
               <Route path="/roadmap/list" element={<RoadmapList />} />
+              <Route path="/roadmap/projects" element={<RoadmapProjects />} />
               <Route path="/lab" element={<LabHub />} />
               <Route path="/lab/code" element={<CodeStudio />} />
               <Route path="/lab/resources" element={<ResourceHub />} />

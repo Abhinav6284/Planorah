@@ -12,6 +12,12 @@ urlpatterns = [
     # Get all roadmaps for authenticated user
     path('list/', views.get_user_roadmaps, name='get_user_roadmaps'),
 
+    # Get all roadmap projects with progress
+    path('projects/', views.get_roadmap_projects, name='get_roadmap_projects'),
+    
+    # Get roadmap progress summary
+    path('progress/', views.get_roadmap_progress, name='get_roadmap_progress'),
+
     # Get detailed roadmap by ID
     path('<int:roadmap_id>/', views.get_roadmap_detail, name='get_roadmap_detail'),
 

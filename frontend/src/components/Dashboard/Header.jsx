@@ -62,6 +62,7 @@ const Header = () => {
             items: [
                 { path: "/lab", label: "Virtual Lab" },
                 { path: "/roadmap/list", label: "Learning Path" },
+                { path: "/roadmap/projects", label: "My Projects" },
             ]
         },
         {

@@ -40,4 +40,16 @@ export const roadmapService = {
         });
         return response.data;
     },
+
+    // Get all roadmap projects (for Projects tab)
+    getRoadmapProjects: async () => {
+        const response = await api.get("roadmap/projects/");
+        return response.data;
+    },
+
+    // Get progress for all roadmaps
+    getRoadmapProgress: async () => {
+        const response = await api.get("roadmap/progress/");
+        return response.data;
+    },
 };
