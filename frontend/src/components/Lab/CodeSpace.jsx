@@ -1,18 +1,19 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Editor from '@monaco-editor/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    FaFolder, FaFolderOpen, FaFile, FaJs, FaPython, FaJava, FaHtml5, FaCss3Alt, 
-    FaPlay, FaStop, FaPlus, FaTimes, FaChevronDown, FaChevronRight, 
+import {
+    FaFolder, FaFolderOpen, FaFile, FaJs, FaPython, FaJava, FaHtml5, FaCss3Alt,
+    FaPlay, FaStop, FaPlus, FaTimes, FaChevronDown, FaChevronRight,
     FaTerminal, FaCog, FaSearch, FaCode, FaBars, FaDownload,
     FaCopy, FaTrash, FaExpand, FaCompress, FaSun, FaMoon, FaCheck, FaGithub,
     FaReact, FaDocker, FaDatabase, FaMarkdown, FaSyncAlt,
     FaCodeBranch, FaUndo, FaStar, FaCloudDownloadAlt, FaKeyboard, FaColumns,
     FaGraduationCap, FaTrophy, FaLightbulb, FaRocket, FaUpload, FaEye, FaPalette,
-    FaBookOpen, FaChartLine, FaMedal, FaCheckCircle, FaExclamationCircle
+    FaBookOpen, FaChartLine, FaMedal, FaCheckCircle, FaExclamationCircle, FaExclamationTriangle
 } from 'react-icons/fa';
 import { VscExtensions, VscSourceControl, VscAccount, VscSettingsGear, VscDebugAlt, VscRemote, VscGitCommit, VscSplitHorizontal } from 'react-icons/vsc';
 import { SiTypescript, SiPrettier, SiEslint, SiTailwindcss, SiGit } from 'react-icons/si';
+import XTerminal from './XTerminal';
 
 // File icons based on extension
 const getFileIcon = (filename) => {
@@ -339,12 +340,12 @@ export default function CodeSpace() {
     const [contextMenu, setContextMenu] = useState(null);
     const [newItemModal, setNewItemModal] = useState(null); // { type: 'file' | 'folder', parentPath: string }
     const [newItemName, setNewItemName] = useState('');
-    
+
     // Extensions state
     const [extensions, setExtensions] = useState(availableExtensions);
     const [extensionSearchQuery, setExtensionSearchQuery] = useState('');
     const [extensionCategory, setExtensionCategory] = useState('all');
-    
+
     // Git state
     const [gitChanges, setGitChanges] = useState([
         { file: 'src/index.js', status: 'modified' },
@@ -353,7 +354,7 @@ export default function CodeSpace() {
     const [gitBranch, setGitBranch] = useState('main');
     const [commitMessage, setCommitMessage] = useState('');
     const [stagedFiles, setStagedFiles] = useState([]);
-    
+
     // Advanced IDE state
     const [splitView, setSplitView] = useState(false);
     const [secondaryActiveTab, setSecondaryActiveTab] = useState(null);
@@ -362,7 +363,7 @@ export default function CodeSpace() {
     const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
     const [terminalTabs, setTerminalTabs] = useState([{ id: 1, name: 'Terminal 1' }]);
     const [activeTerminalTab, setActiveTerminalTab] = useState(1);
-    
+
     // Learning Integration state
     const [showLearningPanel, setShowLearningPanel] = useState(false);
     const [currentChallenge, setCurrentChallenge] = useState(null);
@@ -371,16 +372,16 @@ export default function CodeSpace() {
         total: 10,
         streak: 5
     });
-    
+
     // Portfolio state
     const [showPortfolioTemplates, setShowPortfolioTemplates] = useState(false);
     const [showLivePreview, setShowLivePreview] = useState(false);
     const [selectedTemplate, setSelectedTemplate] = useState(null);
-    
+
     const terminalRef = useRef(null);
     const editorRef = useRef(null);
     const fileInputRef = useRef(null);
-    
+
     // Coding Challenges
     const codingChallenges = [
         {
@@ -464,7 +465,7 @@ export default function CodeSpace() {
             completed: false
         }
     ];
-    
+
     // Portfolio Templates
     const portfolioTemplates = [
         {
@@ -945,7 +946,7 @@ setInterval(() => {
 }, 500);`
         }
     ];
-    
+
     // Command Palette Commands
     const commands = [
         { id: 'file.new', label: 'File: New File', icon: <FaFile />, action: () => setNewItemModal({ type: 'file', parentPath: 'project' }) },
@@ -963,7 +964,7 @@ setInterval(() => {
         { id: 'portfolio.templates', label: 'Portfolio: Browse Templates', icon: <FaPalette />, action: () => setShowPortfolioTemplates(true) },
         { id: 'portfolio.preview', label: 'Portfolio: Live Preview', icon: <FaEye />, action: () => setShowLivePreview(true) },
     ];
-    
+
     // Keyboard Shortcuts
     const keyboardShortcuts = [
         { key: 'Ctrl + Shift + P', action: 'Open Command Palette' },
@@ -981,7 +982,7 @@ setInterval(() => {
         { key: 'Alt + Up/Down', action: 'Move Line' },
         { key: 'Ctrl + D', action: 'Select Next Match' },
     ];
-    
+
     // Keyboard event handler
     const handleKeyDown = useCallback((e) => {
         // Command Palette: Ctrl+Shift+P
@@ -1017,29 +1018,29 @@ setInterval(() => {
             setShowLivePreview(false);
         }
     }, [theme, splitView]);
-    
+
     useEffect(() => {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [handleKeyDown]);
-    
+
     // Handle file upload
     const handleFileUpload = (e) => {
         const files = e.target.files;
         if (!files) return;
-        
+
         Array.from(files).forEach(file => {
             const reader = new FileReader();
             reader.onload = (event) => {
                 const content = event.target.result;
                 const newFs = JSON.parse(JSON.stringify(fileSystem));
                 let current = newFs['project'].children;
-                
+
                 current[file.name] = {
                     type: 'file',
                     content: content
                 };
-                
+
                 setFileSystem(newFs);
                 openFile(`project/${file.name}`, file.name);
                 addTerminalOutput('system', `Uploaded: ${file.name}`);
@@ -1047,29 +1048,29 @@ setInterval(() => {
             reader.readAsText(file);
         });
     };
-    
+
     // Load portfolio template
     const loadTemplate = (template) => {
         const newFs = JSON.parse(JSON.stringify(fileSystem));
         let current = newFs['project'].children;
-        
+
         current['index.html'] = { type: 'file', content: template.html };
         current['styles.css'] = { type: 'file', content: template.css };
         current['script.js'] = { type: 'file', content: template.js };
-        
+
         setFileSystem(newFs);
         setSelectedTemplate(template);
         setShowPortfolioTemplates(false);
         openFile('project/index.html', 'index.html');
         addTerminalOutput('system', `Loaded template: ${template.name}`);
     };
-    
+
     // Generate live preview HTML
     const generatePreviewHTML = () => {
         const htmlContent = getFileContent('project/index.html') || '<h1>No HTML file found</h1>';
         const cssContent = getFileContent('project/styles.css') || '';
         const jsContent = getFileContent('project/script.js') || '';
-        
+
         return `
             <!DOCTYPE html>
             <html>
@@ -1078,7 +1079,7 @@ setInterval(() => {
             </head>
             <body>
                 ${htmlContent.replace(/<link[^>]*href=["']styles\.css["'][^>]*>/gi, '')
-                            .replace(/<script[^>]*src=["']script\.js["'][^>]*><\/script>/gi, '')}
+                .replace(/<script[^>]*src=["']script\.js["'][^>]*><\/script>/gi, '')}
                 <script>${jsContent}</script>
             </body>
             </html>
@@ -1142,17 +1143,17 @@ setInterval(() => {
     // Create new file/folder
     const createItem = () => {
         if (!newItemName.trim() || !newItemModal) return;
-        
+
         const parts = newItemModal.parentPath.split('/');
         const newFs = JSON.parse(JSON.stringify(fileSystem));
         let current = newFs;
-        
+
         for (const part of parts) {
             if (current[part]) {
                 current = current[part].children || current[part];
             }
         }
-        
+
         if (newItemModal.type === 'file') {
             current[newItemName] = {
                 type: 'file',
@@ -1171,7 +1172,7 @@ setInterval(() => {
                 [`${newItemModal.parentPath}/${newItemName}`]: true
             }));
         }
-        
+
         setFileSystem(newFs);
         setNewItemModal(null);
         setNewItemName('');
@@ -1183,14 +1184,14 @@ setInterval(() => {
         const itemName = parts.pop();
         const newFs = JSON.parse(JSON.stringify(fileSystem));
         let current = newFs;
-        
+
         for (const part of parts) {
             current = current[part].children || current[part];
         }
-        
+
         delete current[itemName];
         setFileSystem(newFs);
-        
+
         // Close tab if file was open
         closeTab(path);
     };
@@ -1198,18 +1199,18 @@ setInterval(() => {
     // Run code
     const runCode = async () => {
         if (!activeTab) return;
-        
+
         const language = getLanguageFromFile(activeTab);
         const langConfig = pistonLanguages[language];
-        
+
         if (!langConfig) {
             addTerminalOutput('error', `Language "${language}" is not supported for execution.`);
             return;
         }
-        
+
         setIsRunning(true);
         addTerminalOutput('system', `Running ${activeTab}...`);
-        
+
         try {
             const code = getFileContent(activeTab);
             const response = await fetch('https://emkc.org/api/v2/piston/execute', {
@@ -1221,9 +1222,9 @@ setInterval(() => {
                     files: [{ content: code }]
                 })
             });
-            
+
             const result = await response.json();
-            
+
             if (result.run) {
                 if (result.run.stdout) {
                     result.run.stdout.split('\n').forEach(line => {
@@ -1253,10 +1254,10 @@ setInterval(() => {
     // Handle terminal command
     const handleTerminalCommand = (cmd) => {
         addTerminalOutput('input', `$ ${cmd}`);
-        
+
         const args = cmd.trim().split(' ');
         const command = args[0].toLowerCase();
-        
+
         switch (command) {
             case 'help':
                 addTerminalOutput('output', 'Available commands:');
@@ -1293,7 +1294,7 @@ setInterval(() => {
             default:
                 addTerminalOutput('error', `Command not found: ${command}`);
         }
-        
+
         addTerminalOutput('prompt', '$ ');
     };
 
@@ -1339,7 +1340,7 @@ setInterval(() => {
         return Object.entries(items).map(([name, item]) => {
             const path = parentPath ? `${parentPath}/${name}` : name;
             const isExpanded = expandedFolders[path];
-            
+
             if (item.type === 'folder') {
                 return (
                     <div key={path}>
@@ -1459,12 +1460,12 @@ setInterval(() => {
                                 </button>
                             </div>
                         </div>
-                        
+
                         {/* Branch selector */}
                         <div className="px-4 py-2 border-b border-[#333]">
                             <div className="flex items-center gap-2 text-sm">
                                 <FaCodeBranch className="text-gray-500" />
-                                <select 
+                                <select
                                     value={gitBranch}
                                     onChange={(e) => setGitBranch(e.target.value)}
                                     className="bg-[#3c3c3c] border border-[#555] rounded px-2 py-1 text-xs flex-1"
@@ -1475,7 +1476,7 @@ setInterval(() => {
                                 </select>
                             </div>
                         </div>
-                        
+
                         {/* Commit message */}
                         <div className="px-4 py-2">
                             <input
@@ -1494,13 +1495,13 @@ setInterval(() => {
                                 }}
                             />
                         </div>
-                        
+
                         {/* Staged Changes */}
                         {stagedFiles.length > 0 && (
                             <div className="px-2 py-1">
                                 <div className="flex items-center justify-between px-2 py-1 text-xs text-gray-500">
                                     <span>STAGED CHANGES ({stagedFiles.length})</span>
-                                    <button 
+                                    <button
                                         onClick={() => {
                                             setGitChanges([...gitChanges, ...stagedFiles.map(f => ({ file: f, status: 'modified' }))]);
                                             setStagedFiles([]);
@@ -1515,7 +1516,7 @@ setInterval(() => {
                                     <div key={idx} className="flex items-center gap-2 px-2 py-1 hover:bg-[#2a2d2e] text-sm group">
                                         <VscGitCommit className="text-green-500 text-xs" />
                                         <span className="flex-1 truncate">{file}</span>
-                                        <button 
+                                        <button
                                             onClick={() => {
                                                 setStagedFiles(stagedFiles.filter(f => f !== file));
                                                 setGitChanges([...gitChanges, { file, status: 'modified' }]);
@@ -1528,12 +1529,12 @@ setInterval(() => {
                                 ))}
                             </div>
                         )}
-                        
+
                         {/* Changes */}
                         <div className="px-2 py-1">
                             <div className="flex items-center justify-between px-2 py-1 text-xs text-gray-500">
                                 <span>CHANGES ({gitChanges.length})</span>
-                                <button 
+                                <button
                                     onClick={() => {
                                         setStagedFiles([...stagedFiles, ...gitChanges.map(c => c.file)]);
                                         setGitChanges([]);
@@ -1551,7 +1552,7 @@ setInterval(() => {
                                     </span>
                                     <span className="flex-1 truncate">{change.file}</span>
                                     <div className="opacity-0 group-hover:opacity-100 flex gap-1">
-                                        <button 
+                                        <button
                                             onClick={() => {
                                                 setStagedFiles([...stagedFiles, change.file]);
                                                 setGitChanges(gitChanges.filter(c => c.file !== change.file));
@@ -1573,7 +1574,7 @@ setInterval(() => {
                                 </div>
                             )}
                         </div>
-                        
+
                         {/* Recent Commits */}
                         <div className="px-2 py-1 border-t border-[#333] mt-2">
                             <div className="px-2 py-1 text-xs text-gray-500">RECENT COMMITS</div>
@@ -1599,20 +1600,20 @@ setInterval(() => {
             case 'extensions':
                 const filteredExtensions = extensions.filter(ext => {
                     const matchesSearch = ext.name.toLowerCase().includes(extensionSearchQuery.toLowerCase()) ||
-                                         ext.description.toLowerCase().includes(extensionSearchQuery.toLowerCase());
+                        ext.description.toLowerCase().includes(extensionSearchQuery.toLowerCase());
                     const matchesCategory = extensionCategory === 'all' || ext.category === extensionCategory;
                     return matchesSearch && matchesCategory;
                 });
-                
+
                 const categories = ['all', ...new Set(extensions.map(e => e.category))];
                 const installedCount = extensions.filter(e => e.installed).length;
-                
+
                 return (
                     <div className="text-gray-300 h-full overflow-auto">
                         <div className="px-4 py-2 text-xs uppercase tracking-wider text-gray-500">
                             Extensions
                         </div>
-                        
+
                         {/* Search */}
                         <div className="px-4 py-2">
                             <div className="relative">
@@ -1626,7 +1627,7 @@ setInterval(() => {
                                 />
                             </div>
                         </div>
-                        
+
                         {/* Category Filter */}
                         <div className="px-4 py-1">
                             <select
@@ -1641,7 +1642,7 @@ setInterval(() => {
                                 ))}
                             </select>
                         </div>
-                        
+
                         {/* Installed Section */}
                         {installedCount > 0 && (
                             <div className="px-2 py-1 border-b border-[#333]">
@@ -1659,7 +1660,7 @@ setInterval(() => {
                                         </div>
                                         <button
                                             onClick={() => {
-                                                setExtensions(extensions.map(e => 
+                                                setExtensions(extensions.map(e =>
                                                     e.id === ext.id ? { ...e, installed: false } : e
                                                 ));
                                                 addTerminalOutput('system', `Uninstalled: ${ext.name}`);
@@ -1672,7 +1673,7 @@ setInterval(() => {
                                 ))}
                             </div>
                         )}
-                        
+
                         {/* Available Extensions */}
                         <div className="px-2 py-1">
                             <div className="px-2 py-1 text-xs text-gray-500">
@@ -1699,7 +1700,7 @@ setInterval(() => {
                                     </div>
                                     <button
                                         onClick={() => {
-                                            setExtensions(extensions.map(e => 
+                                            setExtensions(extensions.map(e =>
                                                 e.id === ext.id ? { ...e, installed: true } : e
                                             ));
                                             addTerminalOutput('system', `Installed: ${ext.name}`);
@@ -1725,7 +1726,7 @@ setInterval(() => {
                             Run and Debug
                         </div>
                         <div className="p-4">
-                            <button 
+                            <button
                                 onClick={runCode}
                                 disabled={isRunning}
                                 className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-sm font-medium disabled:bg-gray-600"
@@ -1758,7 +1759,7 @@ setInterval(() => {
                                 Learning Hub
                             </span>
                         </div>
-                        
+
                         {/* Progress Stats */}
                         <div className="px-4 py-3 bg-gradient-to-r from-purple-600/20 to-blue-600/20 mx-2 rounded-lg mb-3">
                             <div className="flex items-center justify-between mb-2">
@@ -1766,7 +1767,7 @@ setInterval(() => {
                                 <span className="text-xs text-gray-400">{challengeProgress.completed}/{challengeProgress.total}</span>
                             </div>
                             <div className="w-full bg-[#333] rounded-full h-2 mb-2">
-                                <div 
+                                <div
                                     className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all"
                                     style={{ width: `${(challengeProgress.completed / challengeProgress.total) * 100}%` }}
                                 />
@@ -1780,7 +1781,7 @@ setInterval(() => {
                                 </span>
                             </div>
                         </div>
-                        
+
                         {/* Coding Challenges */}
                         <div className="px-2">
                             <div className="px-2 py-1 text-xs text-gray-500 flex items-center gap-2">
@@ -1788,7 +1789,7 @@ setInterval(() => {
                                 CODING CHALLENGES
                             </div>
                             {codingChallenges.map(challenge => (
-                                <div 
+                                <div
                                     key={challenge.id}
                                     onClick={() => setCurrentChallenge(challenge)}
                                     className={`px-3 py-2 hover:bg-[#2a2d2e] rounded cursor-pointer mb-1 ${currentChallenge?.id === challenge.id ? 'bg-[#37373d]' : ''}`}
@@ -1802,11 +1803,10 @@ setInterval(() => {
                                             )}
                                             {challenge.title}
                                         </span>
-                                        <span className={`text-xs px-2 py-0.5 rounded ${
-                                            challenge.difficulty === 'Easy' ? 'bg-green-600/30 text-green-400' :
+                                        <span className={`text-xs px-2 py-0.5 rounded ${challenge.difficulty === 'Easy' ? 'bg-green-600/30 text-green-400' :
                                             challenge.difficulty === 'Medium' ? 'bg-yellow-600/30 text-yellow-400' :
-                                            'bg-red-600/30 text-red-400'
-                                        }`}>
+                                                'bg-red-600/30 text-red-400'
+                                            }`}>
                                             {challenge.difficulty}
                                         </span>
                                     </div>
@@ -1818,26 +1818,26 @@ setInterval(() => {
                                 </div>
                             ))}
                         </div>
-                        
+
                         {/* Current Challenge Details */}
                         {currentChallenge && (
                             <div className="px-4 py-3 border-t border-[#333] mt-2">
                                 <h4 className="font-medium text-sm mb-2">{currentChallenge.title}</h4>
                                 <p className="text-xs text-gray-400 mb-3">{currentChallenge.description}</p>
-                                
+
                                 <div className="bg-[#1e1e1e] border border-[#333] rounded p-2 mb-3">
                                     <div className="text-xs text-gray-500 mb-1">💡 Hint</div>
                                     <div className="text-xs text-yellow-400">{currentChallenge.hint}</div>
                                 </div>
-                                
+
                                 <div className="text-xs text-gray-500 mb-2">Test Cases:</div>
                                 {currentChallenge.testCases.map((test, i) => (
                                     <div key={i} className="text-xs text-gray-400 mb-1 flex items-center gap-1">
                                         <FaCheck className="text-gray-600" /> {test}
                                     </div>
                                 ))}
-                                
-                                <button 
+
+                                <button
                                     onClick={() => {
                                         addTerminalOutput('system', `Starting challenge: ${currentChallenge.title}`);
                                         // Create challenge file
@@ -1866,7 +1866,7 @@ setInterval(() => {
                                 Portfolio Builder
                             </span>
                         </div>
-                        
+
                         {/* Upload Section */}
                         <div className="px-4 py-3">
                             <input
@@ -1884,12 +1884,12 @@ setInterval(() => {
                                 <FaUpload /> Upload HTML/CSS/JS Files
                             </button>
                         </div>
-                        
+
                         {/* Templates */}
                         <div className="px-2 py-1">
                             <div className="px-2 py-1 text-xs text-gray-500 flex items-center justify-between">
                                 <span>TEMPLATES</span>
-                                <button 
+                                <button
                                     onClick={() => setShowPortfolioTemplates(true)}
                                     className="hover:text-white"
                                 >
@@ -1897,7 +1897,7 @@ setInterval(() => {
                                 </button>
                             </div>
                             {portfolioTemplates.slice(0, 3).map(template => (
-                                <div 
+                                <div
                                     key={template.id}
                                     onClick={() => loadTemplate(template)}
                                     className={`px-3 py-2 hover:bg-[#2a2d2e] rounded cursor-pointer mb-1 ${selectedTemplate?.id === template.id ? 'bg-[#37373d] border-l-2 border-purple-500' : ''}`}
@@ -1914,7 +1914,7 @@ setInterval(() => {
                                 </div>
                             ))}
                         </div>
-                        
+
                         {/* Actions */}
                         <div className="px-4 py-3 border-t border-[#333] mt-2">
                             <button
@@ -1929,7 +1929,7 @@ setInterval(() => {
                                     const html = getFileContent('project/index.html');
                                     const css = getFileContent('project/styles.css');
                                     const js = getFileContent('project/script.js');
-                                    
+
                                     // Create downloadable HTML with embedded styles/scripts
                                     const fullHtml = `<!DOCTYPE html>
 <html>
@@ -1941,7 +1941,7 @@ ${html.replace(/<link[^>]*>/gi, '').replace(/<script[^>]*src[^>]*><\/script>/gi,
 <script>${js}</script>
 </body>
 </html>`;
-                                    
+
                                     const blob = new Blob([fullHtml], { type: 'text/html' });
                                     const url = URL.createObjectURL(blob);
                                     const a = document.createElement('a');
@@ -2041,70 +2041,92 @@ ${html.replace(/<link[^>]*>/gi, '').replace(/<script[^>]*src[^>]*><\/script>/gi,
 
             {/* Main Content */}
             <div className="flex-1 flex overflow-hidden">
-                {/* Activity Bar */}
-                <div className="w-12 bg-[#333333] flex flex-col items-center py-2 gap-2">
+                {/* Activity Bar - VS Code Style */}
+                <div className="w-12 bg-[#333333] flex flex-col items-center py-1 border-r border-[#252526]">
+                    {/* Top Icons */}
                     <button
                         onClick={() => { setShowSidebar(true); setSidebarTab('files'); }}
-                        className={`p-2.5 rounded ${sidebarTab === 'files' && showSidebar ? 'bg-[#444] text-white' : 'text-gray-500 hover:text-white'}`}
-                        title="Explorer"
+                        className={`relative w-full flex items-center justify-center py-3 transition-all ${sidebarTab === 'files' && showSidebar ? 'text-white' : 'text-gray-500 hover:text-white'}`}
+                        title="Explorer (Ctrl+Shift+E)"
                     >
-                        <FaFile className="text-lg" />
+                        {sidebarTab === 'files' && showSidebar && <div className="absolute left-0 top-1 bottom-1 w-0.5 bg-white rounded-r" />}
+                        <FaFile className="text-xl" />
                     </button>
                     <button
                         onClick={() => { setShowSidebar(true); setSidebarTab('search'); }}
-                        className={`p-2.5 rounded ${sidebarTab === 'search' && showSidebar ? 'bg-[#444] text-white' : 'text-gray-500 hover:text-white'}`}
-                        title="Search"
+                        className={`relative w-full flex items-center justify-center py-3 transition-all ${sidebarTab === 'search' && showSidebar ? 'text-white' : 'text-gray-500 hover:text-white'}`}
+                        title="Search (Ctrl+Shift+F)"
                     >
-                        <FaSearch className="text-lg" />
+                        {sidebarTab === 'search' && showSidebar && <div className="absolute left-0 top-1 bottom-1 w-0.5 bg-white rounded-r" />}
+                        <FaSearch className="text-xl" />
                     </button>
                     <button
                         onClick={() => { setShowSidebar(true); setSidebarTab('git'); }}
-                        className={`p-2.5 rounded ${sidebarTab === 'git' && showSidebar ? 'bg-[#444] text-white' : 'text-gray-500 hover:text-white'}`}
-                        title="Source Control"
+                        className={`relative w-full flex items-center justify-center py-3 transition-all ${sidebarTab === 'git' && showSidebar ? 'text-white' : 'text-gray-500 hover:text-white'}`}
+                        title="Source Control (Ctrl+Shift+G)"
                     >
-                        <VscSourceControl className="text-lg" />
+                        {sidebarTab === 'git' && showSidebar && <div className="absolute left-0 top-1 bottom-1 w-0.5 bg-white rounded-r" />}
+                        <VscSourceControl className="text-xl" />
+                        {gitChanges.length > 0 && (
+                            <span className="absolute top-2 right-2 w-4 h-4 bg-[#007acc] rounded-full text-[10px] flex items-center justify-center">
+                                {gitChanges.length}
+                            </span>
+                        )}
                     </button>
                     <button
                         onClick={() => { setShowSidebar(true); setSidebarTab('debug'); }}
-                        className={`p-2.5 rounded ${sidebarTab === 'debug' && showSidebar ? 'bg-[#444] text-white' : 'text-gray-500 hover:text-white'}`}
-                        title="Run and Debug"
+                        className={`relative w-full flex items-center justify-center py-3 transition-all ${sidebarTab === 'debug' && showSidebar ? 'text-white' : 'text-gray-500 hover:text-white'}`}
+                        title="Run and Debug (Ctrl+Shift+D)"
                     >
-                        <VscDebugAlt className="text-lg" />
+                        {sidebarTab === 'debug' && showSidebar && <div className="absolute left-0 top-1 bottom-1 w-0.5 bg-white rounded-r" />}
+                        <VscDebugAlt className="text-xl" />
                     </button>
                     <button
                         onClick={() => { setShowSidebar(true); setSidebarTab('extensions'); }}
-                        className={`p-2.5 rounded ${sidebarTab === 'extensions' && showSidebar ? 'bg-[#444] text-white' : 'text-gray-500 hover:text-white'}`}
-                        title="Extensions"
+                        className={`relative w-full flex items-center justify-center py-3 transition-all ${sidebarTab === 'extensions' && showSidebar ? 'text-white' : 'text-gray-500 hover:text-white'}`}
+                        title="Extensions (Ctrl+Shift+X)"
                     >
-                        <VscExtensions className="text-lg" />
+                        {sidebarTab === 'extensions' && showSidebar && <div className="absolute left-0 top-1 bottom-1 w-0.5 bg-white rounded-r" />}
+                        <VscExtensions className="text-xl" />
                     </button>
+
+                    {/* Separator */}
+                    <div className="w-8 h-px bg-[#4c4c4c] my-2" />
+
+                    {/* Custom Panels */}
                     <button
                         onClick={() => { setShowSidebar(true); setSidebarTab('learning'); }}
-                        className={`p-2.5 rounded ${sidebarTab === 'learning' && showSidebar ? 'bg-[#444] text-white' : 'text-gray-500 hover:text-white'}`}
+                        className={`relative w-full flex items-center justify-center py-3 transition-all ${sidebarTab === 'learning' && showSidebar ? 'text-white' : 'text-gray-500 hover:text-white'}`}
                         title="Learning Hub"
                     >
-                        <FaGraduationCap className="text-lg" />
+                        {sidebarTab === 'learning' && showSidebar && <div className="absolute left-0 top-1 bottom-1 w-0.5 bg-purple-500 rounded-r" />}
+                        <FaGraduationCap className="text-xl" />
                     </button>
                     <button
                         onClick={() => { setShowSidebar(true); setSidebarTab('portfolio'); }}
-                        className={`p-2.5 rounded ${sidebarTab === 'portfolio' && showSidebar ? 'bg-[#444] text-white' : 'text-gray-500 hover:text-white'}`}
+                        className={`relative w-full flex items-center justify-center py-3 transition-all ${sidebarTab === 'portfolio' && showSidebar ? 'text-white' : 'text-gray-500 hover:text-white'}`}
                         title="Portfolio Builder"
                     >
-                        <FaPalette className="text-lg" />
+                        {sidebarTab === 'portfolio' && showSidebar && <div className="absolute left-0 top-1 bottom-1 w-0.5 bg-pink-500 rounded-r" />}
+                        <FaPalette className="text-xl" />
                     </button>
+
+                    {/* Spacer */}
                     <div className="flex-1" />
-                    <button className="p-2.5 text-gray-500 hover:text-white" title="Remote Window">
-                        <VscRemote className="text-lg" />
+
+                    {/* Bottom Icons */}
+                    <button className="w-full flex items-center justify-center py-3 text-gray-500 hover:text-white transition-all" title="Remote Explorer">
+                        <VscRemote className="text-xl" />
                     </button>
-                    <button className="p-2.5 text-gray-500 hover:text-white" title="Account">
-                        <VscAccount className="text-lg" />
+                    <button className="w-full flex items-center justify-center py-3 text-gray-500 hover:text-white transition-all" title="Account">
+                        <VscAccount className="text-xl" />
                     </button>
                     <button
                         onClick={() => setShowSettings(true)}
-                        className="p-2.5 text-gray-500 hover:text-white"
-                        title="Settings"
+                        className="w-full flex items-center justify-center py-3 text-gray-500 hover:text-white transition-all"
+                        title="Manage (Settings)"
                     >
-                        <VscSettingsGear className="text-lg" />
+                        <VscSettingsGear className="text-xl" />
                     </button>
                 </div>
 
@@ -2184,7 +2206,7 @@ ${html.replace(/<link[^>]*>/gi, '').replace(/<script[^>]*src[^>]*><\/script>/gi,
                                 </div>
                             )}
                         </div>
-                        
+
                         {/* Secondary Editor (Split View) */}
                         {splitView && (
                             <div className="flex-1 flex flex-col">
@@ -2230,98 +2252,116 @@ ${html.replace(/<link[^>]*>/gi, '').replace(/<script[^>]*src[^>]*><\/script>/gi,
                         )}
                     </div>
 
-                    {/* Terminal Panel */}
+                    {/* Terminal Panel - Using XTerminal */}
                     {showTerminal && (
-                        <div className="h-48 bg-[#1e1e1e] border-t border-[#333] flex flex-col">
-                            <div className="flex items-center justify-between px-4 py-1 bg-[#252526] text-xs">
-                                <div className="flex items-center gap-2">
-                                    {/* Terminal Tabs */}
-                                    {terminalTabs.map(tab => (
-                                        <button
-                                            key={tab.id}
-                                            onClick={() => setActiveTerminalTab(tab.id)}
-                                            className={`flex items-center gap-1 px-2 py-1 rounded ${activeTerminalTab === tab.id ? 'bg-[#1e1e1e] text-white' : 'text-gray-400 hover:text-white'}`}
-                                        >
-                                            <FaTerminal className="text-xs" />
-                                            {tab.name}
-                                        </button>
-                                    ))}
-                                    <button
-                                        onClick={() => {
-                                            const newId = Math.max(...terminalTabs.map(t => t.id)) + 1;
-                                            setTerminalTabs([...terminalTabs, { id: newId, name: `Terminal ${newId}` }]);
-                                            setActiveTerminalTab(newId);
-                                        }}
-                                        className="px-1 hover:text-white text-gray-400"
-                                        title="New Terminal"
-                                    >
-                                        <FaPlus className="text-xs" />
-                                    </button>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={() => setTerminalOutput([{ type: 'system', text: 'Terminal cleared.' }, { type: 'prompt', text: '$ ' }])}
-                                        className="hover:text-white text-gray-400"
-                                        title="Clear"
-                                    >
-                                        <FaTrash className="text-xs" />
-                                    </button>
-                                    <button
-                                        onClick={() => setShowTerminal(false)}
-                                        className="hover:text-white text-gray-400"
-                                        title="Close Terminal"
-                                    >
-                                        <FaTimes />
-                                    </button>
-                                </div>
-                            </div>
-                            <div ref={terminalRef} className="flex-1 p-2 font-mono text-sm overflow-auto">
-                                {terminalOutput.map((line, i) => (
-                                    <div
-                                        key={i}
-                                        className={`${line.type === 'error' ? 'text-red-400' : line.type === 'system' ? 'text-blue-400' : line.type === 'input' ? 'text-yellow-400' : line.type === 'prompt' ? 'text-green-400' : 'text-gray-300'}`}
-                                    >
-                                        {line.text}
-                                    </div>
-                                ))}
-                                <div className="flex items-center">
-                                    <span className="text-green-400">$ </span>
-                                    <input
-                                        type="text"
-                                        value={terminalInput}
-                                        onChange={(e) => setTerminalInput(e.target.value)}
-                                        onKeyDown={handleTerminalKeyDown}
-                                        className="flex-1 bg-transparent outline-none text-gray-300 ml-1"
-                                        autoFocus
-                                    />
-                                </div>
-                            </div>
+                        <div className="h-64 bg-[#1e1e1e] border-t border-[#333] flex flex-col resize-y overflow-hidden" style={{ minHeight: '100px', maxHeight: '500px' }}>
+                            <XTerminal
+                                fileSystem={fileSystem}
+                                currentDir="/project"
+                                theme={theme === 'vs-dark' ? 'dark' : 'light'}
+                                onRunCode={runCode}
+                                onCreateFile={(path, name) => {
+                                    const newFs = JSON.parse(JSON.stringify(fileSystem));
+                                    const parts = path.split('/');
+                                    let current = newFs;
+                                    for (let i = 0; i < parts.length - 1; i++) {
+                                        current = current[parts[i]]?.children || current[parts[i]];
+                                    }
+                                    if (current) {
+                                        current[name] = { type: 'file', content: '' };
+                                        setFileSystem(newFs);
+                                        openFile(path, name);
+                                    }
+                                }}
+                                onCreateFolder={(path, name) => {
+                                    const newFs = JSON.parse(JSON.stringify(fileSystem));
+                                    const parts = path.split('/');
+                                    let current = newFs;
+                                    for (let i = 0; i < parts.length - 1; i++) {
+                                        current = current[parts[i]]?.children || current[parts[i]];
+                                    }
+                                    if (current) {
+                                        current[name] = { type: 'folder', children: {} };
+                                        setFileSystem(newFs);
+                                    }
+                                }}
+                                onDeleteItem={deleteItem}
+                                onOpenFile={openFile}
+                                getFileContent={getFileContent}
+                            />
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* Status Bar */}
-            <div className="flex items-center justify-between px-4 py-0.5 bg-[#007acc] text-white text-xs">
-                <div className="flex items-center gap-4">
-                    <span>Planorah CodeSpace</span>
-                    {activeTab && (
-                        <>
-                            <span>|</span>
-                            <span>{getLanguageFromFile(activeTab).toUpperCase()}</span>
-                        </>
-                    )}
+            {/* Status Bar - VS Code Style */}
+            <div className="flex items-center justify-between px-2 py-0.5 bg-[#007acc] text-white text-[11px] select-none">
+                {/* Left Side */}
+                <div className="flex items-center">
+                    {/* Remote Indicator */}
+                    <button className="flex items-center gap-1.5 px-2 py-0.5 hover:bg-white/10 rounded-sm">
+                        <VscRemote className="text-sm" />
+                        <span>Codespace</span>
+                    </button>
+
+                    {/* Git Branch */}
+                    <button className="flex items-center gap-1.5 px-2 py-0.5 hover:bg-white/10 rounded-sm">
+                        <FaCodeBranch className="text-[10px]" />
+                        <span>{gitBranch}</span>
+                        <FaSyncAlt className="text-[9px]" />
+                    </button>
+
+                    {/* Problems */}
+                    <button className="flex items-center gap-1.5 px-2 py-0.5 hover:bg-white/10 rounded-sm">
+                        <FaExclamationCircle className="text-[10px]" />
+                        <span>0</span>
+                        <FaExclamationTriangle className="text-[10px] text-yellow-300" />
+                        <span>0</span>
+                    </button>
                 </div>
-                <div className="flex items-center gap-4">
+
+                {/* Right Side */}
+                <div className="flex items-center">
+                    {/* Line & Column */}
+                    <button className="px-2 py-0.5 hover:bg-white/10 rounded-sm">
+                        Ln 1, Col 1
+                    </button>
+
+                    {/* Spaces */}
+                    <button className="px-2 py-0.5 hover:bg-white/10 rounded-sm">
+                        Spaces: 4
+                    </button>
+
+                    {/* Encoding */}
+                    <button className="px-2 py-0.5 hover:bg-white/10 rounded-sm">
+                        UTF-8
+                    </button>
+
+                    {/* Line Ending */}
+                    <button className="px-2 py-0.5 hover:bg-white/10 rounded-sm">
+                        LF
+                    </button>
+
+                    {/* Language Mode */}
+                    {activeTab && (
+                        <button className="px-2 py-0.5 hover:bg-white/10 rounded-sm">
+                            {getLanguageFromFile(activeTab).charAt(0).toUpperCase() + getLanguageFromFile(activeTab).slice(1)}
+                        </button>
+                    )}
+
+                    {/* Terminal Toggle */}
                     <button
                         onClick={() => setShowTerminal(!showTerminal)}
-                        className="hover:bg-[#1177bb] px-2 py-0.5 rounded flex items-center gap-1"
+                        className={`flex items-center gap-1.5 px-2 py-0.5 hover:bg-white/10 rounded-sm ${showTerminal ? 'bg-white/10' : ''}`}
                     >
-                        <FaTerminal />
+                        <FaTerminal className="text-[10px]" />
                         Terminal
                     </button>
-                    <span>UTF-8</span>
-                    <span>Spaces: 4</span>
+
+                    {/* Notifications */}
+                    <button className="px-2 py-0.5 hover:bg-white/10 rounded-sm">
+                        <FaCheckCircle className="text-[10px]" />
+                    </button>
                 </div>
             </div>
 
@@ -2444,7 +2484,7 @@ ${html.replace(/<link[^>]*>/gi, '').replace(/<script[^>]*src[^>]*><\/script>/gi,
                             <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
                                 <FaCog /> Settings
                             </h3>
-                            
+
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm text-gray-400 mb-1">Font Size</label>
@@ -2458,7 +2498,7 @@ ${html.replace(/<link[^>]*>/gi, '').replace(/<script[^>]*src[^>]*><\/script>/gi,
                                     />
                                     <span className="text-sm">{fontSize}px</span>
                                 </div>
-                                
+
                                 <div>
                                     <label className="block text-sm text-gray-400 mb-1">Theme</label>
                                     <select
@@ -2471,7 +2511,7 @@ ${html.replace(/<link[^>]*>/gi, '').replace(/<script[^>]*src[^>]*><\/script>/gi,
                                         <option value="hc-black">High Contrast</option>
                                     </select>
                                 </div>
-                                
+
                                 <div>
                                     <label className="block text-sm text-gray-400 mb-1">Word Wrap</label>
                                     <select
@@ -2484,7 +2524,7 @@ ${html.replace(/<link[^>]*>/gi, '').replace(/<script[^>]*src[^>]*><\/script>/gi,
                                         <option value="wordWrapColumn">Word Wrap Column</option>
                                     </select>
                                 </div>
-                                
+
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm text-gray-400">Show Minimap</span>
                                     <button
@@ -2495,7 +2535,7 @@ ${html.replace(/<link[^>]*>/gi, '').replace(/<script[^>]*src[^>]*><\/script>/gi,
                                     </button>
                                 </div>
                             </div>
-                            
+
                             <button
                                 onClick={() => setShowSettings(false)}
                                 className="w-full mt-6 px-4 py-2 bg-blue-600 rounded hover:bg-blue-700"
@@ -2506,7 +2546,7 @@ ${html.replace(/<link[^>]*>/gi, '').replace(/<script[^>]*src[^>]*><\/script>/gi,
                     </motion.div>
                 )}
             </AnimatePresence>
-            
+
             {/* Command Palette Modal */}
             <AnimatePresence>
                 {showCommandPalette && (
@@ -2560,7 +2600,7 @@ ${html.replace(/<link[^>]*>/gi, '').replace(/<script[^>]*src[^>]*><\/script>/gi,
                     </motion.div>
                 )}
             </AnimatePresence>
-            
+
             {/* Keyboard Shortcuts Modal */}
             <AnimatePresence>
                 {showKeyboardShortcuts && (
@@ -2599,7 +2639,7 @@ ${html.replace(/<link[^>]*>/gi, '').replace(/<script[^>]*src[^>]*><\/script>/gi,
                     </motion.div>
                 )}
             </AnimatePresence>
-            
+
             {/* Portfolio Templates Modal */}
             <AnimatePresence>
                 {showPortfolioTemplates && (
@@ -2621,7 +2661,7 @@ ${html.replace(/<link[^>]*>/gi, '').replace(/<script[^>]*src[^>]*><\/script>/gi,
                                 <FaPalette className="text-pink-500" /> Portfolio Templates
                             </h3>
                             <p className="text-gray-400 text-sm mb-6">Choose a template to start building your portfolio</p>
-                            
+
                             <div className="grid grid-cols-2 gap-4">
                                 {portfolioTemplates.map(template => (
                                     <div
@@ -2642,7 +2682,7 @@ ${html.replace(/<link[^>]*>/gi, '').replace(/<script[^>]*src[^>]*><\/script>/gi,
                                     </div>
                                 ))}
                             </div>
-                            
+
                             <button
                                 onClick={() => setShowPortfolioTemplates(false)}
                                 className="w-full mt-6 px-4 py-2 bg-[#3c3c3c] rounded hover:bg-[#4c4c4c]"
@@ -2653,7 +2693,7 @@ ${html.replace(/<link[^>]*>/gi, '').replace(/<script[^>]*src[^>]*><\/script>/gi,
                     </motion.div>
                 )}
             </AnimatePresence>
-            
+
             {/* Live Preview Modal */}
             <AnimatePresence>
                 {showLivePreview && (
