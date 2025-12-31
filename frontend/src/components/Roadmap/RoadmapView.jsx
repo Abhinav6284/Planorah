@@ -1,8 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { roadmapService } from "../../api/roadmapService";
+import { tasksService } from "../../api/tasksService";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaCheckCircle, FaRegCircle, FaChevronDown, FaChevronUp, FaExternalLinkAlt, FaQuestionCircle } from "react-icons/fa";
+import { FaCheckCircle, FaRegCircle, FaChevronDown, FaChevronUp, FaExternalLinkAlt, FaQuestionCircle, FaClock, FaTasks, FaRocket, FaCode, FaBook, FaLightbulb } from "react-icons/fa";
+
+// Colorful milestone icons based on phase
+const milestoneIcons = [
+    { icon: FaBook, color: 'from-blue-500 to-cyan-500', bg: 'bg-blue-100 dark:bg-blue-900/30' },
+    { icon: FaCode, color: 'from-purple-500 to-pink-500', bg: 'bg-purple-100 dark:bg-purple-900/30' },
+    { icon: FaRocket, color: 'from-orange-500 to-red-500', bg: 'bg-orange-100 dark:bg-orange-900/30' },
+    { icon: FaLightbulb, color: 'from-yellow-500 to-amber-500', bg: 'bg-yellow-100 dark:bg-yellow-900/30' },
+    { icon: FaTasks, color: 'from-green-500 to-emerald-500', bg: 'bg-green-100 dark:bg-green-900/30' },
+    { icon: FaCheckCircle, color: 'from-indigo-500 to-violet-500', bg: 'bg-indigo-100 dark:bg-indigo-900/30' },
+];
 
 export default function RoadmapView() {
     const { id } = useParams();
@@ -11,9 +22,11 @@ export default function RoadmapView() {
     const [loading, setLoading] = useState(true);
     const [expandedMilestone, setExpandedMilestone] = useState(null);
     const [expandedFAQ, setExpandedFAQ] = useState(null);
+    const [taskProgress, setTaskProgress] = useState({ total: 0, completed: 0 });
 
     useEffect(() => {
         fetchRoadmap();
+        fetchTaskProgress();
     }, [id]);
 
     const fetchRoadmap = async () => {
@@ -24,6 +37,17 @@ export default function RoadmapView() {
             console.error(err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchTaskProgress = async () => {
+        try {
+            const response = await tasksService.getTasks({ roadmap: id });
+            const tasks = response.data || [];
+            const completed = tasks.filter(t => t.status === 'completed').length;
+            setTaskProgress({ total: tasks.length, completed });
+        } catch (err) {
+            console.error('Failed to fetch task progress:', err);
         }
     };
 
@@ -44,10 +68,21 @@ export default function RoadmapView() {
         }
     };
 
+    // Calculate overall progress
+    const overallProgress = taskProgress.total > 0 
+        ? Math.round((taskProgress.completed / taskProgress.total) * 100)
+        : 0;
+
+    const completedMilestones = roadmap?.milestones?.filter(m => m.is_completed).length || 0;
+    const totalMilestones = roadmap?.milestones?.length || 0;
+
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 transition-colors">
-                <div className="text-2xl font-medium text-gray-400 animate-pulse">Loading your journey...</div>
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
+                <div className="text-center">
+                    <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <div className="text-xl font-medium text-gray-400 animate-pulse">Loading your journey...</div>
+                </div>
             </div>
         );
     }
@@ -67,7 +102,7 @@ export default function RoadmapView() {
     }
 
     return (
-        <div className="min-h-screen bg-white dark:bg-gray-900 p-6 md:p-12 font-sans transition-colors duration-200">
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 p-6 md:p-12 font-sans transition-colors duration-200">
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <motion.div
@@ -88,9 +123,29 @@ export default function RoadmapView() {
                         {roadmap.overview}
                     </p>
 
+                    {/* Progress Card */}
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 mb-8 max-w-xl mx-auto">
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Overall Progress</span>
+                            <span className="text-2xl font-bold text-gray-900 dark:text-white">{overallProgress}%</span>
+                        </div>
+                        <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden mb-4">
+                            <motion.div
+                                className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full"
+                                initial={{ width: 0 }}
+                                animate={{ width: `${overallProgress}%` }}
+                                transition={{ duration: 0.8, ease: "easeOut" }}
+                            />
+                        </div>
+                        <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
+                            <span>{taskProgress.completed} / {taskProgress.total} tasks completed</span>
+                            <span>{completedMilestones} / {totalMilestones} milestones</span>
+                        </div>
+                    </div>
+
                     <div className="flex justify-center gap-6 text-sm font-medium text-gray-400">
                         <div className="flex items-center gap-2">
-                            <span>⏱</span> {roadmap.estimated_duration}
+                            <FaClock className="text-indigo-500" /> {roadmap.estimated_duration}
                         </div>
                         {roadmap.daily_commitment && (
                             <div className="flex items-center gap-2">
@@ -98,7 +153,7 @@ export default function RoadmapView() {
                             </div>
                         )}
                         <div className="flex items-center gap-2">
-                            <span>🎯</span> {roadmap.milestones.filter(m => m.is_completed).length} / {roadmap.milestones.length} Milestones
+                            <FaTasks className="text-green-500" /> {completedMilestones} / {totalMilestones} Milestones
                         </div>
                     </div>
 
@@ -111,7 +166,7 @@ export default function RoadmapView() {
                         </button>
                         <button
                             onClick={() => navigate('/tasks')}
-                            className="px-6 py-3 bg-black text-white rounded-xl font-medium hover:bg-gray-800 transition-colors shadow-lg"
+                            className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl"
                         >
                             View Daily Tasks
                         </button>
@@ -120,49 +175,58 @@ export default function RoadmapView() {
 
                 {/* Milestones Timeline */}
                 <div className="relative space-y-8 pl-8 md:pl-0">
-                    {/* Vertical Line */}
-                    <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-700 -translate-x-1/2 hidden md:block" />
+                    {/* Vertical Line - Colorful Gradient */}
+                    <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500 -translate-x-1/2 hidden md:block rounded-full opacity-30" />
 
-                    {roadmap.milestones.map((milestone, index) => (
-                        <motion.div
-                            key={milestone.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            className="relative"
-                        >
-                            {/* Timeline Dot */}
-                            <div className={`absolute left-[-2rem] md:left-1/2 top-8 w-4 h-4 rounded-full border-4 border-white dark:border-gray-900 shadow-sm z-10 -translate-x-1/2 ${milestone.is_completed ? "bg-green-500" : "bg-gray-300 dark:bg-gray-600"
-                                }`} />
+                    {roadmap.milestones.map((milestone, index) => {
+                        const IconConfig = milestoneIcons[index % milestoneIcons.length];
+                        const IconComponent = IconConfig.icon;
+                        
+                        return (
+                            <motion.div
+                                key={milestone.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                                className="relative"
+                            >
+                                {/* Timeline Dot - Colorful */}
+                                <div className={`absolute left-[-2rem] md:left-1/2 top-8 w-10 h-10 rounded-full border-4 border-white dark:border-gray-900 shadow-lg z-10 -translate-x-1/2 flex items-center justify-center ${milestone.is_completed ? "bg-gradient-to-r from-green-400 to-emerald-500" : `bg-gradient-to-r ${IconConfig.color}`}`}>
+                                    <IconComponent className="text-white text-sm" />
+                                </div>
 
-                            <div className={`border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-300 overflow-hidden ${milestone.is_completed ? "bg-gray-50 dark:bg-gray-800/50 opacity-75" : "bg-white dark:bg-gray-800 hover:shadow-xl"
+                                <div className={`border-2 rounded-2xl transition-all duration-300 overflow-hidden ${milestone.is_completed 
+                                    ? "border-green-200 dark:border-green-900/30 bg-green-50/50 dark:bg-green-900/10" 
+                                    : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-xl hover:border-indigo-200 dark:hover:border-indigo-800"
                                 }`}>
-                                {/* Milestone Header */}
-                                <div className="p-6 flex items-center gap-6">
-                                    <button
-                                        onClick={() => handleProgressUpdate(milestone.id, milestone.is_completed)}
-                                        className={`text-3xl transition-transform hover:scale-110 ${milestone.is_completed ? "text-green-500" : "text-gray-300 dark:text-gray-600 hover:text-gray-400"
-                                            }`}
-                                    >
-                                        {milestone.is_completed ? <FaCheckCircle /> : <FaRegCircle />}
-                                    </button>
+                                    {/* Milestone Header */}
+                                    <div className="p-6 flex items-center gap-6">
+                                        <button
+                                            onClick={() => handleProgressUpdate(milestone.id, milestone.is_completed)}
+                                            className={`text-3xl transition-transform hover:scale-110 ${milestone.is_completed ? "text-green-500" : "text-gray-300 dark:text-gray-600 hover:text-indigo-500"
+                                                }`}
+                                        >
+                                            {milestone.is_completed ? <FaCheckCircle /> : <FaRegCircle />}
+                                        </button>
 
-                                    <div className="flex-1 cursor-pointer" onClick={() => toggleMilestone(milestone.id)}>
-                                        <div className="flex items-center gap-3 mb-1">
-                                            <span className="font-mono text-xs text-gray-400 uppercase tracking-wider">Phase {index + 1}</span>
-                                            <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 px-2 py-1 rounded-full font-medium">{milestone.duration}</span>
+                                        <div className="flex-1 cursor-pointer" onClick={() => toggleMilestone(milestone.id)}>
+                                            <div className="flex items-center gap-3 mb-1">
+                                                <span className={`font-mono text-xs uppercase tracking-wider px-2 py-0.5 rounded bg-gradient-to-r ${IconConfig.color} text-white`}>Phase {index + 1}</span>
+                                                <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                                                    <FaClock className="text-xs" /> {milestone.duration}
+                                                </span>
+                                            </div>
+                                            <h3 className={`text-xl font-bold text-gray-900 dark:text-white ${milestone.is_completed ? "line-through text-gray-400 dark:text-gray-500" : ""}`}>
+                                                {milestone.title}
+                                            </h3>
                                         </div>
-                                        <h3 className={`text-xl font-bold text-gray-900 dark:text-white ${milestone.is_completed ? "line-through text-gray-400 dark:text-gray-500" : ""}`}>
-                                            {milestone.title}
-                                        </h3>
-                                    </div>
 
-                                    <button
-                                        onClick={() => toggleMilestone(milestone.id)}
-                                        className="p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
-                                    >
-                                        {expandedMilestone === milestone.id ? <FaChevronUp /> : <FaChevronDown />}
-                                    </button>
+                                        <button
+                                            onClick={() => toggleMilestone(milestone.id)}
+                                            className="p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+                                        >
+                                            {expandedMilestone === milestone.id ? <FaChevronUp /> : <FaChevronDown />}
+                                        </button>
                                 </div>
 
                                 {/* Expanded Content */}
@@ -262,7 +326,8 @@ export default function RoadmapView() {
                                 </AnimatePresence>
                             </div>
                         </motion.div>
-                    ))}
+                        );
+                    })}
                 </div>
 
                 {/* FAQ Section */}
