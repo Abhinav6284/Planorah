@@ -34,7 +34,6 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
             setGuidance(guidanceData);
         } catch (error) {
             console.error('Failed to load guidance:', error);
-            // Set fallback guidance on error
             setGuidance({
                 generated: false,
                 objective: `Complete the task: ${task.title}`,
@@ -118,54 +117,56 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                 </div>
 
                 <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="flex flex-col gap-3">
                         <AnimatePresence mode='popLayout'>
                             {currentTasks.length > 0 ? (
                                 currentTasks.map((task, i) => (
                                     <motion.div
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        exit={{ opacity: 0, scale: 0.9 }}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: 20 }}
                                         transition={{ delay: i * 0.05 }}
                                         key={task.id || i}
                                         onClick={() => handleTaskClick(task)}
-                                        className="group p-5 rounded-2xl bg-white/60 dark:bg-[#1C1C1E]/60 hover:bg-white/80 dark:hover:bg-[#2C2C2E]/80 backdrop-blur-md border border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10 transition-all hover:shadow-xl hover:-translate-y-1 flex flex-col gap-3 cursor-pointer"
+                                        className="group flex items-center gap-4 p-4 rounded-2xl bg-white/60 dark:bg-[#1C1C1E]/60 hover:bg-white/80 dark:hover:bg-[#2C2C2E]/80 backdrop-blur-md border border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10 transition-all hover:shadow-lg cursor-pointer"
                                     >
-                                        <div className="flex justify-between items-start">
-                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-inner ${task.status === 'completed' ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
-                                                task.status === 'in_progress' ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400' :
-                                                    'bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400'
-                                                }`}>
-                                                {task.icon || '📝'}
-                                            </div>
-                                            <div className={`w-2.5 h-2.5 rounded-full shadow-[0_0_8px_currentColor] ${task.status === 'completed' ? 'bg-green-500 text-green-500' :
-                                                task.status === 'in_progress' ? 'bg-orange-500 text-orange-500' :
-                                                    'bg-gray-400 dark:bg-gray-600 text-gray-400 dark:text-gray-600'
-                                                }`} />
+                                        {/* Task Number/Icon */}
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${task.status === 'completed' ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
+                                            task.status === 'in_progress' ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400' :
+                                                'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400'
+                                            }`}>
+                                            {task.status === 'completed' ? '✓' : i + 1}
                                         </div>
 
-                                        <div className="min-w-0">
-                                            <h4 className={`text-base font-bold truncate text-gray-900 dark:text-white mb-1 ${task.status === 'completed' ? 'opacity-50 line-through' : ''}`}>
+                                        {/* Task Content */}
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className={`text-base font-semibold text-gray-900 dark:text-white truncate ${task.status === 'completed' ? 'opacity-50 line-through' : ''}`}>
                                                 {task.title}
                                             </h4>
-                                            <div className="flex flex-wrap gap-2 mt-2">
+                                            <div className="flex items-center gap-2 mt-1 text-xs text-gray-500 dark:text-gray-400">
                                                 {task.roadmap_title && (
-                                                    <span className="text-[10px] px-2 py-1 rounded-md font-medium bg-blue-100 dark:bg-blue-500/10 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-blue-500/20 truncate max-w-full">
-                                                        {task.roadmap_title}
-                                                    </span>
+                                                    <>
+                                                        <span className="truncate max-w-[150px]">📚 {task.roadmap_title}</span>
+                                                        <span>•</span>
+                                                    </>
                                                 )}
-                                                <span className={`text-[10px] px-2 py-1 rounded-md font-medium border ${task.status === 'completed' ? 'bg-green-100 dark:bg-green-500/10 text-green-600 dark:text-green-300 border-green-200 dark:border-green-500/20' :
-                                                    task.status === 'in_progress' ? 'bg-orange-100 dark:bg-orange-500/10 text-orange-600 dark:text-orange-300 border-orange-200 dark:border-orange-500/20' :
-                                                        'bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-white/10'
-                                                    }`}>
-                                                    {task.status.replace('_', ' ')}
-                                                </span>
+                                                <span>⏱️ {task.estimated_minutes || 60} min</span>
                                             </div>
                                         </div>
 
-                                        {/* Click hint */}
-                                        <div className="text-[10px] text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity mt-auto">
-                                            Click for step-by-step guide →
+                                        {/* Status Badge */}
+                                        <div className="flex items-center gap-3 flex-shrink-0">
+                                            <span className={`text-xs px-3 py-1 rounded-full font-medium ${task.status === 'completed' ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
+                                                task.status === 'in_progress' ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400' :
+                                                    'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400'
+                                                }`}>
+                                                {task.status?.replace('_', ' ')}
+                                            </span>
+
+                                            {/* Arrow indicator */}
+                                            <span className="text-gray-300 dark:text-gray-600 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors">
+                                                →
+                                            </span>
                                         </div>
                                     </motion.div>
                                 ))
@@ -173,7 +174,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                 <motion.div
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
-                                    className="col-span-full flex flex-col items-center justify-center h-60 text-center opacity-40"
+                                    className="flex flex-col items-center justify-center h-60 text-center opacity-40"
                                 >
                                     <span className="text-5xl mb-4 grayscale opacity-50">☕</span>
                                     <p className="text-lg font-medium text-gray-900 dark:text-white">No tasks scheduled</p>
