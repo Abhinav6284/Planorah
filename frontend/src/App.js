@@ -18,6 +18,7 @@ import RoadmapList from './components/Roadmap/RoadmapList';
 import RoadmapProjects from './components/Roadmap/RoadmapProjects';
 import LabHub from './components/Lab/LabHub';
 import CodeStudio from './components/Lab/CodeStudio';
+import CodeSpace from './components/Lab/CodeSpace';
 import ResourceHub from './components/Lab/ResourceHub';
 import TaskList from './components/Tasks/TaskList';
 import DayTimeline from './components/Tasks/DayTimeline';
@@ -79,6 +80,7 @@ export default function App() {
               <Route path="/roadmap/projects" element={<RoadmapProjects />} />
               <Route path="/lab" element={<LabHub />} />
               <Route path="/lab/code" element={<CodeStudio />} />
+              <Route path="/lab/codespace" element={<CodeSpace />} />
               <Route path="/lab/resources" element={<ResourceHub />} />
               <Route path="/tasks" element={<TaskList />} />
               <Route path="/tasks/day" element={<DayTimeline />} />
