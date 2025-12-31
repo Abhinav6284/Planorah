@@ -6,7 +6,6 @@ import { userService } from "../../api/userService";
 // Widgets
 import ProfileCard from "./NewWidgets/ProfileCard";
 import ClockWidget from "./NewWidgets/ClockWidget";
-import MusicWidget from "./NewWidgets/MusicWidget";
 import TaskSchedulerWidget from "./NewWidgets/TaskSchedulerWidget";
 import StatsWidget from "./NewWidgets/StatsWidget";
 import ProgressChartWidget from "./NewWidgets/ProgressChartWidget";
@@ -111,18 +110,10 @@ export default function OverviewSection() {
                         <TaskSchedulerWidget tasks={tasks} />
                     </motion.div>
 
-                    {/* Middle: Stats & Music Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 md:h-[320px]">
-                        {/* Stats Widget */}
-                        <motion.div variants={itemVariants} className="md:col-span-4 h-auto md:h-full">
-                            <StatsWidget completed={stats.completed} pending={stats.pending} />
-                        </motion.div>
-
-                        {/* Music Widget */}
-                        <motion.div variants={itemVariants} className="md:col-span-8 h-auto md:h-full">
-                            <MusicWidget />
-                        </motion.div>
-                    </div>
+                    {/* Middle: Stats Widget - Full Width */}
+                    <motion.div variants={itemVariants} className="h-auto md:h-[200px]">
+                        <StatsWidget completed={stats.completed} pending={stats.pending} />
+                    </motion.div>
 
                     {/* Bottom Row: GitHub & Portfolio Widgets */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
