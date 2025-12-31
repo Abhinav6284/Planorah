@@ -7,6 +7,11 @@ export const schedulerService = {
         return response.data;
     },
 
+    getTaskGuidance: async (taskId) => {
+        const response = await api.get(`tasks/${taskId}/guidance/`);
+        return response.data;
+    },
+
     createTask: async (data) => {
         const response = await api.post("dashboard/tasks/create/", data);
         return response.data;
