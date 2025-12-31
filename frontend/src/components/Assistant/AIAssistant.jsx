@@ -93,7 +93,7 @@ Just ask me anything about your learning journey!`
         <div className="h-[calc(100vh-80px)] bg-gray-50 dark:bg-[#0A0A0A] flex flex-col">
             {/* Chat Container - Scrollable */}
             <div className="flex-1 overflow-y-auto pb-4">
-                <div className="max-w-3xl mx-auto px-4 py-6">
+                <div className="max-w-3xl mx-auto px-3 md:px-4 py-4 md:py-6">
                     {/* Powered by header */}
                     <div className="text-center mb-8">
                         <span className="text-xs text-gray-400 dark:text-gray-600">
@@ -168,8 +168,8 @@ Just ask me anything about your learning journey!`
             </div>
 
             {/* Input Area - Fixed at Bottom */}
-            <div className="flex-shrink-0 bg-gray-50 dark:bg-[#0A0A0A] border-t border-gray-200 dark:border-gray-800 py-4">
-                <div className="max-w-3xl mx-auto px-4">
+            <div className="flex-shrink-0 bg-gray-50 dark:bg-[#0A0A0A] border-t border-gray-200 dark:border-gray-800 py-3 md:py-4">
+                <div className="max-w-3xl mx-auto px-3 md:px-4">
                     {/* Quick Questions */}
                     <AnimatePresence>
                         {messages.length <= 2 && (

@@ -11,7 +11,7 @@ class Event(models.Model):
     end_time = models.DateTimeField()
     is_completed = models.BooleanField(default=False)
     linked_task = models.ForeignKey(
-        'dashboard.Task', on_delete=models.SET_NULL, null=True, blank=True)
+        'tasks.Task', on_delete=models.SET_NULL, null=True, blank=True, related_name='calendar_events')
 
     def __str__(self):
         return f"{self.title} ({self.start_time.strftime('%Y-%m-%d %H:%M')})"

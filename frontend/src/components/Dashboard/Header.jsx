@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from "../../context/ThemeContext";
 import { userService } from "../../api/userService";
+import { AnimatePresence, motion } from 'framer-motion';
 
 const Header = () => {
     const location = useLocation();
     const { theme, toggleTheme } = useTheme();
     const [isScrolled, setIsScrolled] = useState(false);
     const [user, setUser] = useState(null);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -43,6 +45,7 @@ const Header = () => {
                 { path: "/ats", label: "Find Your Fit" },
                 { path: "/jobs", label: "Job Finder" },
                 { path: "/interview", label: "Mock Interview" },
+                { path: "/portfolio/edit", label: "Portfolio" },
             ]
         },
         {
@@ -62,6 +65,15 @@ const Header = () => {
             ]
         },
         {
+            label: "Account",
+            type: "dropdown",
+            items: [
+                { path: "/subscription", label: "Subscription" },
+                { path: "/pricing", label: "Pricing" },
+                { path: "/billing/history", label: "Billing History" },
+            ]
+        },
+        {
             label: "AI Help",
             path: "/assistant",
             type: "link",
@@ -76,10 +88,10 @@ const Header = () => {
     const userAvatar = user?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?fit=crop&w=100&h=100";
 
     return (
-        <header className={`flex items-center justify-between px-8 py-4 sticky top-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isScrolled ? 'bg-transparent pointer-events-none' : 'bg-transparent'}`}>
+        <header className={`flex items-center justify-between px-4 md:px-8 py-3 md:py-4 sticky top-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isScrolled ? 'bg-transparent pointer-events-none' : 'bg-transparent'}`}>
             {/* Logo - hides on scroll */}
             <div className={`flex items-center gap-2 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isScrolled ? 'opacity-0 -translate-x-8 pointer-events-none' : 'opacity-100 translate-x-0'}`}>
-                <Link to="/dashboard" className="text-2xl font-serif font-bold text-gray-900 dark:text-white tracking-tight whitespace-nowrap">
+                <Link to="/dashboard" className="text-xl md:text-2xl font-serif font-bold text-gray-900 dark:text-white tracking-tight whitespace-nowrap">
                     Planorah<span className="text-gray-400">.</span>
                 </Link>
             </div>
@@ -140,8 +152,18 @@ const Header = () => {
                 })}
             </nav>
 
+            {/* Mobile Menu Button - visible only on mobile */}
+            <button
+                onClick={() => setMobileMenuOpen(true)}
+                className={`md:hidden flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 transition-all ${isScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+            >
+                <svg className="w-5 h-5 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+
             {/* Right Side Icons - hides on scroll */}
-            <div className={`flex items-center gap-3 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isScrolled ? 'opacity-0 translate-x-8 pointer-events-none absolute right-8' : 'opacity-100 translate-x-0 relative'}`}>
+            <div className={`hidden md:flex items-center gap-3 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isScrolled ? 'opacity-0 translate-x-8 pointer-events-none absolute right-8' : 'opacity-100 translate-x-0 relative'}`}>
                 {/* Settings Dropdown */}
                 <div className="relative group">
                     <button className="w-12 h-12 rounded-full bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:scale-105 transition-transform hover:text-gray-900 dark:hover:text-white shadow-sm" title="Settings">
@@ -221,6 +243,135 @@ const Header = () => {
                     </Link>
                 </div>
             </div>
+
+            {/* Mobile Profile Avatar - visible only on mobile */}
+            <Link to="/profile" className={`md:hidden relative ${isScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                <div className="w-10 h-10 rounded-full p-[2px] bg-gradient-to-tr from-indigo-500 to-purple-500">
+                    <div className="w-full h-full rounded-full bg-white dark:bg-black p-[1px]">
+                        <img src={userAvatar} alt="Profile" className="w-full h-full rounded-full object-cover" />
+                    </div>
+                </div>
+            </Link>
+
+            {/* Mobile Navigation Drawer */}
+            <AnimatePresence>
+                {mobileMenuOpen && (
+                    <>
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+                        />
+                        {/* Drawer */}
+                        <motion.div
+                            initial={{ x: '-100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '-100%' }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                            className="fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-white dark:bg-gray-900 z-50 overflow-y-auto shadow-2xl"
+                        >
+                            {/* Drawer Header */}
+                            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800">
+                                <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className="text-xl font-serif font-bold text-gray-900 dark:text-white">
+                                    Planorah<span className="text-gray-400">.</span>
+                                </Link>
+                                <button
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center"
+                                >
+                                    <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {/* User Info */}
+                            <div className="p-6 border-b border-gray-100 dark:border-gray-800">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-14 h-14 rounded-full p-[2px] bg-gradient-to-tr from-indigo-500 to-purple-500">
+                                        <div className="w-full h-full rounded-full bg-white dark:bg-black p-[2px]">
+                                            <img src={userAvatar} alt="Profile" className="w-full h-full rounded-full object-cover" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-gray-900 dark:text-white">{displayName}</h4>
+                                        <p className="text-sm text-gray-500">{userRole}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Navigation Items */}
+                            <div className="p-4">
+                                {navGroups.map((group, index) => (
+                                    <div key={index} className="mb-2">
+                                        {group.type === 'link' ? (
+                                            <Link
+                                                to={group.path}
+                                                onClick={() => setMobileMenuOpen(false)}
+                                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${location.pathname === group.path
+                                                    ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
+                                                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                                    }`}
+                                            >
+                                                {group.icon && (
+                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                                    </svg>
+                                                )}
+                                                <span className="font-medium">{group.label}</span>
+                                            </Link>
+                                        ) : (
+                                            <div>
+                                                <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                                                    {group.label}
+                                                </div>
+                                                {group.items.map((item) => (
+                                                    <Link
+                                                        key={item.path}
+                                                        to={item.path}
+                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${location.pathname.startsWith(item.path)
+                                                            ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
+                                                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                                                            }`}
+                                                    >
+                                                        <span>{item.label}</span>
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Bottom Actions */}
+                            <div className="p-4 border-t border-gray-100 dark:border-gray-800 mt-auto">
+                                <button
+                                    onClick={toggleTheme}
+                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                >
+                                    <span className="text-xl">{theme === 'light' ? '🌙' : '☀️'}</span>
+                                    <span className="font-medium">{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        localStorage.removeItem('access_token');
+                                        localStorage.removeItem('refresh_token');
+                                        window.location.href = '/login';
+                                    }}
+                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors mt-2"
+                                >
+                                    <span className="text-xl">🚪</span>
+                                    <span className="font-medium">Logout</span>
+                                </button>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
         </header>
     );
 };

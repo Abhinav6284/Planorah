@@ -33,6 +33,11 @@ export const schedulerService = {
         return response.data;
     },
 
+    deleteAllEvents: async () => {
+        const response = await api.delete("scheduler/events/delete-all/");
+        return response.data;
+    },
+
     // Google Calendar
     getGoogleAuthUrl: async () => {
         const response = await api.get("scheduler/google/auth-url/");

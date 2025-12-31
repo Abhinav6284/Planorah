@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { musicService } from '../../../api/musicService';
 
 // YouTube playlist/video options for studying
@@ -46,10 +46,33 @@ const MusicWidget = () => {
         }
     };
 
+    const fetchPlaylists = async () => {
+        try {
+            const data = await musicService.getPlaylists();
+            setPlaylists(data.playlists || []);
+        } catch (error) {
+            console.error('Error fetching playlists:', error);
+        }
+    };
+
+    const checkSpotifyStatus = useCallback(async () => {
+        try {
+            const status = await musicService.getSpotifyStatus();
+            setIsConnected(status.connected);
+            if (status.connected) {
+                fetchPlaylists();
+            }
+        } catch (error) {
+            console.error('Error checking Spotify status:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
     // Check Spotify connection status
     useEffect(() => {
         checkSpotifyStatus();
-    }, []);
+    }, [checkSpotifyStatus]);
 
     // Poll for now playing every 5 seconds when connected
     useEffect(() => {
@@ -64,35 +87,12 @@ const MusicWidget = () => {
         return () => clearInterval(interval);
     }, [isConnected, activeService]);
 
-    const checkSpotifyStatus = async () => {
-        try {
-            const status = await musicService.getSpotifyStatus();
-            setIsConnected(status.connected);
-            if (status.connected) {
-                fetchPlaylists();
-            }
-        } catch (error) {
-            console.error('Error checking Spotify status:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const fetchNowPlaying = async () => {
         try {
             const data = await musicService.getNowPlaying();
             setNowPlaying(data);
         } catch (error) {
             console.error('Error fetching now playing:', error);
-        }
-    };
-
-    const fetchPlaylists = async () => {
-        try {
-            const data = await musicService.getPlaylists();
-            setPlaylists(data.playlists || []);
-        } catch (error) {
-            console.error('Error fetching playlists:', error);
         }
     };
 

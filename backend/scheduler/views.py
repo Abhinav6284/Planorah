@@ -14,9 +14,11 @@ def get_events(request):
     data = [{
         "id": e.id,
         "title": e.title,
-        "start_time": e.start_time,
-        "end_time": e.end_time,
-        "is_completed": e.is_completed
+        "description": e.description,
+        "start_time": e.start_time.isoformat() if e.start_time else None,
+        "end_time": e.end_time.isoformat() if e.end_time else None,
+        "is_completed": e.is_completed,
+        "task_id": e.linked_task_id  # For navigation to tasks section
     } for e in events]
     return Response(data)
 
@@ -25,6 +27,16 @@ def get_events(request):
 def create_event(request):
     # Basic creation logic
     return Response({"message": "Not implemented yet"}, status=status.HTTP_501_NOT_IMPLEMENTED)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_all_events(request):
+    """Delete all calendar events for the current user"""
+    deleted_count, _ = Event.objects.filter(user=request.user).delete()
+    return Response({
+        "message": f"Deleted {deleted_count} events",
+        "deleted_count": deleted_count
+    })
 
 # --- Google Calendar Endpoints ---
 

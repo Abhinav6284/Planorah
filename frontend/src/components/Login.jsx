@@ -112,11 +112,11 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-yellow-100 flex flex-col justify-between p-6 md:p-12">
+    <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-yellow-100 flex flex-col justify-between p-4 md:p-6 lg:p-12">
       {/* Header */}
       <header className="flex justify-between items-center w-full max-w-7xl mx-auto">
-        <Link to="/" className="text-2xl font-bold tracking-tight">Planorah.</Link>
-        <div className="flex items-center gap-6">
+        <Link to="/" className="text-xl md:text-2xl font-bold tracking-tight">Planorah.</Link>
+        <div className="flex items-center gap-3 md:gap-6">
           <Link to="/contact" className="hidden md:block text-sm font-medium hover:opacity-70">Support</Link>
           <Link to="/register" className="px-6 py-2.5 bg-yellow-300 hover:bg-yellow-400 text-black font-semibold rounded-full transition-all">
             Get Started
@@ -272,12 +272,12 @@ export default function Login() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full max-w-7xl mx-auto flex justify-between items-center text-sm text-gray-400 mt-12 py-4 border-t border-gray-100 md:border-none">
+      <footer className="w-full max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-400 mt-12 py-4 border-t border-gray-100 md:border-none">
         <div className="flex gap-6">
           <Link to="/privacy">Privacy Policy</Link>
           <Link to="/terms">Terms & Conditions</Link>
         </div>
-        <div>
+        <div className="text-center sm:text-right">
           Copyrights @Planorah 2024
         </div>
       </footer>

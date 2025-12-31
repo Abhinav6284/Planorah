@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { tasksService } from '../../api/tasksService';
 import { roadmapService } from '../../api/roadmapService';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,16 +8,42 @@ import Loader from '../common/Loader';
 import { FaUndo } from 'react-icons/fa';
 
 export default function TaskList() {
+    const [searchParams] = useSearchParams();
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
     const [roadmaps, setRoadmaps] = useState([]);
     const [selectedRoadmap, setSelectedRoadmap] = useState('all');
+    const [highlightedTaskId, setHighlightedTaskId] = useState(null);
 
     // Undo state
     const [deletedTask, setDeletedTask] = useState(null);
     const [showUndo, setShowUndo] = useState(false);
     const undoTimeoutRef = useRef(null);
+    const taskRefs = useRef({});
+
+    // Handle taskId from URL (from calendar navigation)
+    useEffect(() => {
+        const taskId = searchParams.get('taskId');
+        if (taskId) {
+            setHighlightedTaskId(parseInt(taskId));
+            // Clear filter to show all tasks when navigating from calendar
+            setFilter('all');
+            setSelectedRoadmap('all');
+        }
+    }, [searchParams]);
+
+    // Scroll to highlighted task when tasks load
+    useEffect(() => {
+        if (highlightedTaskId && taskRefs.current[highlightedTaskId] && !loading) {
+            setTimeout(() => {
+                taskRefs.current[highlightedTaskId]?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 300);
+        }
+    }, [highlightedTaskId, loading, tasks]);
 
     useEffect(() => {
         fetchRoadmaps();
@@ -128,7 +155,7 @@ export default function TaskList() {
     // Get selected roadmap name
     const selectedRoadmapName = selectedRoadmap === 'all'
         ? 'All Roadmaps'
-        : roadmaps.find(r => r.id == selectedRoadmap)?.title || 'Roadmap';
+        : roadmaps.find(r => r.id === Number(selectedRoadmap))?.title || 'Roadmap';
 
     if (loading) return <Loader message="Loading your tasks..." />;
 
@@ -260,7 +287,14 @@ export default function TaskList() {
                                                 </h3>
                                                 <div className="grid gap-4">
                                                     {dayTasks.map(task => (
-                                                        <div key={task.id} className="relative group">
+                                                        <div
+                                                            key={task.id}
+                                                            ref={el => taskRefs.current[task.id] = el}
+                                                            className={`relative group transition-all duration-500 ${highlightedTaskId === task.id
+                                                                    ? 'ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-gray-800 rounded-xl'
+                                                                    : ''
+                                                                }`}
+                                                        >
                                                             {task.milestone_title && (
                                                                 <div className="absolute -top-2 left-4 z-10">
                                                                     <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-blue-100 dark:border-blue-800">
@@ -274,6 +308,7 @@ export default function TaskList() {
                                                                     onUpdate={updateTask}
                                                                     onComplete={completeTask}
                                                                     onDelete={() => handleDeleteClick(task)}
+                                                                    isHighlighted={highlightedTaskId === task.id}
                                                                 />
                                                             </div>
                                                         </div>

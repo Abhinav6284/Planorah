@@ -30,7 +30,7 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
         const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Start from Monday
         startOfWeek.setDate(startOfWeek.getDate() + diff);
 
-        for (let i = 0; i < 6; i++) { // Mon-Sat
+        for (let i = 0; i < 7; i++) { // Mon-Sun (7 days)
             const day = new Date(startOfWeek);
             day.setDate(startOfWeek.getDate() + i);
             days.push({
@@ -67,6 +67,7 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
         try {
             setLoading(true);
             const data = await schedulerService.getEvents();
+            console.log('Fetched events:', data); // Debug log
             const formattedEvents = data.map(e => ({
                 ...e,
                 start: new Date(e.start_time),
@@ -92,10 +93,18 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
         setCurrentDate(newDate);
     };
 
-    // Get events for a specific day
+    // Get events for a specific day - now checks if day falls within event date range
     const getEventsForDay = (day) => {
+        const dayStart = new Date(day.date);
+        dayStart.setHours(0, 0, 0, 0);
+        const dayEnd = new Date(day.date);
+        dayEnd.setHours(23, 59, 59, 999);
+
         return events.filter(event => {
-            return event.start.toDateString() === day.date.toDateString();
+            const eventStart = new Date(event.start);
+            const eventEnd = new Date(event.end);
+            // Check if the day falls within the event's date range
+            return dayStart <= eventEnd && dayEnd >= eventStart;
         });
     };
 
@@ -103,43 +112,49 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
     const getEventStyle = (event, dayIndex) => {
         const startHour = event.start.getHours() + event.start.getMinutes() / 60;
         const endHour = event.end.getHours() + event.end.getMinutes() / 60;
-        const duration = endHour - startHour;
+
+        // For multi-day events, use full day display
+        const duration = event.start.toDateString() === event.end.toDateString()
+            ? endHour - startHour
+            : 8; // Full work day for multi-day events
 
         const firstSlotHour = displayedTimeSlots[0]?.hour || 6;
         const slotHeight = compact ? 40 : 60; // pixels per hour
 
         const top = (startHour - firstSlotHour) * slotHeight;
-        const height = Math.max(duration * slotHeight, 40); // Minimum height
+        const height = Math.max(duration * slotHeight, 50); // Minimum height
 
         return {
-            top: `${top}px`,
+            top: `${Math.max(top, 0)}px`,
             height: `${height}px`,
-            left: `${(dayIndex / 6) * 100}%`,
-            width: `${100 / 6 - 2}%`,
+            left: `${(dayIndex / 7) * 100}%`,
+            width: `${100 / 7 - 1}%`,
         };
     };
 
-    // Event colors
+    // Event colors - more vibrant with proper theme support
     const eventColors = [
-        { bg: 'bg-gray-900 dark:bg-white', text: 'text-white dark:text-gray-900' },
-        { bg: 'bg-purple-100 dark:bg-purple-900/50', text: 'text-purple-900 dark:text-purple-200' },
-        { bg: 'bg-blue-100 dark:bg-blue-900/50', text: 'text-blue-900 dark:text-blue-200' },
+        { bg: 'bg-indigo-500 dark:bg-indigo-600', text: 'text-white' },
+        { bg: 'bg-purple-500 dark:bg-purple-600', text: 'text-white' },
+        { bg: 'bg-emerald-500 dark:bg-emerald-600', text: 'text-white' },
+        { bg: 'bg-amber-500 dark:bg-amber-600', text: 'text-white' },
+        { bg: 'bg-rose-500 dark:bg-rose-600', text: 'text-white' },
     ];
 
     return (
-        <div className={`bg-gray-900 rounded-[30px] ${compact ? 'p-4' : 'p-6'} h-full relative overflow-hidden transition-colors`}>
+        <div className={`bg-white dark:bg-gray-900 rounded-[30px] ${compact ? 'p-4' : 'p-6'} h-full relative overflow-hidden transition-colors`}>
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
                 <button
                     onClick={() => navigateMonth(-1)}
-                    className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-full text-xs font-medium text-gray-400 transition-colors"
+                    className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full text-xs font-medium text-gray-600 dark:text-gray-400 transition-colors"
                 >
                     {prevMonth}
                 </button>
-                <h3 className="text-white font-serif text-lg font-medium">{currentMonth}</h3>
+                <h3 className="text-gray-900 dark:text-white font-serif text-lg font-medium">{currentMonth}</h3>
                 <button
                     onClick={() => navigateMonth(1)}
-                    className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-full text-xs font-medium text-gray-400 transition-colors"
+                    className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full text-xs font-medium text-gray-600 dark:text-gray-400 transition-colors"
                 >
                     {nextMonth}
                 </button>
@@ -150,19 +165,19 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                 <div className="flex justify-center gap-2 mb-4">
                     <button
                         onClick={() => navigateWeek(-1)}
-                        className="px-3 py-1 text-gray-400 hover:text-white text-sm transition-colors"
+                        className="px-3 py-1 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors"
                     >
                         ← Prev Week
                     </button>
                     <button
                         onClick={() => setCurrentDate(new Date())}
-                        className="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-white text-sm rounded-lg transition-colors"
+                        className="px-3 py-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white text-sm rounded-lg transition-colors"
                     >
                         Today
                     </button>
                     <button
                         onClick={() => navigateWeek(1)}
-                        className="px-3 py-1 text-gray-400 hover:text-white text-sm transition-colors"
+                        className="px-3 py-1 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors"
                     >
                         Next Week →
                     </button>
@@ -176,7 +191,7 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                     {displayedTimeSlots.map((slot, i) => (
                         <div
                             key={i}
-                            className={`text-[10px] text-gray-500 font-medium ${compact ? 'h-10' : 'h-[60px]'}`}
+                            className={`text-[10px] text-gray-400 dark:text-gray-500 font-medium ${compact ? 'h-10' : 'h-[60px]'}`}
                         >
                             {slot.label}
                         </div>
@@ -186,11 +201,14 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                 {/* Days Grid */}
                 <div className="flex-1 relative">
                     {/* Day Headers */}
-                    <div className="grid grid-cols-6 mb-2">
+                    <div className="grid grid-cols-7 mb-2">
                         {weekDays.map((day, i) => (
                             <div key={i} className="flex flex-col items-center">
-                                <span className="text-xs text-gray-500 mb-1">{day.dayName}</span>
-                                <span className={`text-sm font-bold ${day.isToday ? 'text-white' : 'text-gray-400'}`}>
+                                <span className="text-xs text-gray-400 dark:text-gray-500 mb-1">{day.dayName}</span>
+                                <span className={`text-sm font-bold ${day.isToday
+                                    ? 'bg-indigo-500 text-white w-7 h-7 rounded-full flex items-center justify-center'
+                                    : 'text-gray-700 dark:text-gray-300'}`}
+                                >
                                     {day.dayNumber}
                                 </span>
                             </div>
@@ -198,11 +216,11 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                     </div>
 
                     {/* Grid Lines */}
-                    <div className="absolute inset-0 top-10 grid grid-cols-6">
+                    <div className="absolute inset-0 top-10 grid grid-cols-7">
                         {weekDays.map((_, i) => (
                             <div
                                 key={i}
-                                className="border-l border-dashed border-gray-700 first:border-l-0"
+                                className="border-l border-dashed border-gray-200 dark:border-gray-700 first:border-l-0"
                             />
                         ))}
                     </div>
@@ -212,7 +230,7 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                         {displayedTimeSlots.map((_, i) => (
                             <div
                                 key={i}
-                                className={`border-t border-dashed border-gray-800 ${compact ? 'h-10' : 'h-[60px]'}`}
+                                className={`border-t border-dashed border-gray-100 dark:border-gray-800 ${compact ? 'h-10' : 'h-[60px]'}`}
                             />
                         ))}
                     </div>
@@ -221,22 +239,22 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                     <div className="absolute inset-0 top-10 pointer-events-none">
                         {weekDays.map((day, dayIndex) => (
                             getEventsForDay(day).map((event, eventIndex) => {
-                                const colorIndex = eventIndex % eventColors.length;
+                                const colorIndex = event.id % eventColors.length;
                                 const color = eventColors[colorIndex];
                                 const style = getEventStyle(event, dayIndex);
 
                                 return (
                                     <div
-                                        key={event.id}
+                                        key={`${event.id}-${dayIndex}`}
                                         style={style}
                                         onClick={() => onEventClick?.(event)}
-                                        className={`absolute ${color.bg} ${color.text} p-2 rounded-xl shadow-lg z-10 pointer-events-auto cursor-pointer hover:scale-[1.02] transition-transform mx-1`}
+                                        className={`absolute ${color.bg} ${color.text} p-2 rounded-xl shadow-lg z-10 pointer-events-auto cursor-pointer hover:scale-[1.02] hover:shadow-xl transition-all mx-0.5 overflow-hidden`}
                                     >
                                         <div className={`font-bold ${compact ? 'text-[10px]' : 'text-xs'} mb-0.5 truncate`}>
                                             {event.title}
                                         </div>
                                         {!compact && event.description && (
-                                            <div className="text-[10px] opacity-70 truncate">
+                                            <div className="text-[10px] opacity-80 truncate">
                                                 {event.description}
                                             </div>
                                         )}
@@ -246,10 +264,20 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                         ))}
                     </div>
 
+                    {/* No Events Message */}
+                    {!loading && events.length === 0 && (
+                        <div className="absolute inset-0 top-10 flex items-center justify-center">
+                            <div className="text-center text-gray-400 dark:text-gray-500">
+                                <p className="text-sm font-medium">No events scheduled</p>
+                                <p className="text-xs mt-1">Schedule a roadmap to see events here</p>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Loading Overlay */}
                     {loading && (
-                        <div className="absolute inset-0 bg-gray-900/50 flex items-center justify-center z-20">
-                            <div className="text-gray-400 text-sm animate-pulse">Loading events...</div>
+                        <div className="absolute inset-0 bg-white/50 dark:bg-gray-900/50 flex items-center justify-center z-20">
+                            <div className="text-gray-500 dark:text-gray-400 text-sm animate-pulse">Loading events...</div>
                         </div>
                     )}
                 </div>

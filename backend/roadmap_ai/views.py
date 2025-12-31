@@ -22,10 +22,15 @@ def generate_roadmap(request):
             "error": "Gemini AI is not available. Please install google-generativeai package."
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    if not os.environ.get("GEMINI_API_KEY"):
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
         return Response({
             "error": "GEMINI_API_KEY environment variable is not set."
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # Configure Gemini with API key
+    genai.configure(api_key=api_key)
+    print(f"🔑 Gemini API configured with key: {api_key[:10]}...{api_key[-4:]}")
 
     user = request.user
     goal = request.data.get('goal', '')
@@ -362,9 +367,10 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
 
     try:
         # Call Gemini API with proper error handling
-        # Use the CORRECT model name format
+        # Using Gemini 2.5 Flash Lite - lightweight and cost-effective
         model = genai.GenerativeModel(
-            'gemini-2.0-flash')  # type: ignore
+            'gemini-2.5-flash-lite')  # type: ignore
+        print(f"🤖 Using model: gemini-2.5-flash-lite")
 
         # Use proper GenerationConfig
         generation_config = GenerationConfig(
@@ -372,6 +378,18 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
             top_p=0.95,
             max_output_tokens=8192
         )
+
+        # Generate content and assign to response variable
+        print(f"📝 Generating roadmap for goal: {goal[:50]}...")
+        response = model.generate_content(prompt, generation_config=generation_config)
+        print(f"✅ Response received successfully")
+
+        # Safety check: Ensure valid response from AI
+        if not response or not hasattr(response, "text") or not response.text:
+            return Response({
+                "error": "AI did not return a valid response",
+                "details": "The Gemini API returned an empty or invalid response. Please try again."
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # Parse JSON response
         response_text = response.text.strip()
@@ -581,9 +599,15 @@ def update_milestone_progress(request, milestone_id):
 @permission_classes([IsAuthenticated])
 def schedule_roadmap(request, roadmap_id):
     """
-    Auto-schedule roadmap milestones starting from a given date.
+    Schedule roadmap tasks on the calendar starting from a given date.
     Expects 'start_date' in request body (YYYY-MM-DD).
+    Creates calendar Events for each task so they appear on the scheduler.
     """
+    from datetime import datetime, timedelta
+    from django.utils import timezone
+    from scheduler.models import Event
+    from tasks.models import Task
+    
     try:
         roadmap = Roadmap.objects.get(id=roadmap_id, user=request.user)
         start_date_str = request.data.get('start_date')
@@ -591,61 +615,113 @@ def schedule_roadmap(request, roadmap_id):
         if not start_date_str:
             return Response({"error": "start_date is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        from datetime import datetime, timedelta
-        current_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+        
+        # Get all tasks for this roadmap
+        tasks = Task.objects.filter(roadmap=roadmap).order_by('day', 'order_in_day')
+        
+        if not tasks.exists():
+            return Response({
+                "error": "No tasks found for this roadmap. Please generate tasks first.",
+                "tasks_found": 0
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        created_events = []
+        scheduled_tasks = []
+        
+        # Schedule each task
+        for task in tasks:
+            # Calculate the actual date for this task based on its day number
+            task_date = start_date + timedelta(days=task.day - 1)
+            
+            # Update task's due_date
+            task.due_date = task_date
+            task.save()
+            
+            # Calculate time slots based on order_in_day
+            # Start at 9 AM, each task gets a slot based on its estimated minutes
+            base_hour = 9
+            slot_offset = task.order_in_day * 2  # 2 hour slots
+            start_hour = base_hour + slot_offset
+            
+            # Cap at reasonable hours (9 AM to 8 PM)
+            if start_hour > 20:
+                start_hour = 9 + (task.order_in_day % 6) * 2
+            
+            # Create timezone-aware datetimes
+            naive_start = datetime.combine(task_date, datetime.min.time().replace(hour=start_hour, minute=0))
+            duration_hours = max(1, task.estimated_minutes // 60)
+            naive_end = datetime.combine(task_date, datetime.min.time().replace(hour=min(start_hour + duration_hours, 23), minute=0))
+            
+            start_datetime = timezone.make_aware(naive_start)
+            end_datetime = timezone.make_aware(naive_end)
+            
+            # Create calendar Event for this task
+            event = Event.objects.create(
+                user=request.user,
+                title=task.title,
+                description=task.description or f"Task from roadmap: {roadmap.title}",
+                start_time=start_datetime,
+                end_time=end_datetime,
+                linked_task=task,  # Link to navigate from calendar to task
+            )
+            
+            print(f"  ✅ Created event {event.id}: {task.title} on {task_date}")
+            created_events.append(event.id)
+            
+            scheduled_tasks.append({
+                "id": task.id,
+                "title": task.title,
+                "due_date": str(task_date),
+                "event_id": event.id
+            })
 
+        # Also update milestone dates for reference
         milestones = roadmap.milestones.all().order_by('order')
-        updated_milestones = []
-
+        current_date = start_date
+        
         for milestone in milestones:
-            # Parse duration (e.g., "2 weeks", "1 month", "3 days")
-            duration_str = milestone.duration.lower()
-            days_to_add = 7  # Default to 1 week if parsing fails
-
+            duration_str = milestone.duration.lower() if milestone.duration else ""
+            days_to_add = 7
+            
             if 'week' in duration_str:
                 try:
-                    num = int(duration_str.split()[0])
-                    days_to_add = num * 7
+                    days_to_add = int(duration_str.split()[0]) * 7
                 except:
                     pass
             elif 'month' in duration_str:
                 try:
-                    num = int(duration_str.split()[0])
-                    days_to_add = num * 30
+                    days_to_add = int(duration_str.split()[0]) * 30
                 except:
                     pass
             elif 'day' in duration_str:
                 try:
-                    num = int(duration_str.split()[0])
-                    days_to_add = num
+                    days_to_add = int(duration_str.split()[0])
                 except:
                     pass
 
             milestone.start_date = current_date
-            # End date is start + duration
             milestone.end_date = current_date + timedelta(days=days_to_add)
             milestone.save()
-            
-            updated_milestones.append({
-                "id": milestone.id,
-                "title": milestone.title,
-                "start": milestone.start_date,
-                "end": milestone.end_date
-            })
-
-            # Next milestone starts after this one ends
             current_date = milestone.end_date + timedelta(days=1)
 
+        print(f"✅ Scheduled roadmap {roadmap_id} with {len(created_events)} task events")
+        
         return Response({
-            "message": "Roadmap scheduled successfully",
-            "milestones": updated_milestones
+            "message": f"Roadmap scheduled successfully! {len(created_events)} tasks added to calendar.",
+            "tasks_scheduled": len(scheduled_tasks),
+            "events_created": len(created_events),
+            "tasks": scheduled_tasks[:10]  # Return first 10 for confirmation
         }, status=status.HTTP_200_OK)
 
     except Roadmap.DoesNotExist:
         return Response({"error": "Roadmap not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         print(f"❌ Error scheduling roadmap: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return Response({
             "error": "Failed to schedule roadmap",
             "details": str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+

@@ -189,8 +189,8 @@ export default function ProfilePage() {
                             </div>
 
                             {/* Modal Body */}
-                            <div className="p-8 max-h-[70vh] overflow-y-auto">
-                                <div className="flex gap-8">
+                            <div className="p-4 md:p-8 max-h-[70vh] overflow-y-auto">
+                                <div className="flex flex-col md:flex-row gap-6 md:gap-8">
                                     {/* Left Side - Avatar */}
                                     <div className="flex-shrink-0">
                                         <div className="relative group">
@@ -214,7 +214,7 @@ export default function ProfilePage() {
                                     </div>
 
                                     {/* Right Side - Form Fields */}
-                                    <div className="flex-1 grid grid-cols-2 gap-5">
+                                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
                                         {/* Display Name */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Display Name</label>
@@ -395,7 +395,7 @@ export default function ProfilePage() {
                 )}
             </AnimatePresence>
 
-            <div className="max-w-7xl mx-auto px-6 py-8">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
                 {/* Profile Header Card */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -463,7 +463,7 @@ export default function ProfilePage() {
                 </motion.div>
 
                 {/* Statistics Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
                     {[
                         { icon: "✅", label: "Total Tasks", value: stats?.overview?.total_tasks || 0, sub: `${stats?.overview?.completed_tasks || 0} completed` },
                         { icon: "🎯", label: "Completion Rate", value: `${stats?.overview?.completion_rate || 0}%`, sub: "Overall progress" },
@@ -496,7 +496,7 @@ export default function ProfilePage() {
                         {/* Overall Progress */}
                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6">
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Overall Progress</h2>
-                            <div className="flex items-center justify-around">
+                            <div className="flex flex-col md:flex-row items-center justify-around gap-6">
                                 <ProgressGauge percentage={stats?.overview?.completion_rate || 0} label="Completion Rate" size="lg" />
                                 <div className="grid grid-cols-2 gap-3">
                                     {[
