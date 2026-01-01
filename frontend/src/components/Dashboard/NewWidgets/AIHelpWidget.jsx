@@ -10,7 +10,7 @@ const AIHelpWidget = () => {
     const handleSubmit = (e) => {
         e?.preventDefault();
         // Navigate to AI assistant with the question
-        navigate('/ai-assistant', { state: { initialMessage: inputValue } });
+        navigate('/assistant', { state: { initialMessage: inputValue } });
     };
 
     const handleKeyDown = (e) => {
