@@ -13,7 +13,6 @@ import GitHubWidget from "./NewWidgets/GitHubWidget";
 import SubscriptionWidget from "./NewWidgets/SubscriptionWidget";
 import PortfolioWidget from "./NewWidgets/PortfolioWidget";
 import CalendarWidget from "./NewWidgets/CalendarWidget";
-import RoadmapProgressWidget from "./NewWidgets/RoadmapProgressWidget";
 
 export default function OverviewSection() {
     const [loading, setLoading] = useState(true);
@@ -135,19 +134,14 @@ export default function OverviewSection() {
                         </motion.div>
                     </div>
 
-                    {/* Roadmap Progress Widget */}
-                    <motion.div variants={itemVariants} className="min-h-[200px]">
-                        <RoadmapProgressWidget />
+                    {/* Weekly Progress Chart - Replaces Learning Progress */}
+                    <motion.div variants={itemVariants} className="min-h-[220px]">
+                        <ProgressChartWidget data={tasks} />
                     </motion.div>
 
                     {/* Calendar Widget */}
                     <motion.div variants={itemVariants} className="min-h-[250px]">
                         <CalendarWidget />
-                    </motion.div>
-
-                    {/* Progress Chart - Hidden on mobile to reduce clutter */}
-                    <motion.div variants={itemVariants} className="hidden sm:block min-h-[250px] bg-white dark:bg-[#111] rounded-[32px] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                        <ProgressChartWidget data={tasks} />
                     </motion.div>
 
                     {/* Subscription Widget */}
