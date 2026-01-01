@@ -22,7 +22,7 @@ const AIHelpWidget = () => {
 
     return (
         <div
-            className="bg-white/50 dark:bg-gray-800/30 backdrop-blur-sm rounded-2xl px-5 sm:px-6 py-4 sm:py-5 h-full flex items-center justify-between gap-4 border border-gray-200/50 dark:border-gray-700/50 cursor-text hover:bg-white/70 dark:hover:bg-gray-800/50 transition-all"
+            className="bg-transparent px-2 py-3 h-full flex items-center justify-between gap-4 cursor-text"
             onClick={() => inputRef.current?.focus()}
         >
             {/* Left: Text & Input */}
