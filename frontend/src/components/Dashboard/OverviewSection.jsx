@@ -72,32 +72,24 @@ export default function OverviewSection() {
 
     return (
         <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto font-sans bg-[#F5F5F7] dark:bg-black min-h-screen transition-colors duration-200">
-            {/* Header */}
+            {/* Header - Compact with inline stats */}
             <motion.header
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-6 sm:mb-8"
+                className="mb-4 sm:mb-6"
             >
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-gray-900 dark:text-white tracking-tight">
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-light text-gray-900 dark:text-white tracking-tight">
                             {new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 17 ? 'Good afternoon' : 'Good evening'}, <span className="font-medium">{userProfile?.first_name || userProfile?.username?.split(/(?=[A-Z])/)[0] || "there"}!</span>
                         </h1>
-                        <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm sm:text-base">Here's your learning overview for today.</p>
+                        <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">Here's your learning overview for today.</p>
                     </div>
 
-                    {/* Quick Stats - Mobile: Show as row, Desktop: Show inline */}
-                    <div className="flex flex-wrap gap-2 sm:hidden">
+                    {/* Quick Stats - Always visible, inline on desktop */}
+                    <div className="flex flex-wrap gap-2">
                         <QuickStatsWidget tasks={tasks} />
                     </div>
-                    <div className="hidden sm:flex lg:hidden">
-                        <QuickStatsWidget tasks={tasks} />
-                    </div>
-                </div>
-
-                {/* Quick Stats - Large screens: Adjacent to Welcome */}
-                <div className="hidden lg:flex justify-end mt-4">
-                    <QuickStatsWidget tasks={tasks} />
                 </div>
             </motion.header>
 
@@ -106,7 +98,7 @@ export default function OverviewSection() {
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6"
+                className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5"
             >
                 {/* --- Left Column (Main Content) - Full width on mobile, 8 cols on lg --- */}
                 <div className="lg:col-span-8 flex flex-col gap-4 sm:gap-6">
