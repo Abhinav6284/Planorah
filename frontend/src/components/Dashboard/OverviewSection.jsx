@@ -5,7 +5,8 @@ import { userService } from "../../api/userService";
 
 // Widgets
 import ProfileCard from "./NewWidgets/ProfileCard";
-import ClockWidget from "./NewWidgets/ClockWidget";
+import DateTasksWidget from "./NewWidgets/DateTasksWidget";
+import AIHelpWidget from "./NewWidgets/AIHelpWidget";
 import TaskSchedulerWidget from "./NewWidgets/TaskSchedulerWidget";
 import ProgressChartWidget from "./NewWidgets/ProgressChartWidget";
 import QuickStatsWidget from "./NewWidgets/QuickStatsWidget";
@@ -70,6 +71,19 @@ export default function OverviewSection() {
 
     return (
         <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto font-sans bg-[#F5F5F7] dark:bg-black min-h-screen transition-colors duration-200">
+            {/* Top Bar: Date/Tasks + AI Help */}
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4 sm:mb-6"
+            >
+                {/* Date & Tasks Widget */}
+                <DateTasksWidget tasks={tasks} />
+
+                {/* AI Help Widget */}
+                <AIHelpWidget />
+            </motion.div>
+
             {/* Header - Compact with inline stats */}
             <motion.header
                 initial={{ opacity: 0, y: -20 }}
@@ -120,20 +134,12 @@ export default function OverviewSection() {
                 {/* --- Right Column (Side Panel) - Full width on mobile, 4 cols on lg --- */}
                 <div className="lg:col-span-4 flex flex-col gap-4 sm:gap-6">
 
-                    {/* Clock & Profile at Top - Side by side on mobile/tablet */}
-                    <div className="grid grid-cols-2 gap-4 sm:gap-6">
-                        {/* Clock Widget */}
-                        <motion.div variants={itemVariants} className="min-h-[180px]">
-                            <ClockWidget />
-                        </motion.div>
+                    {/* Profile Card - Full Width */}
+                    <motion.div variants={itemVariants} className="min-h-[200px]">
+                        <ProfileCard user={userProfile} />
+                    </motion.div>
 
-                        {/* Profile Card */}
-                        <motion.div variants={itemVariants} className="min-h-[180px]">
-                            <ProfileCard user={userProfile} />
-                        </motion.div>
-                    </div>
-
-                    {/* Weekly Progress Chart - Replaces Learning Progress */}
+                    {/* Weekly Progress Chart */}
                     <motion.div variants={itemVariants} className="min-h-[220px]">
                         <ProgressChartWidget data={tasks} />
                     </motion.div>
