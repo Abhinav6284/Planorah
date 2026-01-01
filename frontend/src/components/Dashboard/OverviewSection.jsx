@@ -7,7 +7,6 @@ import { userService } from "../../api/userService";
 import ProfileCard from "./NewWidgets/ProfileCard";
 import ClockWidget from "./NewWidgets/ClockWidget";
 import TaskSchedulerWidget from "./NewWidgets/TaskSchedulerWidget";
-import StatsWidget from "./NewWidgets/StatsWidget";
 import ProgressChartWidget from "./NewWidgets/ProgressChartWidget";
 import QuickStatsWidget from "./NewWidgets/QuickStatsWidget";
 import GitHubWidget from "./NewWidgets/GitHubWidget";
@@ -20,7 +19,6 @@ export default function OverviewSection() {
     const [loading, setLoading] = useState(true);
     const [userProfile, setUserProfile] = useState(null);
     const [tasks, setTasks] = useState([]);
-    const [stats, setStats] = useState({ completed: 0, pending: 0 });
 
     useEffect(() => {
         const fetchData = async () => {
@@ -41,11 +39,6 @@ export default function OverviewSection() {
                 };
                 setUserProfile(profile);
                 setTasks(tasksData || []);
-
-                // Calculate stats
-                const completedCount = tasksData?.filter(t => t.status === 'completed').length || 0;
-                const pendingCount = tasksData?.filter(t => t.status !== 'completed').length || 0;
-                setStats({ completed: completedCount, pending: pendingCount });
             } catch (error) {
                 console.error("Failed to fetch dashboard data", error);
             } finally {
@@ -123,11 +116,6 @@ export default function OverviewSection() {
                         <TaskSchedulerWidget tasks={tasks} />
                     </motion.div>
 
-                    {/* Stats Widget - Full Width */}
-                    <motion.div variants={itemVariants}>
-                        <StatsWidget completed={stats.completed} pending={stats.pending} />
-                    </motion.div>
-
                     {/* Bottom Row: GitHub & Portfolio - Stack on mobile */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <motion.div variants={itemVariants} className="min-h-[280px]">
@@ -141,6 +129,19 @@ export default function OverviewSection() {
 
                 {/* --- Right Column (Side Panel) - Full width on mobile, 4 cols on lg --- */}
                 <div className="lg:col-span-4 flex flex-col gap-4 sm:gap-6">
+
+                    {/* Clock & Profile at Top - Side by side on mobile/tablet */}
+                    <div className="grid grid-cols-2 gap-4 sm:gap-6">
+                        {/* Clock Widget */}
+                        <motion.div variants={itemVariants} className="min-h-[180px]">
+                            <ClockWidget />
+                        </motion.div>
+
+                        {/* Profile Card */}
+                        <motion.div variants={itemVariants} className="min-h-[180px]">
+                            <ProfileCard user={userProfile} />
+                        </motion.div>
+                    </div>
 
                     {/* Roadmap Progress Widget */}
                     <motion.div variants={itemVariants} className="min-h-[200px]">
@@ -157,22 +158,9 @@ export default function OverviewSection() {
                         <ProgressChartWidget data={tasks} />
                     </motion.div>
 
-                    {/* Two Column Layout for smaller widgets on tablet */}
-                    <div className="grid grid-cols-2 lg:grid-cols-1 gap-4 sm:gap-6">
-                        {/* Subscription Widget */}
-                        <motion.div variants={itemVariants} className="min-h-[180px]">
-                            <SubscriptionWidget />
-                        </motion.div>
-
-                        {/* Clock Widget */}
-                        <motion.div variants={itemVariants} className="min-h-[180px]">
-                            <ClockWidget />
-                        </motion.div>
-                    </div>
-
-                    {/* Profile Card */}
-                    <motion.div variants={itemVariants} className="min-h-[200px]">
-                        <ProfileCard user={userProfile} />
+                    {/* Subscription Widget */}
+                    <motion.div variants={itemVariants} className="min-h-[180px]">
+                        <SubscriptionWidget />
                     </motion.div>
                 </div>
             </motion.div>
