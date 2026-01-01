@@ -69,7 +69,7 @@ export default function RoadmapView() {
     };
 
     // Calculate overall progress
-    const overallProgress = taskProgress.total > 0 
+    const overallProgress = taskProgress.total > 0
         ? Math.round((taskProgress.completed / taskProgress.total) * 100)
         : 0;
 
@@ -174,31 +174,31 @@ export default function RoadmapView() {
                 </motion.div>
 
                 {/* Milestones Timeline */}
-                <div className="relative space-y-8 pl-8 md:pl-0">
-                    {/* Vertical Line - Colorful Gradient */}
-                    <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500 -translate-x-1/2 hidden md:block rounded-full opacity-30" />
+                <div className="relative space-y-6">
+                    {/* Vertical Line - Left aligned */}
+                    <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500 rounded-full opacity-30" />
 
                     {roadmap.milestones.map((milestone, index) => {
                         const IconConfig = milestoneIcons[index % milestoneIcons.length];
                         const IconComponent = IconConfig.icon;
-                        
+
                         return (
                             <motion.div
                                 key={milestone.id}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.1 }}
-                                className="relative"
+                                className="relative pl-16"
                             >
-                                {/* Timeline Dot - Colorful */}
-                                <div className={`absolute left-[-2rem] md:left-1/2 top-8 w-10 h-10 rounded-full border-4 border-white dark:border-gray-900 shadow-lg z-10 -translate-x-1/2 flex items-center justify-center ${milestone.is_completed ? "bg-gradient-to-r from-green-400 to-emerald-500" : `bg-gradient-to-r ${IconConfig.color}`}`}>
+                                {/* Timeline Dot - Left aligned */}
+                                <div className={`absolute left-0 top-6 w-10 h-10 rounded-full border-4 border-white dark:border-gray-900 shadow-lg z-10 flex items-center justify-center ${milestone.is_completed ? "bg-gradient-to-r from-green-400 to-emerald-500" : `bg-gradient-to-r ${IconConfig.color}`}`}>
                                     <IconComponent className="text-white text-sm" />
                                 </div>
 
-                                <div className={`border-2 rounded-2xl transition-all duration-300 overflow-hidden ${milestone.is_completed 
-                                    ? "border-green-200 dark:border-green-900/30 bg-green-50/50 dark:bg-green-900/10" 
+                                <div className={`border-2 rounded-2xl transition-all duration-300 overflow-hidden ${milestone.is_completed
+                                    ? "border-green-200 dark:border-green-900/30 bg-green-50/50 dark:bg-green-900/10"
                                     : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-xl hover:border-indigo-200 dark:hover:border-indigo-800"
-                                }`}>
+                                    }`}>
                                     {/* Milestone Header */}
                                     <div className="p-6 flex items-center gap-6">
                                         <button
@@ -227,105 +227,105 @@ export default function RoadmapView() {
                                         >
                                             {expandedMilestone === milestone.id ? <FaChevronUp /> : <FaChevronDown />}
                                         </button>
-                                </div>
+                                    </div>
 
-                                {/* Expanded Content */}
-                                <AnimatePresence>
-                                    {expandedMilestone === milestone.id && (
-                                        <motion.div
-                                            initial={{ height: 0, opacity: 0 }}
-                                            animate={{ height: "auto", opacity: 1 }}
-                                            exit={{ height: 0, opacity: 0 }}
-                                            className="overflow-hidden border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50"
-                                        >
-                                            <div className="p-8 space-y-8">
-                                                <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg">{milestone.description}</p>
+                                    {/* Expanded Content */}
+                                    <AnimatePresence>
+                                        {expandedMilestone === milestone.id && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: "auto", opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                className="overflow-hidden border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50"
+                                            >
+                                                <div className="p-8 space-y-8">
+                                                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg">{milestone.description}</p>
 
-                                                {/* Topics / Skills */}
-                                                <div>
-                                                    <h4 className="font-bold text-gray-400 text-xs uppercase tracking-widest mb-4">Key Concepts</h4>
-                                                    <div className="grid gap-3">
-                                                        {(milestone.topics || []).map((topic, i) => (
-                                                            <div key={i} className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                                                                <div className="flex items-center gap-2 mb-2">
-                                                                    <div className="w-2 h-2 rounded-full bg-blue-400" />
-                                                                    <span className="font-medium text-sm text-gray-900 dark:text-white">
-                                                                        {typeof topic === 'string' ? topic : topic.title}
-                                                                    </span>
-                                                                </div>
-                                                                {typeof topic !== 'string' && topic.description && (
-                                                                    <p className="text-xs text-gray-500 dark:text-gray-400 ml-4 leading-relaxed">
-                                                                        {topic.description}
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                {/* Practice / Projects */}
-                                                {milestone.projects.length > 0 && (
+                                                    {/* Topics / Skills */}
                                                     <div>
-                                                        <h4 className="font-bold text-gray-400 text-xs uppercase tracking-widest mb-4">Practical Application</h4>
-                                                        <div className="grid gap-4">
-                                                            {(milestone.projects || []).map((project) => (
-                                                                <div key={project.id} className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                                                                    <div className="flex justify-between items-start mb-2">
-                                                                        <h5 className="font-bold text-lg text-gray-900 dark:text-white">{project.title}</h5>
-                                                                        <span className={`text-xs px-3 py-1 rounded-full font-bold uppercase ${project.difficulty === 'easy' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                                                                            project.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                                                                                'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                                                                            }`}>
-                                                                            {project.difficulty}
+                                                        <h4 className="font-bold text-gray-400 text-xs uppercase tracking-widest mb-4">Key Concepts</h4>
+                                                        <div className="grid gap-3">
+                                                            {(milestone.topics || []).map((topic, i) => (
+                                                                <div key={i} className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                                                    <div className="flex items-center gap-2 mb-2">
+                                                                        <div className="w-2 h-2 rounded-full bg-blue-400" />
+                                                                        <span className="font-medium text-sm text-gray-900 dark:text-white">
+                                                                            {typeof topic === 'string' ? topic : topic.title}
                                                                         </span>
                                                                     </div>
-                                                                    <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">{project.description}</p>
-                                                                    <div className="flex flex-wrap gap-2">
-                                                                        {(project.tech_stack || []).map((tech, t) => (
-                                                                            <span key={t} className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded border border-gray-200 dark:border-gray-600">
-                                                                                {tech}
-                                                                            </span>
-                                                                        ))}
-                                                                    </div>
+                                                                    {typeof topic !== 'string' && topic.description && (
+                                                                        <p className="text-xs text-gray-500 dark:text-gray-400 ml-4 leading-relaxed">
+                                                                            {topic.description}
+                                                                        </p>
+                                                                    )}
                                                                 </div>
                                                             ))}
                                                         </div>
                                                     </div>
-                                                )}
 
-                                                {/* Resources */}
-                                                {milestone.resources.length > 0 && (
-                                                    <div>
-                                                        <h4 className="font-bold text-gray-400 text-xs uppercase tracking-widest mb-4">Curated Resources</h4>
-                                                        <div className="grid gap-3">
-                                                            {(milestone.resources || []).map((resource, r) => (
-                                                                <a
-                                                                    key={r}
-                                                                    href={resource.url}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md transition-all group"
-                                                                >
-                                                                    <div className="flex items-center gap-3">
-                                                                        <div className="p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
-                                                                            <FaExternalLinkAlt className="text-sm" />
+                                                    {/* Practice / Projects */}
+                                                    {milestone.projects.length > 0 && (
+                                                        <div>
+                                                            <h4 className="font-bold text-gray-400 text-xs uppercase tracking-widest mb-4">Practical Application</h4>
+                                                            <div className="grid gap-4">
+                                                                {(milestone.projects || []).map((project) => (
+                                                                    <div key={project.id} className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                                                        <div className="flex justify-between items-start mb-2">
+                                                                            <h5 className="font-bold text-lg text-gray-900 dark:text-white">{project.title}</h5>
+                                                                            <span className={`text-xs px-3 py-1 rounded-full font-bold uppercase ${project.difficulty === 'easy' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                                                                project.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                                                                    'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                                                                }`}>
+                                                                                {project.difficulty}
+                                                                            </span>
                                                                         </div>
-                                                                        <span className="font-medium text-gray-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{resource.title}</span>
+                                                                        <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">{project.description}</p>
+                                                                        <div className="flex flex-wrap gap-2">
+                                                                            {(project.tech_stack || []).map((tech, t) => (
+                                                                                <span key={t} className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded border border-gray-200 dark:border-gray-600">
+                                                                                    {tech}
+                                                                                </span>
+                                                                            ))}
+                                                                        </div>
                                                                     </div>
-                                                                    <span className="text-xs font-bold uppercase tracking-wider text-gray-400 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded">
-                                                                        {resource.type}
-                                                                    </span>
-                                                                </a>
-                                                            ))}
+                                                                ))}
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        </motion.div>
+                                                    )}
+
+                                                    {/* Resources */}
+                                                    {milestone.resources.length > 0 && (
+                                                        <div>
+                                                            <h4 className="font-bold text-gray-400 text-xs uppercase tracking-widest mb-4">Curated Resources</h4>
+                                                            <div className="grid gap-3">
+                                                                {(milestone.resources || []).map((resource, r) => (
+                                                                    <a
+                                                                        key={r}
+                                                                        href={resource.url}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md transition-all group"
+                                                                    >
+                                                                        <div className="flex items-center gap-3">
+                                                                            <div className="p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
+                                                                                <FaExternalLinkAlt className="text-sm" />
+                                                                            </div>
+                                                                            <span className="font-medium text-gray-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{resource.title}</span>
+                                                                        </div>
+                                                                        <span className="text-xs font-bold uppercase tracking-wider text-gray-400 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded">
+                                                                            {resource.type}
+                                                                        </span>
+                                                                    </a>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                            </motion.div>
                         );
                     })}
                 </div>
