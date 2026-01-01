@@ -10,7 +10,6 @@ import TaskSchedulerWidget from "./NewWidgets/TaskSchedulerWidget";
 import ProgressChartWidget from "./NewWidgets/ProgressChartWidget";
 import QuickStatsWidget from "./NewWidgets/QuickStatsWidget";
 import GitHubWidget from "./NewWidgets/GitHubWidget";
-import SubscriptionWidget from "./NewWidgets/SubscriptionWidget";
 import PortfolioWidget from "./NewWidgets/PortfolioWidget";
 import CalendarWidget from "./NewWidgets/CalendarWidget";
 
@@ -142,11 +141,6 @@ export default function OverviewSection() {
                     {/* Calendar Widget */}
                     <motion.div variants={itemVariants} className="min-h-[250px]">
                         <CalendarWidget />
-                    </motion.div>
-
-                    {/* Subscription Widget */}
-                    <motion.div variants={itemVariants} className="min-h-[180px]">
-                        <SubscriptionWidget />
                     </motion.div>
                 </div>
             </motion.div>
