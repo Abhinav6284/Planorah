@@ -63,7 +63,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
     };
 
     return (
-        <div className="bg-white dark:bg-black text-gray-900 dark:text-white rounded-[32px] p-8 h-full flex flex-col relative overflow-hidden shadow-2xl border border-gray-100 dark:border-white/5 transition-all duration-200">
+        <div className="bg-white dark:bg-black text-gray-900 dark:text-white rounded-[32px] p-8 relative overflow-hidden shadow-2xl border border-gray-100 dark:border-white/5 transition-all duration-200">
 
             {/* Header: Date Strip */}
             <div className="mb-6">
@@ -100,8 +100,8 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
             </div>
 
             {/* Tasks List */}
-            <div className="flex-1 overflow-hidden flex flex-col mt-4">
-                <div className="flex justify-between items-center mb-6">
+            <div className="mt-4">
+                <div className="flex justify-between items-center mb-4">
                     <span className="text-lg font-semibold opacity-70 tracking-wide">Tasks ({currentTasks.length})</span>
                     {currentTasks.length > 0 && (
                         <div className="flex items-center gap-3">
@@ -116,73 +116,71 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                     )}
                 </div>
 
-                <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                    <div className="flex flex-col gap-3">
-                        <AnimatePresence mode='popLayout'>
-                            {currentTasks.length > 0 ? (
-                                currentTasks.map((task, i) => (
-                                    <motion.div
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: 20 }}
-                                        transition={{ delay: i * 0.05 }}
-                                        key={task.id || i}
-                                        onClick={() => handleTaskClick(task)}
-                                        className="group flex items-center gap-4 p-4 rounded-2xl bg-white/60 dark:bg-[#1C1C1E]/60 hover:bg-white/80 dark:hover:bg-[#2C2C2E]/80 backdrop-blur-md border border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10 transition-all hover:shadow-lg cursor-pointer"
-                                    >
-                                        {/* Task Number/Icon */}
-                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${task.status === 'completed' ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
-                                            task.status === 'in_progress' ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400' :
-                                                'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400'
-                                            }`}>
-                                            {task.status === 'completed' ? '✓' : i + 1}
-                                        </div>
-
-                                        {/* Task Content */}
-                                        <div className="flex-1 min-w-0">
-                                            <h4 className={`text-base font-semibold text-gray-900 dark:text-white truncate ${task.status === 'completed' ? 'opacity-50 line-through' : ''}`}>
-                                                {task.title}
-                                            </h4>
-                                            <div className="flex items-center gap-2 mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                                {task.roadmap_title && (
-                                                    <>
-                                                        <span className="truncate max-w-[150px]">📚 {task.roadmap_title}</span>
-                                                        <span>•</span>
-                                                    </>
-                                                )}
-                                                <span>⏱️ {task.estimated_minutes || 60} min</span>
-                                            </div>
-                                        </div>
-
-                                        {/* Status Badge */}
-                                        <div className="flex items-center gap-3 flex-shrink-0">
-                                            <span className={`text-xs px-3 py-1 rounded-full font-medium ${task.status === 'completed' ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
-                                                task.status === 'in_progress' ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400' :
-                                                    'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400'
-                                                }`}>
-                                                {task.status?.replace('_', ' ')}
-                                            </span>
-
-                                            {/* Arrow indicator */}
-                                            <span className="text-gray-300 dark:text-gray-600 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors">
-                                                →
-                                            </span>
-                                        </div>
-                                    </motion.div>
-                                ))
-                            ) : (
+                <div className="space-y-3">
+                    <AnimatePresence mode='popLayout'>
+                        {currentTasks.length > 0 ? (
+                            currentTasks.map((task, i) => (
                                 <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="flex flex-col items-center justify-center h-60 text-center opacity-40"
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 20 }}
+                                    transition={{ delay: i * 0.05 }}
+                                    key={task.id || i}
+                                    onClick={() => handleTaskClick(task)}
+                                    className="group flex items-center gap-4 p-4 rounded-2xl bg-white/60 dark:bg-[#1C1C1E]/60 hover:bg-white/80 dark:hover:bg-[#2C2C2E]/80 backdrop-blur-md border border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10 transition-all hover:shadow-lg cursor-pointer"
                                 >
-                                    <span className="text-5xl mb-4 grayscale opacity-50">☕</span>
-                                    <p className="text-lg font-medium text-gray-900 dark:text-white">No tasks scheduled</p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">Time to relax or plan ahead!</p>
+                                    {/* Task Number/Icon */}
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${task.status === 'completed' ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
+                                        task.status === 'in_progress' ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400' :
+                                            'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400'
+                                        }`}>
+                                        {task.status === 'completed' ? '✓' : i + 1}
+                                    </div>
+
+                                    {/* Task Content */}
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className={`text-base font-semibold text-gray-900 dark:text-white truncate ${task.status === 'completed' ? 'opacity-50 line-through' : ''}`}>
+                                            {task.title}
+                                        </h4>
+                                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                            {task.roadmap_title && (
+                                                <>
+                                                    <span className="truncate max-w-[150px]">📚 {task.roadmap_title}</span>
+                                                    <span>•</span>
+                                                </>
+                                            )}
+                                            <span>⏱️ {task.estimated_minutes || 60} min</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Status Badge */}
+                                    <div className="flex items-center gap-3 flex-shrink-0">
+                                        <span className={`text-xs px-3 py-1 rounded-full font-medium ${task.status === 'completed' ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
+                                            task.status === 'in_progress' ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400' :
+                                                'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400'
+                                            }`}>
+                                            {task.status?.replace('_', ' ')}
+                                        </span>
+
+                                        {/* Arrow indicator */}
+                                        <span className="text-gray-300 dark:text-gray-600 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors">
+                                            →
+                                        </span>
+                                    </div>
                                 </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
+                            ))
+                        ) : (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="flex flex-col items-center justify-center py-8 text-center opacity-40"
+                            >
+                                <span className="text-4xl mb-3 grayscale opacity-50">☕</span>
+                                <p className="text-base font-medium text-gray-900 dark:text-white">No tasks scheduled</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">Time to relax or plan ahead!</p>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
             </div>
 
@@ -211,8 +209,8 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                         <div className="flex items-center gap-2 mb-2">
                                             <span className="text-2xl">{selectedTask.icon || '📝'}</span>
                                             <span className={`text-xs px-2 py-1 rounded-full font-medium ${selectedTask.status === 'completed' ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
-                                                    selectedTask.status === 'in_progress' ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400' :
-                                                        'bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-400'
+                                                selectedTask.status === 'in_progress' ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400' :
+                                                    'bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-400'
                                                 }`}>
                                                 {selectedTask.status?.replace('_', ' ')}
                                             </span>
