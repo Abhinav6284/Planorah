@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const ProfileCard = ({ user }) => {
     return (
-        <Link to="/settings" className="block relative h-full w-full rounded-[30px] overflow-hidden group cursor-pointer">
+        <Link to="/settings" className="block relative h-full min-h-[200px] w-full rounded-[24px] sm:rounded-[30px] overflow-hidden group cursor-pointer">
             {/* Background Image / Gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-400 dark:from-gray-700 dark:to-gray-800">
                 {/* Placeholder or User Image */}
@@ -18,19 +18,19 @@ const ProfileCard = ({ user }) => {
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
 
             {/* Content */}
-            <div className="absolute bottom-6 left-6 text-white transform group-hover:translate-x-2 transition-transform duration-300">
-                <h3 className="text-2xl font-serif font-medium leading-tight">
-                    {user?.username || "Lora Piterson"}
+            <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 text-white transform group-hover:translate-x-2 transition-transform duration-300">
+                <h3 className="text-xl sm:text-2xl font-serif font-medium leading-tight">
+                    {user?.username || "Student"}
                 </h3>
-                <p className="text-sm text-gray-200 mt-1 font-light opacity-90">
-                    {user?.role || "Student"}
+                <p className="text-xs sm:text-sm text-gray-200 mt-1 font-light opacity-90">
+                    {user?.role || "Learner"}
                 </p>
             </div>
 
             {/* Stats Pill */}
-            <div className="absolute bottom-6 right-6 group-hover:scale-110 transition-transform duration-300">
-                <div className="backdrop-blur-md bg-white/20 border border-white/30 px-4 py-2 rounded-full text-white text-sm font-medium">
-                    {user?.xp || 1200} XP
+            <div className="absolute bottom-4 sm:bottom-6 right-4 sm:right-6 group-hover:scale-110 transition-transform duration-300">
+                <div className="backdrop-blur-md bg-white/20 border border-white/30 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-white text-xs sm:text-sm font-medium">
+                    {user?.xp || 0} XP
                 </div>
             </div>
         </Link>
