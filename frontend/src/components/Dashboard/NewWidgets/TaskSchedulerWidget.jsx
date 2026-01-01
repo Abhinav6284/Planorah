@@ -63,34 +63,34 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
     };
 
     return (
-        <div className="bg-white dark:bg-black text-gray-900 dark:text-white rounded-[32px] p-8 relative overflow-hidden shadow-2xl border border-gray-100 dark:border-white/5 transition-all duration-200">
+        <div className="bg-white dark:bg-black text-gray-900 dark:text-white rounded-[24px] sm:rounded-[32px] p-4 sm:p-6 md:p-8 relative overflow-hidden shadow-xl sm:shadow-2xl border border-gray-100 dark:border-white/5 transition-all duration-200">
 
             {/* Header: Date Strip */}
-            <div className="mb-6">
-                <div className="flex justify-between items-end mb-5">
-                    <h3 className="text-2xl font-semibold tracking-tight">Schedule</h3>
+            <div className="mb-4 sm:mb-6">
+                <div className="flex justify-between items-end mb-4 sm:mb-5">
+                    <h3 className="text-xl sm:text-2xl font-semibold tracking-tight">Schedule</h3>
                     <div className="flex gap-4 text-sm font-medium text-gray-500">
                         <span className="text-gray-900 dark:text-white font-semibold">Days</span>
                     </div>
                 </div>
 
                 {/* Date Scroll Area */}
-                <div className="flex gap-3 overflow-x-auto py-6 px-2 -mx-2 no-scrollbar" style={{ scrollbarWidth: 'none' }}>
+                <div className="flex gap-2 sm:gap-3 overflow-x-auto py-4 sm:py-6 px-1 sm:px-2 -mx-1 sm:-mx-2 no-scrollbar" style={{ scrollbarWidth: 'none' }}>
                     {days.map((day) => {
                         const isSelected = selectedDate === day.isoDate;
                         return (
                             <button
                                 key={day.isoDate}
                                 onClick={() => setSelectedDate(day.isoDate)}
-                                className={`flex flex-col items-center justify-center min-w-[60px] h-[90px] rounded-[30px] transition-all duration-300 ${isSelected
-                                    ? 'bg-[#E0C8FF] text-black scale-110 z-10'
+                                className={`flex flex-col items-center justify-center min-w-[48px] sm:min-w-[60px] h-[72px] sm:h-[90px] rounded-[20px] sm:rounded-[30px] transition-all duration-300 flex-shrink-0 ${isSelected
+                                    ? 'bg-[#E0C8FF] text-black scale-105 sm:scale-110 z-10'
                                     : 'bg-gray-100 dark:bg-[#1C1C1E] text-gray-500 hover:bg-gray-200 dark:hover:bg-[#2C2C2E] hover:text-gray-900 dark:hover:text-white'
                                     }`}
                             >
-                                <span className={`text-2xl font-bold mb-1 leading-none ${isSelected ? 'text-black' : 'text-gray-700 dark:text-gray-200'}`}>
+                                <span className={`text-lg sm:text-2xl font-bold mb-0.5 sm:mb-1 leading-none ${isSelected ? 'text-black' : 'text-gray-700 dark:text-gray-200'}`}>
                                     {String(day.dayNum).padStart(2, '0')}
                                 </span>
-                                <span className={`text-[12px] font-medium tracking-wide ${isSelected ? 'text-gray-900' : 'text-gray-500 dark:text-gray-600'}`}>
+                                <span className={`text-[10px] sm:text-[12px] font-medium tracking-wide ${isSelected ? 'text-gray-900' : 'text-gray-500 dark:text-gray-600'}`}>
                                     {day.dayName}
                                 </span>
                             </button>
@@ -98,6 +98,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                     })}
                 </div>
             </div>
+
 
             {/* Tasks List */}
             <div className="mt-4">
