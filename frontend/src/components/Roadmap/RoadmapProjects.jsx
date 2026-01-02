@@ -169,6 +169,46 @@ export default function RoadmapProjects() {
                     </motion.div>
                 </div>
 
+                {/* Connect to GitHub Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="bg-gradient-to-r from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-5 mb-8 border border-gray-700"
+                >
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                                <FaGithub className="text-2xl text-white" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-white">Connect to GitHub</h3>
+                                <p className="text-sm text-gray-400">Push your projects directly to GitHub repositories</p>
+                            </div>
+                        </div>
+                        <div className="flex flex-wrap gap-3">
+                            <a
+                                href="https://github.com/new"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-4 py-2 bg-white text-gray-900 rounded-lg font-medium text-sm hover:bg-gray-100 transition-colors flex items-center gap-2"
+                            >
+                                <FaRocket className="text-xs" />
+                                New Repository
+                            </a>
+                            <a
+                                href="https://github.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium text-sm hover:bg-gray-600 transition-colors flex items-center gap-2"
+                            >
+                                <FaExternalLinkAlt className="text-xs" />
+                                Open GitHub
+                            </a>
+                        </div>
+                    </div>
+                </motion.div>
+
                 {/* Filters */}
                 <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 mb-6 border border-gray-100 dark:border-gray-700">
                     <div className="flex flex-col md:flex-row gap-4">
@@ -446,6 +486,21 @@ export default function RoadmapProjects() {
                                                                         Open CodeSpace
                                                                     </span>
                                                                     <FaArrowRight />
+                                                                </button>
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        // Create GitHub repo URL with project title as suggested name
+                                                                        const repoName = project.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                                                                        window.open(`https://github.com/new?name=${repoName}&description=${encodeURIComponent(project.description || '')}`, '_blank');
+                                                                    }}
+                                                                    className="w-full flex items-center justify-between px-4 py-3 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-white transition-all"
+                                                                >
+                                                                    <span className="flex items-center gap-2">
+                                                                        <FaGithub />
+                                                                        Push to GitHub
+                                                                    </span>
+                                                                    <FaExternalLinkAlt className="text-xs" />
                                                                 </button>
                                                             </div>
                                                         </div>

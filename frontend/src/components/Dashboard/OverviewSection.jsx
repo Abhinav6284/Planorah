@@ -123,13 +123,17 @@ export default function OverviewSection() {
                     {/* Bottom Row: GitHub/Research & Portfolio - Stack on mobile */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <motion.div variants={itemVariants} className="min-h-[280px]">
-                            {/* Show GitHub for CS/IT, Research for others */}
-                            {userProfile?.field_of_study?.toLowerCase().includes('computer') ||
-                                userProfile?.field_of_study?.toLowerCase().includes('it') ||
-                                !userProfile?.field_of_study ? (
+                            {/* Show GitHub for CS/IT, Research for Medical/Science only */}
+                            {(userProfile?.field_of_study?.toLowerCase().includes('computer') ||
+                                userProfile?.field_of_study?.toLowerCase().includes('it')) ? (
                                 <GitHubWidget />
-                            ) : (
+                            ) : (userProfile?.field_of_study?.toLowerCase().includes('medical') ||
+                                userProfile?.field_of_study?.toLowerCase().includes('life') ||
+                                userProfile?.field_of_study?.toLowerCase().includes('science') ||
+                                userProfile?.field_of_study?.toLowerCase().includes('doctor')) ? (
                                 <ResearchWidget userField={userProfile?.field_of_study} />
+                            ) : (
+                                <PortfolioWidget />
                             )}
                         </motion.div>
                         <motion.div variants={itemVariants} className="min-h-[280px]">
