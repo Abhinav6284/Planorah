@@ -19,6 +19,7 @@ import RoadmapProjects from './components/Roadmap/RoadmapProjects';
 import LabHub from './components/Lab/LabHub';
 import CodeSpace from './components/Lab/CodeSpace';
 import ResourceHub from './components/Lab/ResourceHub';
+import PublishResearch from './components/Lab/PublishResearch';
 import TaskList from './components/Tasks/TaskList';
 import DayTimeline from './components/Tasks/DayTimeline';
 import FocusMode from './components/Tasks/FocusMode';
@@ -81,6 +82,7 @@ export default function App() {
               <Route path="/lab/code" element={<Navigate to="/lab/codespace" replace />} />
               <Route path="/lab/codespace" element={<CodeSpace />} />
               <Route path="/lab/resources" element={<ResourceHub />} />
+              <Route path="/lab/publish" element={<PublishResearch />} />
               <Route path="/tasks" element={<TaskList />} />
               <Route path="/tasks/day" element={<DayTimeline />} />
               <Route path="/tasks/focus" element={<FocusMode />} />

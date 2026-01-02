@@ -11,6 +11,7 @@ import TaskSchedulerWidget from "./NewWidgets/TaskSchedulerWidget";
 import ProgressChartWidget from "./NewWidgets/ProgressChartWidget";
 import QuickStatsWidget from "./NewWidgets/QuickStatsWidget";
 import GitHubWidget from "./NewWidgets/GitHubWidget";
+import ResearchWidget from "./NewWidgets/ResearchWidget";
 import PortfolioWidget from "./NewWidgets/PortfolioWidget";
 import CalendarWidget from "./NewWidgets/CalendarWidget";
 
@@ -34,6 +35,7 @@ export default function OverviewSection() {
                     first_name: profileData?.first_name,
                     last_name: profileData?.last_name,
                     username: profileData?.username,
+                    field_of_study: profileData?.profile?.field_of_study || profileData?.field_of_study || '',
                     xp: profileData?.xp_points || 0 // Map backend xp_points to xp prop
                 };
                 setUserProfile(profile);
@@ -118,10 +120,17 @@ export default function OverviewSection() {
                         <TaskSchedulerWidget tasks={tasks} />
                     </motion.div>
 
-                    {/* Bottom Row: GitHub & Portfolio - Stack on mobile */}
+                    {/* Bottom Row: GitHub/Research & Portfolio - Stack on mobile */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <motion.div variants={itemVariants} className="min-h-[280px]">
-                            <GitHubWidget />
+                            {/* Show GitHub for CS/IT, Research for others */}
+                            {userProfile?.field_of_study?.toLowerCase().includes('computer') ||
+                                userProfile?.field_of_study?.toLowerCase().includes('it') ||
+                                !userProfile?.field_of_study ? (
+                                <GitHubWidget />
+                            ) : (
+                                <ResearchWidget userField={userProfile?.field_of_study} />
+                            )}
                         </motion.div>
                         <motion.div variants={itemVariants} className="min-h-[280px]">
                             <PortfolioWidget />

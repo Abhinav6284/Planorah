@@ -25,6 +25,19 @@ export default function LabHub() {
             ),
             color: 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
             link: '/lab/resources'
+        },
+        {
+            id: 'publish',
+            title: 'Publish Research',
+            description: 'Submit your research papers to trusted academic publishers and repositories worldwide.',
+            icon: (
+                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+            ),
+            color: 'bg-teal-50 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400',
+            link: '/lab/publish',
+            badge: 'New'
         }
     ];
 
