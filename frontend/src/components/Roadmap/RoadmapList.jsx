@@ -38,15 +38,15 @@ export default function RoadmapList() {
 
     return (
         <div className="min-h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-            <div className="p-8 md:p-12 max-w-7xl mx-auto font-sans overflow-auto">
-                <div className="flex justify-between items-end mb-12">
+            <div className="p-4 sm:p-8 md:p-12 max-w-7xl mx-auto font-sans overflow-auto">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8 sm:mb-12">
                     <div>
-                        <h2 className="text-4xl font-serif font-medium text-gray-900 dark:text-white mb-2">My Learning Paths</h2>
-                        <p className="text-gray-500 dark:text-gray-400">Track your progress and achieve your goals.</p>
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-medium text-gray-900 dark:text-white mb-2">My Learning Paths</h2>
+                        <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">Track your progress and achieve your goals.</p>
                     </div>
                     <button
                         onClick={() => navigate("/roadmap/generate")}
-                        className="flex items-center gap-2 px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-all shadow-lg shadow-black/10 dark:shadow-white/10 hover:shadow-xl hover:-translate-y-0.5"
+                        className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-all shadow-lg shadow-black/10 dark:shadow-white/10 hover:shadow-xl hover:-translate-y-0.5 w-full sm:w-auto"
                     >
                         <FaPlus className="text-sm" />
                         <span>New Path</span>

@@ -142,56 +142,60 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
     ];
 
     return (
-        <div className={`bg-white dark:bg-gray-900 rounded-[30px] ${compact ? 'p-4' : 'p-6'} h-full relative overflow-hidden transition-colors`}>
+        <div className={`bg-white dark:bg-gray-900 rounded-2xl md:rounded-[30px] ${compact ? 'p-3 md:p-4' : 'p-4 md:p-6'} h-full relative overflow-hidden transition-colors`}>
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
                 <button
                     onClick={() => navigateMonth(-1)}
-                    className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full text-xs font-medium text-gray-600 dark:text-gray-400 transition-colors"
+                    className="px-2 md:px-3 py-1 md:py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full text-[10px] md:text-xs font-medium text-gray-600 dark:text-gray-400 transition-colors"
                 >
-                    {prevMonth}
+                    <span className="hidden sm:inline">{prevMonth}</span>
+                    <span className="sm:hidden">←</span>
                 </button>
-                <h3 className="text-gray-900 dark:text-white font-serif text-lg font-medium">{currentMonth}</h3>
+                <h3 className="text-gray-900 dark:text-white font-serif text-sm md:text-lg font-medium">{currentMonth}</h3>
                 <button
                     onClick={() => navigateMonth(1)}
-                    className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full text-xs font-medium text-gray-600 dark:text-gray-400 transition-colors"
+                    className="px-2 md:px-3 py-1 md:py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full text-[10px] md:text-xs font-medium text-gray-600 dark:text-gray-400 transition-colors"
                 >
-                    {nextMonth}
+                    <span className="hidden sm:inline">{nextMonth}</span>
+                    <span className="sm:hidden">→</span>
                 </button>
             </div>
 
             {/* Week Navigation */}
             {!compact && (
-                <div className="flex justify-center gap-2 mb-4">
+                <div className="flex justify-center gap-1 md:gap-2 mb-4">
                     <button
                         onClick={() => navigateWeek(-1)}
-                        className="px-3 py-1 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors"
+                        className="px-2 md:px-3 py-1 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-xs md:text-sm transition-colors"
                     >
-                        ← Prev Week
+                        <span className="hidden sm:inline">← Prev Week</span>
+                        <span className="sm:hidden">← Prev</span>
                     </button>
                     <button
                         onClick={() => setCurrentDate(new Date())}
-                        className="px-3 py-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white text-sm rounded-lg transition-colors"
+                        className="px-2 md:px-3 py-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white text-xs md:text-sm rounded-lg transition-colors"
                     >
                         Today
                     </button>
                     <button
                         onClick={() => navigateWeek(1)}
-                        className="px-3 py-1 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors"
+                        className="px-2 md:px-3 py-1 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-xs md:text-sm transition-colors"
                     >
-                        Next Week →
+                        <span className="hidden sm:inline">Next Week →</span>
+                        <span className="sm:hidden">Next →</span>
                     </button>
                 </div>
             )}
 
             {/* Calendar Grid */}
-            <div className="flex h-[calc(100%-80px)]">
+            <div className="flex h-[calc(100%-80px)] overflow-x-auto">
                 {/* Time Column */}
-                <div className={`flex flex-col pr-2 ${compact ? 'pt-8' : 'pt-10'}`}>
+                <div className={`flex flex-col pr-1 md:pr-2 ${compact ? 'pt-8' : 'pt-10'} flex-shrink-0`}>
                     {displayedTimeSlots.map((slot, i) => (
                         <div
                             key={i}
-                            className={`text-[10px] text-gray-400 dark:text-gray-500 font-medium ${compact ? 'h-10' : 'h-[60px]'}`}
+                            className={`text-[8px] md:text-[10px] text-gray-400 dark:text-gray-500 font-medium whitespace-nowrap ${compact ? 'h-8 md:h-10' : 'h-10 md:h-[60px]'}`}
                         >
                             {slot.label}
                         </div>
@@ -199,14 +203,14 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                 </div>
 
                 {/* Days Grid */}
-                <div className="flex-1 relative">
+                <div className="flex-1 relative min-w-[280px] md:min-w-0">
                     {/* Day Headers */}
                     <div className="grid grid-cols-7 mb-2">
                         {weekDays.map((day, i) => (
                             <div key={i} className="flex flex-col items-center">
-                                <span className="text-xs text-gray-400 dark:text-gray-500 mb-1">{day.dayName}</span>
-                                <span className={`text-sm font-bold ${day.isToday
-                                    ? 'bg-indigo-500 text-white w-7 h-7 rounded-full flex items-center justify-center'
+                                <span className="text-[10px] md:text-xs text-gray-400 dark:text-gray-500 mb-1">{day.dayName}</span>
+                                <span className={`text-xs md:text-sm font-bold ${day.isToday
+                                    ? 'bg-indigo-500 text-white w-5 h-5 md:w-7 md:h-7 rounded-full flex items-center justify-center'
                                     : 'text-gray-700 dark:text-gray-300'}`}
                                 >
                                     {day.dayNumber}
@@ -230,7 +234,7 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                         {displayedTimeSlots.map((_, i) => (
                             <div
                                 key={i}
-                                className={`border-t border-dashed border-gray-100 dark:border-gray-800 ${compact ? 'h-10' : 'h-[60px]'}`}
+                                className={`border-t border-dashed border-gray-100 dark:border-gray-800 ${compact ? 'h-8 md:h-10' : 'h-10 md:h-[60px]'}`}
                             />
                         ))}
                     </div>
@@ -248,13 +252,13 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                                         key={`${event.id}-${dayIndex}`}
                                         style={style}
                                         onClick={() => onEventClick?.(event)}
-                                        className={`absolute ${color.bg} ${color.text} p-2 rounded-xl shadow-lg z-10 pointer-events-auto cursor-pointer hover:scale-[1.02] hover:shadow-xl transition-all mx-0.5 overflow-hidden`}
+                                        className={`absolute ${color.bg} ${color.text} p-1 md:p-2 rounded-lg md:rounded-xl shadow-lg z-10 pointer-events-auto cursor-pointer hover:scale-[1.02] hover:shadow-xl transition-all mx-0.5 overflow-hidden`}
                                     >
-                                        <div className={`font-bold ${compact ? 'text-[10px]' : 'text-xs'} mb-0.5 truncate`}>
+                                        <div className={`font-bold ${compact ? 'text-[8px] md:text-[10px]' : 'text-[10px] md:text-xs'} mb-0.5 truncate`}>
                                             {event.title}
                                         </div>
                                         {!compact && event.description && (
-                                            <div className="text-[10px] opacity-80 truncate">
+                                            <div className="text-[8px] md:text-[10px] opacity-80 truncate hidden md:block">
                                                 {event.description}
                                             </div>
                                         )}
@@ -268,8 +272,8 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                     {!loading && events.length === 0 && (
                         <div className="absolute inset-0 top-10 flex items-center justify-center">
                             <div className="text-center text-gray-400 dark:text-gray-500">
-                                <p className="text-sm font-medium">No events scheduled</p>
-                                <p className="text-xs mt-1">Schedule a roadmap to see events here</p>
+                                <p className="text-xs md:text-sm font-medium">No events scheduled</p>
+                                <p className="text-[10px] md:text-xs mt-1">Schedule a roadmap to see events here</p>
                             </div>
                         </div>
                     )}
@@ -277,7 +281,7 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                     {/* Loading Overlay */}
                     {loading && (
                         <div className="absolute inset-0 bg-white/50 dark:bg-gray-900/50 flex items-center justify-center z-20">
-                            <div className="text-gray-500 dark:text-gray-400 text-sm animate-pulse">Loading events...</div>
+                            <div className="text-gray-500 dark:text-gray-400 text-xs md:text-sm animate-pulse">Loading events...</div>
                         </div>
                     )}
                 </div>
