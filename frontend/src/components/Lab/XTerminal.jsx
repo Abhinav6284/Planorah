@@ -168,22 +168,17 @@ const XTerminal = ({
         xtermRef.current = term;
         fitAddonRef.current = fitAddon;
 
-        // Try to connect to WebSocket
-        connectWebSocket();
+        // Start immediately in simulated mode (no WebSocket needed)
+        setUseSimulated(true);
+        setConnectionStatus('local');
 
-        // If WebSocket fails, show simulated mode welcome after a delay
-        setTimeout(() => {
-            if (connectionStatus !== 'connected' && xtermRef.current) {
-                setUseSimulated(true);
-                setConnectionStatus('fallback');
-                term.writeln('\x1b[1;36m╔══════════════════════════════════════════════════════════╗\x1b[0m');
-                term.writeln('\x1b[1;36m║\x1b[0m  \x1b[1;35m🚀 Planorah CodeSpace Terminal (Simulated)\x1b[0m             \x1b[1;36m║\x1b[0m');
-                term.writeln('\x1b[1;36m║\x1b[0m  Type \x1b[1;33mhelp\x1b[0m for available commands                         \x1b[1;36m║\x1b[0m');
-                term.writeln('\x1b[1;36m╚══════════════════════════════════════════════════════════╝\x1b[0m');
-                term.writeln('');
-                writePrompt(term);
-            }
-        }, 2000);
+        // Show welcome message immediately
+        term.writeln('\x1b[1;36m╔══════════════════════════════════════════════════════════╗\x1b[0m');
+        term.writeln('\x1b[1;36m║\x1b[0m  \x1b[1;35m🚀 Planorah CodeSpace Terminal\x1b[0m                          \x1b[1;36m║\x1b[0m');
+        term.writeln('\x1b[1;36m║\x1b[0m  Type \x1b[1;33mhelp\x1b[0m for available commands                         \x1b[1;36m║\x1b[0m');
+        term.writeln('\x1b[1;36m╚══════════════════════════════════════════════════════════╝\x1b[0m');
+        term.writeln('');
+        writePrompt(term);
 
         // Handle resize
         const handleResize = () => {
@@ -487,6 +482,7 @@ const XTerminal = ({
         switch (connectionStatus) {
             case 'connected': return 'text-green-500';
             case 'connecting': return 'text-yellow-500 animate-pulse';
+            case 'local': return 'text-green-400';
             case 'fallback': return 'text-orange-400';
             default: return 'text-gray-500';
         }
@@ -496,6 +492,7 @@ const XTerminal = ({
         switch (connectionStatus) {
             case 'connected': return 'Connected';
             case 'connecting': return 'Connecting...';
+            case 'local': return 'Local';
             case 'fallback': return 'Simulated';
             default: return 'Disconnected';
         }
@@ -511,8 +508,8 @@ const XTerminal = ({
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`flex items-center gap-2 px-3 py-1.5 text-xs cursor-pointer group ${activeTab === tab.id
-                                    ? 'bg-[#1e1e1e] text-white border-t border-t-[#007acc]'
-                                    : 'text-gray-400 hover:text-white'
+                                ? 'bg-[#1e1e1e] text-white border-t border-t-[#007acc]'
+                                : 'text-gray-400 hover:text-white'
                                 }`}
                         >
                             <FaTerminal className="text-[10px]" />

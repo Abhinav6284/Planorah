@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 const AIHelpWidget = () => {
     const [inputValue, setInputValue] = useState('');
-    const [isFocused, setIsFocused] = useState(false);
     const inputRef = useRef(null);
     const navigate = useNavigate();
 
@@ -42,8 +41,6 @@ const AIHelpWidget = () => {
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        onFocus={() => setIsFocused(true)}
-                        onBlur={() => setIsFocused(false)}
                         placeholder="Just type here..."
                         className="w-full bg-transparent text-gray-600 dark:text-gray-300 text-base sm:text-lg placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none caret-indigo-500"
                         style={{ caretColor: '#6366f1' }}
