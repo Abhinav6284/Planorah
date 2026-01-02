@@ -9,9 +9,21 @@ const STEPS = [
     {
         id: "field",
         title: "What's your field of study?",
-        subtitle: "We'll tailor your career path based on this.",
+        subtitle: "We'll tailor your experience based on this.",
         fields: [
-            { name: "field_of_study", label: "Field (e.g. CS, Business)", placeholder: "Computer Science", colSpan: 2 },
+            {
+                name: "field_of_study",
+                label: "Field of Study",
+                options: [
+                    "Computer Science / IT",
+                    "Medical / Life Sciences",
+                    "Commerce / Accounts",
+                    "Creative Arts / Design",
+                    "Science (Physics/Chemistry/Math)",
+                    "Other"
+                ],
+                colSpan: 2
+            },
             { name: "role", label: "Current Status", options: ["Student", "Graduate", "Professional"], colSpan: 2 }
         ]
     },
@@ -73,7 +85,7 @@ export default function StepForm() {
         name: "",
         phone_number: "",
         date_of_birth: "",
-        field_of_study: "",
+        field_of_study: "Computer Science / IT",
         role: "Student", // Default
         target_role: "",
         experience_level: "Beginner", // Default
