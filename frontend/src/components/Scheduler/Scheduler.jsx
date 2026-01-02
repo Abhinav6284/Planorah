@@ -184,7 +184,7 @@ export default function Scheduler() {
                             animate={{ x: 0 }}
                             exit={{ x: '-100%' }}
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className="md:hidden fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-white dark:bg-gray-800 z-50 overflow-y-auto shadow-2xl"
+                            className="md:hidden fixed top-0 left-0 bottom-0 w-full max-w-[320px] bg-white dark:bg-gray-800 z-50 overflow-y-auto shadow-2xl"
                         >
                             {/* Mobile Sidebar Header */}
                             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
@@ -252,43 +252,33 @@ export default function Scheduler() {
                                 {/* Tasks List */}
                                 <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                                     <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Tasks</h3>
-                                    <DragDropContext onDragEnd={onDragEnd}>
-                                        <Droppable droppableId="tasks-mobile">
-                                            {(provided) => (
-                                                <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
-                                                    {tasks.map((task, index) => (
-                                                        <Draggable key={task.id} draggableId={`mobile-${task.id}`} index={index}>
-                                                            {(provided) => (
-                                                                <div
-                                                                    ref={provided.innerRef}
-                                                                    {...provided.draggableProps}
-                                                                    {...provided.dragHandleProps}
-                                                                    className="p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl shadow-sm"
-                                                                    onClick={() => {
-                                                                        setActiveTask(task);
-                                                                        setSidebarOpen(false);
-                                                                    }}
-                                                                >
-                                                                    <div className="flex justify-between items-start mb-1">
-                                                                        <h3 className="font-bold text-gray-900 dark:text-white text-sm">{task.title}</h3>
-                                                                        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${task.priority === 'high' ? 'bg-red-400' :
-                                                                            task.priority === 'medium' ? 'bg-yellow-400' : 'bg-green-400'
-                                                                            }`} />
-                                                                    </div>
-                                                                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 font-medium">
-                                                                        <span className="flex items-center gap-1">
-                                                                            🍅 {task.estimated_pomodoros}
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            )}
-                                                        </Draggable>
-                                                    ))}
-                                                    {provided.placeholder}
+                                    <div className="space-y-3">
+                                        {tasks.map((task) => (
+                                            <div
+                                                key={task.id}
+                                                className="p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl shadow-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                                                onClick={() => {
+                                                    setActiveTask(task);
+                                                    setSidebarOpen(false);
+                                                }}
+                                            >
+                                                <div className="flex justify-between items-start mb-1">
+                                                    <h3 className="font-bold text-gray-900 dark:text-white text-sm">{task.title}</h3>
+                                                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${task.priority === 'high' ? 'bg-red-400' :
+                                                        task.priority === 'medium' ? 'bg-yellow-400' : 'bg-green-400'
+                                                        }`} />
                                                 </div>
-                                            )}
-                                        </Droppable>
-                                    </DragDropContext>
+                                                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                                    <span className="flex items-center gap-1">
+                                                        🍅 {task.estimated_pomodoros}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {tasks.length === 0 && (
+                                            <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">No tasks available</p>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </motion.div>

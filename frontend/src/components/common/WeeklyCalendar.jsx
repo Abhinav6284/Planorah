@@ -195,7 +195,7 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                     {displayedTimeSlots.map((slot, i) => (
                         <div
                             key={i}
-                            className={`text-[8px] md:text-[10px] text-gray-400 dark:text-gray-500 font-medium whitespace-nowrap ${compact ? 'h-8 md:h-10' : 'h-10 md:h-[60px]'}`}
+                            className={`text-[10px] md:text-xs text-gray-400 dark:text-gray-500 font-medium whitespace-nowrap ${compact ? 'h-8 md:h-10' : 'h-10 md:h-[60px]'}`}
                         >
                             {slot.label}
                         </div>
@@ -254,11 +254,11 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                                         onClick={() => onEventClick?.(event)}
                                         className={`absolute ${color.bg} ${color.text} p-1 md:p-2 rounded-lg md:rounded-xl shadow-lg z-10 pointer-events-auto cursor-pointer hover:scale-[1.02] hover:shadow-xl transition-all mx-0.5 overflow-hidden`}
                                     >
-                                        <div className={`font-bold ${compact ? 'text-[8px] md:text-[10px]' : 'text-[10px] md:text-xs'} mb-0.5 truncate`}>
+                                        <div className={`font-bold ${compact ? 'text-[10px] md:text-xs' : 'text-xs'} mb-0.5 truncate`}>
                                             {event.title}
                                         </div>
                                         {!compact && event.description && (
-                                            <div className="text-[8px] md:text-[10px] opacity-80 truncate hidden md:block">
+                                            <div className="text-[10px] md:text-xs opacity-80 truncate hidden md:block">
                                                 {event.description}
                                             </div>
                                         )}
@@ -273,7 +273,7 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                         <div className="absolute inset-0 top-10 flex items-center justify-center">
                             <div className="text-center text-gray-400 dark:text-gray-500">
                                 <p className="text-xs md:text-sm font-medium">No events scheduled</p>
-                                <p className="text-[10px] md:text-xs mt-1">Schedule a roadmap to see events here</p>
+                                <p className="text-xs mt-1">Schedule a roadmap to see events here</p>
                             </div>
                         </div>
                     )}
