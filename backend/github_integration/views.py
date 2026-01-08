@@ -411,3 +411,182 @@ MIT License
             'total_repos': repos.count(),
             'errors': errors
         })
+
+    @action(detail=False, methods=['post'])
+    def publish_user_project(self, request):
+        """
+        Publish a UserProject (from CodeSpace) to GitHub.
+        Creates repo and pushes all project files.
+        No subscription required for this endpoint.
+        """
+        import base64
+        from projects.models import UserProject
+        from projects.security import validate_project_files, sanitize_repo_name
+        
+        project_id = request.data.get('project_id')
+        repo_name = request.data.get('repo_name')
+        is_private = request.data.get('is_private', False)
+        description = request.data.get('description', '')
+        
+        if not project_id:
+            return Response({
+                'error': 'project_id is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get GitHub credential - if not connected, return clear message
+        try:
+            credential = GitHubCredential.objects.get(user=request.user)
+        except GitHubCredential.DoesNotExist:
+            return Response({
+                'error': 'GitHub not connected',
+                'needs_connection': True,
+                'message': 'Please connect your GitHub account first.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get the project
+        try:
+            project = UserProject.objects.get(id=project_id, user=request.user)
+        except UserProject.DoesNotExist:
+            return Response({
+                'error': 'Project not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Check if project has files
+        if project.files.count() == 0:
+            return Response({
+                'error': 'Project has no files to push'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if already pushed
+        if project.github_repo_url:
+            return Response({
+                'error': 'Project already published to GitHub',
+                'repo_url': project.github_repo_url
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Sanitize repo name
+        if not repo_name:
+            repo_name = project.title
+        repo_name = sanitize_repo_name(repo_name)
+        
+        # Security: Re-validate all files before pushing
+        files_data = [{'path': f.path, 'content': f.content} for f in project.files.all()]
+        try:
+            validate_project_files(files_data)
+        except Exception as e:
+            return Response({
+                'error': f'Security validation failed: {str(e)}'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create repository on GitHub
+        create_response = requests.post(
+            'https://api.github.com/user/repos',
+            headers={
+                'Authorization': f'Bearer {credential.access_token}',
+                'Accept': 'application/json'
+            },
+            json={
+                'name': repo_name,
+                'description': description or project.description[:200] if project.description else '',
+                'private': is_private,
+                'auto_init': False
+            },
+            timeout=30
+        )
+        
+        if create_response.status_code not in [200, 201]:
+            error_data = create_response.json()
+            return Response({
+                'error': 'Failed to create repository',
+                'details': error_data.get('message', 'Unknown error')
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        repo_data = create_response.json()
+        repo_full_name = repo_data.get('full_name')
+        repo_url = repo_data.get('html_url')
+        
+        # Generate README
+        tech_stack_str = ', '.join(project.tech_stack) if project.tech_stack else 'Not specified'
+        readme_content = f"""# {project.title}
+
+{project.description or 'A project created in Planorah CodeSpace.'}
+
+## Tech Stack
+{tech_stack_str}
+
+## About
+This project was created using [Planorah](https://planorah.me) - Your Career Execution Platform.
+
+## License
+MIT License
+"""
+        
+        # Push all files including README
+        files_to_push = [{'path': 'README.md', 'content': readme_content}]
+        files_to_push.extend(files_data)
+        
+        push_errors = []
+        pushed_count = 0
+        
+        for file_data in files_to_push:
+            try:
+                file_content_encoded = base64.b64encode(
+                    file_data['content'].encode('utf-8')
+                ).decode('utf-8')
+                
+                file_response = requests.put(
+                    f"https://api.github.com/repos/{repo_full_name}/contents/{file_data['path']}",
+                    headers={
+                        'Authorization': f'Bearer {credential.access_token}',
+                        'Accept': 'application/json'
+                    },
+                    json={
+                        'message': f"Add {file_data['path']}",
+                        'content': file_content_encoded
+                    },
+                    timeout=30
+                )
+                
+                if file_response.status_code in [200, 201]:
+                    pushed_count += 1
+                else:
+                    push_errors.append(f"Failed to push {file_data['path']}")
+                    
+            except Exception as e:
+                push_errors.append(f"Error pushing {file_data['path']}: {str(e)}")
+        
+        # Update project with GitHub info
+        project.github_repo_url = repo_url
+        project.github_repo_name = repo_name
+        project.status = 'pushed'
+        project.save()
+        
+        # Save repository reference
+        github_repo = GitHubRepository.objects.create(
+            user=request.user,
+            project_type='user_project',
+            repo_name=repo_name,
+            repo_full_name=repo_full_name,
+            repo_url=repo_url,
+            clone_url=repo_data.get('clone_url'),
+            is_private=is_private,
+            last_synced_at=timezone.now()
+        )
+        
+        # Log the publish action
+        GitHubPublishLog.objects.create(
+            repository=github_repo,
+            action='create',
+            status='success' if not push_errors else 'partial',
+            commit_message=f'Published {pushed_count} files from Planorah'
+        )
+        
+        return Response({
+            'message': 'Project published to GitHub successfully!',
+            'repo_url': repo_url,
+            'clone_url': repo_data.get('clone_url'),
+            'files_pushed': pushed_count,
+            'total_files': len(files_to_push),
+            'errors': push_errors if push_errors else None
+        }, status=status.HTTP_201_CREATED)
+

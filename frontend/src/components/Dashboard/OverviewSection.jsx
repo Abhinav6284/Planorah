@@ -10,7 +10,7 @@ import AIHelpWidget from "./NewWidgets/AIHelpWidget";
 import TaskSchedulerWidget from "./NewWidgets/TaskSchedulerWidget";
 import ProgressChartWidget from "./NewWidgets/ProgressChartWidget";
 import QuickStatsWidget from "./NewWidgets/QuickStatsWidget";
-import GitHubWidget from "./NewWidgets/GitHubWidget";
+import CodeSpaceWidget from "./NewWidgets/CodeSpaceWidget";
 import ResearchWidget from "./NewWidgets/ResearchWidget";
 import PortfolioWidget from "./NewWidgets/PortfolioWidget";
 import CalendarWidget from "./NewWidgets/CalendarWidget";
@@ -19,14 +19,16 @@ export default function OverviewSection() {
     const [loading, setLoading] = useState(true);
     const [userProfile, setUserProfile] = useState(null);
     const [tasks, setTasks] = useState([]);
+    const [streakData, setStreakData] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [statsData, tasksData, profileData] = await Promise.all([
+                const [statsData, tasksData, profileData, detailedStats] = await Promise.all([
                     schedulerService.getDashboardStats(),
                     schedulerService.getTasks(),
-                    userService.getProfile().catch(() => null)
+                    userService.getProfile().catch(() => null),
+                    userService.getStatistics().catch(() => null)
                 ]);
 
                 // Merge profile data for better name display and stats
@@ -40,6 +42,7 @@ export default function OverviewSection() {
                 };
                 setUserProfile(profile);
                 setTasks(tasksData || []);
+                setStreakData(detailedStats);
             } catch (error) {
                 console.error("Failed to fetch dashboard data", error);
             } finally {
@@ -126,7 +129,7 @@ export default function OverviewSection() {
                             {/* Show GitHub for CS/IT, Research for Medical/Science only */}
                             {(userProfile?.field_of_study?.toLowerCase().includes('computer') ||
                                 userProfile?.field_of_study?.toLowerCase().includes('it')) ? (
-                                <GitHubWidget />
+                                <CodeSpaceWidget />
                             ) : (userProfile?.field_of_study?.toLowerCase().includes('medical') ||
                                 userProfile?.field_of_study?.toLowerCase().includes('life') ||
                                 userProfile?.field_of_study?.toLowerCase().includes('science') ||
@@ -147,7 +150,7 @@ export default function OverviewSection() {
 
                     {/* Profile Card - Full Width */}
                     <motion.div variants={itemVariants} className="min-h-[200px]">
-                        <ProfileCard user={userProfile} />
+                        <ProfileCard user={userProfile} streak={streakData} />
                     </motion.div>
 
                     {/* Weekly Progress Chart */}

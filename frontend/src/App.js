@@ -42,7 +42,7 @@ import PricingPage from './components/Subscription/PricingPage';
 import SubscriptionStatus from './components/Subscription/SubscriptionStatus';
 import CheckoutPage from './components/Billing/CheckoutPage';
 import PaymentHistory from './components/Billing/PaymentHistory';
-import { PortfolioEditor, ProjectManager } from './components/Portfolio';
+import { PortfolioEditor, ProjectManager, PublicPortfolio } from './components/Portfolio';
 
 export default function App() {
   return (
@@ -63,6 +63,9 @@ export default function App() {
             <Route path="/auth/github/callback" element={<GitHubCallback />} />
             <Route path="/auth/spotify/callback" element={<SpotifyCallback />} />
             <Route path="/auth/youtube/callback" element={<YouTubeCallback />} />
+
+            {/* Public Portfolio Route - No Auth Required */}
+            <Route path="/p/:slug" element={<PublicPortfolio />} />
 
             {/* Protected App Routes */}
             <Route element={<Layout />}>
