@@ -14,6 +14,7 @@ class Roadmap(models.Model):
         ('career', 'Career Path'),
         ('research', 'Research & Academia'),
         ('skill_mastery', 'Skill Mastery'),
+        ('exam_prep', 'Exam Preparation'),
     ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -35,6 +36,11 @@ class Roadmap(models.Model):
     learning_constraints = models.TextField(blank=True, help_text="Time, budget, or resource constraints")
     motivation_style = models.CharField(max_length=50, blank=True, default='Milestones')
     success_definition = models.TextField(blank=True, help_text="How success is defined")
+    
+    # Exam Preparation fields
+    exam_name = models.CharField(max_length=255, blank=True, help_text="Name of the exam/paper")
+    exam_date = models.DateField(null=True, blank=True, help_text="Date of the exam")
+    syllabus_text = models.TextField(blank=True, help_text="Pasted syllabus content")
 
     prerequisites = models.JSONField(default=list, blank=True)
     career_outcomes = models.JSONField(default=list, blank=True)

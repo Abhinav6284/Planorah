@@ -1,39 +1,106 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
-const ProfileCard = ({ user }) => {
+const ProfileCard = ({ user, streak }) => {
+    // Calculate last 7 days
+    const weekDays = useMemo(() => {
+        const days = [];
+        const today = new Date();
+
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(today);
+            d.setDate(today.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            // Check if active in heatmap
+            const isActive = streak?.activity_heatmap?.[dateStr] > 0;
+
+            days.push({
+                day: d.toLocaleDateString('en-US', { weekday: 'short' }).charAt(0),
+                fullDate: dateStr,
+                active: isActive,
+                isToday: i === 0
+            });
+        }
+        return days;
+    }, [streak]);
+
+    const currentStreak = streak?.streak?.current || 0;
+
     return (
-        <Link to="/settings" className="block relative h-full min-h-[200px] w-full rounded-[24px] sm:rounded-[30px] overflow-hidden group cursor-pointer">
-            {/* Background Image / Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-400 dark:from-gray-700 dark:to-gray-800">
-                {/* Placeholder or User Image */}
-                <img
-                    src={user?.avatar || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=600"}
-                    alt="Profile"
-                    className="w-full h-full object-cover opacity-80 mix-blend-overlay group-hover:scale-105 transition-transform duration-700"
-                />
-            </div>
+        <div className="bg-white dark:bg-[#1C1C1E] rounded-[30px] p-6 h-full flex flex-col justify-between border border-gray-100 dark:border-gray-800 shadow-sm relative overflow-hidden">
+            {/* Header: Avatar and Greeting */}
+            <div className="flex items-center justify-between z-10">
+                <div className="flex items-center gap-4">
+                    <Link to="/settings" className="relative group">
+                        <div className="w-16 h-16 rounded-full p-1 bg-gradient-to-tr from-indigo-500 to-purple-500">
+                            <img
+                                src={user?.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=" + (user?.username || "default")}
+                                alt="User"
+                                className="w-full h-full rounded-full bg-white dark:bg-black object-cover border-2 border-white dark:border-black"
+                            />
+                        </div>
+                        <div className="absolute inset-0 rounded-full bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-medium">
+                            Edit
+                        </div>
+                    </Link>
+                    <div>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                            {user?.username || "Student"}
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {user?.role || "Planora Learner"}
+                        </p>
+                    </div>
+                </div>
 
-            {/* Overlay Gradient for Text Readability */}
-            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
-
-            {/* Content */}
-            <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 text-white transform group-hover:translate-x-2 transition-transform duration-300">
-                <h3 className="text-xl sm:text-2xl font-serif font-medium leading-tight">
-                    {user?.username || "Student"}
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-200 mt-1 font-light opacity-90">
-                    {user?.role || "Learner"}
-                </p>
-            </div>
-
-            {/* Stats Pill */}
-            <div className="absolute bottom-4 sm:bottom-6 right-4 sm:right-6 group-hover:scale-110 transition-transform duration-300">
-                <div className="backdrop-blur-md bg-white/20 border border-white/30 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-white text-xs sm:text-sm font-medium">
-                    {user?.xp || 0} XP
+                {/* Fire Icon for Streak */}
+                <div className="flex flex-col items-center">
+                    <div className="relative">
+                        <motion.div
+                            animate={{ scale: [1, 1.1, 1] }}
+                            transition={{ repeat: Infinity, duration: 2 }}
+                            className="text-3xl"
+                        >
+                            🔥
+                        </motion.div>
+                        <div className="absolute -bottom-1 -right-1 bg-orange-500 text-white text-[10px] font-bold px-1.5 rounded-full border border-white dark:border-[#1C1C1E]">
+                            {currentStreak}
+                        </div>
+                    </div>
                 </div>
             </div>
-        </Link>
+
+            {/* Streak Plan Visualization */}
+            <div className="z-10 mt-6">
+                <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">Daily Streak</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {currentStreak} Day{currentStreak !== 1 ? 's' : ''}
+                    </span>
+                </div>
+
+                <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800/50 p-3 rounded-2xl">
+                    {weekDays.map((day, index) => (
+                        <div key={index} className="flex flex-col items-center gap-1.5">
+                            <div
+                                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${day.active
+                                        ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30 scale-110'
+                                        : day.isToday
+                                            ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 animate-pulse' // Today but not done yet
+                                            : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600'
+                                    }`}
+                            >
+                                {day.active ? '✓' : day.day}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Decorative */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+        </div>
     );
 };
 
