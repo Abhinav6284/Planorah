@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { isSessionExpired, clearTokens } from '../utils/auth';
 
 // Auto-detect API URL based on environment
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -13,9 +14,20 @@ const axiosInstance = axios.create({
     },
 });
 
-// Request interceptor to add token
+// Request interceptor to add token and check session expiry
 axiosInstance.interceptors.request.use(
     (config) => {
+        // Check if session has expired (15 days for Remember Me)
+        if (isSessionExpired()) {
+            clearTokens();
+            // Only redirect if not already on login/register pages
+            if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
+                alert('Your session has expired. Please login again.');
+                window.location.href = '/login';
+            }
+            return Promise.reject(new Error('Session expired'));
+        }
+
         const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;

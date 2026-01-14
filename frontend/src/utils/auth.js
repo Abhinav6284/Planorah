@@ -4,6 +4,79 @@ import axios from "axios";
 import { API_BASE_URL } from "../api/axios";
 const API_BASE = process.env.REACT_APP_API_BASE || API_BASE_URL;
 
+// Maximum session duration for "Remember Me" - 15 days in milliseconds
+export const MAX_SESSION_DAYS = 15;
+const MAX_SESSION_MS = MAX_SESSION_DAYS * 24 * 60 * 60 * 1000;
+
+/**
+ * Store tokens based on rememberMe preference
+ * @param {string} access - Access token
+ * @param {string} refresh - Refresh token
+ * @param {boolean} rememberMe - Whether to persist tokens in localStorage with timestamp
+ */
+export function setTokens(access, refresh, rememberMe = false) {
+    // Clear any existing tokens first
+    clearTokens();
+
+    if (rememberMe) {
+        localStorage.setItem("access_token", access);
+        localStorage.setItem("refresh_token", refresh);
+        localStorage.setItem("login_timestamp", Date.now().toString());
+    } else {
+        sessionStorage.setItem("access_token", access);
+        sessionStorage.setItem("refresh_token", refresh);
+    }
+}
+
+/**
+ * Set the Remember Me preference (used before OAuth redirects)
+ */
+export function setRememberMePreference(rememberMe) {
+    sessionStorage.setItem("remember_me_preference", rememberMe ? "true" : "false");
+}
+
+/**
+ * Get the Remember Me preference
+ */
+export function getRememberMePreference() {
+    return sessionStorage.getItem("remember_me_preference") === "true";
+}
+
+/**
+ * Clear the Remember Me preference
+ */
+export function clearRememberMePreference() {
+    sessionStorage.removeItem("remember_me_preference");
+}
+
+/**
+ * Get login timestamp (only exists for Remember Me sessions)
+ */
+export function getLoginTimestamp() {
+    const timestamp = localStorage.getItem("login_timestamp");
+    return timestamp ? parseInt(timestamp, 10) : null;
+}
+
+/**
+ * Check if the current session has expired (for Remember Me sessions)
+ * Returns true if session is expired or invalid
+ */
+export function isSessionExpired() {
+    // Only check expiry for localStorage sessions (Remember Me)
+    if (!localStorage.getItem("access_token")) {
+        return false; // sessionStorage sessions don't have a max duration
+    }
+
+    const loginTimestamp = getLoginTimestamp();
+    if (!loginTimestamp) {
+        // No timestamp but tokens exist - legacy session, consider valid
+        return false;
+    }
+
+    const elapsed = Date.now() - loginTimestamp;
+    return elapsed > MAX_SESSION_MS;
+}
+
 export function getAccessToken() {
     return localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
 }
@@ -15,8 +88,10 @@ export function getRefreshToken() {
 export function clearTokens() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
+    localStorage.removeItem("login_timestamp");
     sessionStorage.removeItem("access_token");
     sessionStorage.removeItem("refresh_token");
+    sessionStorage.removeItem("remember_me_preference");
 }
 
 export async function logoutBackend() {
