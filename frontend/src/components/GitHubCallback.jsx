@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from "../api/axios";
-import { setTokens, getRememberMePreference, clearRememberMePreference, setRememberMePreference } from "../utils/auth";
+import { setTokens, getRememberMePreference, clearRememberMePreference } from "../utils/auth";
 
 export default function GitHubCallback() {
     const [searchParams] = useSearchParams();
