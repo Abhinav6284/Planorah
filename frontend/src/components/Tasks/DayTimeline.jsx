@@ -92,7 +92,11 @@ export default function DayTimeline() {
 
                 {/* Tasks for the Day */}
                 <div className="space-y-3">
-                    {tasks.length === 0 ? (
+                    {loading ? (
+                        <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl">
+                            <p className="text-gray-400">Loading tasks...</p>
+                        </div>
+                    ) : tasks.length === 0 ? (
                         <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl">
                             <p className="text-gray-400">No tasks scheduled for this day</p>
                         </div>
