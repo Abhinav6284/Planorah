@@ -5,15 +5,7 @@ import { format, addDays, startOfToday } from 'date-fns';
 
 export default function DayTimeline() {
     const [tasks, setTasks] = useState([]);
-    const [selectedDate, setSelectedDate] = useState(startOfToday());
-    const [selectedDay, setSelectedDay] = useState(1);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetchDayTasks();
-    }, [selectedDay]);
-
-    const fetchDayTasks = async () => {
+    const fetchDayTasks = useCallback(async () => {
         try {
             const response = await tasksService.getTasksByDay(selectedDay);
             setTasks(response.data);
@@ -22,7 +14,11 @@ export default function DayTimeline() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [selectedDay]);
+
+    useEffect(() => {
+        fetchDayTasks();
+    }, [selectedDay, fetchDayTasks]);
 
     const completeTask = async (taskId) => {
         try {

@@ -10,17 +10,7 @@ export default function FocusMode() {
     const [notes, setNotes] = useState('');
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchTodayTasks();
-    }, []);
-
-    useEffect(() => {
-        if (currentTask) {
-            setNotes(currentTask.notes || '');
-        }
-    }, [currentTask]);
-
-    const fetchTodayTasks = async () => {
+    const fetchTodayTasks = useCallback(async () => {
         try {
             const response = await tasksService.getTodayTasks();
             const incompleteTasks = response.data.filter(t => t.status !== 'completed');
@@ -33,7 +23,11 @@ export default function FocusMode() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [currentTask]);
+
+    useEffect(() => {
+        fetchTodayTasks();
+    }, [fetchTodayTasks]);
 
     const handleComplete = async () => {
         if (!currentTask) return;
@@ -93,8 +87,8 @@ export default function FocusMode() {
                             key={task.id}
                             onClick={() => setCurrentTask(task)}
                             className={`w-full text-left p-4 rounded-xl transition-all ${currentTask?.id === task.id
-                                    ? 'bg-black dark:bg-white text-white dark:text-black shadow-lg'
-                                    : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                ? 'bg-black dark:bg-white text-white dark:text-black shadow-lg'
+                                : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
                                 }`}
                         >
                             <div className="font-medium">{task.title}</div>

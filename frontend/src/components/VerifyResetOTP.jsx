@@ -20,15 +20,13 @@ export default function VerifyResetOTP() {
         // Parse Query Params (Magic Link Support)
         const params = new URLSearchParams(location.search);
         const urlEmail = params.get("email");
-        const urlOtp = params.get("otp");
-
         if (urlEmail && !email) {
             // If email came from URL, update local logic (though we can't easily set state passed from nav unless we rely on location.search logic primarily)
             // But since 'email' constant is derived from location.state, we should handle this.
         }
 
         // Better approach: Derived state or effect to handle both URL and State sources
-    }, [location.search, navigate]);
+    }, [location.search, email]);
 
     // NEW LOGIC: Determine email from State OR URL
     const params = new URLSearchParams(location.search);
@@ -57,7 +55,7 @@ export default function VerifyResetOTP() {
         };
         window.addEventListener("mousemove", handleMouseMove);
         return () => window.removeEventListener("mousemove", handleMouseMove);
-    }, [effectiveEmail, navigate, urlOtp]);
+    }, [effectiveEmail, navigate, urlOtp, otp]);
 
     const handleOtpChange = (index, value) => {
         if (value.length > 1) return;

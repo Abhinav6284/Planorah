@@ -27,9 +27,9 @@ export default function RoadmapView() {
     useEffect(() => {
         fetchRoadmap();
         fetchTaskProgress();
-    }, [id]);
+    }, [id, fetchRoadmap, fetchTaskProgress]);
 
-    const fetchRoadmap = async () => {
+    const fetchRoadmap = useCallback(async () => {
         try {
             const data = await roadmapService.getRoadmapDetail(id);
             setRoadmap(data);
@@ -38,9 +38,9 @@ export default function RoadmapView() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id]);
 
-    const fetchTaskProgress = async () => {
+    const fetchTaskProgress = useCallback(async () => {
         try {
             const response = await tasksService.getTasks({ roadmap: id });
             const tasks = response.data || [];
@@ -49,7 +49,7 @@ export default function RoadmapView() {
         } catch (err) {
             console.error('Failed to fetch task progress:', err);
         }
-    };
+    }, [id]);
 
     const toggleMilestone = (milestoneId) => {
         setExpandedMilestone(expandedMilestone === milestoneId ? null : milestoneId);
