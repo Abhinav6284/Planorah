@@ -104,10 +104,8 @@ export default function ResumeBuilder() {
                 projects: resume.projects?.length ? resume.projects : [{}],
                 links: [{ type: "GitHub", url: "" }]
             });
-        } catch (error) {
-            console.error("Failed to fetch resume:", error);
         }
-    }, [id, navigate]);
+    }, [id]);
 
     // Fetch existing resume if editing
     useEffect(() => {
