@@ -53,19 +53,27 @@ class PortfolioViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def my_portfolio(self, request):
         """Get or create user's portfolio."""
-        portfolio, created = Portfolio.objects.get_or_create(
-            user=request.user,
-            defaults={
-                'slug': slugify(request.user.username) + '-' + str(uuid.uuid4())[:8]
-            }
-        )
-        
-        # Update status based on subscription
-        subscription = Subscription.get_active_subscription(request.user)
-        portfolio.update_status_from_subscription(subscription)
-        
-        serializer = PortfolioSerializer(portfolio)
-        return Response(serializer.data)
+        try:
+            portfolio, created = Portfolio.objects.get_or_create(
+                user=request.user,
+                defaults={
+                    'slug': slugify(request.user.username) + '-' + str(uuid.uuid4())[:8],
+                    'status': 'archived'
+                }
+            )
+            
+            # Update status based on subscription
+            subscription = Subscription.get_active_subscription(request.user)
+            portfolio.update_status_from_subscription(subscription)
+            
+            serializer = PortfolioSerializer(portfolio)
+            return Response(serializer.data)
+        except Exception as e:
+            print(f"Portfolio Error: {str(e)}")
+            return Response(
+                {"error": "Failed to initialize or fetch portfolio"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @action(detail=False, methods=['patch'])
     def update_settings(self, request):
