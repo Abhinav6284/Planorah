@@ -12,6 +12,8 @@ export default function PortfolioEditor() {
     const [message, setMessage] = useState(null);
     const [copied, setCopied] = useState(false);
     const [activeTab, setActiveTab] = useState('general');
+    const [newSubdomain, setNewSubdomain] = useState('');
+    const [subdomainLoading, setSubdomainLoading] = useState(false);
 
     useEffect(() => {
         fetchPortfolio();
@@ -57,6 +59,24 @@ export default function PortfolioEditor() {
             setMessage({ type: 'error', text: 'Failed to save changes.' });
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleSetSubdomain = async () => {
+        if (!newSubdomain) return;
+        setSubdomainLoading(true);
+        try {
+            await portfolioService.setSubdomain(newSubdomain);
+            setPortfolio({ ...portfolio, custom_subdomain: newSubdomain });
+            setMessage({ type: 'success', text: 'Subdomain updated successfully!' });
+            setNewSubdomain('');
+        } catch (error) {
+            setMessage({
+                type: 'error',
+                text: error.response?.data?.error || 'Failed to update subdomain.'
+            });
+        } finally {
+            setSubdomainLoading(false);
         }
     };
 
@@ -197,8 +217,8 @@ export default function PortfolioEditor() {
                         className="fixed top-4 right-4 z-50"
                     >
                         <div className={`px-4 py-3 rounded-lg shadow-lg ${message.type === 'success'
-                                ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
-                                : 'bg-red-500/20 border border-red-500/30 text-red-400'
+                            ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
+                            : 'bg-red-500/20 border border-red-500/30 text-red-400'
                             }`}>
                             <div className="flex items-center gap-2">
                                 {message.type === 'success' ? (
@@ -226,8 +246,8 @@ export default function PortfolioEditor() {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`px-4 py-3 text-sm font-medium transition-colors relative ${activeTab === tab.id
-                                    ? 'text-white'
-                                    : 'text-gray-500 hover:text-gray-300'
+                                ? 'text-white'
+                                : 'text-gray-500 hover:text-gray-300'
                                 }`}
                         >
                             {tab.label}
@@ -482,16 +502,42 @@ export default function PortfolioEditor() {
 
                                 {canAccess('custom_subdomain') && (
                                     <div className="bg-[#0a0a0a] border border-gray-800 rounded-xl p-6">
-                                        <h3 className="text-white font-semibold mb-4">Custom Domain</h3>
-                                        <p className="text-gray-500 text-sm mb-4">
-                                            Your portfolio is available at a custom subdomain
-                                        </p>
-                                        <div className="p-4 bg-black border border-gray-800 rounded-lg">
-                                            <p className="text-white font-mono">
-                                                {portfolio?.custom_subdomain
-                                                    ? `${portfolio.custom_subdomain}.planorah.me`
-                                                    : 'Not configured'}
-                                            </p>
+                                        <h3 className="text-white font-semibold mb-4">Custom Subdomain</h3>
+                                        <div className="space-y-4">
+                                            <div>
+                                                <label className="block text-gray-400 text-sm mb-2">Claim your subdomain</label>
+                                                <div className="flex gap-2">
+                                                    <div className="flex-1 flex items-center bg-black border border-gray-800 rounded-lg overflow-hidden focus-within:border-gray-600 transition-colors">
+                                                        <input
+                                                            value={newSubdomain}
+                                                            onChange={(e) => setNewSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                                                            placeholder={portfolio?.custom_subdomain || "your-name"}
+                                                            className="flex-1 bg-transparent px-4 py-3 text-white outline-none"
+                                                        />
+                                                        <span className="px-4 py-3 bg-gray-900 text-gray-500 border-l border-gray-800">.planorah.me</span>
+                                                    </div>
+                                                    <button
+                                                        onClick={handleSetSubdomain}
+                                                        disabled={subdomainLoading || !newSubdomain}
+                                                        className="px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+                                                    >
+                                                        {subdomainLoading ? '...' : 'Claim'}
+                                                    </button>
+                                                </div>
+                                                <p className="mt-2 text-gray-500 text-xs text-center">
+                                                    Once claimed, your portfolio will be live at this address.
+                                                </p>
+                                            </div>
+
+                                            {portfolio?.custom_subdomain && (
+                                                <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-lg flex items-center justify-between">
+                                                    <div>
+                                                        <p className="text-emerald-400 text-xs font-medium uppercase tracking-wider mb-1">Active Subdomain</p>
+                                                        <p className="text-white font-mono text-sm">{portfolio.custom_subdomain}.planorah.me</p>
+                                                    </div>
+                                                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 )}

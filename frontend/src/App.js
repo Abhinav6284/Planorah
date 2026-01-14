@@ -45,6 +45,39 @@ import PaymentHistory from './components/Billing/PaymentHistory';
 import { PortfolioEditor, ProjectManager, PublicPortfolio } from './components/Portfolio';
 
 export default function App() {
+  // Subdomain detection logic
+  const hostname = window.location.hostname;
+  const parts = hostname.split('.');
+
+  // Logic to determine if we are on a user subdomain
+  // On production: username.planorah.me
+  // On local: username.localhost (if configured)
+  const isLocal = hostname.includes('localhost') || hostname.includes('127.0.0.1');
+  const domainParts = isLocal ? 1 : 2; // planorah.me (2) vs localhost (1)
+
+  let subdomain = null;
+  if (parts.length > domainParts) {
+    const potentialSubdomain = parts[0];
+    if (potentialSubdomain !== 'www' && potentialSubdomain !== 'planorah') {
+      subdomain = potentialSubdomain;
+    }
+  }
+
+  // If we are on a subdomain, show the public portfolio
+  if (subdomain) {
+    return (
+      <ThemeProvider>
+        <SubscriptionProvider>
+          <Router>
+            <Routes>
+              <Route path="*" element={<PublicPortfolio subdomain={subdomain} />} />
+            </Routes>
+          </Router>
+        </SubscriptionProvider>
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider>
       <SubscriptionProvider>
