@@ -69,9 +69,15 @@ class PortfolioViewSet(viewsets.ModelViewSet):
             serializer = PortfolioSerializer(portfolio)
             return Response(serializer.data)
         except Exception as e:
-            print(f"Portfolio Error: {str(e)}")
+            import traceback
+            error_details = traceback.format_exc()
+            print(f"Portfolio Error: {error_details}")
             return Response(
-                {"error": "Failed to initialize or fetch portfolio"},
+                {
+                    "error": str(e),
+                    "traceback": error_details,
+                    "message": "Failed to initialize or fetch portfolio"
+                },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
