@@ -37,16 +37,7 @@ Just ask me anything about your learning journey!`
         inputRef.current?.focus();
     }, []);
 
-    // Handle initial message from dashboard widget
-    useEffect(() => {
-        if (initialMessage && !hasProcessedInitialMessage.current) {
-            hasProcessedInitialMessage.current = true;
-            // Auto-send the initial message
-            sendMessage(initialMessage);
-        }
-    }, [initialMessage]);
-
-    const sendMessage = async (messageText) => {
+    const sendMessage = useCallback(async (messageText) => {
         if (!messageText.trim() || loading) return;
 
         const userMessage = {
@@ -77,7 +68,16 @@ Just ask me anything about your learning journey!`
         } finally {
             setLoading(false);
         }
-    };
+    }, [loading]);
+
+    // Handle initial message from dashboard widget
+    useEffect(() => {
+        if (initialMessage && !hasProcessedInitialMessage.current) {
+            hasProcessedInitialMessage.current = true;
+            // Auto-send the initial message
+            sendMessage(initialMessage);
+        }
+    }, [initialMessage, sendMessage]);
 
     const handleSend = async (e) => {
         e?.preventDefault();

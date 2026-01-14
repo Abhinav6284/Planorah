@@ -4,7 +4,7 @@ import { roadmapService } from '../../api/roadmapService';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     FaCode, FaClock, FaLayerGroup, FaCheckCircle, FaPlayCircle, FaCircle,
-    FaChevronDown, FaChevronUp, FaTasks, FaCalendarAlt, FaRocket, FaBookmark,
+    FaChevronDown, FaChevronUp, FaTasks, FaRocket,
     FaExternalLinkAlt, FaGithub, FaLightbulb, FaListUl, FaArrowRight
 } from 'react-icons/fa';
 

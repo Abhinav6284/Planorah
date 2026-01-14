@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { portfolioService } from '../../api/portfolioService';
 
 export default function PublicPortfolio({ subdomain }) {
@@ -11,25 +11,25 @@ export default function PublicPortfolio({ subdomain }) {
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
+        const fetchPortfolio = async () => {
+            try {
+                const data = subdomain
+                    ? await portfolioService.getPublicBySubdomain(subdomain)
+                    : await portfolioService.getPublicBySlug(slug);
+                setPortfolio(data);
+            } catch (err) {
+                console.error('Failed to fetch portfolio:', err);
+                setError('Portfolio not found');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchPortfolio();
         const handleScroll = () => setScrolled(window.scrollY > 50);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, [slug, subdomain]);
-
-    const fetchPortfolio = async () => {
-        try {
-            const data = subdomain
-                ? await portfolioService.getPublicBySubdomain(subdomain)
-                : await portfolioService.getPublicBySlug(slug);
-            setPortfolio(data);
-        } catch (err) {
-            console.error('Failed to fetch portfolio:', err);
-            setError('Portfolio not found');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     if (loading) {
         return (

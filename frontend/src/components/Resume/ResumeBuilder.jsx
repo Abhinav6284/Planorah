@@ -85,15 +85,7 @@ export default function ResumeBuilder() {
         links: [{ type: "GitHub", url: "" }]
     });
 
-    // Fetch existing resume if editing
-    useEffect(() => {
-        if (isEditing) {
-            fetchResume();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id]);
-
-    const fetchResume = async () => {
+    const fetchResume = useCallback(async () => {
         try {
             const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
             const response = await axios.get(`${API_BASE_URL}/api/resume/${id}/`, {
@@ -115,7 +107,14 @@ export default function ResumeBuilder() {
         } catch (error) {
             console.error("Failed to fetch resume:", error);
         }
-    };
+    }, [id, navigate]);
+
+    // Fetch existing resume if editing
+    useEffect(() => {
+        if (isEditing) {
+            fetchResume();
+        }
+    }, [isEditing, fetchResume]);
 
     const toggleSection = (id) => {
         setOpenSections(prev =>
