@@ -14,17 +14,21 @@ export default function PortfolioEditor() {
     const [activeTab, setActiveTab] = useState('general');
     const [newSubdomain, setNewSubdomain] = useState('');
     const [subdomainLoading, setSubdomainLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         fetchPortfolio();
     }, []);
 
     const fetchPortfolio = async () => {
+        setLoading(true);
+        setError(null);
         try {
             const data = await portfolioService.getMyPortfolio();
             setPortfolio(data);
         } catch (error) {
             console.error('Failed to fetch portfolio:', error);
+            setError('Failed to load portfolio settings. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -106,6 +110,33 @@ export default function PortfolioEditor() {
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                     <p className="text-gray-400 text-sm">Loading portfolio...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center p-6">
+                <div className="max-w-md w-full text-center space-y-6">
+                    <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto">
+                        <span className="text-3xl text-red-500">⚠️</span>
+                    </div>
+                    <div className="space-y-2">
+                        <h2 className="text-xl font-bold text-white">Oops! Something went wrong</h2>
+                        <p className="text-gray-400">{error}</p>
+                    </div>
+                    <button
+                        onClick={fetchPortfolio}
+                        className="px-8 py-3 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition-all"
+                    >
+                        Try Again
+                    </button>
+                    <div className="pt-4">
+                        <Link to="/" className="text-gray-500 hover:text-white text-sm transition-colors">
+                            Return to Dashboard
+                        </Link>
+                    </div>
                 </div>
             </div>
         );

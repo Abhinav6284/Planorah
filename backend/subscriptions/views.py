@@ -29,8 +29,8 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
         
         if subscription is None:
             return Response(
-                {"message": "No active subscription found"},
-                status=status.HTTP_404_NOT_FOUND
+                {"message": "No active subscription found", "status": "none"},
+                status=status.HTTP_200_OK
             )
         
         # Update status based on current date
