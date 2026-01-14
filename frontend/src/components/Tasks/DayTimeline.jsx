@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { tasksService } from '../../api/tasksService';
 import { motion } from 'framer-motion';
 import { format, addDays, startOfToday } from 'date-fns';
 
 export default function DayTimeline() {
     const [tasks, setTasks] = useState([]);
+    const [selectedDay, setSelectedDay] = useState(1);
+    const [loading, setLoading] = useState(true);
     const fetchDayTasks = useCallback(async () => {
         try {
             const response = await tasksService.getTasksByDay(selectedDay);
