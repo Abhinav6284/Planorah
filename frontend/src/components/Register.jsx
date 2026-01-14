@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useGoogleLogin } from '@react-oauth/google';
 import { API_BASE_URL } from "../api/axios";
+import { setTokens } from "../utils/auth";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -58,8 +59,8 @@ export default function Register() {
           return;
         }
 
-        localStorage.setItem("access_token", res.data.access);
-        localStorage.setItem("refresh_token", res.data.refresh);
+        // Use sessionStorage for new registrations (no remember me by default)
+        setTokens(res.data.access, res.data.refresh, false);
         setMessage("success:Google signup successful!");
         if (res.data.onboarding_complete) {
           setTimeout(() => navigate("/dashboard"), 1500);
@@ -89,8 +90,8 @@ export default function Register() {
         token: credentialResponse.credential,
         mode: "signup"
       });
-      localStorage.setItem("access_token", res.data.access);
-      localStorage.setItem("refresh_token", res.data.refresh);
+      // Use sessionStorage for new registrations (no remember me by default)
+      setTokens(res.data.access, res.data.refresh, false);
       setMessage("success:Google signup successful!");
       if (res.data.onboarding_complete) {
         setTimeout(() => navigate("/dashboard"), 1500);
