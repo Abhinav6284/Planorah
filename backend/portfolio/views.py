@@ -18,6 +18,7 @@ from .serializers import (
 from subscriptions.models import Subscription
 from subscriptions.permissions import (
     HasActiveSubscription,
+    HasActiveOrGraceSubscription,
     CanAccessPortfolioAnalytics,
     CanUseCustomSubdomain,
     IsGraceOrReadOnly
@@ -81,18 +82,10 @@ class PortfolioViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-    @action(detail=False, methods=['patch'])
+    @action(detail=False, methods=['patch'], permission_classes=[IsAuthenticated, HasActiveOrGraceSubscription])
     def update_settings(self, request):
         """Update portfolio settings."""
         portfolio = get_object_or_404(Portfolio, user=request.user)
-        
-        # Check if user can edit (active subscription)
-        subscription = Subscription.get_active_subscription(request.user)
-        if not subscription or not subscription.is_active:
-            return Response(
-                {"error": "Active subscription required to edit portfolio"},
-                status=status.HTTP_403_FORBIDDEN
-            )
         
         serializer = PortfolioUpdateSerializer(portfolio, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
