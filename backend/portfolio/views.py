@@ -53,19 +53,33 @@ class PortfolioViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def my_portfolio(self, request):
         """Get or create user's portfolio."""
-        portfolio, created = Portfolio.objects.get_or_create(
-            user=request.user,
-            defaults={
-                'slug': slugify(request.user.username) + '-' + str(uuid.uuid4())[:8]
-            }
-        )
-        
-        # Update status based on subscription
-        subscription = Subscription.get_active_subscription(request.user)
-        portfolio.update_status_from_subscription(subscription)
-        
-        serializer = PortfolioSerializer(portfolio)
-        return Response(serializer.data)
+        try:
+            portfolio, created = Portfolio.objects.get_or_create(
+                user=request.user,
+                defaults={
+                    'slug': slugify(request.user.username) + '-' + str(uuid.uuid4())[:8],
+                    'status': 'archived'
+                }
+            )
+            
+            # Update status based on subscription
+            subscription = Subscription.get_active_subscription(request.user)
+            portfolio.update_status_from_subscription(subscription)
+            
+            serializer = PortfolioSerializer(portfolio)
+            return Response(serializer.data)
+        except Exception as e:
+            import traceback
+            error_details = traceback.format_exc()
+            print(f"Portfolio Error: {error_details}")
+            return Response(
+                {
+                    "error": str(e),
+                    "traceback": error_details,
+                    "message": "Failed to initialize or fetch portfolio"
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @action(detail=False, methods=['patch'])
     def update_settings(self, request):
@@ -120,9 +134,10 @@ class PortfolioViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def add_project(self, request):
-        """Add a project to portfolio."""
+        """Add a project to portfolio (roadmap or student project)."""
         portfolio = get_object_or_404(Portfolio, user=request.user)
         project_id = request.data.get('project_id')
+        project_type = request.data.get('project_type', 'roadmap')
         
         if not project_id:
             return Response(
@@ -130,27 +145,66 @@ class PortfolioViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        from roadmap_ai.models import Project
-        project = get_object_or_404(Project, id=project_id)
-        
-        # Verify project belongs to user's roadmap
-        if project.milestone.roadmap.user != request.user:
+        if project_type not in ['roadmap', 'student']:
             return Response(
-                {"error": "Project not found"},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        
-        # Check if already added
-        if PortfolioProject.objects.filter(portfolio=portfolio, project=project).exists():
-            return Response(
-                {"error": "Project already in portfolio"},
+                {"error": "project_type must be 'roadmap' or 'student'"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        portfolio_project = PortfolioProject.objects.create(
-            portfolio=portfolio,
-            project=project
-        )
+        if project_type == 'roadmap':
+            from roadmap_ai.models import Project
+            project = get_object_or_404(Project, id=project_id)
+            
+            # Verify project belongs to user's roadmap
+            if project.milestone.roadmap.user != request.user:
+                return Response(
+                    {"error": "Project not found"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Check if already added
+            if PortfolioProject.objects.filter(
+                portfolio=portfolio, 
+                project_type='roadmap',
+                project=project
+            ).exists():
+                return Response(
+                    {"error": "Project already in portfolio"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            portfolio_project = PortfolioProject.objects.create(
+                portfolio=portfolio,
+                project_type='roadmap',
+                project=project
+            )
+        else:  # student project
+            from roadmap_ai.models import StudentProject
+            student_project = get_object_or_404(StudentProject, id=project_id)
+            
+            # Verify project belongs to user
+            if student_project.user != request.user:
+                return Response(
+                    {"error": "Project not found"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Check if already added
+            if PortfolioProject.objects.filter(
+                portfolio=portfolio,
+                project_type='student',
+                student_project=student_project
+            ).exists():
+                return Response(
+                    {"error": "Project already in portfolio"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            portfolio_project = PortfolioProject.objects.create(
+                portfolio=portfolio,
+                project_type='student',
+                student_project=student_project
+            )
         
         return Response(PortfolioProjectSerializer(portfolio_project).data, status=status.HTTP_201_CREATED)
 
@@ -159,12 +213,23 @@ class PortfolioViewSet(viewsets.ModelViewSet):
         """Remove a project from portfolio."""
         portfolio = get_object_or_404(Portfolio, user=request.user)
         project_id = request.data.get('project_id')
+        project_type = request.data.get('project_type', 'roadmap')
         
-        portfolio_project = get_object_or_404(
-            PortfolioProject,
-            portfolio=portfolio,
-            project_id=project_id
-        )
+        if project_type == 'roadmap':
+            portfolio_project = get_object_or_404(
+                PortfolioProject,
+                portfolio=portfolio,
+                project_type='roadmap',
+                project_id=project_id
+            )
+        else:
+            portfolio_project = get_object_or_404(
+                PortfolioProject,
+                portfolio=portfolio,
+                project_type='student',
+                student_project_id=project_id
+            )
+        
         portfolio_project.delete()
         
         return Response({"message": "Project removed from portfolio"})

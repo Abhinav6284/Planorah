@@ -28,9 +28,10 @@ export const githubService = {
     },
 
     // Publish project to GitHub
-    publish: async (projectId, repoName = null, isPrivate = false, commitMessage = null) => {
+    publish: async (projectId, projectType = 'roadmap', repoName = null, isPrivate = false, commitMessage = null) => {
         const data = {
             project_id: projectId,
+            project_type: projectType,
             is_private: isPrivate
         };
         if (repoName) {
@@ -53,6 +54,13 @@ export const githubService = {
     getLogs: async (repoId = null) => {
         const params = repoId ? { repo_id: repoId } : {};
         const response = await api.get('/api/github/logs/', { params });
+        return response.data;
+    },
+
+    // Sync GitHub stats
+    syncStats: async (repoId = null) => {
+        const data = repoId ? { repo_id: repoId } : {};
+        const response = await api.post('/api/github/sync_stats/', data);
         return response.data;
     }
 };

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from "../api/axios";
+import { setTokens, getRememberMePreference, clearRememberMePreference } from "../utils/auth";
 
 export default function GitHubCallback() {
     const [searchParams] = useSearchParams();
@@ -23,6 +24,8 @@ export default function GitHubCallback() {
             try {
                 const redirectUri = window.location.origin + '/auth/github/callback';
                 const mode = searchParams.get('state') || 'login'; // Get mode from state parameter
+                const rememberMe = getRememberMePreference();
+
                 const res = await axios.post(`${API_BASE_URL}/api/users/github/login/`, {
                     code: code,
                     redirect_uri: redirectUri,
@@ -31,6 +34,7 @@ export default function GitHubCallback() {
 
                 // Check for 2FA
                 if (res.data.two_factor_required) {
+                    // Keep rememberMe preference for OTP verification
                     navigate("/verify-otp", {
                         state: {
                             email: res.data.email,
@@ -40,9 +44,9 @@ export default function GitHubCallback() {
                     return;
                 }
 
-                // Store tokens
-                localStorage.setItem('access_token', res.data.access);
-                localStorage.setItem('refresh_token', res.data.refresh);
+                // Store tokens with rememberMe preference
+                setTokens(res.data.access, res.data.refresh, rememberMe);
+                clearRememberMePreference();
 
                 // Redirect based on onboarding status
                 if (res.data.onboarding_complete) {

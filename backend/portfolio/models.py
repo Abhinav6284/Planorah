@@ -114,17 +114,34 @@ class Portfolio(models.Model):
 class PortfolioProject(models.Model):
     """
     Project displayed on the portfolio.
-    Links to the roadmap project.
+    Links to either a roadmap project or a student project.
     """
+    PROJECT_TYPE_CHOICES = [
+        ('roadmap', 'Roadmap Project'),
+        ('student', 'Student Project'),
+    ]
+    
     portfolio = models.ForeignKey(
         Portfolio,
         on_delete=models.CASCADE,
         related_name='portfolio_projects'
     )
+    
+    # Project type and references
+    project_type = models.CharField(max_length=20, choices=PROJECT_TYPE_CHOICES, default='roadmap')
     project = models.ForeignKey(
         'roadmap_ai.Project',
         on_delete=models.CASCADE,
-        related_name='portfolio_entries'
+        related_name='portfolio_entries',
+        null=True,
+        blank=True
+    )
+    student_project = models.ForeignKey(
+        'roadmap_ai.StudentProject',
+        on_delete=models.CASCADE,
+        related_name='portfolio_entries',
+        null=True,
+        blank=True
     )
     
     # Display settings
@@ -140,20 +157,56 @@ class PortfolioProject(models.Model):
 
     class Meta:
         ordering = ['-is_featured', 'order']
-        constraints = [
-            models.UniqueConstraint(fields=['portfolio', 'project'], name='unique_portfolio_project')
-        ]
 
     def __str__(self):
-        return f"{self.portfolio.user.username} - {self.project.title}"
+        project_title = self.get_project_title()
+        return f"{self.portfolio.user.username} - {project_title}"
+
+    def get_project_title(self):
+        """Get the title of the linked project."""
+        if self.project_type == 'roadmap' and self.project:
+            return self.project.title
+        elif self.project_type == 'student' and self.student_project:
+            return self.student_project.title
+        return "Untitled Project"
+    
+    def get_project_description(self):
+        """Get the description of the linked project."""
+        if self.project_type == 'roadmap' and self.project:
+            return self.project.description
+        elif self.project_type == 'student' and self.student_project:
+            return self.student_project.description
+        return ""
+    
+    def get_tech_stack(self):
+        """Get the tech stack of the linked project."""
+        if self.project_type == 'roadmap' and self.project:
+            return self.project.tech_stack
+        elif self.project_type == 'student' and self.student_project:
+            return self.student_project.tech_stack
+        return []
+    
+    def get_github_url(self):
+        """Get the GitHub URL of the linked project."""
+        if self.project_type == 'roadmap' and self.project:
+            return self.project.github_url
+        elif self.project_type == 'student' and self.student_project:
+            return self.student_project.github_url
+        return None
+    
+    def get_demo_url(self):
+        """Get the demo URL of the linked project."""
+        if self.project_type == 'student' and self.student_project:
+            return self.student_project.live_demo_url
+        return None
 
     @property
     def display_title(self):
-        return self.custom_title or self.project.title
+        return self.custom_title or self.get_project_title()
 
     @property
     def display_description(self):
-        return self.custom_description or self.project.description
+        return self.custom_description or self.get_project_description()
 
 
 class PortfolioAnalytics(models.Model):

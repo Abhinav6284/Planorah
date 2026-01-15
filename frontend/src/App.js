@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
 import { SubscriptionProvider } from "./context/SubscriptionContext";
 import WelcomePage from "./components/WelcomePage";
@@ -15,9 +15,11 @@ import ResetPassword from "./components/ResetPassword";
 import RoadmapGenerator from "./components/Roadmap/RoadmapGenerator";
 import RoadmapView from "./components/Roadmap/RoadmapView";
 import RoadmapList from './components/Roadmap/RoadmapList';
+import RoadmapProjects from './components/Roadmap/RoadmapProjects';
 import LabHub from './components/Lab/LabHub';
-import CodeStudio from './components/Lab/CodeStudio';
+import CodeSpace from './components/Lab/CodeSpace';
 import ResourceHub from './components/Lab/ResourceHub';
+import PublishResearch from './components/Lab/PublishResearch';
 import TaskList from './components/Tasks/TaskList';
 import DayTimeline from './components/Tasks/DayTimeline';
 import FocusMode from './components/Tasks/FocusMode';
@@ -40,9 +42,42 @@ import PricingPage from './components/Subscription/PricingPage';
 import SubscriptionStatus from './components/Subscription/SubscriptionStatus';
 import CheckoutPage from './components/Billing/CheckoutPage';
 import PaymentHistory from './components/Billing/PaymentHistory';
-import PortfolioEditor from './components/Portfolio/PortfolioEditor';
+import { PortfolioEditor, ProjectManager, PublicPortfolio } from './components/Portfolio';
 
 export default function App() {
+  // Subdomain detection logic
+  const hostname = window.location.hostname;
+  const parts = hostname.split('.');
+
+  // Logic to determine if we are on a user subdomain
+  // On production: username.planorah.me
+  // On local: username.localhost (if configured)
+  const isLocal = hostname.includes('localhost') || hostname.includes('127.0.0.1');
+  const domainParts = isLocal ? 1 : 2; // planorah.me (2) vs localhost (1)
+
+  let subdomain = null;
+  if (parts.length > domainParts) {
+    const potentialSubdomain = parts[0];
+    if (potentialSubdomain !== 'www' && potentialSubdomain !== 'planorah') {
+      subdomain = potentialSubdomain;
+    }
+  }
+
+  // If we are on a subdomain, show the public portfolio
+  if (subdomain) {
+    return (
+      <ThemeProvider>
+        <SubscriptionProvider>
+          <Router>
+            <Routes>
+              <Route path="*" element={<PublicPortfolio subdomain={subdomain} />} />
+            </Routes>
+          </Router>
+        </SubscriptionProvider>
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider>
       <SubscriptionProvider>
@@ -62,6 +97,9 @@ export default function App() {
             <Route path="/auth/spotify/callback" element={<SpotifyCallback />} />
             <Route path="/auth/youtube/callback" element={<YouTubeCallback />} />
 
+            {/* Public Portfolio Route - No Auth Required */}
+            <Route path="/p/:slug" element={<PublicPortfolio />} />
+
             {/* Protected App Routes */}
             <Route element={<Layout />}>
               <Route path="/dashboard" element={<Dashboard />} />
@@ -75,9 +113,12 @@ export default function App() {
               <Route path="/interview" element={<MockInterviewComingSoon />} />
               <Route path="/roadmap/:id" element={<RoadmapView />} />
               <Route path="/roadmap/list" element={<RoadmapList />} />
+              <Route path="/roadmap/projects" element={<RoadmapProjects />} />
               <Route path="/lab" element={<LabHub />} />
-              <Route path="/lab/code" element={<CodeStudio />} />
+              <Route path="/lab/code" element={<Navigate to="/lab/codespace" replace />} />
+              <Route path="/lab/codespace" element={<CodeSpace />} />
               <Route path="/lab/resources" element={<ResourceHub />} />
+              <Route path="/lab/publish" element={<PublishResearch />} />
               <Route path="/tasks" element={<TaskList />} />
               <Route path="/tasks/day" element={<DayTimeline />} />
               <Route path="/tasks/focus" element={<FocusMode />} />
@@ -92,6 +133,7 @@ export default function App() {
               <Route path="/billing/checkout" element={<CheckoutPage />} />
               <Route path="/billing/history" element={<PaymentHistory />} />
               <Route path="/portfolio/edit" element={<PortfolioEditor />} />
+              <Route path="/projects" element={<ProjectManager />} />
             </Route>
           </Routes>
         </Router>

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import PlanoraLogo from "../assets/Planora.svg";
 import { API_BASE_URL } from "../api/axios";
+import { setTokens, getRememberMePreference, clearRememberMePreference } from "../utils/auth";
 
 export default function VerifyOTP() {
   const location = useLocation();
@@ -87,9 +88,10 @@ export default function VerifyOTP() {
       });
 
       if (response.status === 200 || response.status === 201) {
-        // Auto-login: Save tokens
-        localStorage.setItem("access_token", response.data.access);
-        localStorage.setItem("refresh_token", response.data.refresh);
+        // Auto-login: Save tokens with rememberMe preference
+        const rememberMe = getRememberMePreference();
+        setTokens(response.data.access, response.data.refresh, rememberMe);
+        clearRememberMePreference();
 
         // Check if onboarding is complete to decide redirect destination
         const onboardingComplete = response.data.onboarding_complete;

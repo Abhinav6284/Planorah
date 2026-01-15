@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useGoogleLogin } from '@react-oauth/google';
 import { API_BASE_URL } from "../api/axios";
+import { setTokens, setRememberMePreference } from "../utils/auth";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -11,7 +12,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,8 +26,7 @@ export default function Login() {
     try {
       const payload = { identifier: identifier.trim(), password };
       const res = await axios.post(`${API_BASE_URL}/api/users/login/`, payload);
-      localStorage.setItem("access_token", res.data.access);
-      localStorage.setItem("refresh_token", res.data.refresh);
+      setTokens(res.data.access, res.data.refresh, rememberMe);
       setMessage("success:Welcome back!");
       if (res.data.onboarding_complete) {
         setTimeout(() => navigate("/dashboard"), 1500);
@@ -50,6 +51,8 @@ export default function Login() {
           mode: "login"
         });
         if (res.data.two_factor_required) {
+          // Store rememberMe preference for after OTP verification
+          setRememberMePreference(rememberMe);
           // Redirect to OTP verification page
           navigate("/verify-otp", {
             state: {
@@ -60,8 +63,7 @@ export default function Login() {
           return;
         }
 
-        localStorage.setItem("access_token", res.data.access);
-        localStorage.setItem("refresh_token", res.data.refresh);
+        setTokens(res.data.access, res.data.refresh, rememberMe);
         setMessage("success:Google login successful!");
         if (res.data.onboarding_complete) {
           setTimeout(() => navigate("/dashboard"), 1500);
@@ -83,33 +85,7 @@ export default function Login() {
     }
   });
 
-  const handleGoogleSuccess = async (credentialResponse) => {
-    setLoading(true);
-    setMessage("");
-    try {
-      const res = await axios.post(`${API_BASE_URL}/api/users/google/login/`, {
-        token: credentialResponse.credential,
-        mode: "login"
-      });
-      localStorage.setItem("access_token", res.data.access);
-      localStorage.setItem("refresh_token", res.data.refresh);
-      setMessage("success:Google login successful!");
-      if (res.data.onboarding_complete) {
-        setTimeout(() => navigate("/dashboard"), 1500);
-      } else {
-        setTimeout(() => navigate("/onboarding"), 1500);
-      }
-    } catch (err) {
-      const serverMsg = err.response?.data?.error || err.response?.data?.message;
-      setMessage(serverMsg || "Google login failed.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const handleGoogleError = () => {
-    setMessage("Google login failed. Please try again.");
-  };
 
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-yellow-100 flex flex-col justify-between p-4 md:p-6 lg:p-12">
@@ -178,6 +154,20 @@ export default function Login() {
                 />
               </div>
 
+              {/* Remember Me Checkbox */}
+              <div className="flex items-center gap-3 px-2">
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-5 h-5 rounded border-gray-300 text-black focus:ring-black focus:ring-offset-0 cursor-pointer"
+                />
+                <label htmlFor="rememberMe" className="text-gray-600 text-sm cursor-pointer select-none">
+                  Remember me for 15 days
+                </label>
+              </div>
+
               {message && (
                 <div className={`text-sm font-medium ${message.startsWith("success:") ? "text-green-600" : "text-red-500"}`}>
                   {message.replace("success:", "")}
@@ -234,6 +224,8 @@ export default function Login() {
             {/* GitHub Button */}
             <button
               onClick={() => {
+                // Store rememberMe preference for after OAuth callback
+                setRememberMePreference(rememberMe);
                 const clientId = 'Ov23ctPC9ZlwUvXMuyWM';
                 const redirectUri = encodeURIComponent(window.location.origin + '/auth/github/callback');
                 const scope = encodeURIComponent('read:user user:email');

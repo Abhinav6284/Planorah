@@ -1,5 +1,9 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from . import views
+
+router = DefaultRouter()
+router.register('student-projects', views.StudentProjectViewSet, basename='student-project')
 
 urlpatterns = [
     # Generate AI roadmap
@@ -7,6 +11,12 @@ urlpatterns = [
 
     # Get all roadmaps for authenticated user
     path('list/', views.get_user_roadmaps, name='get_user_roadmaps'),
+
+    # Get all roadmap projects with progress
+    path('projects/', views.get_roadmap_projects, name='get_roadmap_projects'),
+    
+    # Get roadmap progress summary
+    path('progress/', views.get_roadmap_progress, name='get_roadmap_progress'),
 
     # Get detailed roadmap by ID
     path('<int:roadmap_id>/', views.get_roadmap_detail, name='get_roadmap_detail'),
@@ -21,4 +31,7 @@ urlpatterns = [
 
     # Schedule roadmap
     path('<int:roadmap_id>/schedule/', views.schedule_roadmap, name='schedule_roadmap'),
+    
+    # Student projects router
+    path('', include(router.urls)),
 ]

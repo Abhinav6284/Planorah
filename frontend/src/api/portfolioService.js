@@ -24,14 +24,20 @@ export const portfolioService = {
     },
 
     // Add project to portfolio
-    addProject: async (projectId) => {
-        const response = await api.post('/api/portfolio/add_project/', { project_id: projectId });
+    addProject: async (projectId, projectType = 'roadmap') => {
+        const response = await api.post('/api/portfolio/add_project/', { 
+            project_id: projectId,
+            project_type: projectType
+        });
         return response.data;
     },
 
     // Remove project from portfolio
-    removeProject: async (projectId) => {
-        const response = await api.post('/api/portfolio/remove_project/', { project_id: projectId });
+    removeProject: async (projectId, projectType = 'roadmap') => {
+        const response = await api.post('/api/portfolio/remove_project/', { 
+            project_id: projectId,
+            project_type: projectType
+        });
         return response.data;
     },
 

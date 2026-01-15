@@ -26,10 +26,10 @@ const ClockWidget = () => {
     const hourNumbers = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 
     return (
-        <div className="h-full flex flex-col items-center justify-center relative p-4">
+        <div className="h-full flex flex-col items-center justify-center relative p-3 sm:p-4">
             {/* Square Watch Container */}
             <div
-                className="relative w-52 h-52 rounded-3xl bg-white dark:bg-[#1a1a1a] transition-colors duration-300"
+                className="relative w-40 h-40 sm:w-52 sm:h-52 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#1a1a1a] transition-colors duration-300"
                 style={{
                     boxShadow: `
                         0 25px 50px -12px rgba(0, 0, 0, 0.25),
@@ -61,8 +61,8 @@ const ClockWidget = () => {
                             >
                                 <div
                                     className={`absolute left-1/2 -translate-x-1/2 transition-colors duration-300 ${i % 5 === 0
-                                            ? 'w-[2px] h-3 bg-black/80 dark:bg-white/80'
-                                            : 'w-[1px] h-1.5 bg-black/20 dark:bg-white/20'
+                                        ? 'w-[2px] h-3 bg-black/80 dark:bg-white/80'
+                                        : 'w-[1px] h-1.5 bg-black/20 dark:bg-white/20'
                                         }`}
                                     style={{ top: '8px' }}
                                 />
@@ -80,8 +80,8 @@ const ClockWidget = () => {
                                 <span
                                     key={num}
                                     className={`absolute transition-colors duration-300 ${num % 3 === 0
-                                            ? 'text-black dark:text-white text-sm font-medium'
-                                            : 'text-black/40 dark:text-white/40 text-xs'
+                                        ? 'text-black dark:text-white text-sm font-medium'
+                                        : 'text-black/40 dark:text-white/40 text-xs'
                                         }`}
                                     style={{
                                         left: `${x}%`,

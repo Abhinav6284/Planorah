@@ -1,9 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
+import { useLocation } from 'react-router-dom';
 import { assistantService } from '../../api/assistantService';
 
 export default function AIAssistant() {
+    const location = useLocation();
+    const initialMessage = location.state?.initialMessage;
+
     const [messages, setMessages] = useState([
         {
             id: 1,
@@ -23,6 +27,7 @@ Just ask me anything about your learning journey!`
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
+    const hasProcessedInitialMessage = useRef(false);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -31,6 +36,48 @@ Just ask me anything about your learning journey!`
     useEffect(() => {
         inputRef.current?.focus();
     }, []);
+
+    const sendMessage = useCallback(async (messageText) => {
+        if (!messageText.trim() || loading) return;
+
+        const userMessage = {
+            id: Date.now(),
+            role: 'user',
+            content: messageText.trim()
+        };
+
+        setMessages(prev => [...prev, userMessage]);
+        setInput('');
+        setLoading(true);
+
+        try {
+            const response = await assistantService.sendMessage(userMessage.content);
+
+            setMessages(prev => [...prev, {
+                id: Date.now() + 1,
+                role: 'assistant',
+                content: response.message || "I'm not sure how to help with that. Try asking about your tasks or roadmaps!"
+            }]);
+        } catch (error) {
+            console.error('Chat error:', error);
+            setMessages(prev => [...prev, {
+                id: Date.now() + 1,
+                role: 'assistant',
+                content: "Sorry, I encountered an error. Please try again."
+            }]);
+        } finally {
+            setLoading(false);
+        }
+    }, [loading]);
+
+    // Handle initial message from dashboard widget
+    useEffect(() => {
+        if (initialMessage && !hasProcessedInitialMessage.current) {
+            hasProcessedInitialMessage.current = true;
+            // Auto-send the initial message
+            sendMessage(initialMessage);
+        }
+    }, [initialMessage, sendMessage]);
 
     const handleSend = async (e) => {
         e?.preventDefault();

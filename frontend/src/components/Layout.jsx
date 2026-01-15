@@ -1,7 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Header from './Dashboard/Header';
-import ChatWidget from './Assistant/ChatWidget';
 
 const Layout = () => {
     return (
@@ -10,7 +9,6 @@ const Layout = () => {
             <main className="flex-1 overflow-auto">
                 <Outlet />
             </main>
-            <ChatWidget />
         </div>
     );
 };

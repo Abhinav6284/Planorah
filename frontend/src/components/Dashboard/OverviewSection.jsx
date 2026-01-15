@@ -5,14 +5,13 @@ import { userService } from "../../api/userService";
 
 // Widgets
 import ProfileCard from "./NewWidgets/ProfileCard";
-import ClockWidget from "./NewWidgets/ClockWidget";
-import MusicWidget from "./NewWidgets/MusicWidget";
+import DateTasksWidget from "./NewWidgets/DateTasksWidget";
+import AIHelpWidget from "./NewWidgets/AIHelpWidget";
 import TaskSchedulerWidget from "./NewWidgets/TaskSchedulerWidget";
-import StatsWidget from "./NewWidgets/StatsWidget";
 import ProgressChartWidget from "./NewWidgets/ProgressChartWidget";
 import QuickStatsWidget from "./NewWidgets/QuickStatsWidget";
-import GitHubWidget from "./NewWidgets/GitHubWidget";
-import SubscriptionWidget from "./NewWidgets/SubscriptionWidget";
+import CodeSpaceWidget from "./NewWidgets/CodeSpaceWidget";
+import ResearchWidget from "./NewWidgets/ResearchWidget";
 import PortfolioWidget from "./NewWidgets/PortfolioWidget";
 import CalendarWidget from "./NewWidgets/CalendarWidget";
 
@@ -20,15 +19,16 @@ export default function OverviewSection() {
     const [loading, setLoading] = useState(true);
     const [userProfile, setUserProfile] = useState(null);
     const [tasks, setTasks] = useState([]);
-    const [stats, setStats] = useState({ completed: 0, pending: 0 });
+    const [streakData, setStreakData] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [statsData, tasksData, profileData] = await Promise.all([
+                const [statsData, tasksData, profileData, detailedStats] = await Promise.all([
                     schedulerService.getDashboardStats(),
                     schedulerService.getTasks(),
-                    userService.getProfile().catch(() => null)
+                    userService.getProfile().catch(() => null),
+                    userService.getStatistics().catch(() => null)
                 ]);
 
                 // Merge profile data for better name display and stats
@@ -37,15 +37,12 @@ export default function OverviewSection() {
                     first_name: profileData?.first_name,
                     last_name: profileData?.last_name,
                     username: profileData?.username,
+                    field_of_study: profileData?.profile?.field_of_study || profileData?.field_of_study || '',
                     xp: profileData?.xp_points || 0 // Map backend xp_points to xp prop
                 };
                 setUserProfile(profile);
                 setTasks(tasksData || []);
-
-                // Calculate stats
-                const completedCount = tasksData?.filter(t => t.status === 'completed').length || 0;
-                const pendingCount = tasksData?.filter(t => t.status !== 'completed').length || 0;
-                setStats({ completed: completedCount, pending: pendingCount });
+                setStreakData(detailedStats);
             } catch (error) {
                 console.error("Failed to fetch dashboard data", error);
             } finally {
@@ -70,99 +67,100 @@ export default function OverviewSection() {
 
     if (loading) return (
         <div className="min-h-screen flex items-center justify-center bg-[#F5F5F7] dark:bg-black">
-            <div className="text-gray-400 animate-pulse text-lg">Loading dashboard...</div>
+            <div className="text-center">
+                <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <div className="text-gray-400 text-lg">Loading dashboard...</div>
+            </div>
         </div>
     );
 
     return (
-        <div className="p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto font-sans bg-[#F5F5F7] dark:bg-black min-h-screen transition-colors duration-200">
-            {/* Header */}
-            <motion.header
+        <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto font-sans bg-[#F5F5F7] dark:bg-black min-h-screen transition-colors duration-200">
+            {/* Top Bar: Date + Greeting + Quick Stats */}
+            <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4"
+                className="flex flex-col lg:flex-row lg:items-center gap-4 mb-4 sm:mb-6"
             >
-                <div>
-                    <h1 className="text-2xl md:text-4xl lg:text-5xl font-light text-gray-900 dark:text-white tracking-tight">
+                {/* Date & Tasks Widget */}
+                <DateTasksWidget tasks={tasks} />
+
+                {/* Greeting - Next to calendar */}
+                <div className="flex-1">
+                    <h1 className="text-2xl sm:text-3xl font-light text-gray-900 dark:text-white tracking-tight">
                         {new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 17 ? 'Good afternoon' : 'Good evening'}, <span className="font-medium">{userProfile?.first_name || userProfile?.username?.split(/(?=[A-Z])/)[0] || "there"}!</span>
                     </h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-2">Here's your learning overview for today.</p>
+                    <p className="text-gray-500 dark:text-gray-400 mt-0.5 text-sm">Here's your learning overview for today.</p>
                 </div>
 
-                {/* Quick Stats (Moved here - Adjacent to Welcome) */}
-                <div className="hidden lg:block pb-1">
+                {/* Quick Stats - Right side */}
+                <div className="flex flex-wrap gap-2">
                     <QuickStatsWidget tasks={tasks} />
                 </div>
-            </motion.header>
+            </motion.div>
 
-            {/* Asymmetric Dashboard Grid */}
+            {/* AI Help Widget - Full width */}
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4 sm:mb-6"
+            >
+                <AIHelpWidget />
+            </motion.div>
+
+            {/* Dashboard Grid - Responsive Layout */}
             <motion.div
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="grid grid-cols-1 lg:grid-cols-12 gap-6"
+                className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5"
             >
-                {/* --- Left Column (Main Content) - Span 8 --- */}
-                <div className="lg:col-span-8 flex flex-col gap-6">
+                {/* --- Left Column (Main Content) - Full width on mobile, 8 cols on lg --- */}
+                <div className="lg:col-span-8 flex flex-col gap-4 sm:gap-6">
 
-                    {/* Top: Task Scheduler (Calendar + Tasks) - NOW MAJOR WIDGET */}
-                    <motion.div variants={itemVariants} className="flex-1 min-h-[400px] md:min-h-[500px]">
+                    {/* Task Scheduler - Main Widget */}
+                    <motion.div variants={itemVariants}>
                         <TaskSchedulerWidget tasks={tasks} />
                     </motion.div>
 
-                    {/* Middle: Stats & Music Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 md:h-[320px]">
-                        {/* Stats Widget */}
-                        <motion.div variants={itemVariants} className="md:col-span-4 h-auto md:h-full">
-                            <StatsWidget completed={stats.completed} pending={stats.pending} />
+                    {/* Bottom Row: GitHub/Research & Portfolio - Stack on mobile */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                        <motion.div variants={itemVariants} className="min-h-[280px]">
+                            {/* Show GitHub for CS/IT, Research for Medical/Science only */}
+                            {(userProfile?.field_of_study?.toLowerCase().includes('computer') ||
+                                userProfile?.field_of_study?.toLowerCase().includes('it')) ? (
+                                <CodeSpaceWidget />
+                            ) : (userProfile?.field_of_study?.toLowerCase().includes('medical') ||
+                                userProfile?.field_of_study?.toLowerCase().includes('life') ||
+                                userProfile?.field_of_study?.toLowerCase().includes('science') ||
+                                userProfile?.field_of_study?.toLowerCase().includes('doctor')) ? (
+                                <ResearchWidget userField={userProfile?.field_of_study} />
+                            ) : (
+                                <PortfolioWidget />
+                            )}
                         </motion.div>
-
-                        {/* Music Widget */}
-                        <motion.div variants={itemVariants} className="md:col-span-8 h-auto md:h-full">
-                            <MusicWidget />
-                        </motion.div>
-                    </div>
-
-                    {/* Bottom Row: GitHub & Portfolio Widgets */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                        {/* GitHub Widget */}
-                        <motion.div variants={itemVariants} className="h-auto min-h-[280px]">
-                            <GitHubWidget />
-                        </motion.div>
-
-                        {/* Portfolio Widget */}
-                        <motion.div variants={itemVariants} className="h-auto min-h-[280px]">
+                        <motion.div variants={itemVariants} className="min-h-[280px]">
                             <PortfolioWidget />
                         </motion.div>
                     </div>
                 </div>
 
-                {/* --- Right Column (Side Panel) - Span 4 --- */}
-                <div className="lg:col-span-4 flex flex-col gap-6">
+                {/* --- Right Column (Side Panel) - Full width on mobile, 4 cols on lg --- */}
+                <div className="lg:col-span-4 flex flex-col gap-4 sm:gap-6">
 
-                    {/* Calendar Widget */}
-                    <motion.div variants={itemVariants} className="h-auto min-h-[280px]">
-                        <CalendarWidget />
+                    {/* Profile Card - Full Width */}
+                    <motion.div variants={itemVariants} className="min-h-[200px]">
+                        <ProfileCard user={userProfile} streak={streakData} />
                     </motion.div>
 
-                    {/* Progress Chart */}
-                    <motion.div variants={itemVariants} className="h-auto md:h-[280px] bg-white dark:bg-[#111] rounded-[32px] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    {/* Weekly Progress Chart */}
+                    <motion.div variants={itemVariants} className="min-h-[220px]">
                         <ProgressChartWidget data={tasks} />
                     </motion.div>
 
-                    {/* Subscription Widget */}
-                    <motion.div variants={itemVariants} className="h-auto min-h-[220px]">
-                        <SubscriptionWidget />
-                    </motion.div>
-
-                    {/* Clock Widget */}
-                    <motion.div variants={itemVariants} className="h-auto md:h-[260px]">
-                        <ClockWidget />
-                    </motion.div>
-
-                    {/* Profile Card */}
-                    <motion.div variants={itemVariants} className="h-auto">
-                        <ProfileCard user={userProfile} />
+                    {/* Calendar Widget */}
+                    <motion.div variants={itemVariants} className="min-h-[250px]">
+                        <CalendarWidget />
                     </motion.div>
                 </div>
             </motion.div>

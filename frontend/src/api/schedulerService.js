@@ -1,9 +1,14 @@
 import api from "../api";
 
 export const schedulerService = {
-    // Tasks
+    // Tasks - Fetch roadmap tasks which have proper due_date for filtering
     getTasks: async () => {
-        const response = await api.get("dashboard/tasks/");
+        const response = await api.get("tasks/");
+        return response.data;
+    },
+
+    getTaskGuidance: async (taskId) => {
+        const response = await api.get(`tasks/${taskId}/guidance/`);
         return response.data;
     },
 

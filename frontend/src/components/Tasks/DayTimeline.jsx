@@ -1,19 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { tasksService } from '../../api/tasksService';
 import { motion } from 'framer-motion';
 import { format, addDays, startOfToday } from 'date-fns';
 
 export default function DayTimeline() {
     const [tasks, setTasks] = useState([]);
-    const [selectedDate, setSelectedDate] = useState(startOfToday());
     const [selectedDay, setSelectedDay] = useState(1);
     const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetchDayTasks();
-    }, [selectedDay]);
-
-    const fetchDayTasks = async () => {
+    const fetchDayTasks = useCallback(async () => {
         try {
             const response = await tasksService.getTasksByDay(selectedDay);
             setTasks(response.data);
@@ -22,7 +16,11 @@ export default function DayTimeline() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [selectedDay]);
+
+    useEffect(() => {
+        fetchDayTasks();
+    }, [selectedDay, fetchDayTasks]);
 
     const completeTask = async (taskId) => {
         try {
@@ -94,7 +92,11 @@ export default function DayTimeline() {
 
                 {/* Tasks for the Day */}
                 <div className="space-y-3">
-                    {tasks.length === 0 ? (
+                    {loading ? (
+                        <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl">
+                            <p className="text-gray-400">Loading tasks...</p>
+                        </div>
+                    ) : tasks.length === 0 ? (
                         <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl">
                             <p className="text-gray-400">No tasks scheduled for this day</p>
                         </div>

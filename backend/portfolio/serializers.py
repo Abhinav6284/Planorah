@@ -5,10 +5,12 @@ from .models import Portfolio, PortfolioProject, PortfolioAnalytics
 class PortfolioProjectSerializer(serializers.ModelSerializer):
     """Serializer for portfolio projects."""
     
-    project_title = serializers.CharField(source='project.title', read_only=True)
-    project_description = serializers.CharField(source='project.description', read_only=True)
-    tech_stack = serializers.JSONField(source='project.tech_stack', read_only=True)
-    github_url = serializers.URLField(source='project.github_url', read_only=True)
+    # Project info based on type
+    project_title = serializers.SerializerMethodField()
+    project_description = serializers.SerializerMethodField()
+    tech_stack = serializers.SerializerMethodField()
+    github_url = serializers.SerializerMethodField()
+    demo_url = serializers.SerializerMethodField()
     display_title = serializers.ReadOnlyField()
     display_description = serializers.ReadOnlyField()
     
@@ -16,11 +18,14 @@ class PortfolioProjectSerializer(serializers.ModelSerializer):
         model = PortfolioProject
         fields = [
             'id',
+            'project_type',
             'project',
+            'student_project',
             'project_title',
             'project_description',
             'tech_stack',
             'github_url',
+            'demo_url',
             'order',
             'is_featured',
             'is_visible',
@@ -30,6 +35,21 @@ class PortfolioProjectSerializer(serializers.ModelSerializer):
             'display_description',
         ]
         read_only_fields = ['id']
+    
+    def get_project_title(self, obj):
+        return obj.get_project_title()
+    
+    def get_project_description(self, obj):
+        return obj.get_project_description()
+    
+    def get_tech_stack(self, obj):
+        return obj.get_tech_stack()
+    
+    def get_github_url(self, obj):
+        return obj.get_github_url()
+    
+    def get_demo_url(self, obj):
+        return obj.get_demo_url()
 
 
 class PortfolioSerializer(serializers.ModelSerializer):

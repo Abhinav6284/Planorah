@@ -312,10 +312,10 @@ export default function SupportPage() {
                                     Follow us for updates and tips
                                 </p>
                                 <div className="flex justify-center gap-4">
-                                    <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                                    <a href="#!" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
                                         Twitter/X
                                     </a>
-                                    <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                                    <a href="#!" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
                                         LinkedIn
                                     </a>
                                 </div>

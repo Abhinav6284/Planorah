@@ -725,3 +725,165 @@ def schedule_roadmap(request, roadmap_id):
             "details": str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_roadmap_projects(request):
+    """
+    Get all projects from all roadmaps for the authenticated user.
+    Projects are auto-pulled from roadmap milestones with progress tracking.
+    """
+    try:
+        from tasks.models import Task
+        
+        user_roadmaps = Roadmap.objects.filter(user=request.user)
+        all_projects = []
+        
+        for roadmap in user_roadmaps:
+            milestones = roadmap.milestones.all()
+            
+            for milestone in milestones:
+                for project in milestone.projects.all():
+                    # Calculate project progress based on related tasks
+                    project_tasks = Task.objects.filter(
+                        roadmap=roadmap,
+                        milestone=milestone,
+                        tags__contains=['project']
+                    )
+                    
+                    total_tasks = project_tasks.count()
+                    completed_tasks = project_tasks.filter(status='completed').count()
+                    in_progress_tasks = project_tasks.filter(status='in_progress').count()
+                    
+                    # Calculate progress percentage
+                    progress = 0
+                    if total_tasks > 0:
+                        progress = int((completed_tasks / total_tasks) * 100)
+                    
+                    # Determine status
+                    if progress == 100:
+                        status_val = 'completed'
+                    elif progress > 0 or in_progress_tasks > 0:
+                        status_val = 'in_progress'
+                    else:
+                        status_val = 'not_started'
+                    
+                    all_projects.append({
+                        'id': project.id,
+                        'title': project.title,
+                        'description': project.description,
+                        'difficulty': project.difficulty,
+                        'estimated_hours': project.estimated_hours,
+                        'tech_stack': project.tech_stack,
+                        'learning_outcomes': project.learning_outcomes,
+                        'roadmap_id': roadmap.id,
+                        'roadmap_title': roadmap.title,
+                        'milestone_id': milestone.id,
+                        'milestone_title': milestone.title,
+                        'progress': progress,
+                        'status': status_val,
+                        'total_tasks': total_tasks,
+                        'completed_tasks': completed_tasks,
+                        'completed': project.completed,
+                    })
+        
+        return Response(all_projects)
+        
+    except Exception as e:
+        print(f"❌ Error fetching roadmap projects: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return Response({
+            "error": "Failed to fetch projects",
+            "details": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_roadmap_progress(request):
+    """
+    Get progress summary for all user roadmaps.
+    """
+    try:
+        from tasks.models import Task
+        
+        user_roadmaps = Roadmap.objects.filter(user=request.user)
+        progress_data = []
+        
+        for roadmap in user_roadmaps:
+            tasks = Task.objects.filter(roadmap=roadmap)
+            total_tasks = tasks.count()
+            completed_tasks = tasks.filter(status='completed').count()
+            
+            milestones = roadmap.milestones.all()
+            total_milestones = milestones.count()
+            completed_milestones = milestones.filter(is_completed=True).count()
+            
+            progress = 0
+            if total_tasks > 0:
+                progress = int((completed_tasks / total_tasks) * 100)
+            
+            progress_data.append({
+                'id': roadmap.id,
+                'title': roadmap.title,
+                'goal': roadmap.goal,
+                'progress': progress,
+                'total_tasks': total_tasks,
+                'completed_tasks': completed_tasks,
+                'total_milestones': total_milestones,
+                'completed_milestones': completed_milestones,
+                'difficulty_level': roadmap.difficulty_level,
+                'estimated_duration': roadmap.estimated_duration,
+            })
+        
+        return Response(progress_data)
+        
+    except Exception as e:
+        print(f"❌ Error fetching roadmap progress: {str(e)}")
+        return Response({
+            "error": "Failed to fetch progress",
+            "details": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# Student Projects ViewSet
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from .models import StudentProject
+from .serializers import StudentProjectSerializer, StudentProjectCreateSerializer
+
+
+class StudentProjectViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing student-uploaded projects.
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            return StudentProjectCreateSerializer
+        return StudentProjectSerializer
+    
+    def get_queryset(self):
+        return StudentProject.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+    
+    @action(detail=False, methods=['get'])
+    def stats(self, request):
+        """Get statistics about student projects."""
+        queryset = self.get_queryset()
+        
+        total = queryset.count()
+        with_github = queryset.exclude(github_url__isnull=True).exclude(github_url='').count()
+        public = queryset.filter(visibility='public').count()
+        
+        return Response({
+            'total_projects': total,
+            'projects_on_github': with_github,
+            'public_projects': public,
+            'private_projects': total - public,
+        })
+

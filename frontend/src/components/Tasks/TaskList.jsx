@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { tasksService } from '../../api/tasksService';
 import { roadmapService } from '../../api/roadmapService';
@@ -45,27 +45,16 @@ export default function TaskList() {
         }
     }, [highlightedTaskId, loading, tasks]);
 
-    useEffect(() => {
-        fetchRoadmaps();
-    }, []);
-
-    useEffect(() => {
-        fetchTasks();
-        return () => {
-            if (undoTimeoutRef.current) clearTimeout(undoTimeoutRef.current);
-        };
-    }, [filter, selectedRoadmap]);
-
-    const fetchRoadmaps = async () => {
+    const fetchRoadmaps = useCallback(async () => {
         try {
             const data = await roadmapService.getUserRoadmaps();
             setRoadmaps(data);
         } catch (error) {
             console.error('Failed to fetch roadmaps:', error);
         }
-    };
+    }, []);
 
-    const fetchTasks = async () => {
+    const fetchTasks = useCallback(async () => {
         try {
             const filters = {};
             if (filter !== 'all') filters.status = filter;
@@ -77,7 +66,18 @@ export default function TaskList() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [filter, selectedRoadmap]);
+
+    useEffect(() => {
+        fetchRoadmaps();
+    }, [fetchRoadmaps]);
+
+    useEffect(() => {
+        fetchTasks();
+        return () => {
+            if (undoTimeoutRef.current) clearTimeout(undoTimeoutRef.current);
+        };
+    }, [filter, selectedRoadmap, fetchTasks]);
 
     const updateTask = async (taskId, updates) => {
         try {
@@ -291,8 +291,8 @@ export default function TaskList() {
                                                             key={task.id}
                                                             ref={el => taskRefs.current[task.id] = el}
                                                             className={`relative group transition-all duration-500 ${highlightedTaskId === task.id
-                                                                    ? 'ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-gray-800 rounded-xl'
-                                                                    : ''
+                                                                ? 'ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-gray-800 rounded-xl'
+                                                                : ''
                                                                 }`}
                                                         >
                                                             {task.milestone_title && (
