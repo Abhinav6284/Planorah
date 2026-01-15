@@ -82,7 +82,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-    @action(detail=False, methods=['patch'], permission_classes=[IsAuthenticated, HasActiveOrGraceSubscription])
+    @action(detail=False, methods=['patch'], permission_classes=[IsAuthenticated])
     def update_settings(self, request):
         """Update portfolio settings."""
         portfolio = get_object_or_404(Portfolio, user=request.user)
