@@ -29,3 +29,102 @@ INFO 2026-01-08 20:50:49,693 autoreload Watching for file changes with StatReloa
 INFO 2026-01-08 21:51:16,895 autoreload Watching for file changes with StatReloader
 INFO 2026-01-08 21:51:39,819 autoreload Watching for file changes with StatReloader
 INFO 2026-01-08 21:56:55,264 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:09:24,669 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:12:53,295 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:13:05,710 autoreload P:\Planora\backend\tasks\views.py changed, reloading.
+INFO 2026-01-16 22:13:09,079 autoreload Watching for file changes with StatReloader
+WARNING 2026-01-16 22:13:25,435 log Not Found: /
+WARNING 2026-01-16 22:13:25,439 runserver [33mHTTP GET / 404 [0.04, 127.0.0.1:60308][0m
+WARNING 2026-01-16 22:13:25,675 log Not Found: /favicon.ico
+WARNING 2026-01-16 22:13:25,678 runserver [33mHTTP GET /favicon.ico 404 [0.01, 127.0.0.1:60308][0m
+INFO 2026-01-16 22:16:31,903 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:21:41,163 autoreload P:\Planora\backend\backend\settings.py changed, reloading.
+INFO 2026-01-16 22:21:41,833 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:21:46,935 autoreload P:\Planora\backend\backend\settings.py changed, reloading.
+INFO 2026-01-16 22:21:47,519 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:23:48,642 autoreload P:\Planora\backend\backend\settings.py changed, reloading.
+INFO 2026-01-16 22:23:49,947 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:32:06,122 autoreload P:\Planora\backend\roadmap_ai\models.py changed, reloading.
+INFO 2026-01-16 22:32:06,800 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:32:26,398 autoreload P:\Planora\backend\roadmap_ai\models.py changed, reloading.
+INFO 2026-01-16 22:32:26,985 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:32:29,817 autoreload P:\Planora\backend\roadmap_ai\models.py changed, reloading.
+INFO 2026-01-16 22:32:30,380 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:32:38,351 autoreload P:\Planora\backend\roadmap_ai\serializers.py changed, reloading.
+INFO 2026-01-16 22:32:38,922 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:32:47,943 autoreload P:\Planora\backend\roadmap_ai\serializers.py changed, reloading.
+INFO 2026-01-16 22:32:48,537 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:33:27,599 autoreload P:\Planora\backend\roadmap_ai\serializers.py changed, reloading.
+INFO 2026-01-16 22:33:28,229 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:33:43,498 autoreload P:\Planora\backend\roadmap_ai\urls.py changed, reloading.
+INFO 2026-01-16 22:33:44,077 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:34:27,518 autoreload P:\Planora\backend\tasks\models.py changed, reloading.
+INFO 2026-01-16 22:34:28,273 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:35:52,277 autoreload P:\Planora\backend\tasks\models.py changed, reloading.
+INFO 2026-01-16 22:35:52,923 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:36:26,498 autoreload P:\Planora\backend\tasks\models.py changed, reloading.
+INFO 2026-01-16 22:36:27,059 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:37:16,084 autoreload P:\Planora\backend\tasks\serializers.py changed, reloading.
+INFO 2026-01-16 22:37:16,904 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:38:07,603 autoreload P:\Planora\backend\tasks\views.py changed, reloading.
+INFO 2026-01-16 22:38:08,412 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:38:32,389 autoreload P:\Planora\backend\tasks\views.py changed, reloading.
+INFO 2026-01-16 22:38:33,120 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:38:48,143 autoreload P:\Planora\backend\roadmap_ai\models.py changed, reloading.
+INFO 2026-01-16 22:38:48,954 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:38:59,256 autoreload P:\Planora\backend\roadmap_ai\serializers.py changed, reloading.
+INFO 2026-01-16 22:38:59,990 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:39:13,318 autoreload P:\Planora\backend\roadmap_ai\serializers.py changed, reloading.
+INFO 2026-01-16 22:39:14,216 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 22:44:58,903 autoreload P:\Planora\backend\roadmap_ai\serializers.py changed, reloading.
+INFO 2026-01-16 22:45:00,111 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:00:00,042 autoreload P:\Planora\backend\tasks\validators.py changed, reloading.
+INFO 2026-01-16 23:00:00,724 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:00:29,132 autoreload P:\Planora\backend\tasks\models.py changed, reloading.
+INFO 2026-01-16 23:00:29,836 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:00:47,688 autoreload P:\Planora\backend\tasks\models.py changed, reloading.
+INFO 2026-01-16 23:00:48,380 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:01:25,161 autoreload P:\Planora\backend\tasks\task_views.py changed, reloading.
+INFO 2026-01-16 23:01:25,866 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:01:43,667 autoreload P:\Planora\backend\tasks\serializers.py changed, reloading.
+INFO 2026-01-16 23:01:44,345 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:02:14,834 autoreload P:\Planora\backend\tasks\task_views.py changed, reloading.
+INFO 2026-01-16 23:02:15,541 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:03:07,178 autoreload P:\Planora\backend\tasks\task_views.py changed, reloading.
+INFO 2026-01-16 23:03:07,870 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:03:23,424 autoreload P:\Planora\backend\tasks\task_views.py changed, reloading.
+INFO 2026-01-16 23:03:24,114 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:03:37,684 autoreload P:\Planora\backend\tasks\urls.py changed, reloading.
+INFO 2026-01-16 23:03:38,377 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:04:10,798 autoreload P:\Planora\backend\tasks\task_views.py changed, reloading.
+INFO 2026-01-16 23:04:11,768 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:04:14,277 autoreload P:\Planora\backend\tasks\task_views.py changed, reloading.
+INFO 2026-01-16 23:04:15,036 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:04:52,949 autoreload P:\Planora\backend\tasks\stagnation.py changed, reloading.
+INFO 2026-01-16 23:04:53,806 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:06:04,221 autoreload P:\Planora\backend\tasks\validators.py changed, reloading.
+INFO 2026-01-16 23:06:04,965 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:09:27,593 autoreload P:\Planora\backend\tasks\models.py changed, reloading.
+INFO 2026-01-16 23:09:28,273 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:10:52,924 autoreload P:\Planora\backend\tasks\task_views.py changed, reloading.
+INFO 2026-01-16 23:10:53,611 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:11:04,044 autoreload P:\Planora\backend\tasks\task_views.py changed, reloading.
+INFO 2026-01-16 23:11:04,747 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:11:55,375 autoreload P:\Planora\backend\tasks\urls.py changed, reloading.
+INFO 2026-01-16 23:11:56,060 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:12:43,394 autoreload P:\Planora\backend\tasks\admin_views.py changed, reloading.
+INFO 2026-01-16 23:12:44,043 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:13:01,956 autoreload P:\Planora\backend\tasks\task_views.py changed, reloading.
+INFO 2026-01-16 23:13:02,744 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:17:09,608 autoreload P:\Planora\backend\tasks\task_views.py changed, reloading.
+INFO 2026-01-16 23:17:10,756 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:19:08,090 autoreload P:\Planora\backend\tasks\urls.py changed, reloading.
+INFO 2026-01-16 23:19:08,789 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:19:12,974 autoreload P:\Planora\backend\tasks\urls.py changed, reloading.
+INFO 2026-01-16 23:19:13,666 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:19:18,823 autoreload P:\Planora\backend\tasks\urls.py changed, reloading.
+INFO 2026-01-16 23:19:19,516 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:19:58,357 autoreload P:\Planora\backend\tasks\resume_compiler.py changed, reloading.
+INFO 2026-01-16 23:19:59,043 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:20:50,243 autoreload P:\Planora\backend\tasks\resume_models.py changed, reloading.
+INFO 2026-01-16 23:20:51,185 autoreload Watching for file changes with StatReloader

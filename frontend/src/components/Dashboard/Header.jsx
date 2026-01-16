@@ -42,6 +42,7 @@ const Header = () => {
             type: "dropdown",
             items: [
                 { path: "/resume", label: "Resume Builder" },
+                { path: "/resume/compiled", label: "Compiled Resumes" },
                 { path: "/ats", label: "Find Your Fit" },
                 { path: "/jobs", label: "Job Finder" },
                 { path: "/interview", label: "Mock Interview" },

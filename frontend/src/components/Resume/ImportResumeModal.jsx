@@ -56,7 +56,7 @@ export default function ImportResumeModal({ isOpen, onClose, onSuccess }) {
         formData.append('file', file);
 
         try {
-            const response = await axios.post(`${API_BASE_URL}/api/resume/import/`, formData, {
+            const response = await axios.post(`/resume/import/`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'
@@ -87,7 +87,7 @@ export default function ImportResumeModal({ isOpen, onClose, onSuccess }) {
         formData.append('file', file);
 
         try {
-            const response = await axios.post(`${API_BASE_URL}/api/resume/analyze-ats/`, formData, {
+            const response = await axios.post(`/resume/analyze-ats/`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'

@@ -20,6 +20,7 @@ urlpatterns = [
     path('api/', include('tasks.urls')),  # Tasks and Notes API
     path('api/assistant/', include('assistant.urls')),  # AI Assistant Chat
     path('api/music/', include('music.urls')),  # Music Integration (Spotify/YouTube)
+    path('api/lifecycle/', include('user_lifecycle.urls')),  # Phase-gating and Lifecycle
     # Career execution platform modules
     path('api/plans/', include('plans.urls')),
     path('api/subscriptions/', include('subscriptions.urls')),

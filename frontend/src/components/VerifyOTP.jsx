@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
-import { API_BASE_URL } from "../api/axios";
 import { setTokens, getRememberMePreference, clearRememberMePreference } from "../utils/auth";
 
 export default function VerifyOTP() {
@@ -76,9 +75,9 @@ export default function VerifyOTP() {
     setMessage({ text: "", type: "" });
 
     try {
-      let endpoint = `${API_BASE_URL}/api/users/verify-otp/`;
+      let endpoint = `/users/verify-otp/`;
       if (location.state && location.state.isLogin) {
-        endpoint = `${API_BASE_URL}/api/users/verify-social-otp/`;
+        endpoint = `/users/verify-social-otp/`;
       }
 
       const response = await axios.post(endpoint, {
@@ -127,7 +126,7 @@ export default function VerifyOTP() {
     setMessage({ text: "", type: "" });
 
     try {
-      await axios.post(`${API_BASE_URL}/api/users/resend-otp/`, { email });
+      await axios.post(`/users/resend-otp/`, { email });
       setMessage({ text: "A new OTP has been sent to your email", type: "success" });
       setCountdown(60); // 60 second cooldown
       setOtp(["", "", "", "", "", ""]);

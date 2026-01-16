@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_BASE_URL } from "../../api/axios";
 import { motion } from "framer-motion";
 
 export default function InterviewSetup() {
@@ -14,7 +13,7 @@ export default function InterviewSetup() {
         setLoading(true);
         try {
             const token = localStorage.getItem("access_token");
-            const res = await axios.post(`${API_BASE_URL}/api/interview/start/`, {
+            const res = await axios.post(`/interview/start/`, {
                 job_role: jobRole,
                 topic: topic
             }, {

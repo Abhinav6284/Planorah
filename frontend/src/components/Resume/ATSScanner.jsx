@@ -1,7 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import { API_BASE_URL } from "../../api/axios";
 
 // Circular Score Component
 const CircularScore = ({ score, size = 160, strokeWidth = 12 }) => {
@@ -152,7 +151,7 @@ export default function ATSScanner() {
         }
 
         try {
-            const response = await axios.post(`${API_BASE_URL}/api/resume/analyze-ats/`, formData, {
+            const response = await axios.post(`/resume/analyze-ats/`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'

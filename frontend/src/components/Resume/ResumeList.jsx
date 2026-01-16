@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import { API_BASE_URL } from "../../api/axios";
 
 // Semi-circular Score Gauge Component
 const ScoreGauge = ({ score, size = 120 }) => {
@@ -161,7 +160,7 @@ const JobMatchModal = ({ isOpen, onClose, resume, onMatch }) => {
 
         try {
             const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-            const response = await axios.post(`${API_BASE_URL}/api/resume/analyze-ats/`, {
+            const response = await axios.post(`/resume/analyze-ats/`, {
                 resume_id: resume.id,
                 job_description: jobDescription
             }, {
@@ -316,7 +315,7 @@ const ImportAnalyzeModal = ({ isOpen, onClose, onSuccess }) => {
 
         try {
             // First analyze
-            const atsResponse = await axios.post(`${API_BASE_URL}/api/resume/analyze-ats/`, formData, {
+            const atsResponse = await axios.post(`/resume/analyze-ats/`, formData, {
                 headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
             });
             setResult(atsResponse.data);
@@ -335,7 +334,7 @@ const ImportAnalyzeModal = ({ isOpen, onClose, onSuccess }) => {
         formData.append('file', file);
 
         try {
-            const response = await axios.post(`${API_BASE_URL}/api/resume/import/`, formData, {
+            const response = await axios.post(`/resume/import/`, formData, {
                 headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
             });
             onSuccess(response.data);
@@ -493,7 +492,7 @@ export default function ResumeList() {
     const fetchResumes = async () => {
         try {
             const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-            const response = await axios.get(`${API_BASE_URL}/api/resume/list/`, {
+            const response = await axios.get(`/resume/list/`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // Add mock ATS scores for demo
@@ -516,7 +515,7 @@ export default function ResumeList() {
         if (!window.confirm('Delete this resume?')) return;
         try {
             const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-            await axios.delete(`${API_BASE_URL}/api/resume/${id}/delete/`, {
+            await axios.delete(`/resume/${id}/delete/`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setResumes(resumes.filter(r => r.id !== id));
