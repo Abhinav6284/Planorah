@@ -128,3 +128,276 @@ INFO 2026-01-16 23:19:58,357 autoreload P:\Planora\backend\tasks\resume_compiler
 INFO 2026-01-16 23:19:59,043 autoreload Watching for file changes with StatReloader
 INFO 2026-01-16 23:20:50,243 autoreload P:\Planora\backend\tasks\resume_models.py changed, reloading.
 INFO 2026-01-16 23:20:51,185 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:27:45,383 basehttp "POST /api/users/login/ HTTP/1.1" 200 620
+WARNING 2026-01-16 23:27:46,953 log Not Found: /users/profile/
+WARNING 2026-01-16 23:27:46,958 basehttp "GET /users/profile/ HTTP/1.1" 404 179
+WARNING 2026-01-16 23:27:46,974 log Not Found: /users/profile/
+WARNING 2026-01-16 23:27:46,976 basehttp "GET /users/profile/ HTTP/1.1" 404 179
+WARNING 2026-01-16 23:28:18,839 log Not Found: /users/update-profile/
+WARNING 2026-01-16 23:28:18,840 basehttp "PATCH /users/update-profile/ HTTP/1.1" 404 179
+WARNING 2026-01-16 23:28:30,519 log Not Found: /api/api/users/profile/
+WARNING 2026-01-16 23:28:30,540 basehttp "GET /api/api/users/profile/ HTTP/1.1" 404 179
+INFO 2026-01-16 23:28:30,675 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+WARNING 2026-01-16 23:28:30,688 log Not Found: /api/api/users/statistics/
+WARNING 2026-01-16 23:28:30,691 basehttp "GET /api/api/users/statistics/ HTTP/1.1" 404 179
+WARNING 2026-01-16 23:28:30,714 log Not Found: /api/api/subscriptions/current/
+WARNING 2026-01-16 23:28:30,723 basehttp "GET /api/api/subscriptions/current/ HTTP/1.1" 404 179
+ERROR 2026-01-16 23:28:30,731 log Internal Server Error: /api/tasks/
+Traceback (most recent call last):
+  File "P:\Planora\.venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.UndefinedColumn: column tasks_task.weight does not exist
+LINE 1: ...ask"."max_attempts", "tasks_task"."is_core_task", "tasks_tas...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "P:\Planora\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "P:\Planora\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "P:\Planora\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\mixins.py", line 46, in list
+    return Response(serializer.data)
+                    ^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\serializers.py", line 797, in data
+    ret = super().data
+          ^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\serializers.py", line 251, in data
+    self._data = self.to_representation(self.instance)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\serializers.py", line 716, in to_representation
+    self.child.to_representation(item) for item in iterable
+                                                   ^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\query.py", line 384, in __iter__
+    self._fetch_all()
+    ~~~~~~~~~~~~~~~^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\query.py", line 1949, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+        chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
+    )
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1623, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "P:\Planora\.venv\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "P:\Planora\.venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+django.db.utils.ProgrammingError: column tasks_task.weight does not exist
+LINE 1: ...ask"."max_attempts", "tasks_task"."is_core_task", "tasks_tas...
+                                                             ^
+
+WARNING 2026-01-16 23:28:30,735 log Not Found: /api/api/users/profile/
+WARNING 2026-01-16 23:28:30,763 basehttp "GET /api/api/users/profile/ HTTP/1.1" 404 179
+ERROR 2026-01-16 23:28:30,763 basehttp "GET /api/tasks/ HTTP/1.1" 500 145
+WARNING 2026-01-16 23:28:30,784 log Not Found: /api/api/users/statistics/
+WARNING 2026-01-16 23:28:30,785 basehttp "GET /api/api/users/statistics/ HTTP/1.1" 404 179
+WARNING 2026-01-16 23:28:30,794 log Not Found: /api/api/subscriptions/current/
+WARNING 2026-01-16 23:28:30,798 basehttp "GET /api/api/subscriptions/current/ HTTP/1.1" 404 179
+WARNING 2026-01-16 23:28:30,811 log Not Found: /api/api/users/profile/
+WARNING 2026-01-16 23:28:30,818 basehttp "GET /api/api/users/profile/ HTTP/1.1" 404 179
+WARNING 2026-01-16 23:28:30,827 log Not Found: /api/api/users/profile/
+WARNING 2026-01-16 23:28:30,828 basehttp "GET /api/api/users/profile/ HTTP/1.1" 404 179
+INFO 2026-01-16 23:28:30,872 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+WARNING 2026-01-16 23:28:30,888 log Not Found: /api/api/portfolio/my_portfolio/
+ERROR 2026-01-16 23:28:30,893 log Internal Server Error: /api/tasks/
+Traceback (most recent call last):
+  File "P:\Planora\.venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.UndefinedColumn: column tasks_task.weight does not exist
+LINE 1: ...ask"."max_attempts", "tasks_task"."is_core_task", "tasks_tas...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "P:\Planora\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "P:\Planora\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "P:\Planora\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\mixins.py", line 46, in list
+    return Response(serializer.data)
+                    ^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\serializers.py", line 797, in data
+    ret = super().data
+          ^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\serializers.py", line 251, in data
+    self._data = self.to_representation(self.instance)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\serializers.py", line 716, in to_representation
+    self.child.to_representation(item) for item in iterable
+                                                   ^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\query.py", line 384, in __iter__
+    self._fetch_all()
+    ~~~~~~~~~~~~~~~^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\query.py", line 1949, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+        chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
+    )
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1623, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "P:\Planora\.venv\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "P:\Planora\.venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+django.db.utils.ProgrammingError: column tasks_task.weight does not exist
+LINE 1: ...ask"."max_attempts", "tasks_task"."is_core_task", "tasks_tas...
+                                                             ^
+
+WARNING 2026-01-16 23:28:30,894 basehttp "GET /api/api/portfolio/my_portfolio/ HTTP/1.1" 404 179
+WARNING 2026-01-16 23:28:30,905 log Not Found: /api/api/portfolio/my_portfolio/
+ERROR 2026-01-16 23:28:30,906 basehttp "GET /api/tasks/ HTTP/1.1" 500 145
+WARNING 2026-01-16 23:28:30,910 basehttp "GET /api/api/portfolio/my_portfolio/ HTTP/1.1" 404 179
+WARNING 2026-01-16 23:28:30,938 log Not Found: /api/api/portfolio/my_portfolio/
+WARNING 2026-01-16 23:28:30,942 basehttp "GET /api/api/portfolio/my_portfolio/ HTTP/1.1" 404 179
+WARNING 2026-01-16 23:28:30,959 log Not Found: /api/api/portfolio/my_portfolio/
+WARNING 2026-01-16 23:28:30,960 basehttp "GET /api/api/portfolio/my_portfolio/ HTTP/1.1" 404 179
+INFO 2026-01-16 23:28:31,027 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-01-16 23:28:31,142 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+WARNING 2026-01-16 23:28:40,981 log Not Found: /resume/list/
+WARNING 2026-01-16 23:28:40,992 basehttp "GET /resume/list/ HTTP/1.1" 404 179
+WARNING 2026-01-16 23:28:41,025 log Not Found: /resume/list/
+WARNING 2026-01-16 23:28:41,040 basehttp "GET /resume/list/ HTTP/1.1" 404 179
+INFO 2026-01-16 23:28:54,008 basehttp "GET /api/roadmap/projects/ HTTP/1.1" 200 2
+INFO 2026-01-16 23:28:54,077 basehttp "GET /api/roadmap/list/ HTTP/1.1" 200 2
+INFO 2026-01-16 23:28:54,143 basehttp "GET /api/roadmap/projects/ HTTP/1.1" 200 2
+INFO 2026-01-16 23:28:54,196 basehttp "GET /api/roadmap/list/ HTTP/1.1" 200 2
+INFO 2026-01-16 23:28:55,952 basehttp "GET /api/roadmap/list/ HTTP/1.1" 200 2
+INFO 2026-01-16 23:28:56,022 basehttp "GET /api/roadmap/list/ HTTP/1.1" 200 2
+ERROR 2026-01-16 23:29:08,360 log Internal Server Error: /api/roadmap/generate/
+ERROR 2026-01-16 23:29:08,361 basehttp "POST /api/roadmap/generate/ HTTP/1.1" 500 669
+INFO 2026-01-16 23:33:21,180 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:35:39,816 basehttp "POST /api/users/login/ HTTP/1.1" 200 620
+WARNING 2026-01-16 23:35:41,426 log Not Found: /users/profile/
+WARNING 2026-01-16 23:35:41,431 basehttp "GET /users/profile/ HTTP/1.1" 404 179
+WARNING 2026-01-16 23:35:41,461 log Not Found: /users/profile/
+WARNING 2026-01-16 23:35:41,462 basehttp "GET /users/profile/ HTTP/1.1" 404 179
+WARNING 2026-01-16 23:36:26,353 log Not Found: /users/update-profile/
+WARNING 2026-01-16 23:36:26,357 basehttp "PATCH /users/update-profile/ HTTP/1.1" 404 179
+WARNING 2026-01-16 23:41:53,011 log Not Found: /users/profile/
+WARNING 2026-01-16 23:41:53,011 basehttp "GET /users/profile/ HTTP/1.1" 404 179
+INFO 2026-01-16 23:41:53,097 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+WARNING 2026-01-16 23:41:53,106 log Not Found: /users/profile/
+WARNING 2026-01-16 23:41:53,107 basehttp "GET /users/profile/ HTTP/1.1" 404 179
+WARNING 2026-01-16 23:42:11,459 log Not Found: /users/update-profile/
+WARNING 2026-01-16 23:42:11,461 basehttp "PATCH /users/update-profile/ HTTP/1.1" 404 179
+INFO 2026-01-16 23:42:19,348 basehttp "GET /api/users/profile/ HTTP/1.1" 200 404
+INFO 2026-01-16 23:42:19,384 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-01-16 23:42:19,391 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-01-16 23:42:19,489 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-01-16 23:42:19,500 basehttp "GET /api/users/profile/ HTTP/1.1" 200 404
+INFO 2026-01-16 23:42:19,500 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-01-16 23:42:19,587 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-01-16 23:42:19,621 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-01-16 23:42:19,647 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-01-16 23:42:19,694 basehttp "GET /api/users/profile/ HTTP/1.1" 200 404
+INFO 2026-01-16 23:42:19,782 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-01-16 23:42:19,810 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-01-16 23:42:19,828 basehttp "GET /api/users/profile/ HTTP/1.1" 200 404
+INFO 2026-01-16 23:42:19,851 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-01-16 23:42:19,938 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-01-16 23:42:19,990 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-01-16 23:42:20,105 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-01-16 23:42:20,204 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+WARNING 2026-01-16 23:42:32,420 log Not Found: /resume/list/
+WARNING 2026-01-16 23:42:32,432 basehttp "GET /resume/list/ HTTP/1.1" 404 179
+WARNING 2026-01-16 23:42:32,467 log Not Found: /resume/list/
+WARNING 2026-01-16 23:42:32,489 basehttp "GET /resume/list/ HTTP/1.1" 404 179
+WARNING 2026-01-16 23:42:37,872 log Not Found: /api/tasks/resume/
+WARNING 2026-01-16 23:42:37,873 basehttp "GET /api/tasks/resume/ HTTP/1.1" 404 23
+WARNING 2026-01-16 23:42:37,925 log Not Found: /api/tasks/resume/
+WARNING 2026-01-16 23:42:37,926 basehttp "GET /api/tasks/resume/ HTTP/1.1" 404 23
+INFO 2026-01-16 23:42:44,074 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-01-16 23:42:44,151 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+WARNING 2026-01-16 23:42:44,682 log Not Found: /api/tasks/resume/
+INFO 2026-01-16 23:42:44,682 basehttp "GET /api/users/profile/ HTTP/1.1" 200 404
+WARNING 2026-01-16 23:42:44,686 basehttp "GET /api/tasks/resume/ HTTP/1.1" 404 23
+WARNING 2026-01-16 23:42:44,759 log Not Found: /api/tasks/resume/
+WARNING 2026-01-16 23:42:44,763 basehttp "GET /api/tasks/resume/ HTTP/1.1" 404 23
+INFO 2026-01-16 23:42:44,765 basehttp "GET /api/users/profile/ HTTP/1.1" 200 404
+INFO 2026-01-16 23:42:47,651 basehttp "GET /api/roadmap/list/ HTTP/1.1" 200 2
+INFO 2026-01-16 23:42:47,720 basehttp "GET /api/roadmap/list/ HTTP/1.1" 200 2
+WARNING 2026-01-16 23:42:51,473 log Not Found: /api/tasks/resume/
+WARNING 2026-01-16 23:42:51,477 basehttp "GET /api/tasks/resume/ HTTP/1.1" 404 23
+WARNING 2026-01-16 23:42:51,657 log Not Found: /api/tasks/resume/
+WARNING 2026-01-16 23:42:51,658 basehttp "GET /api/tasks/resume/ HTTP/1.1" 404 23
+WARNING 2026-01-16 23:42:59,570 log Not Found: /users/profile/
+WARNING 2026-01-16 23:42:59,571 basehttp "GET /users/profile/ HTTP/1.1" 404 179
+WARNING 2026-01-16 23:42:59,577 log Not Found: /users/profile/
+WARNING 2026-01-16 23:42:59,591 basehttp "GET /users/profile/ HTTP/1.1" 404 179
+INFO 2026-01-16 23:47:53,826 autoreload P:\Planora\backend\users\models.py changed, reloading.
+INFO 2026-01-16 23:47:54,610 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:54:07,339 autoreload P:\Planora\backend\users\models.py changed, reloading.
+INFO 2026-01-16 23:54:08,809 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:54:20,140 autoreload P:\Planora\backend\users\serializers.py changed, reloading.
+INFO 2026-01-16 23:54:21,753 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:54:30,040 autoreload P:\Planora\backend\users\views.py changed, reloading.
+INFO 2026-01-16 23:54:31,075 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:54:34,904 autoreload P:\Planora\backend\users\serializers.py changed, reloading.
+INFO 2026-01-16 23:54:37,006 autoreload Watching for file changes with StatReloader
+INFO 2026-01-16 23:55:07,925 autoreload Watching for file changes with StatReloader
