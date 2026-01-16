@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.utils import timezone
 from datetime import timedelta
+from typing import TYPE_CHECKING
 
 
 class CustomUserManager(BaseUserManager):
@@ -45,6 +46,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
+    if TYPE_CHECKING:
+        profile: "UserProfile"  # type annotation for reverse relation
+
     objects = CustomUserManager()
 
     USERNAME_FIELD = "email"
@@ -55,16 +59,88 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')
-    field_of_study = models.CharField(max_length=100, blank=True, null=True)  # e.g. CS, MBBS
-    target_role = models.CharField(max_length=100, blank=True, null=True)     # e.g. Python Intern
-    experience_level = models.CharField(max_length=50, blank=True, null=True) # e.g. Beginner, Intermediate
-    skills = models.JSONField(default=list, blank=True)                       # e.g. ["Python", "Django"]
-    career_intent = models.CharField(max_length=100, blank=True, null=True)   # e.g. Jobs, Internships, Resume
-    
+    user = models.OneToOneField(
+        CustomUser, on_delete=models.CASCADE, related_name='profile')
+
+    # UNIVERSAL ONBOARDING FIELDS
+    purpose = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        choices=[
+            ('skill_learning', 'Skill learning'),
+            ('project_building', 'Project building'),
+            ('research_work', 'Research work'),
+            ('teaching_mentoring', 'Teaching / mentoring others'),
+            ('personal_goal', 'Personal goal tracking'),
+        ],
+        help_text='What the user is using Planorah for'
+    )
+    domain = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        choices=[
+            ('technology', 'Technology'),
+            ('science_research', 'Science & Research'),
+            ('design_creative', 'Design & Creative'),
+            ('business_management', 'Business & Management'),
+            ('arts_humanities', 'Arts & Humanities'),
+            ('other', 'Other'),
+        ],
+        help_text='General domain/area of work'
+    )
+    validation_mode = models.CharField(
+        max_length=20,
+        default='automatic',
+        choices=[
+            ('automatic', 'Automatic (quizzes, repos, structured proofs)'),
+            ('manual', 'Manual (mentor / professor / reviewer)'),
+            ('mixed', 'Mixed (recommended)'),
+        ],
+        help_text='How work should be validated'
+    )
+    weekly_hours = models.IntegerField(
+        default=5,
+        help_text='Committed hours per week'
+    )
+    goal_statement = models.TextField(
+        blank=True,
+        null=True,
+        help_text='One-line goal description (logged and enforced)'
+    )
+    goal_type = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        choices=[
+            ('learn_skill', 'Learn a skill'),
+            ('build_project', 'Build a project'),
+            ('research_study', 'Complete a research study'),
+            ('prepare_evaluation', 'Prepare for evaluation'),
+            ('track_work', 'Track structured work'),
+        ],
+        help_text='Type of goal being pursued'
+    )
+    readiness_score = models.IntegerField(
+        default=0,
+        help_text='Execution readiness score (0-100)'
+    )
+    onboarding_accepted_terms = models.BooleanField(
+        default=False,
+        help_text='User accepted work validation terms'
+    )
+
+    # LEGACY FIELDS (kept for backward compatibility)
+    field_of_study = models.CharField(max_length=100, blank=True, null=True)
+    target_role = models.CharField(max_length=100, blank=True, null=True)
+    experience_level = models.CharField(max_length=50, blank=True, null=True)
+    skills = models.JSONField(default=list, blank=True)
+    career_intent = models.CharField(max_length=100, blank=True, null=True)
+
     # Onboarding flag - DEPRECATED in favor of lifecycle_state
     onboarding_complete = models.BooleanField(default=False)
-    
+
     # Phase-gating state machine (NEW)
     lifecycle_state = models.CharField(
         max_length=50,
@@ -72,12 +148,12 @@ class UserProfile(models.Model):
         help_text="Current phase in the user lifecycle"
     )
     goal_locked_at = models.DateTimeField(
-        null=True, 
+        null=True,
         blank=True,
         help_text="Timestamp when goal was locked (point of no return)"
     )
     last_activity_date = models.DateField(
-        null=True, 
+        null=True,
         blank=True,
         help_text="Last date user had meaningful activity for consistency tracking"
     )
@@ -85,14 +161,15 @@ class UserProfile(models.Model):
         default=0.0,
         help_text="Score tracking user's consistency in executing their roadmap"
     )
-    
+
     # Profile Extensions
     bio = models.TextField(blank=True, null=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
 
     # Gamification
     streak_count = models.IntegerField(default=0)
-    last_study_date = models.DateField(null=True, blank=True) # Used for streak tracking
+    last_study_date = models.DateField(
+        null=True, blank=True)  # Used for streak tracking
     xp_points = models.IntegerField(default=0)
 
     def __str__(self):
@@ -100,10 +177,12 @@ class UserProfile(models.Model):
 
 
 class StreakLog(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="streak_logs")
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="streak_logs")
     activity_date = models.DateField(auto_now_add=True)
-    activity_type = models.CharField(max_length=50) # e.g., 'login', 'resume_gen', 'ats_scan'
-    
+    # e.g., 'login', 'resume_gen', 'ats_scan'
+    activity_type = models.CharField(max_length=50)
+
     class Meta:
         unique_together = ('user', 'activity_date')
 
@@ -132,11 +211,11 @@ class DeletedUser(models.Model):
     email = models.EmailField(unique=True, db_index=True)
     deleted_at = models.DateTimeField(auto_now_add=True)
     deletion_reason = models.TextField(blank=True, null=True)
-    
+
     class Meta:
         verbose_name = "Deleted User"
         verbose_name_plural = "Deleted Users"
         ordering = ['-deleted_at']
-    
+
     def __str__(self):
         return f"{self.email} (deleted {self.deleted_at.strftime('%Y-%m-%d')})"

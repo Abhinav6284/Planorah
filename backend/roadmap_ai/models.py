@@ -241,7 +241,8 @@ class Task(models.Model):
         Derived status - computed from latest attempt, never stored.
         Returns: 'COMPLETED', 'IN_PROGRESS', or 'NOT_STARTED'
         """
-        latest_attempt = self.attempts.filter(
+        # attempts is reverse relation from TaskAttempt.task (defined in tasks/models.py)
+        latest_attempt = self.attempts.filter(  # type: ignore[attr-defined]
             user=user).order_by('-submitted_at').first()
 
         if not latest_attempt:
@@ -257,5 +258,7 @@ class Task(models.Model):
         if self.max_attempts is None:
             return True
 
-        attempt_count = self.attempts.filter(user=user).count()
+        # attempts is reverse relation from TaskAttempt.task (defined in tasks/models.py)
+        attempt_count = self.attempts.filter(
+            user=user).count()  # type: ignore[attr-defined]
         return attempt_count < self.max_attempts

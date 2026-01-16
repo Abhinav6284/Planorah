@@ -53,16 +53,26 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "avatar",
             "onboarding_complete",
             "xp_points",
-            "streak_count"
+            "streak_count",
+            # Universal onboarding fields
+            "purpose",
+            "domain",
+            "validation_mode",
+            "weekly_hours",
+            "goal_statement",
+            "goal_type",
+            "readiness_score",
+            "onboarding_accepted_terms",
+            "goal_locked_at"
         ]
-        read_only_fields = ["onboarding_complete"]
+        read_only_fields = ["onboarding_complete", "goal_locked_at"]
 
 
 class UserSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer(read_only=True)
     role = serializers.SerializerMethodField()
     avatar = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = User
         fields = [
@@ -77,11 +87,11 @@ class UserSerializer(serializers.ModelSerializer):
             "avatar",
             "profile"
         ]
-    
+
     def get_role(self, obj):
         """Return user role based on is_staff status"""
         return "Admin" if obj.is_staff else "Student"
-    
+
     def get_avatar(self, obj):
         """Return full avatar URL if user has profile with avatar"""
         if hasattr(obj, 'profile') and obj.profile.avatar:
@@ -90,4 +100,3 @@ class UserSerializer(serializers.ModelSerializer):
                 return request.build_absolute_uri(obj.profile.avatar.url)
             return obj.profile.avatar.url
         return None
-
