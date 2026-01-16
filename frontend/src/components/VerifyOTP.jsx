@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
-import PlanoraLogo from "../assets/Planora.svg";
 import { API_BASE_URL } from "../api/axios";
 import { setTokens, getRememberMePreference, clearRememberMePreference } from "../utils/auth";
 
@@ -149,9 +148,8 @@ export default function VerifyOTP() {
       >
         {/* Logo and Header */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <img src={PlanoraLogo} alt="Planorah" className="h-8 w-auto" />
-            <span className="text-xl font-serif font-bold text-gray-900">Planorah.</span>
+          <Link to="/" className="inline-block text-xl font-serif font-bold text-gray-900 mb-6">
+            Planorah<span className="text-gray-400">.</span>
           </Link>
           <h2 className="text-2xl font-serif font-medium text-gray-900 mb-2">Verify Your Email</h2>
           <p className="text-gray-500 text-sm">

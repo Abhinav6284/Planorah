@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import PlanoraLogo from "../assets/Planora.svg";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 
 export default function LandingPage() {
@@ -37,9 +36,8 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-2 md:gap-3">
-            <img src={PlanoraLogo} alt="Planorah" className="h-7 md:h-8 w-auto dark:invert" />
-            <span className="text-lg md:text-xl font-serif font-bold tracking-tight text-gray-900 dark:text-white">Planorah.</span>
+          <Link to="/" className="text-xl md:text-2xl font-serif font-bold tracking-tight text-gray-900 dark:text-white">
+            Planorah<span className="text-gray-400">.</span>
           </Link>
 
           <div className="hidden md:flex gap-8 text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -239,7 +237,6 @@ export default function LandingPage() {
       <footer className="bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 py-20 px-6 transition-colors duration-300">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-3">
-            <img src={PlanoraLogo} alt="Planorah" className="h-8 w-auto opacity-50 grayscale dark:invert" />
             <span className="text-gray-400 font-serif">Planorah © 2025</span>
           </div>
           <div className="flex gap-8 text-sm text-gray-500 dark:text-gray-400">
