@@ -1,15 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import PlanoraLogo from "../../assets/Planora.svg";
 
 export default function OnboardingLayout({ children, title, subtitle }) {
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
             <header className="p-6">
-                <Link to="/" className="inline-flex items-center gap-2">
-                    <img src={PlanoraLogo} alt="Planorah" className="h-8 w-auto" />
-                    <span className="text-xl font-serif font-bold text-gray-900">Planorah.</span>
+                <Link to="/" className="text-xl font-serif font-bold text-gray-900">
+                    Planorah<span className="text-gray-400">.</span>
                 </Link>
             </header>
 
