@@ -62,8 +62,29 @@ class UserProfile(models.Model):
     skills = models.JSONField(default=list, blank=True)                       # e.g. ["Python", "Django"]
     career_intent = models.CharField(max_length=100, blank=True, null=True)   # e.g. Jobs, Internships, Resume
     
-    # Onboarding flag - set to True once user completes initial onboarding
+    # Onboarding flag - DEPRECATED in favor of lifecycle_state
     onboarding_complete = models.BooleanField(default=False)
+    
+    # Phase-gating state machine (NEW)
+    lifecycle_state = models.CharField(
+        max_length=50,
+        default='ONBOARDING',
+        help_text="Current phase in the user lifecycle"
+    )
+    goal_locked_at = models.DateTimeField(
+        null=True, 
+        blank=True,
+        help_text="Timestamp when goal was locked (point of no return)"
+    )
+    last_activity_date = models.DateField(
+        null=True, 
+        blank=True,
+        help_text="Last date user had meaningful activity for consistency tracking"
+    )
+    consistency_score = models.FloatField(
+        default=0.0,
+        help_text="Score tracking user's consistency in executing their roadmap"
+    )
     
     # Profile Extensions
     bio = models.TextField(blank=True, null=True)

@@ -28,6 +28,8 @@ import StepForm from './components/Onboarding/StepForm';
 import ResumeBuilder from './components/Resume/ResumeBuilder';
 import ResumeList from './components/Resume/ResumeList';
 import ATSScanner from './components/Resume/ATSScanner';
+import CompiledResumeView from './components/Resume/CompiledResumeView';
+import CompiledResumeList from './components/Resume/CompiledResumeList';
 import JobFinder from './components/Jobs/JobFinder';
 import MockInterviewComingSoon from './components/Interview/MockInterviewComingSoon';
 import Layout from './components/Layout';
@@ -108,6 +110,8 @@ export default function App() {
               <Route path="/resume" element={<ResumeList />} />
               <Route path="/resume/new" element={<ResumeBuilder />} />
               <Route path="/resume/:id" element={<ResumeBuilder />} />
+              <Route path="/resume/compiled" element={<CompiledResumeList />} />
+              <Route path="/resume/compiled/:versionId" element={<CompiledResumeView />} />
               <Route path="/ats" element={<ATSScanner />} />
               <Route path="/jobs" element={<JobFinder />} />
               <Route path="/interview" element={<MockInterviewComingSoon />} />

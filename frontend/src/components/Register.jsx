@@ -3,7 +3,6 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useGoogleLogin } from '@react-oauth/google';
-import { API_BASE_URL } from "../api/axios";
 import { setTokens } from "../utils/auth";
 
 export default function Register() {
@@ -25,7 +24,7 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/users/register/`, formData);
+      const res = await axios.post(`/users/register/`, formData);
       setMessage("success:" + (res.data.message || "OTP sent successfully!"));
       if (res.data.message.includes("OTP")) {
         setTimeout(() => navigate("/verify-otp", { state: { ...formData } }), 1500);
@@ -43,7 +42,7 @@ export default function Register() {
       setLoading(true);
       setMessage("");
       try {
-        const res = await axios.post(`${API_BASE_URL}/api/users/google/login/`, {
+        const res = await axios.post(`/users/google/login/`, {
           token: tokenResponse.access_token,
           mode: "signup"
         });

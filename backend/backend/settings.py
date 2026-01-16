@@ -38,19 +38,20 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'daphne',  # Must be before django.contrib.staticfiles for ASGI
+    # 'daphne',  # Disabled: Python 3.13 compatibility issue with Twisted
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'channels',
+    # 'channels',  # Disabled: Python 3.13 compatibility issue with Twisted
     'rest_framework_simplejwt.token_blacklist',
     'api',
     'rest_framework',
     'corsheaders',
     'users',
+    'user_lifecycle',  # Phase-gating state machine
     'dashboard',
     'scheduler',
     'roadmap_ai',
@@ -70,15 +71,15 @@ INSTALLED_APPS = [
     'codespace',  # Real terminal / IDE backend
 ]
 
-# ASGI Application
-ASGI_APPLICATION = 'backend.asgi.application'
+# WSGI Application (using WSGI for development instead of ASGI due to Python 3.13 compatibility)
+# ASGI_APPLICATION = 'backend.asgi.application'
 
-# Channel Layers (in-memory for development, use Redis for production)
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    }
-}
+# Channel Layers (disabled for development - using WSGI instead of ASGI)
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer"
+#     }
+# }
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -217,7 +218,6 @@ DEFAULT_FROM_EMAIL = 'abhinavgoyal9729@gmail.com'
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
 
-
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     'accept',
@@ -233,7 +233,8 @@ CORS_ALLOW_HEADERS = [
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=15),  # Extended for Remember Me feature
+    # Extended for Remember Me feature
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': True,
@@ -248,17 +249,20 @@ SIMPLE_JWT = {
 # Google OAuth Settings
 GOOGLE_OAUTH_CLIENT_ID = os.getenv('GOOGLE_OAUTH_CLIENT_ID', '')
 GOOGLE_OAUTH_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH_CLIENT_SECRET', '')
-GOOGLE_OAUTH_REDIRECT_URI = os.getenv('GOOGLE_OAUTH_REDIRECT_URI', 'https://planorah.me')
+GOOGLE_OAUTH_REDIRECT_URI = os.getenv(
+    'GOOGLE_OAUTH_REDIRECT_URI', 'https://planorah.me')
 
 # GitHub OAuth Settings
 GITHUB_OAUTH_CLIENT_ID = os.getenv('GITHUB_OAUTH_CLIENT_ID', '')
 GITHUB_OAUTH_CLIENT_SECRET = os.getenv('GITHUB_OAUTH_CLIENT_SECRET', '')
-GITHUB_OAUTH_REDIRECT_URI = os.getenv('GITHUB_OAUTH_REDIRECT_URI', 'https://planorah.me/auth/github/callback')
+GITHUB_OAUTH_REDIRECT_URI = os.getenv(
+    'GITHUB_OAUTH_REDIRECT_URI', 'https://planorah.me/auth/github/callback')
 
 # Spotify OAuth Settings
 SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID', '')
 SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET', '')
-SPOTIFY_REDIRECT_URI = os.getenv('SPOTIFY_REDIRECT_URI', 'https://planorah.me/auth/spotify/callback')
+SPOTIFY_REDIRECT_URI = os.getenv(
+    'SPOTIFY_REDIRECT_URI', 'https://planorah.me/auth/spotify/callback')
 
 # Logging Configuration
 LOGGING = {

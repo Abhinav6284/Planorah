@@ -3,7 +3,6 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useGoogleLogin } from '@react-oauth/google';
-import { API_BASE_URL } from "../api/axios";
 import { setTokens, setRememberMePreference } from "../utils/auth";
 
 export default function Login() {
@@ -25,7 +24,7 @@ export default function Login() {
     setMessage("");
     try {
       const payload = { identifier: identifier.trim(), password };
-      const res = await axios.post(`${API_BASE_URL}/api/users/login/`, payload);
+      const res = await axios.post(`/api/users/login/`, payload);
       setTokens(res.data.access, res.data.refresh, rememberMe);
       setMessage("success:Welcome back!");
       if (res.data.onboarding_complete) {
@@ -46,7 +45,7 @@ export default function Login() {
       setLoading(true);
       setMessage("");
       try {
-        const res = await axios.post(`${API_BASE_URL}/api/users/google/login/`, {
+        const res = await axios.post(`/api/users/google/login/`, {
           token: tokenResponse.access_token,
           mode: "login"
         });

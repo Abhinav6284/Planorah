@@ -4,6 +4,7 @@ import { roadmapService } from "../../api/roadmapService";
 import { tasksService } from "../../api/tasksService";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaCheckCircle, FaRegCircle, FaChevronDown, FaChevronUp, FaExternalLinkAlt, FaQuestionCircle, FaClock, FaTasks, FaRocket, FaCode, FaBook, FaLightbulb } from "react-icons/fa";
+import GenerateResumeButton from "../Resume/GenerateResumeButton";
 
 // Colorful milestone icons based on phase
 const milestoneIcons = [
@@ -170,6 +171,10 @@ export default function RoadmapView() {
                         >
                             View Daily Tasks
                         </button>
+                        <GenerateResumeButton 
+                            roadmapId={id}
+                            onSuccess={(resume) => navigate(`/resume/compiled/${resume.version_id}`)}
+                        />
                     </div>
                 </motion.div>
 

@@ -1,8 +1,7 @@
 // simple auth helper: get token, clear tokens, and logout (call backend to blacklist refresh)
 import axios from "axios";
 
-import { API_BASE_URL } from "../api/axios";
-const API_BASE = process.env.REACT_APP_API_BASE || API_BASE_URL;
+const API_BASE = '/api/'; // Using proxy in package.json
 
 // Maximum session duration for "Remember Me" - 15 days in milliseconds
 export const MAX_SESSION_DAYS = 15;

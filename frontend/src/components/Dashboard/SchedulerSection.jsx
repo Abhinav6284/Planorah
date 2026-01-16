@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { API_BASE_URL } from "../../api/axios";
+import axios from "axios";
 
 export default function SchedulerSection() {
     const [events, setEvents] = useState([]);
 
     useEffect(() => {
-        axios.get(`${API_BASE_URL}/api/scheduler/events/`)
+        axios.get(`/scheduler/events/`)
             .then((res) => setEvents(res.data))
             .catch((err) => console.error(err));
     }, []);

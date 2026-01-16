@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { API_BASE_URL } from "../api/axios";
 
 export default function CompleteProfile() {
     const navigate = useNavigate();
@@ -37,7 +36,7 @@ export default function CompleteProfile() {
             }
 
             await axios.patch(
-                `${API_BASE_URL}/api/users/update-profile/`,
+                `/users/update-profile/`,
                 formData,
                 getAuthHeaders()
             );

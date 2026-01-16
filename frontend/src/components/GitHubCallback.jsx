@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
-import { API_BASE_URL } from "../api/axios";
 import { setTokens, getRememberMePreference, clearRememberMePreference } from "../utils/auth";
 
 export default function GitHubCallback() {
@@ -26,7 +25,7 @@ export default function GitHubCallback() {
                 const mode = searchParams.get('state') || 'login'; // Get mode from state parameter
                 const rememberMe = getRememberMePreference();
 
-                const res = await axios.post(`${API_BASE_URL}/api/users/github/login/`, {
+                const res = await axios.post(`/users/github/login/`, {
                     code: code,
                     redirect_uri: redirectUri,
                     mode: mode
