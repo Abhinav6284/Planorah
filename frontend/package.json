@@ -18,7 +18,7 @@
     "axios": "^1.13.0",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.25",
-    "moment": "^2.30.1",
+    "lucide-react": "^0.575.0",
     "monaco-editor": "^0.55.1",
     "react": "^18.3.1",
     "react-big-calendar": "^1.19.4",
@@ -34,6 +34,8 @@
     "start": "react-scripts start",
     "dev": "react-scripts start",
     "build": "react-scripts build",
+    "lint": "eslint src --ext .js,.jsx",
+    "lint:fix": "eslint src --ext .js,.jsx --fix",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -57,6 +59,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
+    "eslint": "^8.57.1",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.18"
   }

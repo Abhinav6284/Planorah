@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'github_integration',
     'billing',
     'analytics',
+    'projects',  # User projects from CodeSpace
     'codespace',  # Real terminal / IDE backend
 ]
 
@@ -94,6 +95,7 @@ REST_FRAMEWORK = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Must be before CommonMiddleware
     # 'whitenoise.middleware.WhiteNoiseMiddleware',  # Only needed for production
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -101,7 +103,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -211,14 +212,13 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-DEFAULT_FROM_EMAIL = 'abhinavgoyal9729@gmail.com'
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@planorah.me')
 
 
 # Gemini API Key
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
 
-CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',

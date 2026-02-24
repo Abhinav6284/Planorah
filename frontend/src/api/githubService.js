@@ -7,7 +7,7 @@ import api from './axios';
 export const githubService = {
     // Get GitHub connection status
     getStatus: async () => {
-        const response = await api.get('/api/github/status/');
+        const response = await api.get('github/status/');
         return response.data;
     },
 
@@ -17,13 +17,13 @@ export const githubService = {
         if (redirectUri) {
             data.redirect_uri = redirectUri;
         }
-        const response = await api.post('/api/github/connect/', data);
+        const response = await api.post('github/connect/', data);
         return response.data;
     },
 
     // Disconnect GitHub account
     disconnect: async () => {
-        const response = await api.post('/api/github/disconnect/');
+        const response = await api.post('github/disconnect/');
         return response.data;
     },
 
@@ -40,27 +40,27 @@ export const githubService = {
         if (commitMessage) {
             data.commit_message = commitMessage;
         }
-        const response = await api.post('/api/github/publish/', data);
+        const response = await api.post('github/publish/', data);
         return response.data;
     },
 
     // Get all published repositories
     getRepositories: async () => {
-        const response = await api.get('/api/github/repositories/');
+        const response = await api.get('github/repositories/');
         return response.data;
     },
 
     // Get publish logs
     getLogs: async (repoId = null) => {
         const params = repoId ? { repo_id: repoId } : {};
-        const response = await api.get('/api/github/logs/', { params });
+        const response = await api.get('github/logs/', { params });
         return response.data;
     },
 
     // Sync GitHub stats
     syncStats: async (repoId = null) => {
         const data = repoId ? { repo_id: repoId } : {};
-        const response = await api.post('/api/github/sync_stats/', data);
+        const response = await api.post('github/sync_stats/', data);
         return response.data;
     }
 };

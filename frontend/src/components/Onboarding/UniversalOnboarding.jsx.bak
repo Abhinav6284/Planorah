@@ -1,0 +1,653 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { motion } from "framer-motion";
+import OnboardingLayout from "./OnboardingLayout";
+
+// Education stage options
+const EDUCATION_STAGES = [
+    { value: 'class_9_10', label: 'Class 9–10', icon: '📚' },
+    { value: 'class_11_12', label: 'Class 11–12', icon: '📖' },
+    { value: 'undergraduate', label: 'Undergraduate (Bachelor\'s degree)', icon: '🎓' },
+    { value: 'postgraduate', label: 'Postgraduate (Master\'s degree)', icon: '👨‍🎓' },
+    { value: 'phd_research', label: 'PhD / Research', icon: '🔬' },
+    { value: 'professional', label: 'Professional / Other', icon: '💼' },
+];
+
+// Board options for Class 9-10 and 11-12
+const BOARD_OPTIONS = [
+    { value: 'cbse', label: 'CBSE' },
+    { value: 'icse', label: 'ICSE' },
+    { value: 'state_board', label: 'State Board' },
+    { value: 'other', label: 'Other' },
+];
+
+// Stream options for Class 11-12
+const STREAM_OPTIONS = [
+    { value: 'science_pcm', label: 'Science (PCM)' },
+    { value: 'science_pcb', label: 'Science (PCB)' },
+    { value: 'commerce', label: 'Commerce' },
+    { value: 'arts_humanities', label: 'Arts / Humanities' },
+    { value: 'other', label: 'Other / Not sure' },
+];
+
+// Exam focus for Class 11-12
+const EXAM_FOCUS = [
+    { value: 'cbse', label: 'CBSE' },
+    { value: 'icse', label: 'ICSE' },
+    { value: 'state_board', label: 'State Board' },
+    { value: 'jee_neet', label: 'JEE / NEET' },
+    { value: 'other_competitive', label: 'Other competitive exams' },
+];
+
+export default function UniversalOnboarding() {
+    const navigate = useNavigate();
+    const [currentStep, setCurrentStep] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [educationStage, setEducationStage] = useState('');
+    const [formData, setFormData] = useState({
+        // Common fields
+        education_stage: '',
+        weekly_hours: 5,
+        validation_mode: 'mixed',
+        onboarding_accepted_terms: false,
+
+        // Class 9-10 fields
+        class_9_10_current_class: '',
+        class_9_10_board: '',
+        comfort_mathematics: '',
+        comfort_science: '',
+        comfort_english: '',
+        comfort_social: '',
+        confusion_areas: [],
+        parent_access: '',
+
+        // Class 11-12 fields
+        class_11_12_current_class: '',
+        class_11_12_stream: '',
+        class_11_12_exam_focus: '',
+        class_11_12_subjects_enjoyed: [],
+        class_11_12_help_needed: '',
+        profile_consent: '',
+
+        // Undergraduate fields
+        ug_degree: '',
+        ug_year: '',
+        ug_skills: [],
+        ug_aiming_for: '',
+
+        // Postgraduate/PhD fields
+        pg_specialization: '',
+        pg_intent: '',
+
+        // Personal info
+        name: '',
+        phone_number: '',
+        date_of_birth: '',
+    });
+
+    // Dynamic steps based on education stage
+    const getSteps = () => {
+        const baseSteps = [
+            { id: 'welcome', title: 'Welcome to Planorah 👋', type: 'info' },
+            { id: 'education_stage', title: 'Tell us where you are right now', type: 'select' },
+        ];
+
+        if (!educationStage) return baseSteps;
+
+        switch (educationStage) {
+            case 'class_9_10':
+                return [
+                    ...baseSteps,
+                    { id: 'class_9_10_basics', title: 'Let\'s understand your studies', type: 'form' },
+                    { id: 'subject_comfort', title: 'How comfortable do you feel with these subjects?', type: 'scale' },
+                    { id: 'confusion_check', title: 'What feels most confusing right now?', type: 'multi' },
+                    { id: 'study_reality', title: 'How much time can you usually study in a day?', type: 'select' },
+                    { id: 'support_visibility', title: 'Would you like a parent or guardian to view your progress?', type: 'select' },
+                    { id: 'reality_check', title: 'Your plan, realistically', type: 'confirm' },
+                    { id: 'personal', title: 'Complete Your Profile', type: 'input' },
+                ];
+            
+            case 'class_11_12':
+                return [
+                    ...baseSteps,
+                    { id: 'class_11_12_details', title: 'Tell us about your current studies', type: 'form' },
+                    { id: 'interest_mapping', title: 'Which subjects do you enjoy more?', type: 'multi' },
+                    { id: 'career_confusion', title: 'What do you want help with the most?', type: 'select' },
+                    { id: 'time_commitment', title: 'How much time can you realistically give each week?', type: 'select' },
+                    { id: 'early_profile', title: 'About your student profile', type: 'consent' },
+                    { id: 'reality_check', title: 'Your plan, realistically', type: 'confirm' },
+                    { id: 'personal', title: 'Complete Your Profile', type: 'input' },
+                ];
+            
+            case 'undergraduate':
+                return [
+                    ...baseSteps,
+                    { id: 'ug_degree_info', title: 'Your academic background', type: 'form' },
+                    { id: 'ug_current_skills', title: 'Which skills can you actually use right now?', type: 'multi' },
+                    { id: 'ug_direction', title: 'What are you currently aiming for?', type: 'select' },
+                    { id: 'time_commitment', title: 'How much time can you realistically give each week?', type: 'select' },
+                    { id: 'reality_check', title: 'Your plan, realistically', type: 'confirm' },
+                    { id: 'personal', title: 'Complete Your Profile', type: 'input' },
+                ];
+            
+            case 'postgraduate':
+            case 'phd_research':
+                return [
+                    ...baseSteps,
+                    { id: 'pg_focus', title: 'Your primary focus', type: 'form' },
+                    { id: 'validation_preference', title: 'How should your work be reviewed?', type: 'select' },
+                    { id: 'time_commitment', title: 'How much time can you realistically give each week?', type: 'select' },
+                    { id: 'reality_check', title: 'Your plan, realistically', type: 'confirm' },
+                    { id: 'personal', title: 'Complete Your Profile', type: 'input' },
+                ];
+            
+            default:
+                return [
+                    ...baseSteps,
+                    { id: 'reality_check', title: 'Your plan, realistically', type: 'confirm' },
+                    { id: 'personal', title: 'Complete Your Profile', type: 'input' },
+                ];
+        }
+    };
+
+    const STEPS = getSteps();
+
+    useEffect(() => {
+        // Reset to step 2 if education stage changes
+        if (currentStep > 1 && formData.education_stage !== educationStage) {
+            setEducationStage(formData.education_stage);
+            setCurrentStep(2);
+        }
+    }, [formData.education_stage, currentStep, educationStage]);
+
+    const handleNext = () => {
+        if (currentStep < STEPS.length - 1) {
+            setCurrentStep(currentStep + 1);
+        }
+    };
+
+    const handleBack = () => {
+        if (currentStep > 0) {
+            setCurrentStep(currentStep - 1);
+        }
+    };
+
+    const handleSubmit = async () => {
+        setLoading(true);
+        try {
+            const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+
+            const dataToSend = {
+                education_stage: formData.education_stage,
+                weekly_hours: formData.weekly_hours,
+                validation_mode: formData.validation_mode,
+                onboarding_accepted_terms: formData.onboarding_accepted_terms,
+                // Add stage-specific data as JSON
+                onboarding_data: JSON.stringify(formData),
+                // User model fields
+                ...(formData.name && { name: formData.name }),
+                ...(formData.phone_number && { phone_number: formData.phone_number }),
+                ...(formData.date_of_birth && { date_of_birth: formData.date_of_birth }),
+            };
+
+            await axios.patch('/api/users/update-profile/', dataToSend, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            navigate('/dashboard');
+        } catch (error) {
+            console.error('Onboarding failed:', error);
+            alert('Failed to complete onboarding. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const renderStepContent = () => {
+        const step = STEPS[currentStep];
+
+        switch (step.id) {
+            case 'intro':
+                return (
+                    <div className="space-y-12">
+                        <div className="text-left">
+                            <h2 className="text-4xl font-serif font-medium text-gray-900 dark:text-white mb-6">
+                                Proof, Not Promises
+                            </h2>
+                            <p className="text-xl text-gray-500 dark:text-gray-400 font-light leading-relaxed">
+                                Turn your goals into verified work with evidence that counts.
+                            </p>
+                        </div>
+
+                        <div className="space-y-12 border-l border-gray-200 dark:border-gray-800 ml-3 pl-8 py-2">
+                            <div className="relative">
+                                <span className="absolute -left-[41px] top-0 flex items-center justify-center w-6 h-6 rounded-full bg-black dark:bg-white text-white dark:text-black text-xs font-bold">1</span>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                                        Define your goal
+                                    </h3>
+                                    <p className="text-gray-500 dark:text-gray-400 leading-relaxed">
+                                        Be clear about what you want to achieve. This becomes your measurable outcome.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="relative">
+                                <span className="absolute -left-[41px] top-0 flex items-center justify-center w-6 h-6 rounded-full bg-black dark:bg-white text-white dark:text-black text-xs font-bold">2</span>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                                        Complete verified work
+                                    </h3>
+                                    <p className="text-gray-500 dark:text-gray-400 leading-relaxed">
+                                        Submit proof—code, projects, assessments—that proves you've done the work.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="relative">
+                                <span className="absolute -left-[41px] top-0 flex items-center justify-center w-6 h-6 rounded-full bg-black dark:bg-white text-white dark:text-black text-xs font-bold">3</span>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                                        Unlock outputs
+                                    </h3>
+                                    <p className="text-gray-500 dark:text-gray-400 leading-relaxed">
+                                        Earn verifiable outcomes—portfolios, certifications, research logs, proof of impact.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-6 border border-gray-200 dark:border-gray-800 rounded-lg bg-gray-50 dark:bg-gray-900/50">
+                            <p className="text-gray-900 dark:text-white font-medium mb-1 flex items-center gap-2">
+                                <span className="text-sm">⚠</span> Important
+                            </p>
+                            <p className="text-gray-600 dark:text-gray-400 text-sm">
+                                Outcomes require verified work. You cannot claim results without proof.
+                            </p>
+                        </div>
+
+                        <label className="flex items-center gap-3 cursor-pointer group">
+                            <input
+                                type="checkbox"
+                                checked={formData.onboarding_accepted_terms}
+                                onChange={(e) => setFormData({ ...formData, onboarding_accepted_terms: e.target.checked })}
+                                className="w-5 h-5 rounded border-gray-300 text-black dark:text-white focus:ring-black dark:focus:ring-white transition-colors"
+                            />
+                            <span className="text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                                I understand and accept this
+                            </span>
+                        </label>
+                    </div>
+                );
+
+            case 'purpose':
+                return (
+                    <div className="space-y-6">
+                        <p className="text-gray-600 dark:text-gray-400 text-center">
+                            This choice customizes everything next
+                        </p>
+                        <div className="grid grid-cols-1 gap-4">
+                            {PURPOSE_OPTIONS.map((option) => (
+                                <button
+                                    key={option.value}
+                                    onClick={() => setFormData({ ...formData, purpose: option.value })}
+                                    className={`p-6 rounded-xl border-2 transition-all text-left ${formData.purpose === option.value
+                                        ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                                        : 'border-gray-200 dark:border-gray-700 hover:border-green-300'
+                                        }`}
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <span className="text-4xl">{option.icon}</span>
+                                        <div className="flex-1">
+                                            <h3 className="font-bold text-gray-900 dark:text-white mb-1">
+                                                {option.label}
+                                            </h3>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                {option.desc}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                );
+
+            case 'domain':
+                return (
+                    <div className="grid grid-cols-2 gap-4">
+                        {DOMAIN_OPTIONS.map((option) => (
+                            <button
+                                key={option.value}
+                                onClick={() => setFormData({ ...formData, domain: option.value })}
+                                className={`p-6 rounded-xl border-2 transition-all ${formData.domain === option.value
+                                    ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                                    : 'border-gray-200 dark:border-gray-700 hover:border-green-300'
+                                    }`}
+                            >
+                                <div className="text-4xl mb-3">{option.icon}</div>
+                                <div className="font-semibold text-gray-900 dark:text-white">
+                                    {option.label}
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                );
+
+            case 'level':
+                return (
+                    <div className="space-y-6">
+                        <p className="text-center text-sm text-gray-600 dark:text-gray-400 italic">
+                            💡 Tasks and validation will be adjusted. Overstating hurts you.
+                        </p>
+                        <div className="space-y-4">
+                            {['Beginner', 'Intermediate', 'Advanced'].map((level) => (
+                                <button
+                                    key={level}
+                                    onClick={() => setFormData({ ...formData, experience_level: level })}
+                                    className={`w-full p-6 rounded-xl border-2 transition-all text-left ${formData.experience_level === level
+                                        ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                                        : 'border-gray-200 dark:border-gray-700 hover:border-green-300'
+                                        }`}
+                                >
+                                    <div className="font-bold text-lg text-gray-900 dark:text-white">
+                                        {level}
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                );
+
+            case 'time':
+                return (
+                    <div className="space-y-6 max-w-md mx-auto">
+                        <label className="block">
+                            <span className="text-gray-700 dark:text-gray-300 font-medium mb-3 block">
+                                Hours per week you can commit:
+                            </span>
+                            <input
+                                type="number"
+                                min="1"
+                                max="40"
+                                value={formData.weekly_hours}
+                                onChange={(e) => setFormData({ ...formData, weekly_hours: parseInt(e.target.value) })}
+                                className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-green-500 focus:ring-2 focus:ring-green-500"
+                            />
+                        </label>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+                            This controls task scope, not content
+                        </p>
+                    </div>
+                );
+
+            case 'goal_type':
+                return (
+                    <div className="space-y-4">
+                        {GOAL_TYPES.map((type) => (
+                            <button
+                                key={type.value}
+                                onClick={() => setFormData({ ...formData, goal_type: type.value })}
+                                className={`w-full p-6 rounded-xl border-2 transition-all text-left ${formData.goal_type === type.value
+                                    ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                                    : 'border-gray-200 dark:border-gray-700 hover:border-green-300'
+                                    }`}
+                            >
+                                <div className="font-bold text-lg text-gray-900 dark:text-white mb-2">
+                                    {type.label}
+                                </div>
+                                <div className="text-sm text-gray-600 dark:text-gray-400">
+                                    Example: {type.example}
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                );
+
+            case 'goal_statement':
+                return (
+                    <div className="space-y-6 max-w-2xl mx-auto">
+                        <p className="text-center text-gray-600 dark:text-gray-400">
+                            ⚠️ This is not free fantasy — it is logged and later enforced.
+                        </p>
+                        <textarea
+                            value={formData.goal_statement}
+                            onChange={(e) => setFormData({ ...formData, goal_statement: e.target.value })}
+                            placeholder="Example: Build a working solar tracker prototype"
+                            className="w-full h-32 px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-green-500 focus:ring-2 focus:ring-green-500"
+                        />
+                        <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl">
+                            <p className="text-sm text-blue-900 dark:text-blue-300 font-medium">
+                                💡 Keep it specific and measurable
+                            </p>
+                        </div>
+                    </div>
+                );
+
+            case 'validation':
+                return (
+                    <div className="space-y-4">
+                        {VALIDATION_MODES.map((mode) => {
+                            const isRecommended = mode.recommended.includes(formData.purpose);
+                            return (
+                                <button
+                                    key={mode.value}
+                                    onClick={() => setFormData({ ...formData, validation_mode: mode.value })}
+                                    className={`w-full p-6 rounded-xl border-2 transition-all text-left relative ${formData.validation_mode === mode.value
+                                        ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                                        : 'border-gray-200 dark:border-gray-700 hover:border-green-300'
+                                        }`}
+                                >
+                                    {isRecommended && (
+                                        <span className="absolute top-4 right-4 px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full">
+                                            RECOMMENDED
+                                        </span>
+                                    )}
+                                    <div className="font-bold text-lg text-gray-900 dark:text-white mb-2">
+                                        {mode.label}
+                                    </div>
+                                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                                        {mode.desc}
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </div>
+                );
+
+            case 'readiness':
+                return (
+                    <div className="space-y-8 max-w-2xl mx-auto">
+                        <div className="text-center">
+                            <h3 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                                {readinessScore} / 100
+                            </h3>
+                            <p className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                Execution Readiness Score
+                            </p>
+                        </div>
+
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                            <h4 className="font-bold text-gray-900 dark:text-white mb-4">Based on:</h4>
+                            <ul className="space-y-3 text-gray-600 dark:text-gray-400">
+                                <li className="flex items-center gap-3">
+                                    <span className="text-green-500">✓</span>
+                                    Time commitment: {formData.weekly_hours} hrs/week
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <span className="text-green-500">✓</span>
+                                    Experience level: {formData.experience_level}
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <span className="text-green-500">✓</span>
+                                    Validation mode: {formData.validation_mode}
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <span className="text-green-500">✓</span>
+                                    Goal clarity: {formData.goal_statement ? 'Defined' : 'Needs work'}
+                                </li>
+                            </ul>
+                        </div>
+
+                        {readinessScore < 60 && (
+                            <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-4 rounded-r-xl">
+                                <p className="text-yellow-900 dark:text-yellow-300 font-semibold">
+                                    ⚠️ Your readiness score is below optimal
+                                </p>
+                                <p className="text-yellow-800 dark:text-yellow-400 text-sm mt-2">
+                                    Consider: Increasing weekly hours, revising goal scope, or adjusting experience level
+                                </p>
+                            </div>
+                        )}
+
+                        <div className="flex gap-4">
+                            <button
+                                onClick={handleBack}
+                                className="flex-1 px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-800"
+                            >
+                                Revise Inputs
+                            </button>
+                            <button
+                                onClick={handleNext}
+                                className="flex-1 px-6 py-3 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600"
+                            >
+                                Accept & Continue
+                            </button>
+                        </div>
+                    </div>
+                );
+
+            case 'lock':
+                return (
+                    <div className="space-y-8 max-w-2xl mx-auto">
+                        <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-500 rounded-xl p-6">
+                            <h3 className="font-bold text-xl text-red-900 dark:text-red-300 mb-4">
+                                🔒 Point of No Return
+                            </h3>
+                            <p className="text-red-800 dark:text-red-400 mb-4">
+                                Changing this goal later will archive current progress. History is preserved, but you start fresh.
+                            </p>
+                            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 mt-4">
+                                <p className="text-sm text-gray-700 dark:text-gray-300 font-semibold mb-2">
+                                    Your Goal:
+                                </p>
+                                <p className="text-gray-900 dark:text-white italic">
+                                    "{formData.goal_statement}"
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <button
+                                onClick={handleBack}
+                                className="flex-1 px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-800"
+                            >
+                                Go Back
+                            </button>
+                            <button
+                                onClick={handleNext}
+                                className="flex-1 px-6 py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600"
+                            >
+                                Lock Goal
+                            </button>
+                        </div>
+                    </div>
+                );
+
+            case 'personal':
+                return (
+                    <div className="space-y-6 max-w-2xl mx-auto">
+                        <p className="text-center text-gray-600 dark:text-gray-400">
+                            One last step — help us personalize your experience
+                        </p>
+                        <div className="space-y-4">
+                            <input
+                                type="text"
+                                value={formData.name}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                placeholder="Full Name"
+                                className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                            />
+                            <input
+                                type="date"
+                                value={formData.date_of_birth}
+                                onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
+                                className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                            />
+                            <input
+                                type="tel"
+                                value={formData.phone_number}
+                                onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+                                placeholder="Phone Number"
+                                className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                            />
+                        </div>
+                    </div>
+                );
+
+            default:
+                return null;
+        }
+    };
+
+    const canProceed = () => {
+        const step = STEPS[currentStep];
+        switch (step.id) {
+            case 'intro':
+                return formData.onboarding_accepted_terms;
+            case 'purpose':
+                return formData.purpose;
+            case 'domain':
+                return formData.domain;
+            case 'level':
+                return formData.experience_level;
+            case 'time':
+                return formData.weekly_hours > 0;
+            case 'goal_type':
+                return formData.goal_type;
+            case 'goal_statement':
+                return formData.goal_statement && formData.goal_statement.length > 10;
+            case 'validation':
+                return formData.validation_mode;
+            case 'personal':
+                return formData.name;
+            default:
+                return true;
+        }
+    };
+
+    return (
+        <OnboardingLayout title={STEPS[currentStep].title}>
+            <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+            >
+                {renderStepContent()}
+
+                {STEPS[currentStep].id !== 'readiness' && STEPS[currentStep].id !== 'lock' && (
+                    <div className="flex gap-4 mt-12">
+                        {currentStep > 0 && (
+                            <button
+                                onClick={handleBack}
+                                className="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                            >
+                                Back
+                            </button>
+                        )}
+                        <button
+                            onClick={currentStep === STEPS.length - 1 ? handleSubmit : handleNext}
+                            disabled={!canProceed() || loading}
+                            className="flex-1 px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg font-medium hover:bg-gray-900 dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                            {loading ? 'Saving...' : currentStep === STEPS.length - 1 ? 'Complete Setup' : 'Continue'}
+                        </button>
+                    </div>
+                )}
+            </motion.div>
+        </OnboardingLayout>
+    );
+}

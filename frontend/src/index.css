@@ -6,7 +6,7 @@
 
 @layer base {
   body {
-    @apply antialiased text-gray-900 bg-white;
+    @apply antialiased text-gray-900 bg-white dark:bg-gray-900 dark:text-white;
   }
 
   /* Smooth scrolling for better UX */
@@ -39,5 +39,93 @@
   /* Touch action for better mobile scrolling */
   .touch-pan-y {
     touch-action: pan-y;
+  }
+}
+
+@layer components {
+  .onboarding-shell {
+    background-image:
+      radial-gradient(circle at 0% 0%, rgba(251, 191, 36, 0.15) 0%, transparent 35%),
+      radial-gradient(circle at 100% 20%, rgba(14, 165, 233, 0.14) 0%, transparent 40%),
+      linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  }
+
+  .dark .onboarding-shell {
+    background-image:
+      radial-gradient(circle at 0% 0%, rgba(250, 204, 21, 0.12) 0%, transparent 35%),
+      radial-gradient(circle at 100% 20%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
+      linear-gradient(180deg, #020617 0%, #0f172a 100%);
+  }
+
+  .onboarding-panel {
+    @apply rounded-3xl border border-slate-200/90 bg-white/90 shadow-2xl backdrop-blur-sm p-6 md:p-10;
+  }
+
+  .dark .onboarding-panel {
+    @apply border-slate-700/80 bg-slate-900/85;
+  }
+
+  .dark .onboarding-content .text-gray-900 {
+    color: rgb(241 245 249) !important;
+  }
+
+  .dark .onboarding-content .text-gray-700 {
+    color: rgb(226 232 240) !important;
+  }
+
+  .dark .onboarding-content .text-gray-600 {
+    color: rgb(203 213 225) !important;
+  }
+
+  .dark .onboarding-content .text-gray-500 {
+    color: rgb(148 163 184) !important;
+  }
+
+  .dark .onboarding-content .border-gray-200 {
+    border-color: rgb(71 85 105) !important;
+  }
+
+  .dark .onboarding-content .bg-gray-50 {
+    background-color: rgba(30, 41, 59, 0.75) !important;
+  }
+
+  .onboarding-input,
+  .onboarding-select,
+  .onboarding-textarea {
+    @apply w-full px-4 py-3 rounded-xl border-2 border-slate-300 bg-white text-slate-900 placeholder:text-slate-500 outline-none transition-all;
+  }
+
+  .onboarding-input:focus,
+  .onboarding-select:focus,
+  .onboarding-textarea:focus {
+    @apply border-slate-900 ring-2 ring-slate-900/10;
+  }
+
+  .dark .onboarding-input,
+  .dark .onboarding-select,
+  .dark .onboarding-textarea {
+    @apply border-slate-600 bg-slate-800/90 text-slate-100 placeholder:text-slate-400;
+  }
+
+  .dark .onboarding-input:focus,
+  .dark .onboarding-select:focus,
+  .dark .onboarding-textarea:focus {
+    @apply border-slate-100 ring-slate-300/20;
+  }
+
+  .onboarding-checkbox {
+    @apply mt-1 h-5 w-5 rounded border-slate-400 text-slate-900 focus:ring-slate-900;
+  }
+
+  .dark .onboarding-checkbox {
+    @apply border-slate-500 text-slate-100 focus:ring-slate-300;
+  }
+
+  .onboarding-input[type="date"] {
+    color-scheme: light;
+  }
+
+  .dark .onboarding-input[type="date"] {
+    color-scheme: dark;
   }
 }

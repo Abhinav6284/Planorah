@@ -17,7 +17,10 @@ axiosInstance.interceptors.request.use(
             clearTokens();
             // Only redirect if not already on login/register pages
             if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
-                alert('Your session has expired. Please login again.');
+                // Dispatch a custom event that the Toast system can listen for
+                window.dispatchEvent(new CustomEvent('session-expired', {
+                    detail: { message: 'Your session has expired. Please login again.' }
+                }));
                 window.location.href = '/login';
             }
             return Promise.reject(new Error('Session expired'));
@@ -85,7 +88,9 @@ axiosInstance.interceptors.response.use(
                 sessionStorage.removeItem('refresh_token');
 
                 // Redirect to login page
-                alert('Session expired. Please login again.');
+                window.dispatchEvent(new CustomEvent('session-expired', {
+                    detail: { message: 'Session expired. Please login again.' }
+                }));
                 window.location.href = '/login';
                 return Promise.reject(refreshError);
             }

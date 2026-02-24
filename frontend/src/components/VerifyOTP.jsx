@@ -75,9 +75,9 @@ export default function VerifyOTP() {
     setMessage({ text: "", type: "" });
 
     try {
-      let endpoint = `/users/verify-otp/`;
+      let endpoint = `/api/users/verify-otp/`;
       if (location.state && location.state.isLogin) {
-        endpoint = `/users/verify-social-otp/`;
+        endpoint = `/api/users/verify-social-otp/`;
       }
 
       const response = await axios.post(endpoint, {
@@ -126,7 +126,7 @@ export default function VerifyOTP() {
     setMessage({ text: "", type: "" });
 
     try {
-      await axios.post(`/users/resend-otp/`, { email });
+      await axios.post(`/api/users/resend-otp/`, { email });
       setMessage({ text: "A new OTP has been sent to your email", type: "success" });
       setCountdown(60); // 60 second cooldown
       setOtp(["", "", "", "", "", ""]);

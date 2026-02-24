@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "lint": "npm --prefix frontend run lint",
+    "lint:fix": "npm --prefix frontend run lint:fix"
+  },
+  "dependencies": {
+    "axios": "^1.13.5",
+    "react-router-dom": "^7.13.0",
+    "webpack": "^5.105.2"
+  }
+}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { schedulerService } from "../../api/schedulerService";
 import { userService } from "../../api/userService";
@@ -7,6 +7,7 @@ import { userService } from "../../api/userService";
 import ProfileCard from "./NewWidgets/ProfileCard";
 import DateTasksWidget from "./NewWidgets/DateTasksWidget";
 import AIHelpWidget from "./NewWidgets/AIHelpWidget";
+import OnboardingWidget from "./NewWidgets/OnboardingWidget";
 import TaskSchedulerWidget from "./NewWidgets/TaskSchedulerWidget";
 import ProgressChartWidget from "./NewWidgets/ProgressChartWidget";
 import QuickStatsWidget from "./NewWidgets/QuickStatsWidget";
@@ -20,8 +21,12 @@ export default function OverviewSection() {
     const [userProfile, setUserProfile] = useState(null);
     const [tasks, setTasks] = useState([]);
     const [streakData, setStreakData] = useState(null);
+    const hasFetchedRef = useRef(false);
 
     useEffect(() => {
+        if (hasFetchedRef.current) return;
+        hasFetchedRef.current = true;
+
         const fetchData = async () => {
             try {
                 const [statsData, tasksData, profileData, detailedStats] = await Promise.all([
@@ -140,7 +145,7 @@ export default function OverviewSection() {
                             )}
                         </motion.div>
                         <motion.div variants={itemVariants} className="min-h-[280px]">
-                            <PortfolioWidget />
+                            <CalendarWidget />
                         </motion.div>
                     </div>
                 </div>
@@ -153,15 +158,17 @@ export default function OverviewSection() {
                         <ProfileCard user={userProfile} streak={streakData} />
                     </motion.div>
 
+                    {/* Onboarding AI Guidance */}
+                    <motion.div variants={itemVariants} className="min-h-[280px]">
+                        <OnboardingWidget />
+                    </motion.div>
+
                     {/* Weekly Progress Chart */}
                     <motion.div variants={itemVariants} className="min-h-[220px]">
                         <ProgressChartWidget data={tasks} />
                     </motion.div>
 
-                    {/* Calendar Widget */}
-                    <motion.div variants={itemVariants} className="min-h-[250px]">
-                        <CalendarWidget />
-                    </motion.div>
+
                 </div>
             </motion.div>
         </div>

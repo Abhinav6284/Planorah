@@ -215,7 +215,7 @@ export default function StepForm() {
                                         name={field.name}
                                         value={formData[field.name]}
                                         onChange={handleChange}
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-black focus:ring-1 focus:ring-black outline-none bg-gray-50 focus:bg-white"
+                                        className="onboarding-select"
                                     >
                                         {field.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                     </select>
@@ -226,7 +226,7 @@ export default function StepForm() {
                                         value={formData[field.name]}
                                         onChange={handleChange}
                                         placeholder={field.placeholder}
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-black focus:ring-1 focus:ring-black outline-none bg-gray-50 focus:bg-white"
+                                        className="onboarding-input"
                                     />
                                 )}
                             </div>
