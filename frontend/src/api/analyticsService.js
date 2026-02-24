@@ -7,25 +7,25 @@ import api from './axios';
 export const analyticsService = {
     // Get dashboard statistics
     getDashboard: async () => {
-        const response = await api.get('/api/analytics/dashboard/');
+        const response = await api.get('analytics/dashboard/');
         return response.data;
     },
 
     // Get overall user progress
     getProgress: async () => {
-        const response = await api.get('/api/analytics/progress/');
+        const response = await api.get('analytics/progress/');
         return response.data;
     },
 
     // Get all roadmap progress
     getRoadmapProgress: async () => {
-        const response = await api.get('/api/analytics/roadmaps/');
+        const response = await api.get('analytics/roadmaps/');
         return response.data;
     },
 
     // Get activity chart data
     getActivityChart: async (days = 30) => {
-        const response = await api.get('/api/analytics/activity_chart/', {
+        const response = await api.get('analytics/activity_chart/', {
             params: { days }
         });
         return response.data;
@@ -33,7 +33,7 @@ export const analyticsService = {
 
     // Get usage logs
     getUsageLogs: async (limit = 50) => {
-        const response = await api.get('/api/analytics/usage_logs/', {
+        const response = await api.get('analytics/usage_logs/', {
             params: { limit }
         });
         return response.data;
@@ -48,7 +48,7 @@ export const analyticsService = {
         if (resourceId) {
             data.resource_id = resourceId;
         }
-        const response = await api.post('/api/analytics/log_activity/', data);
+        const response = await api.post('analytics/log_activity/', data);
         return response.data;
     }
 };

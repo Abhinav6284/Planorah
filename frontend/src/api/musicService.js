@@ -31,37 +31,37 @@ export const musicService = {
     },
 
     spotifyCallback: async (code) => {
-        const response = await api.post('/api/music/spotify/callback/', { code });
+        const response = await api.post('music/spotify/callback/', { code });
         return response.data;
     },
 
     getSpotifyStatus: async () => {
-        const response = await api.get('/api/music/spotify/status/');
+        const response = await api.get('music/spotify/status/');
         return response.data;
     },
 
     disconnectSpotify: async () => {
-        const response = await api.post('/api/music/spotify/disconnect/');
+        const response = await api.post('music/spotify/disconnect/');
         return response.data;
     },
 
     getNowPlaying: async () => {
-        const response = await api.get('/api/music/spotify/now-playing/');
+        const response = await api.get('music/spotify/now-playing/');
         return response.data;
     },
 
     playbackControl: async (action) => {
-        const response = await api.post('/api/music/spotify/playback/', { action });
+        const response = await api.post('music/spotify/playback/', { action });
         return response.data;
     },
 
     getPlaylists: async () => {
-        const response = await api.get('/api/music/spotify/playlists/');
+        const response = await api.get('music/spotify/playlists/');
         return response.data;
     },
 
     playPlaylist: async (playlistUri) => {
-        const response = await api.post('/api/music/spotify/play-playlist/', { playlist_uri: playlistUri });
+        const response = await api.post('music/spotify/play-playlist/', { playlist_uri: playlistUri });
         return response.data;
     },
 
@@ -79,28 +79,28 @@ export const musicService = {
     },
 
     youtubeCallback: async (code) => {
-        const response = await api.post('/api/music/youtube/callback/', { code });
+        const response = await api.post('music/youtube/callback/', { code });
         return response.data;
     },
 
     getYouTubeStatus: async () => {
-        const response = await api.get('/api/music/youtube/status/');
+        const response = await api.get('music/youtube/status/');
         return response.data;
     },
 
     disconnectYouTube: async () => {
-        const response = await api.post('/api/music/youtube/disconnect/');
+        const response = await api.post('music/youtube/disconnect/');
         return response.data;
     },
 
     // ==================== Preferences ====================
     getPreferences: async () => {
-        const response = await api.get('/api/music/preferences/');
+        const response = await api.get('music/preferences/');
         return response.data;
     },
 
     updatePreferences: async (preferences) => {
-        const response = await api.put('/api/music/preferences/', preferences);
+        const response = await api.put('music/preferences/', preferences);
         return response.data;
     },
 };

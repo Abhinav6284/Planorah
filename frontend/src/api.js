@@ -13,7 +13,9 @@ const api = axios.create({
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
-        console.log("API Request:", config.url, "Token exists:", !!token);
+        if (process.env.REACT_APP_API_DEBUG === "true") {
+            console.log("API Request:", config.url, "Token exists:", !!token);
+        }
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }

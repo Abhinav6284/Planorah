@@ -1,115 +1,65 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export default function ForgotPassword() {
     const [email, setEmail] = useState("");
-    const [message, setMessage] = useState("");
+    const [message, setMessage] = useState({ text: "", type: "" });
     const [loading, setLoading] = useState(false);
-    const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
-    const [isVisible, setIsVisible] = useState(false);
     const navigate = useNavigate();
-
-    useEffect(() => {
-        setIsVisible(true);
-        const handleMouseMove = (e) => {
-            setMousePosition({
-                x: (e.clientX / window.innerWidth) * 100,
-                y: (e.clientY / window.innerHeight) * 100,
-            });
-        };
-        window.addEventListener("mousemove", handleMouseMove);
-        return () => window.removeEventListener("mousemove", handleMouseMove);
-    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!email.trim()) {
-            setMessage("⚠️ Please enter your email address.");
+            setMessage({ text: "Please enter your email address.", type: "error" });
             return;
         }
 
         setLoading(true);
-        setMessage("");
+        setMessage({ text: "", type: "" });
 
         try {
             const res = await axios.post(
-                `/users/request-password-reset/`,
-                { email }
+                `/api/users/request-password-reset/`,
+                { email: email.trim() }
             );
 
-            setMessage("✅ " + res.data.message);
+            setMessage({ text: res.data.message || "OTP sent successfully!", type: "success" });
             setTimeout(() => {
-                navigate("/verify-reset-otp", { state: { email } });
+                navigate("/verify-reset-otp", { state: { email: email.trim() } });
             }, 1500);
         } catch (err) {
             const errorMsg =
                 err.response?.data?.message ||
-                "❌ Unable to send OTP. Please try again later.";
-            setMessage(errorMsg);
+                "Unable to send OTP. Please try again later.";
+            setMessage({ text: errorMsg, type: "error" });
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="relative min-h-screen bg-white overflow-hidden flex items-center justify-center">
-            {/* Animated gradient following mouse */}
-            <div
-                className="absolute inset-0 opacity-[0.03] pointer-events-none transition-opacity duration-300"
-                style={{
-                    background: `radial-gradient(circle 600px at ${mousePosition.x}% ${mousePosition.y}%, black, transparent)`,
-                }}
-            />
-
-            {/* Floating geometric shapes */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                {[...Array(12)].map((_, i) => (
-                    <div
-                        key={i}
-                        className="absolute border border-black/5"
-                        style={{
-                            width: `${80 + i * 35}px`,
-                            height: `${80 + i * 35}px`,
-                            left: `${(i * 18) % 100}%`,
-                            top: `${(i * 22) % 100}%`,
-                            animation: `float-random ${9 + i * 1.5}s ease-in-out infinite`,
-                            animationDelay: `${i * 0.4}s`,
-                            transform: `rotate(${i * 25}deg)`,
-                        }}
-                    />
-                ))}
-            </div>
-
-            {/* Corner brackets */}
-            <div className="absolute top-8 left-8 w-16 h-16 border-t-2 border-l-2 border-black/20" />
-            <div className="absolute top-8 right-8 w-16 h-16 border-t-2 border-r-2 border-black/20" />
-            <div className="absolute bottom-8 left-8 w-16 h-16 border-b-2 border-l-2 border-black/20" />
-            <div className="absolute bottom-8 right-8 w-16 h-16 border-b-2 border-r-2 border-black/20" />
-
-            {/* Main content */}
-            <div
-                className={`relative z-10 bg-white border-4 border-black p-12 w-full max-w-md transition-all duration-1000 ${isVisible ? "opacity-100 scale-100" : "opacity-0 scale-90"
-                    }`}
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 font-sans">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white w-full max-w-md p-8 md:p-10 rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100"
             >
-                {/* Title */}
-                <h2 className="text-5xl font-black text-center mb-2 tracking-tighter">
-                    FORGOT
-                </h2>
-                <h3 className="text-3xl font-black text-center mb-4 tracking-tighter text-black/60">
-                    PASSWORD?
-                </h3>
-                <div className="h-1 w-20 bg-black mx-auto mb-6" />
-
-                <p className="text-center text-xs font-mono mb-8 text-black/60">
-                    ENTER YOUR EMAIL TO RECEIVE AN OTP
-                </p>
+                <div className="text-center mb-8">
+                    <Link to="/" className="inline-block text-xl font-serif font-bold text-gray-900 mb-6">
+                        Planorah<span className="text-gray-400">.</span>
+                    </Link>
+                    <h2 className="text-2xl font-serif font-medium text-gray-900 mb-2">Forgot your password?</h2>
+                    <p className="text-gray-500 text-sm">
+                        Enter your email to receive a 6-digit OTP
+                    </p>
+                </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Email Input */}
                     <div>
-                        <label className="block text-xs font-black tracking-widest mb-2 uppercase">
+                        <label className="block text-xs font-semibold tracking-wide text-gray-600 mb-2 uppercase">
                             Email Address
                         </label>
                         <input
@@ -117,58 +67,46 @@ export default function ForgotPassword() {
                             placeholder="you@example.com"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-3 border-2 border-black bg-white focus:bg-black focus:text-white outline-none transition-all duration-300 font-mono"
+                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:border-black focus:ring-2 focus:ring-black/5 outline-none transition-all bg-gray-50 focus:bg-white"
                             required
                         />
                     </div>
 
-                    {/* Submit Button */}
+                    {message.text && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className={`p-4 rounded-xl text-center text-sm ${message.type === "success"
+                                ? "bg-green-50 text-green-700 border border-green-200"
+                                : "bg-red-50 text-red-700 border border-red-200"
+                                }`}
+                        >
+                            {message.type === "success" ? "✓ " : "✕ "}
+                            {message.text}
+                        </motion.div>
+                    )}
+
                     <button
                         type="submit"
                         disabled={loading}
-                        className={`group relative w-full py-4 bg-black text-white font-black text-lg tracking-widest uppercase overflow-hidden transition-all duration-300 ${loading
-                            ? "opacity-50 cursor-not-allowed"
-                            : "hover:bg-white hover:text-black hover:border-4 hover:border-black"
+                        className={`w-full py-4 rounded-xl font-semibold text-base transition-all duration-300 ${loading
+                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                            : "bg-black text-white hover:bg-gray-800 active:scale-[0.98]"
                             }`}
                     >
-                        <span className="relative z-10">
-                            {loading ? "SENDING OTP..." : "SEND OTP"}
-                        </span>
+                        {loading ? "Sending OTP..." : "Send OTP"}
                     </button>
                 </form>
 
-                {/* Message */}
-                {message && (
-                    <div
-                        className={`mt-6 p-3 border-2 text-center font-mono text-sm ${message.includes("✅")
-                            ? "border-black bg-black text-white"
-                            : message.includes("⚠️")
-                                ? "border-black bg-yellow-100 text-black"
-                                : "border-black bg-white text-black"
-                            }`}
-                    >
-                        {message}
-                    </div>
-                )}
-
-                {/* Back to Login */}
-                <p className="text-center text-xs mt-8 font-bold tracking-wider">
-                    REMEMBERED YOUR PASSWORD?{" "}
-                    <button
-                        type="button"
-                        onClick={() => navigate("/login")}
-                        className="font-black underline hover:no-underline"
-                    >
-                        BACK TO LOGIN
-                    </button>
-                </p>
-
-                {/* Decorative corners */}
-                <div className="absolute -top-2 -left-2 w-4 h-4 bg-white border-2 border-black" />
-                <div className="absolute -top-2 -right-2 w-4 h-4 bg-white border-2 border-black" />
-                <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-white border-2 border-black" />
-                <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-white border-2 border-black" />
-            </div>
+                <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+                    <p className="text-sm text-gray-500">
+                        Remembered your password?{" "}
+                        <Link to="/login" className="font-medium text-black hover:text-gray-600 transition-colors">
+                            Back to login
+                        </Link>
+                    </p>
+                </div>
+            </motion.div>
         </div>
     );
 }

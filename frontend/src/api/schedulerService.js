@@ -89,4 +89,9 @@ export const schedulerService = {
         const response = await api.get("dashboard/stats/");
         return response.data;
     },
+
+    getOnboardingInsights: async () => {
+        const response = await api.get("dashboard/onboarding-insights/");
+        return response.data;
+    },
 };

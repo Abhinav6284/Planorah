@@ -2,9 +2,12 @@ from django.db import models
 from django.conf import settings
 import uuid
 import hashlib
-import uuid
-import hashlib
 from django.utils import timezone
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from tasks.models import TaskAttempt
+    from django.db.models.manager import RelatedManager
 
 
 class Roadmap(models.Model):
@@ -227,6 +230,9 @@ class Task(models.Model):
         default=0, help_text="Display order within roadmap/milestone")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    if TYPE_CHECKING:
+        attempts: 'RelatedManager[TaskAttempt]'
 
     class Meta:
         ordering = ['order', 'created_at']

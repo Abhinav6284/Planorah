@@ -7,13 +7,13 @@ import api from './axios';
 export const codeProjectService = {
     // List user's saved CodeSpace projects
     getProjects: async () => {
-        const response = await api.get('/api/projects/');
+        const response = await api.get('projects/');
         return response.data;
     },
 
     // Get a specific project with files
     getProject: async (projectId) => {
-        const response = await api.get(`/api/projects/${projectId}/`);
+        const response = await api.get(`projects/${projectId}/`);
         return response.data;
     },
 
@@ -28,24 +28,24 @@ export const codeProjectService = {
          *   files: [{ path: string, content: string, language: string }]
          * }
          */
-        const response = await api.post('/api/projects/', projectData);
+        const response = await api.post('projects/', projectData);
         return response.data;
     },
 
     // Update an existing project
     updateProject: async (projectId, projectData) => {
-        const response = await api.put(`/api/projects/${projectId}/`, projectData);
+        const response = await api.put(`projects/${projectId}/`, projectData);
         return response.data;
     },
 
     // Delete a project
     deleteProject: async (projectId) => {
-        await api.delete(`/api/projects/${projectId}/`);
+        await api.delete(`projects/${projectId}/`);
     },
 
     // Add a single file to a project
     addFile: async (projectId, path, content) => {
-        const response = await api.post(`/api/projects/${projectId}/add_file/`, {
+        const response = await api.post(`projects/${projectId}/add_file/`, {
             path,
             content
         });
@@ -54,13 +54,13 @@ export const codeProjectService = {
 
     // Get all files for a project
     getFiles: async (projectId) => {
-        const response = await api.get(`/api/projects/${projectId}/files/`);
+        const response = await api.get(`projects/${projectId}/files/`);
         return response.data;
     },
 
     // Prepare project for GitHub push (validate)
     prepareGitHub: async (projectId, repoName) => {
-        const response = await api.post(`/api/projects/${projectId}/prepare_github/`, {
+        const response = await api.post(`projects/${projectId}/prepare_github/`, {
             repo_name: repoName
         });
         return response.data;
@@ -75,7 +75,7 @@ export const codeProjectService = {
          *   description: string (optional)
          * }
          */
-        const response = await api.post('/api/github/publish_user_project/', {
+        const response = await api.post('github/publish_user_project/', {
             project_id: projectId,
             ...options
         });
@@ -84,7 +84,7 @@ export const codeProjectService = {
 
     // Check GitHub connection status
     checkGitHubStatus: async () => {
-        const response = await api.get('/api/github/status/');
+        const response = await api.get('github/status/');
         return response.data;
     }
 };

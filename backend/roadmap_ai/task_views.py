@@ -10,15 +10,15 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from django.db.models import Q
 
-from .models import Task, TaskAttempt, TaskValidator
-from .serializers import (
+from .models import Task
+from tasks.models import TaskAttempt
+from tasks.serializers import (
     TaskSerializer,
     TaskSubmitSerializer,
     TaskAttemptListSerializer,
     TaskAttemptDetailSerializer,
-    TaskValidatorSerializer
 )
-from .validators import run_validation
+from tasks.validators import run_validation
 
 
 class TaskViewSet(viewsets.ReadOnlyModelViewSet):

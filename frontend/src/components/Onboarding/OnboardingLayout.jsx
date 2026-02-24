@@ -4,36 +4,40 @@ import { motion } from "framer-motion";
 
 export default function OnboardingLayout({ children, title, subtitle }) {
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
-            <header className="p-6">
-                <Link to="/" className="text-xl font-serif font-bold text-gray-900">
-                    Planorah<span className="text-gray-400">.</span>
+        <div className="onboarding-shell min-h-screen flex flex-col font-sans text-gray-900 dark:text-white transition-colors duration-300">
+            <header className="fixed top-0 left-0 w-full p-6 md:p-8 z-50 bg-white/45 dark:bg-slate-950/45 backdrop-blur-md border-b border-white/40 dark:border-slate-800/60">
+                <Link to="/" className="text-2xl font-serif font-bold tracking-tight text-slate-900 dark:text-slate-100">
+                    Planorah<span className="text-slate-500 dark:text-slate-400">.</span>
                 </Link>
             </header>
 
-            <main className="flex-1 flex flex-col items-center justify-center p-6 pb-20">
+            <main className="flex-1 flex flex-col items-center justify-center pt-32 pb-20 px-6">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="w-full max-w-2xl"
+                    className="onboarding-panel w-full max-w-4xl mx-auto"
                 >
-                    <div className="mb-10 text-center">
-                        {/* Support for Badge */}
-                        {title.badge && (
-                            <div className="flex justify-center mb-4">
-                                <span className="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-                                    {title.badge}
-                                </span>
-                            </div>
-                        )}
+                    {title && (
+                        <div className="mb-12">
+                            {typeof title === 'object' && title.badge && (
+                                <div className="inline-block mb-6">
+                                    <span className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white text-xs font-semibold rounded-full uppercase tracking-wider border border-gray-200 dark:border-gray-700">
+                                        {title.badge}
+                                    </span>
+                                </div>
+                            )}
+                            <h1 className="text-4xl md:text-5xl font-serif font-medium mb-6 leading-tight text-gray-900 dark:text-white">
+                                {typeof title === 'object' ? title.text : title}
+                            </h1>
+                            {subtitle && (
+                                <p className="text-xl text-gray-500 dark:text-gray-400 font-light leading-relaxed">
+                                    {subtitle}
+                                </p>
+                            )}
+                        </div>
+                    )}
 
-                        <h1 className="text-3xl md:text-4xl font-serif font-medium text-gray-900 mb-4">
-                            {title.text || title}
-                        </h1>
-                        {subtitle && <p className="text-gray-500 text-lg">{subtitle}</p>}
-                    </div>
-
-                    <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl shadow-gray-200/50 border border-gray-100">
+                    <div className="w-full onboarding-content">
                         {children}
                     </div>
                 </motion.div>

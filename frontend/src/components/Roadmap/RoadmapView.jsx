@@ -171,7 +171,7 @@ export default function RoadmapView() {
                         >
                             View Daily Tasks
                         </button>
-                        <GenerateResumeButton 
+                        <GenerateResumeButton
                             roadmapId={id}
                             onSuccess={(resume) => navigate(`/resume/compiled/${resume.version_id}`)}
                         />

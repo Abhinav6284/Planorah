@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from "../../context/ThemeContext";
 import { userService } from "../../api/userService";
 import { AnimatePresence, motion } from 'framer-motion';
+import { User, Bell, Mail, Sun, Moon, LogOut } from 'lucide-react';
 
 const Header = () => {
     const location = useLocation();
@@ -187,20 +188,20 @@ const Header = () => {
                             to="/profile"
                             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition-colors"
                         >
-                            <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center">👤</span>
+                            <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center"><User className="w-4 h-4 text-gray-600 dark:text-gray-300" /></span>
                             <span>My Profile</span>
                         </Link>
                         <button
                             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition-colors"
                         >
-                            <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center">🔔</span>
+                            <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center"><Bell className="w-4 h-4 text-gray-600 dark:text-gray-300" /></span>
                             <span>Notifications</span>
                         </button>
                         <Link
                             to="/support"
                             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition-colors"
                         >
-                            <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center">✉️</span>
+                            <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center"><Mail className="w-4 h-4 text-gray-600 dark:text-gray-300" /></span>
                             <span>Contact Support</span>
                         </Link>
                         <div className="my-2 border-t border-gray-100 dark:border-white/5"></div>
@@ -208,7 +209,7 @@ const Header = () => {
                             onClick={toggleTheme}
                             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition-colors"
                         >
-                            <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center">{theme === 'light' ? '🌙' : '☀️'}</span>
+                            <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center">{theme === 'light' ? <Moon className="w-4 h-4 text-gray-600" /> : <Sun className="w-4 h-4 text-yellow-400" />}</span>
                             <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
                         </button>
                         <div className="my-2 border-t border-gray-100 dark:border-white/5"></div>
@@ -220,7 +221,7 @@ const Header = () => {
                             }}
                             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                         >
-                            <span className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/20 flex items-center justify-center">🚪</span>
+                            <span className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/20 flex items-center justify-center"><LogOut className="w-4 h-4 text-red-500" /></span>
                             <span>Logout</span>
                         </button>
                     </div>
@@ -357,7 +358,7 @@ const Header = () => {
                                     onClick={toggleTheme}
                                     className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                                 >
-                                    <span className="text-xl">{theme === 'light' ? '🌙' : '☀️'}</span>
+                                    <span className="text-xl flex items-center justify-center">{theme === 'light' ? <Moon className="w-5 h-5 text-gray-700 dark:text-gray-300" /> : <Sun className="w-5 h-5 text-yellow-400" />}</span>
                                     <span className="font-medium">{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
                                 </button>
                                 <button
@@ -368,7 +369,7 @@ const Header = () => {
                                     }}
                                     className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors mt-2"
                                 >
-                                    <span className="text-xl">🚪</span>
+                                    <span className="text-xl flex items-center justify-center"><LogOut className="w-5 h-5" /></span>
                                     <span className="font-medium">Logout</span>
                                 </button>
                             </div>

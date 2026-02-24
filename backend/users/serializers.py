@@ -63,7 +63,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "goal_type",
             "readiness_score",
             "onboarding_accepted_terms",
-            "goal_locked_at"
+            "goal_locked_at",
+            # Education-stage onboarding fields
+            "education_stage",
+            "onboarding_data",
         ]
         read_only_fields = ["onboarding_complete", "goal_locked_at"]
 

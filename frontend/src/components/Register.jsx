@@ -4,9 +4,12 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useGoogleLogin } from '@react-oauth/google';
 import { setTokens } from "../utils/auth";
+import { useTheme } from "../context/ThemeContext";
+import env from "../config/env";
 
 export default function Register() {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -14,7 +17,7 @@ export default function Register() {
   });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -24,7 +27,7 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post(`/users/register/`, formData);
+      const res = await axios.post(`/api/users/register/`, formData);
       setMessage("success:" + (res.data.message || "OTP sent successfully!"));
       if (res.data.message.includes("OTP")) {
         setTimeout(() => navigate("/verify-otp", { state: { ...formData } }), 1500);
@@ -42,7 +45,7 @@ export default function Register() {
       setLoading(true);
       setMessage("");
       try {
-        const res = await axios.post(`/users/google/login/`, {
+        const res = await axios.post(`/api/users/google/login/`, {
           token: tokenResponse.access_token,
           mode: "signup"
         });
@@ -84,15 +87,28 @@ export default function Register() {
 
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-yellow-100 flex flex-col justify-between p-4 md:p-6 lg:p-12">
+    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-sans selection:bg-yellow-100 dark:selection:bg-yellow-900 flex flex-col justify-between p-4 md:p-6 lg:p-12 transition-colors duration-300">
       {/* Header */}
       <header className="flex justify-between items-center w-full max-w-7xl mx-auto">
-        <Link to="/" className="text-xl md:text-2xl font-bold tracking-tight">Planorah.</Link>
+        <Link to="/" className="text-xl md:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Planorah.</Link>
         <div className="flex items-center gap-3 md:gap-6">
-          <Link to="/login" className="hidden md:block text-sm font-medium hover:opacity-70">Already have an account?</Link>
-          <Link to="/login" className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-black font-semibold rounded-full transition-all">
-            Sign In
-          </Link>
+          <Link to="/login" className="hidden md:block text-sm font-medium hover:opacity-70 text-gray-700 dark:text-gray-300">Already have an account?</Link>
+          <Link to="/login" className="text-sm font-medium hover:opacity-70 text-gray-700 dark:text-gray-300 md:hidden">Sign In</Link>
+          <button
+            onClick={toggleTheme}
+            className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+          >
+            {theme === 'light' ? (
+              <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            )}
+          </button>
         </div>
       </header>
 
@@ -101,10 +117,10 @@ export default function Register() {
 
         {/* Hero Section */}
         <div className="text-center mb-16 relative">
-          <span className="inline-block py-1 px-3 rounded-full bg-yellow-100 text-xs font-medium text-yellow-800 mb-6">
+          <span className="inline-block py-1 px-3 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-xs font-medium text-yellow-800 dark:text-yellow-300 mb-6">
             Join the community
           </span>
-          <h1 className="text-5xl md:text-7xl font-serif max-w-4xl mx-auto leading-tight relative z-10">
+          <h1 className="text-5xl md:text-7xl font-serif max-w-4xl mx-auto leading-tight relative z-10 text-gray-900 dark:text-white">
             Create Your New <br />
             <span className="relative inline-block">
               Account
@@ -120,7 +136,7 @@ export default function Register() {
               </motion.svg>
             </span>
           </h1>
-          <p className="mt-6 text-lg text-gray-500 max-w-xl mx-auto">
+          <p className="mt-6 text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
             Start organizing your academic life and collaborating with ease.
           </p>
         </div>
@@ -138,7 +154,7 @@ export default function Register() {
                   value={formData.username}
                   onChange={handleChange}
                   placeholder="Choose a Username"
-                  className="w-full px-8 py-5 rounded-full bg-white border border-gray-200 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all placeholder-gray-400 shadow-sm text-lg"
+                  className="w-full px-8 py-5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-sm text-lg text-gray-900 dark:text-white"
                   required
                 />
                 <input
@@ -147,18 +163,32 @@ export default function Register() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="Email Address"
-                  className="w-full px-8 py-5 rounded-full bg-white border border-gray-200 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all placeholder-gray-400 shadow-sm text-lg"
+                  className="w-full px-8 py-5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-sm text-lg text-gray-900 dark:text-white"
                   required
                 />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Create Password"
-                  className="w-full px-8 py-5 rounded-full bg-white border border-gray-200 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all placeholder-gray-400 shadow-sm text-lg"
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Create Password"
+                    className="w-full px-8 py-5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-sm text-lg pr-14 text-gray-900 dark:text-white"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors p-1"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                    ) : (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                    )}
+                  </button>
+                </div>
               </div>
 
               {message && (
@@ -170,11 +200,11 @@ export default function Register() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-5 bg-black text-white rounded-full font-bold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-between px-8 group disabled:opacity-70"
+                className="w-full py-5 bg-black dark:bg-white text-white dark:text-black rounded-full font-bold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-between px-8 group disabled:opacity-70"
               >
                 <span>{loading ? "Creating Account..." : "Create Account"}</span>
-                <span className="bg-white/20 p-2 rounded-full group-hover:bg-white/30 transition-colors">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span className="bg-white/20 dark:bg-black/20 p-2 rounded-full group-hover:bg-white/30 dark:group-hover:bg-black/30 transition-colors">
+                  <svg className="w-5 h-5 text-white dark:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
                 </span>
@@ -184,14 +214,14 @@ export default function Register() {
 
           {/* Divider */}
           <div className="hidden md:flex flex-col items-center justify-center">
-            <div className="h-full w-px bg-gray-200/50"></div>
-            <span className="py-4 text-gray-400 italic font-serif text-xl">/</span>
-            <div className="h-full w-px bg-gray-200/50"></div>
+            <div className="h-full w-px bg-gray-200/50 dark:bg-gray-700/50"></div>
+            <span className="py-4 text-gray-400 dark:text-gray-500 italic font-serif text-xl">/</span>
+            <div className="h-full w-px bg-gray-200/50 dark:bg-gray-700/50"></div>
           </div>
           <div className="md:hidden flex items-center gap-4 w-full">
-            <div className="h-px bg-gray-200 flex-1"></div>
-            <span className="text-gray-400 italic">or</span>
-            <div className="h-px bg-gray-200 flex-1"></div>
+            <div className="h-px bg-gray-200 dark:bg-gray-700 flex-1"></div>
+            <span className="text-gray-400 dark:text-gray-500 italic">or</span>
+            <div className="h-px bg-gray-200 dark:bg-gray-700 flex-1"></div>
           </div>
 
           {/* Right Column: Social Login */}
@@ -199,9 +229,9 @@ export default function Register() {
             {/* Google Button */}
             <button
               onClick={() => login()}
-              className="w-full py-4 px-8 rounded-full border border-gray-200 hover:bg-gray-50 transition-all flex items-center justify-start gap-4 group bg-white shadow-sm hover:shadow-md"
+              className="w-full py-4 px-8 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center justify-start gap-4 group bg-white dark:bg-gray-800/50 shadow-sm hover:shadow-md"
             >
-              <div className="p-2 bg-gray-50 rounded-full group-hover:scale-110 transition-transform">
+              <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-full group-hover:scale-110 transition-transform">
                 <svg className="w-6 h-6" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                   <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -209,7 +239,7 @@ export default function Register() {
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                 </svg>
               </div>
-              <span className="text-lg font-medium text-gray-700">Sign up with Gmail Account</span>
+              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">Sign up with Gmail Account</span>
             </button>
 
 
@@ -217,25 +247,25 @@ export default function Register() {
             {/* GitHub Button */}
             <button
               onClick={() => {
-                const clientId = 'Ov23ctPC9ZlwUvXMuyWM';
+                const clientId = env.GITHUB_CLIENT_ID;
                 const redirectUri = encodeURIComponent(window.location.origin + '/auth/github/callback');
                 const scope = encodeURIComponent('read:user user:email');
                 const state = encodeURIComponent('signup');
                 window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
               }}
-              className="w-full py-4 px-8 rounded-full border border-gray-200 hover:bg-gray-50 transition-all flex items-center justify-start gap-4 group bg-white shadow-sm hover:shadow-md"
+              className="w-full py-4 px-8 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center justify-start gap-4 group bg-white dark:bg-gray-800/50 shadow-sm hover:shadow-md"
             >
-              <div className="p-2 bg-gray-50 rounded-full group-hover:scale-110 transition-transform">
-                <svg className="w-6 h-6 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
+              <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-full group-hover:scale-110 transition-transform">
+                <svg className="w-6 h-6 text-gray-900 dark:text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path fillRule="evenodd" clipRule="evenodd" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
                 </svg>
               </div>
-              <span className="text-lg font-medium text-gray-700">Sign up with GitHub account</span>
+              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">Sign up with GitHub account</span>
             </button>
 
             {/* Placeholder for more buttons (Apple, Facebook etc) */}
-            <div className="w-full py-4 px-8 rounded-full border border-gray-100 flex items-center justify-start gap-4 opacity-50 cursor-not-allowed">
-              <div className="p-2 bg-gray-50 rounded-full">
+            <div className="w-full py-4 px-8 rounded-full border border-gray-100 dark:border-gray-800 flex items-center justify-start gap-4 opacity-50 cursor-not-allowed">
+              <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-full">
                 <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M17.05 20.28c-.98.95-2.05.88-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.78 1.18-.19 2.31-.89 3.51-.84 1.54.02 2.68.75 3.37 1.74-2.69 1.63-2.12 5.04.5 6.13-.57 1.4-1.31 2.76-2.46 3.16zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.17 2.29-2.08 4.28-3.74 4.25z" />
                 </svg>
@@ -247,7 +277,7 @@ export default function Register() {
 
         {/* Footer Link */}
         <div className="mt-16 text-center">
-          <Link to="/contact" className="text-lg font-medium text-gray-900 hover:text-gray-600 transition-colors border-b-2 border-black/10 hover:border-black pb-0.5">
+          <Link to="/contact" className="text-lg font-medium text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors border-b-2 border-black/10 dark:border-white/10 hover:border-black dark:hover:border-white pb-0.5">
             Need Help?
           </Link>
         </div>
@@ -255,13 +285,13 @@ export default function Register() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-400 mt-12 py-4 border-t border-gray-100 md:border-none">
+      <footer className="w-full max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-400 dark:text-gray-500 mt-12 py-4 border-t border-gray-100 dark:border-gray-800 md:border-none">
         <div className="flex gap-6">
           <Link to="/privacy">Privacy Policy</Link>
           <Link to="/terms">Terms & Conditions</Link>
         </div>
         <div className="text-center sm:text-right">
-          Copyrights @Planorah 2024
+          Copyrights @Planorah 2025
         </div>
       </footer>
     </div>

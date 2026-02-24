@@ -10,24 +10,24 @@ export default function LandingPage() {
 
   const features = [
     {
-      title: "Smart Tracking",
-      description: "AI-powered progress tracking with detailed analytics and personalized insights.",
+      title: "Universal Validation",
+      description: "For students, researchers, designers, professors — anyone building verified work.",
+      icon: "🎓",
+    },
+    {
+      title: "Proof-Based System",
+      description: "Every task requires evidence. No claims without verification.",
+      icon: "🔒",
+    },
+    {
+      title: "Compiled Outputs",
+      description: "Auto-generate portfolios, resumes, research logs from your validated work.",
       icon: "📊",
     },
     {
-      title: "Real-time Collaboration",
-      description: "Work together seamlessly with live editing and instant synchronization.",
-      icon: "✨",
-    },
-    {
-      title: "Project Portfolio",
-      description: "Showcase your work with beautiful templates and custom domains.",
-      icon: "🎨",
-    },
-    {
-      title: "Productivity Boost",
-      description: "Smart reminders, time tracking, and focus modes to maximize efficiency.",
-      icon: "⚡",
+      title: "Goal Enforcement",
+      description: "Lock your goal, track progress, no fantasy — just execution.",
+      icon: "🎯",
     },
   ];
 
@@ -141,18 +141,34 @@ export default function LandingPage() {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <span className="inline-block px-4 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-sm font-medium mb-8">
-              ✨ The Student Success OS
+              ✨ Turn Goals into Verified Work
             </span>
-            <h1 className="text-6xl md:text-8xl font-serif font-medium text-gray-900 dark:text-white mb-8 leading-tight tracking-tight">
-              Build. Learn. <br />
-              <span className="italic text-gray-400 dark:text-gray-500">Grow.</span>
+            <h1 className="text-5xl md:text-7xl font-serif font-medium text-gray-900 dark:text-white mb-8 leading-tight tracking-tight">
+              Proof, Not Promises<span className="text-gray-400 dark:text-gray-500">.</span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-500 dark:text-gray-400 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
-              The ultimate platform for students and creators to track progress, collaborate with peers, and achieve their dreams.
+            <p className="text-xl md:text-2xl text-gray-500 dark:text-gray-400 mb-6 max-w-3xl mx-auto font-light leading-relaxed">
+              Planorah helps you turn goals into verified work — with proof, not promises.
             </p>
+            <div className="flex flex-wrap justify-center gap-6 mb-12 text-gray-600 dark:text-gray-400 font-medium">
+              <span className="flex items-center gap-2">
+                <span className="text-green-500">✓</span> Learn skills
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="text-green-500">✓</span> Build projects
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="text-green-500">✓</span> Do research
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="text-green-500">✓</span> Track execution
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="text-green-500">✓</span> Generate outcomes
+              </span>
+            </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link to="/login">
+              <Link to="/register">
                 <button className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-2xl text-lg font-medium hover:scale-105 transition-transform shadow-xl shadow-black/10 dark:shadow-white/5">
                   Start Your Journey
                 </button>
@@ -175,8 +191,8 @@ export default function LandingPage() {
       <section id="features" className="py-32 px-6 bg-gray-50 dark:bg-gray-800/50 transition-colors duration-300">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-serif font-medium text-gray-900 dark:text-white mb-6">Designed for Focus</h2>
-            <p className="text-xl text-gray-500 dark:text-gray-400 font-light">Everything you need to succeed, nothing you don't.</p>
+            <h2 className="text-4xl md:text-5xl font-serif font-medium text-gray-900 dark:text-white mb-6">One System, All Goals</h2>
+            <p className="text-xl text-gray-500 dark:text-gray-400 font-light">Whether you code, research, design, or teach — same validation engine.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

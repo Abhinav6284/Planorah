@@ -11,13 +11,13 @@ export const billingService = {
         if (couponCode) {
             data.coupon_code = couponCode;
         }
-        const response = await api.post('/api/billing/payments/create_order/', data);
+        const response = await api.post('billing/payments/create_order/', data);
         return response.data;
     },
 
     // Verify payment completion
     verifyPayment: async (orderId, paymentId, signature) => {
-        const response = await api.post('/api/billing/payments/verify/', {
+        const response = await api.post('billing/payments/verify/', {
             order_id: orderId,
             payment_id: paymentId,
             signature: signature
@@ -27,25 +27,25 @@ export const billingService = {
 
     // Get payment history
     getHistory: async () => {
-        const response = await api.get('/api/billing/payments/history/');
+        const response = await api.get('billing/payments/history/');
         return response.data;
     },
 
     // Get invoices
     getInvoices: async () => {
-        const response = await api.get('/api/billing/invoices/');
+        const response = await api.get('billing/invoices/');
         return response.data;
     },
 
     // Get invoice by ID
     getInvoiceById: async (invoiceId) => {
-        const response = await api.get(`/api/billing/invoices/${invoiceId}/`);
+        const response = await api.get(`billing/invoices/${invoiceId}/`);
         return response.data;
     },
 
     // Validate coupon code
     validateCoupon: async (code, planId) => {
-        const response = await api.post('/api/billing/coupons/validate/', {
+        const response = await api.post('billing/coupons/validate/', {
             code: code,
             plan_id: planId
         });

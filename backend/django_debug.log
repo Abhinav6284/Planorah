@@ -401,3 +401,641 @@ INFO 2026-01-16 23:54:31,075 autoreload Watching for file changes with StatReloa
 INFO 2026-01-16 23:54:34,904 autoreload P:\Planora\backend\users\serializers.py changed, reloading.
 INFO 2026-01-16 23:54:37,006 autoreload Watching for file changes with StatReloader
 INFO 2026-01-16 23:55:07,925 autoreload Watching for file changes with StatReloader
+INFO 2026-01-17 01:34:03,554 autoreload Watching for file changes with StatReloader
+INFO 2026-01-17 01:37:29,536 basehttp "POST /api/users/login/ HTTP/1.1" 200 620
+INFO 2026-01-17 01:38:00,705 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-01-17 01:38:00,748 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-01-17 02:13:44,894 autoreload Watching for file changes with StatReloader
+WARNING 2026-01-17 02:13:54,153 log Unauthorized: /api/subscriptions/current/
+WARNING 2026-01-17 02:13:54,154 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 401 58
+INFO 2026-01-17 02:18:15,712 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-01-17 02:18:15,881 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-01-17 02:18:17,532 autoreload P:\Planora\backend\backend\settings.py changed, reloading.
+INFO 2026-01-17 02:18:18,519 autoreload Watching for file changes with StatReloader
+INFO 2026-01-17 02:24:01,695 autoreload Watching for file changes with StatReloader
+INFO 2026-01-17 02:27:15,880 autoreload Watching for file changes with StatReloader
+WARNING 2026-01-17 02:27:26,948 log Unauthorized: /api/subscriptions/current/
+WARNING 2026-01-17 02:27:26,948 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 401 172
+INFO 2026-01-17 02:29:20,032 autoreload Watching for file changes with StatReloader
+INFO 2026-01-17 02:43:06,019 autoreload P:\Planora\backend\users\models.py changed, reloading.
+INFO 2026-01-17 02:43:07,892 autoreload Watching for file changes with StatReloader
+INFO 2026-01-17 02:43:16,426 autoreload P:\Planora\backend\users\serializers.py changed, reloading.
+INFO 2026-01-17 02:43:18,146 autoreload Watching for file changes with StatReloader
+INFO 2026-01-17 02:48:43,637 autoreload P:\Planora\backend\users\models.py changed, reloading.
+INFO 2026-01-17 02:48:45,313 autoreload Watching for file changes with StatReloader
+INFO 2026-01-17 02:49:04,997 autoreload Watching for file changes with StatReloader
+INFO 2026-01-17 02:49:29,192 autoreload P:\Planora\backend\user_lifecycle\migrations\0002_rename_user_lifecy_user_id_77b9ff_idx_user_lifecy_user_id_5def59_idx_and_more.py changed, reloading.
+INFO 2026-01-17 02:49:29,831 autoreload Watching for file changes with StatReloader
+INFO 2026-01-17 02:49:48,195 autoreload P:\Planora\backend\user_lifecycle\migrations\0002_rename_user_lifecy_user_id_77b9ff_idx_user_lifecy_user_id_5def59_idx_and_more.py changed, reloading.
+INFO 2026-01-17 02:49:49,065 autoreload Watching for file changes with StatReloader
+INFO 2026-01-17 02:49:55,460 basehttp "POST /api/users/login/ HTTP/1.1" 200 620
+WARNING 2026-01-17 19:10:31,464 log Unauthorized: /api/subscriptions/current/
+WARNING 2026-01-17 19:10:31,465 log Unauthorized: /api/subscriptions/current/
+WARNING 2026-01-17 19:10:31,504 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 401 172
+WARNING 2026-01-17 19:10:31,620 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 401 172
+INFO 2026-01-17 19:10:32,119 basehttp "POST /api/token/refresh/ HTTP/1.1" 200 489
+INFO 2026-01-17 19:10:32,122 basehttp "POST /api/token/refresh/ HTTP/1.1" 200 489
+INFO 2026-01-17 19:10:32,215 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-01-17 19:10:32,279 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-01-17 20:57:10,709 autoreload Watching for file changes with StatReloader
+INFO 2026-01-17 23:23:00,330 basehttp "POST /api/users/login/ HTTP/1.1" 200 620
+INFO 2026-01-17 23:23:46,920 basehttp "POST /api/users/login/ HTTP/1.1" 200 620
+INFO 2026-01-21 20:25:12,474 autoreload Watching for file changes with StatReloader
+INFO 2026-01-21 20:27:49,360 basehttp "POST /api/users/login/ HTTP/1.1" 200 620
+INFO 2026-01-31 23:58:47,713 autoreload Watching for file changes with StatReloader
+WARNING 2026-02-01 00:00:09,837 log Bad Request: /api/users/login/
+WARNING 2026-02-01 00:00:09,838 basehttp "POST /api/users/login/ HTTP/1.1" 400 31
+INFO 2026-02-01 00:00:14,632 basehttp "POST /api/users/login/ HTTP/1.1" 200 620
+WARNING 2026-02-01 00:00:54,556 log Unauthorized: /api/users/update-profile/
+WARNING 2026-02-01 00:00:54,557 basehttp "POST /api/users/update-profile/ HTTP/1.1" 401 58
+WARNING 2026-02-06 17:16:23,076 log Not Found: /api/ielts/sessions/
+WARNING 2026-02-06 17:16:23,079 basehttp "GET /api/ielts/sessions/ HTTP/1.1" 404 179
+WARNING 2026-02-06 17:16:23,088 log Not Found: /api/ielts/sessions/
+WARNING 2026-02-06 17:16:23,088 basehttp "GET /api/ielts/sessions/ HTTP/1.1" 404 179
+WARNING 2026-02-06 17:34:31,417 log Not Found: /api/ielts/sessions/
+WARNING 2026-02-06 17:34:31,418 basehttp "GET /api/ielts/sessions/ HTTP/1.1" 404 179
+WARNING 2026-02-06 17:34:31,420 log Not Found: /api/ielts/sessions/
+WARNING 2026-02-06 17:34:31,421 basehttp "GET /api/ielts/sessions/ HTTP/1.1" 404 179
+INFO 2026-02-22 14:29:36,541 autoreload Watching for file changes with StatReloader
+INFO 2026-02-22 14:29:54,793 basehttp "POST /api/users/login/ HTTP/1.1" 200 620
+INFO 2026-02-22 14:53:46,802 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 14:53:46,802 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+WARNING 2026-02-22 14:54:28,540 log Unauthorized: /api/users/update-profile/
+WARNING 2026-02-22 14:54:28,541 basehttp "POST /api/users/update-profile/ HTTP/1.1" 401 58
+INFO 2026-02-22 14:56:05,391 basehttp "PATCH /api/users/update-profile/ HTTP/1.1" 200 853
+INFO 2026-02-22 14:56:05,819 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 14:56:06,088 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-22 14:56:06,124 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 14:56:06,131 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 14:56:06,232 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 14:56:06,329 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-22 14:56:06,408 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 14:56:06,443 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 14:56:06,537 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 14:56:06,719 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 14:56:06,774 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-22 14:56:06,876 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 14:56:07,018 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-22 14:56:07,123 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 14:56:07,347 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 14:56:07,544 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+WARNING 2026-02-22 14:56:22,670 log Not Found: /resume/list/
+WARNING 2026-02-22 14:56:22,681 basehttp "GET /resume/list/ HTTP/1.1" 404 179
+WARNING 2026-02-22 14:56:22,723 log Not Found: /resume/list/
+WARNING 2026-02-22 14:56:22,748 basehttp "GET /resume/list/ HTTP/1.1" 404 179
+WARNING 2026-02-22 14:56:28,037 log Not Found: /api/subscriptions/usage/
+WARNING 2026-02-22 14:56:28,137 basehttp "GET /api/subscriptions/usage/ HTTP/1.1" 404 42
+INFO 2026-02-22 14:56:28,135 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 14:56:28,950 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+WARNING 2026-02-22 14:56:29,775 log Not Found: /api/subscriptions/usage/
+WARNING 2026-02-22 14:56:29,785 basehttp "GET /api/subscriptions/usage/ HTTP/1.1" 404 42
+INFO 2026-02-22 14:56:30,932 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 14:56:31,381 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 14:56:31,389 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-22 14:56:31,639 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 14:56:33,098 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 14:56:34,000 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-22 14:56:34,004 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 14:56:34,044 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 14:56:34,068 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 14:56:34,178 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-22 14:56:34,274 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 14:56:34,325 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-22 14:56:34,433 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 14:56:34,544 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+WARNING 2026-02-22 15:03:08,246 log Not Found: /api/subscriptions/usage/
+INFO 2026-02-22 15:03:08,247 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+WARNING 2026-02-22 15:03:08,249 basehttp "GET /api/subscriptions/usage/ HTTP/1.1" 404 42
+INFO 2026-02-22 15:03:08,367 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+WARNING 2026-02-22 15:03:08,375 log Not Found: /api/subscriptions/usage/
+WARNING 2026-02-22 15:03:08,376 basehttp "GET /api/subscriptions/usage/ HTTP/1.1" 404 42
+WARNING 2026-02-22 15:03:08,513 log Not Found: /resume/list/
+WARNING 2026-02-22 15:03:08,514 basehttp "GET /resume/list/ HTTP/1.1" 404 179
+WARNING 2026-02-22 15:03:08,523 log Not Found: /resume/list/
+WARNING 2026-02-22 15:03:08,524 basehttp "GET /resume/list/ HTTP/1.1" 404 179
+INFO 2026-02-22 15:03:09,226 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 15:03:09,248 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 15:03:09,250 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-22 15:03:09,376 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 15:03:09,383 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 15:03:09,403 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 15:03:09,519 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-22 15:03:09,583 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 15:03:09,632 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-22 15:03:09,672 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 15:03:09,809 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-22 15:03:09,914 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 15:03:10,101 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 15:03:10,187 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 15:11:07,810 autoreload P:\Planora\backend\backend\settings.py changed, reloading.
+INFO 2026-02-22 15:11:09,206 autoreload Watching for file changes with StatReloader
+INFO 2026-02-22 15:12:59,234 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 15:12:59,299 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 15:14:24,915 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 15:15:03,887 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 15:15:03,950 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 15:24:26,117 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 15:24:26,857 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 16:28:34,949 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 16:28:34,949 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 16:32:07,267 autoreload P:\Planora\backend\dashboard\views.py changed, reloading.
+INFO 2026-02-22 16:32:08,607 autoreload Watching for file changes with StatReloader
+INFO 2026-02-22 16:32:11,491 autoreload P:\Planora\backend\dashboard\urls.py changed, reloading.
+INFO 2026-02-22 16:32:12,389 autoreload Watching for file changes with StatReloader
+INFO 2026-02-22 16:33:12,517 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 16:33:12,762 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 16:33:12,848 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 16:33:12,865 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:33:12,888 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-22 16:33:13,008 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 16:33:13,009 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 16:33:13,051 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:33:13,079 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-22 16:33:13,188 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 16:33:13,219 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 16:33:13,362 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 16:33:13,477 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:33:13,478 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:33:13,676 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:33:13,716 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:33:13,919 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:33:14,102 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:33:15,209 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 721
+INFO 2026-02-22 16:33:16,606 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 721
+WARNING 2026-02-22 16:33:22,997 log Too Many Requests: /api/assistant/chat/
+WARNING 2026-02-22 16:33:22,998 basehttp "POST /api/assistant/chat/ HTTP/1.1" 429 98
+INFO 2026-02-22 16:33:27,852 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-22 16:33:27,973 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:33:28,068 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 16:33:28,236 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 16:33:28,236 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:33:28,250 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 16:33:28,262 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-22 16:33:28,428 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 16:33:28,499 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:33:28,624 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:33:28,646 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:33:28,842 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:33:29,038 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:33:29,227 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:33:29,961 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 721
+INFO 2026-02-22 16:33:31,701 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 721
+INFO 2026-02-22 16:33:41,475 basehttp "GET /api/roadmap/list/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:33:41,511 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:33:41,663 basehttp "GET /api/roadmap/list/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:33:41,702 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:33:47,259 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:33:47,275 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-22 16:33:47,371 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 16:33:47,445 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 16:33:47,494 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:33:47,627 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 16:33:47,653 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-22 16:33:47,749 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 16:33:47,749 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:33:47,888 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:33:48,115 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:33:48,128 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:33:48,445 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:33:48,834 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:33:49,813 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 721
+INFO 2026-02-22 16:33:50,925 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 721
+INFO 2026-02-22 16:34:22,028 autoreload P:\Planora\backend\dashboard\views.py changed, reloading.
+INFO 2026-02-22 16:34:23,222 autoreload Watching for file changes with StatReloader
+INFO 2026-02-22 16:35:01,901 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 721
+INFO 2026-02-22 16:38:26,701 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 16:38:26,814 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 16:38:26,831 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 16:38:26,910 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 16:38:26,954 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-22 16:38:26,981 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:38:27,056 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 16:38:27,102 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 16:38:27,135 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-22 16:38:27,162 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:38:27,171 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 16:38:27,217 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 16:38:27,428 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:38:27,452 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:38:27,557 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:38:27,621 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:38:27,768 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:38:27,921 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:38:28,428 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 721
+INFO 2026-02-22 16:38:29,398 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 721
+WARNING 2026-02-22 16:38:32,650 log Too Many Requests: /api/assistant/chat/
+WARNING 2026-02-22 16:38:32,651 basehttp "POST /api/assistant/chat/ HTTP/1.1" 429 98
+INFO 2026-02-22 16:41:09,017 autoreload Watching for file changes with StatReloader
+INFO 2026-02-22 16:41:16,088 autoreload P:\Planora\backend\assistant\views.py changed, reloading.
+INFO 2026-02-22 16:41:17,109 autoreload Watching for file changes with StatReloader
+INFO 2026-02-22 16:41:44,713 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 16:41:45,110 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 16:41:45,615 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 16:41:46,016 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 16:41:53,172 basehttp "POST /api/assistant/chat/ HTTP/1.1" 200 1664
+INFO 2026-02-22 16:42:06,216 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 16:42:06,237 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:42:06,251 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-22 16:42:06,358 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 16:42:06,597 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-22 16:42:06,611 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:42:06,779 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:42:06,953 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:42:07,106 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 16:42:11,408 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 721
+INFO 2026-02-22 16:42:13,884 basehttp "POST /api/assistant/chat/ HTTP/1.1" 200 767
+INFO 2026-02-22 18:47:20,196 basehttp "POST /api/assistant/chat/ HTTP/1.1" 200 251
+INFO 2026-02-22 18:47:26,392 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-22 18:47:26,486 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 18:47:26,569 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 18:47:26,671 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 18:47:26,833 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-22 18:47:26,851 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 18:47:27,065 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 18:47:27,190 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 18:47:27,315 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 18:47:28,402 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 18:47:28,410 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-22 18:47:28,613 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 18:47:28,613 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 18:47:28,619 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-22 18:47:28,751 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 18:47:28,752 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 18:47:28,795 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 18:47:29,018 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-22 18:47:29,037 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 18:47:29,183 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 18:47:29,331 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 18:47:29,463 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 18:47:30,527 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 721
+INFO 2026-02-22 18:47:32,886 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 721
+INFO 2026-02-22 18:47:36,769 basehttp "POST /api/assistant/chat/ HTTP/1.1" 200 1139
+INFO 2026-02-22 18:47:42,521 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 18:47:42,521 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-22 18:47:42,535 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-22 18:47:42,638 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 18:47:42,815 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-22 18:47:42,849 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 18:47:43,001 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 18:47:43,139 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 18:47:43,259 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 459
+INFO 2026-02-22 18:47:46,996 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 721
+INFO 2026-02-22 18:51:07,876 basehttp "GET /api/users/check-auth-type/ HTTP/1.1" 200 38
+INFO 2026-02-22 18:51:08,013 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 18:51:08,102 basehttp "GET /api/users/check-auth-type/ HTTP/1.1" 200 38
+INFO 2026-02-22 18:51:08,142 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 18:51:08,187 basehttp "GET /api/users/profile/ HTTP/1.1" 200 866
+INFO 2026-02-22 18:51:08,250 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-22 18:51:20,333 basehttp "POST /api/users/delete-account/ HTTP/1.1" 200 79
+WARNING 2026-02-22 19:16:25,975 log Unauthorized: /api/users/profile/
+WARNING 2026-02-22 19:16:25,976 basehttp "GET /api/users/profile/ HTTP/1.1" 401 51
+WARNING 2026-02-22 19:16:25,985 log Unauthorized: /api/users/statistics/
+WARNING 2026-02-22 19:16:26,002 basehttp "GET /api/users/statistics/ HTTP/1.1" 401 51
+WARNING 2026-02-22 19:16:26,003 log Unauthorized: /api/users/check-auth-type/
+WARNING 2026-02-22 19:16:26,046 basehttp "GET /api/users/check-auth-type/ HTTP/1.1" 401 51
+WARNING 2026-02-22 19:16:26,112 log Unauthorized: /api/users/profile/
+WARNING 2026-02-22 19:16:26,114 basehttp "GET /api/users/profile/ HTTP/1.1" 401 51
+ERROR 2026-02-22 19:16:26,163 log Internal Server Error: /api/token/refresh/
+Traceback (most recent call last):
+  File "P:\Planora\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "P:\Planora\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "P:\Planora\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "P:\Planora\.venv\Lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework_simplejwt\views.py", line 46, in post
+    serializer.is_valid(raise_exception=True)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\serializers.py", line 225, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\serializers.py", line 447, in run_validation
+    value = self.validate(value)
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework_simplejwt\serializers.py", line 116, in validate
+    user := get_user_model().objects.get(
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        **{api_settings.USER_ID_FIELD: user_id}
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\query.py", line 633, in get
+    raise self.model.DoesNotExist(
+        "%s matching query does not exist." % self.model._meta.object_name
+    )
+users.models.CustomUser.DoesNotExist: CustomUser matching query does not exist.
+WARNING 2026-02-22 19:16:26,168 log Unauthorized: /api/users/statistics/
+ERROR 2026-02-22 19:16:26,184 log Internal Server Error: /api/token/refresh/
+Traceback (most recent call last):
+  File "P:\Planora\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "P:\Planora\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "P:\Planora\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "P:\Planora\.venv\Lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework_simplejwt\views.py", line 46, in post
+    serializer.is_valid(raise_exception=True)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\serializers.py", line 225, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\serializers.py", line 447, in run_validation
+    value = self.validate(value)
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework_simplejwt\serializers.py", line 116, in validate
+    user := get_user_model().objects.get(
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        **{api_settings.USER_ID_FIELD: user_id}
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\query.py", line 633, in get
+    raise self.model.DoesNotExist(
+        "%s matching query does not exist." % self.model._meta.object_name
+    )
+users.models.CustomUser.DoesNotExist: CustomUser matching query does not exist.
+WARNING 2026-02-22 19:16:26,185 log Unauthorized: /api/users/check-auth-type/
+ERROR 2026-02-22 19:16:26,196 basehttp "POST /api/token/refresh/ HTTP/1.1" 500 145
+WARNING 2026-02-22 19:16:26,197 basehttp "GET /api/users/statistics/ HTTP/1.1" 401 51
+ERROR 2026-02-22 19:16:26,204 basehttp "POST /api/token/refresh/ HTTP/1.1" 500 145
+WARNING 2026-02-22 19:16:26,206 basehttp "GET /api/users/check-auth-type/ HTTP/1.1" 401 51
+WARNING 2026-02-22 19:16:26,291 log Unauthorized: /api/users/profile/
+WARNING 2026-02-22 19:16:26,293 basehttp "GET /api/users/profile/ HTTP/1.1" 401 51
+ERROR 2026-02-22 19:16:26,306 log Internal Server Error: /api/token/refresh/
+Traceback (most recent call last):
+  File "P:\Planora\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "P:\Planora\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "P:\Planora\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "P:\Planora\.venv\Lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework_simplejwt\views.py", line 46, in post
+    serializer.is_valid(raise_exception=True)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\serializers.py", line 225, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\serializers.py", line 447, in run_validation
+    value = self.validate(value)
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework_simplejwt\serializers.py", line 116, in validate
+    user := get_user_model().objects.get(
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        **{api_settings.USER_ID_FIELD: user_id}
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\query.py", line 633, in get
+    raise self.model.DoesNotExist(
+        "%s matching query does not exist." % self.model._meta.object_name
+    )
+users.models.CustomUser.DoesNotExist: CustomUser matching query does not exist.
+ERROR 2026-02-22 19:16:26,318 log Internal Server Error: /api/token/refresh/
+Traceback (most recent call last):
+  File "P:\Planora\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "P:\Planora\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "P:\Planora\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "P:\Planora\.venv\Lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework_simplejwt\views.py", line 46, in post
+    serializer.is_valid(raise_exception=True)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\serializers.py", line 225, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework\serializers.py", line 447, in run_validation
+    value = self.validate(value)
+  File "P:\Planora\.venv\Lib\site-packages\rest_framework_simplejwt\serializers.py", line 116, in validate
+    user := get_user_model().objects.get(
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        **{api_settings.USER_ID_FIELD: user_id}
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\query.py", line 633, in get
+    raise self.model.DoesNotExist(
+        "%s matching query does not exist." % self.model._meta.object_name
+    )
+users.models.CustomUser.DoesNotExist: CustomUser matching query does not exist.
+ERROR 2026-02-22 19:16:26,321 basehttp "POST /api/token/refresh/ HTTP/1.1" 500 145
+ERROR 2026-02-22 19:16:26,343 basehttp "POST /api/token/refresh/ HTTP/1.1" 500 145
+WARNING 2026-02-22 19:16:26,398 log Unauthorized: /api/users/profile/
+WARNING 2026-02-22 19:16:26,399 basehttp "GET /api/users/profile/ HTTP/1.1" 401 51
+WARNING 2026-02-22 20:17:13,451 log Bad Request: /api/users/login/
+WARNING 2026-02-22 20:17:13,453 basehttp "POST /api/users/login/ HTTP/1.1" 400 31
+INFO 2026-02-22 20:18:19,171 basehttp "POST /api/users/register/ HTTP/1.1" 201 111
+WARNING 2026-02-22 20:18:38,640 log Not Found: /users/verify-otp/
+WARNING 2026-02-22 20:18:38,647 basehttp "POST /users/verify-otp/ HTTP/1.1" 404 179
+INFO 2026-02-22 20:27:09,969 basehttp "POST /api/users/register/ HTTP/1.1" 201 112
+INFO 2026-02-22 21:09:05,963 autoreload P:\Planora\backend\dashboard\views.py changed, reloading.
+INFO 2026-02-22 21:09:07,573 autoreload Watching for file changes with StatReloader
+INFO 2026-02-22 21:09:23,072 autoreload P:\Planora\backend\users\views.py changed, reloading.
+INFO 2026-02-22 21:09:24,009 autoreload Watching for file changes with StatReloader
+INFO 2026-02-22 21:11:22,859 autoreload P:\Planora\backend\dashboard\views.py changed, reloading.
+INFO 2026-02-22 21:11:26,885 autoreload Watching for file changes with StatReloader
+INFO 2026-02-23 23:02:50,531 autoreload Watching for file changes with StatReloader
+ERROR 2026-02-23 23:07:34,638 views [GOOGLE_OAUTH] Step 8: Email normalized to: abhinavgoyal6284@gmail.com
+ERROR 2026-02-23 23:07:34,644 views [GOOGLE_OAUTH] Step 9: Checking if user exists
+WARNING 2026-02-23 23:07:34,743 log Not Found: /api/users/google/login/
+WARNING 2026-02-23 23:07:34,744 basehttp "POST /api/users/google/login/ HTTP/1.1" 404 158
+WARNING 2026-02-23 23:08:13,633 log Bad Request: /api/users/register/
+WARNING 2026-02-23 23:08:13,638 basehttp "POST /api/users/register/ HTTP/1.1" 400 34
+INFO 2026-02-23 23:08:21,549 basehttp "POST /api/users/register/ HTTP/1.1" 201 118
+WARNING 2026-02-23 23:08:45,256 log Not Found: /users/verify-otp/
+WARNING 2026-02-23 23:08:45,262 basehttp "POST /users/verify-otp/ HTTP/1.1" 404 179
+WARNING 2026-02-23 23:08:52,503 log Not Found: /users/verify-otp/
+WARNING 2026-02-23 23:08:52,505 basehttp "POST /users/verify-otp/ HTTP/1.1" 404 179
+WARNING 2026-02-23 23:09:17,922 log Not Found: /users/verify-otp/
+WARNING 2026-02-23 23:09:17,923 basehttp "POST /users/verify-otp/ HTTP/1.1" 404 179
+WARNING 2026-02-23 23:10:01,833 log Not Found: /users/verify-otp/
+WARNING 2026-02-23 23:10:01,838 basehttp "POST /users/verify-otp/ HTTP/1.1" 404 179
+WARNING 2026-02-23 23:10:06,120 log Not Found: /users/resend-otp/
+WARNING 2026-02-23 23:10:06,131 basehttp "POST /users/resend-otp/ HTTP/1.1" 404 179
+WARNING 2026-02-23 23:10:30,063 log Not Found: /users/verify-otp/
+WARNING 2026-02-23 23:10:30,065 basehttp "POST /users/verify-otp/ HTTP/1.1" 404 179
+WARNING 2026-02-23 23:12:18,678 log Bad Request: /api/users/login/
+WARNING 2026-02-23 23:12:18,679 basehttp "POST /api/users/login/ HTTP/1.1" 400 31
+WARNING 2026-02-23 23:12:25,586 log Bad Request: /api/users/login/
+WARNING 2026-02-23 23:12:25,589 basehttp "POST /api/users/login/ HTTP/1.1" 400 31
+INFO 2026-02-23 23:21:17,070 autoreload Watching for file changes with StatReloader
+WARNING 2026-02-23 23:21:54,352 log Bad Request: /api/users/register/
+WARNING 2026-02-23 23:21:54,363 basehttp "POST /api/users/register/ HTTP/1.1" 400 36
+WARNING 2026-02-23 23:22:10,996 log Bad Request: /api/users/login/
+WARNING 2026-02-23 23:22:10,996 basehttp "POST /api/users/login/ HTTP/1.1" 400 31
+INFO 2026-02-23 23:24:11,881 basehttp "POST /api/users/request-password-reset/ HTTP/1.1" 200 52
+INFO 2026-02-23 23:25:31,187 basehttp "POST /api/users/verify-reset-otp/ HTTP/1.1" 200 40
+INFO 2026-02-23 23:28:16,549 basehttp "POST /api/users/reset-password/ HTTP/1.1" 200 42
+WARNING 2026-02-23 23:28:22,167 log Bad Request: /api/users/login/
+WARNING 2026-02-23 23:28:22,168 basehttp "POST /api/users/login/ HTTP/1.1" 400 31
+WARNING 2026-02-23 23:28:44,198 log Bad Request: /api/users/login/
+WARNING 2026-02-23 23:28:44,199 basehttp "POST /api/users/login/ HTTP/1.1" 400 31
+WARNING 2026-02-23 23:37:08,874 log Bad Request: /api/users/login/
+WARNING 2026-02-23 23:37:08,875 basehttp "POST /api/users/login/ HTTP/1.1" 400 31
+ERROR 2026-02-23 23:37:25,917 views [GOOGLE_OAUTH] Step 8: Email normalized to: abhinavgoyal9729@gmail.com
+ERROR 2026-02-23 23:37:25,918 views [GOOGLE_OAUTH] Step 9: Checking if user exists
+INFO 2026-02-23 23:37:27,920 basehttp "POST /api/users/google/login/ HTTP/1.1" 200 114
+INFO 2026-02-23 23:37:39,951 basehttp "POST /api/users/verify-social-otp/ HTTP/1.1" 200 640
+INFO 2026-02-23 23:39:55,495 autoreload P:\Planora\backend\users\views.py changed, reloading.
+INFO 2026-02-23 23:39:56,635 autoreload Watching for file changes with StatReloader
+INFO 2026-02-23 23:58:39,684 autoreload P:\Planora\backend\users\views.py changed, reloading.
+INFO 2026-02-23 23:58:40,546 autoreload Watching for file changes with StatReloader
+INFO 2026-02-23 23:58:48,499 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-02-23 23:58:48,516 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+WARNING 2026-02-24 22:09:41,882 log Bad Request: /api/users/login/
+WARNING 2026-02-24 22:09:41,882 basehttp "POST /api/users/login/ HTTP/1.1" 400 31
+WARNING 2026-02-24 22:10:25,451 log Bad Request: /api/users/register/
+WARNING 2026-02-24 22:10:25,452 basehttp "POST /api/users/register/ HTTP/1.1" 400 36
+WARNING 2026-02-24 22:10:44,033 log Bad Request: /api/users/login/
+WARNING 2026-02-24 22:10:44,034 basehttp "POST /api/users/login/ HTTP/1.1" 400 31
+INFO 2026-02-24 22:13:35,982 basehttp "POST /api/users/request-password-reset/ HTTP/1.1" 200 52
+INFO 2026-02-24 22:13:47,636 basehttp "POST /api/users/verify-reset-otp/ HTTP/1.1" 200 40
+INFO 2026-02-24 22:13:58,017 basehttp "POST /api/users/reset-password/ HTTP/1.1" 200 42
+INFO 2026-02-24 22:14:16,356 basehttp "POST /api/users/login/ HTTP/1.1" 200 627
+INFO 2026-02-24 22:15:17,418 basehttp "PATCH /api/users/update-profile/ HTTP/1.1" 200 744
+INFO 2026-02-24 22:15:17,861 basehttp "GET /api/users/profile/ HTTP/1.1" 200 758
+INFO 2026-02-24 22:15:17,918 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-24 22:15:17,955 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-24 22:15:18,059 basehttp "GET /api/users/profile/ HTTP/1.1" 200 758
+INFO 2026-02-24 22:15:18,154 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-24 22:15:18,195 basehttp "GET /api/users/profile/ HTTP/1.1" 200 758
+INFO 2026-02-24 22:15:18,591 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-24 22:15:18,602 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 22:15:18,867 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 22:15:19,032 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 22:15:19,196 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 22:15:23,936 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 902
+INFO 2026-02-24 22:16:56,194 basehttp "POST /api/assistant/chat/ HTTP/1.1" 200 1635
+INFO 2026-02-24 22:19:28,096 basehttp "GET /api/users/profile/ HTTP/1.1" 200 758
+INFO 2026-02-24 22:19:28,100 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-24 22:19:28,114 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-24 22:19:28,191 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-24 22:19:28,320 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-24 22:19:28,337 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 22:19:28,528 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 22:19:28,620 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 22:19:28,694 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 22:19:33,485 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 902
+INFO 2026-02-24 22:19:38,154 basehttp "GET /api/users/profile/ HTTP/1.1" 200 758
+INFO 2026-02-24 22:19:38,175 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-24 22:19:38,228 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-24 22:19:38,266 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-24 22:19:38,286 basehttp "GET /api/users/profile/ HTTP/1.1" 200 758
+INFO 2026-02-24 22:19:38,356 basehttp "GET /api/users/profile/ HTTP/1.1" 200 758
+INFO 2026-02-24 22:19:38,440 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 22:19:38,465 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-24 22:19:38,552 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 22:19:38,659 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 22:19:38,760 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 22:19:43,680 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 902
+INFO 2026-02-24 22:20:21,871 basehttp "GET /api/users/profile/ HTTP/1.1" 200 758
+INFO 2026-02-24 22:20:21,887 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-24 22:20:21,962 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-24 22:20:21,965 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-24 22:20:22,099 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 22:20:22,190 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-24 22:20:22,224 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 22:20:22,360 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 22:20:22,476 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 22:20:31,141 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 902
+INFO 2026-02-24 23:11:08,511 autoreload P:\Planora\backend\dashboard\views.py changed, reloading.
+INFO 2026-02-24 23:11:10,598 autoreload Watching for file changes with StatReloader
+INFO 2026-02-24 23:11:45,173 autoreload P:\Planora\backend\dashboard\views.py changed, reloading.
+INFO 2026-02-24 23:11:45,820 autoreload Watching for file changes with StatReloader
+INFO 2026-02-24 23:22:20,613 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 1962
+INFO 2026-02-24 23:24:47,659 basehttp "POST /api/assistant/chat/ HTTP/1.1" 200 1655
+INFO 2026-02-24 23:25:14,658 basehttp "GET /api/roadmap/projects/ HTTP/1.1" 200 2
+INFO 2026-02-24 23:25:14,727 basehttp "GET /api/roadmap/list/ HTTP/1.1" 200 2
+INFO 2026-02-24 23:25:14,793 basehttp "GET /api/roadmap/projects/ HTTP/1.1" 200 2
+INFO 2026-02-24 23:25:14,837 basehttp "GET /api/roadmap/list/ HTTP/1.1" 200 2
+INFO 2026-02-24 23:27:11,148 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-24 23:27:11,159 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-24 23:27:11,228 basehttp "GET /api/users/profile/ HTTP/1.1" 200 758
+INFO 2026-02-24 23:27:11,238 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-24 23:27:11,453 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-24 23:27:11,453 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 23:27:11,585 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 23:27:11,699 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 23:27:11,792 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 23:27:19,827 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 1962
+INFO 2026-02-24 23:28:19,820 basehttp "GET /api/scheduler/google/auth-url/ HTTP/1.1" 200 270
+INFO 2026-02-24 23:28:19,965 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-24 23:28:23,490 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-24 23:28:28,070 basehttp "GET /api/users/check-auth-type/ HTTP/1.1" 200 38
+INFO 2026-02-24 23:28:28,089 basehttp "GET /api/users/profile/ HTTP/1.1" 200 758
+INFO 2026-02-24 23:28:28,253 basehttp "GET /api/users/check-auth-type/ HTTP/1.1" 200 38
+INFO 2026-02-24 23:28:28,298 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-24 23:28:28,329 basehttp "GET /api/users/profile/ HTTP/1.1" 200 758
+INFO 2026-02-24 23:28:28,404 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-24 23:28:31,472 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 1962
+INFO 2026-02-24 23:28:37,606 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-02-24 23:28:37,616 basehttp "GET /api/users/profile/ HTTP/1.1" 200 758
+INFO 2026-02-24 23:28:37,629 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 261
+INFO 2026-02-24 23:28:37,802 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-02-24 23:28:37,970 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-02-24 23:28:38,003 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 23:28:38,135 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-02-24 23:28:42,374 basehttp "GET /api/roadmap/list/ HTTP/1.1" 200 2
+INFO 2026-02-24 23:28:42,454 basehttp "GET /api/roadmap/list/ HTTP/1.1" 200 2
+INFO 2026-02-24 23:28:45,932 basehttp "GET /api/roadmap/list/ HTTP/1.1" 200 2
+INFO 2026-02-24 23:28:46,022 basehttp "GET /api/roadmap/list/ HTTP/1.1" 200 2
+INFO 2026-02-24 23:28:46,898 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 1962
+INFO 2026-02-24 23:28:53,375 autoreload P:\Planora\backend\dashboard\views.py changed, reloading.
+INFO 2026-02-24 23:28:54,616 autoreload Watching for file changes with StatReloader

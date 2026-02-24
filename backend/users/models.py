@@ -47,6 +47,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     updated_at = models.DateTimeField(auto_now=True)
 
     if TYPE_CHECKING:
+        id: int  # Django auto-generated primary key
         profile: "UserProfile"  # type annotation for reverse relation
 
     objects = CustomUserManager()
@@ -129,6 +130,27 @@ class UserProfile(models.Model):
     onboarding_accepted_terms = models.BooleanField(
         default=False,
         help_text='User accepted work validation terms'
+    )
+
+    # Education-stage-based onboarding fields
+    education_stage = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        choices=[
+            ('class_9_10', 'Class 9-10'),
+            ('class_11_12', 'Class 11-12'),
+            ('undergraduate', 'Undergraduate'),
+            ('postgraduate', 'Postgraduate'),
+            ('phd_research', 'PhD / Research'),
+            ('professional', 'Professional / Other'),
+        ],
+        help_text='Current education stage of the user'
+    )
+    onboarding_data = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text='Complete onboarding data specific to education stage'
     )
 
     # LEGACY FIELDS (kept for backward compatibility)

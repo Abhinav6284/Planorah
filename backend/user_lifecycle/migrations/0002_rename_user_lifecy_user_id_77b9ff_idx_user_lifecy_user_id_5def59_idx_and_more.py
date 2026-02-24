@@ -10,12 +10,12 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RenameIndex(
+        migrations.RenameIndex(  # type: ignore[attr-defined]
             model_name='lifecycleevent',
             new_name='user_lifecy_user_id_5def59_idx',
             old_name='user_lifecy_user_id_77b9ff_idx',
         ),
-        migrations.RenameIndex(
+        migrations.RenameIndex(  # type: ignore[attr-defined]
             model_name='lifecycleevent',
             new_name='user_lifecy_user_id_2c657e_idx',
             old_name='user_lifecy_user_id_aa0e90_idx',

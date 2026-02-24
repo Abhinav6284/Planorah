@@ -239,9 +239,11 @@ Assistant Response:"""
     except GeminiAPIError as e:
         print(f"⚠️ Gemini API error: {str(e)}")
         return Response({
+            "message": "I'm getting too many requests right now. Please wait a minute and try again. In the meantime, focus on your top pending task and complete one small milestone.",
             "error": str(e),
-            "success": False
-        }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+            "success": False,
+            "rate_limited": True
+        }, status=status.HTTP_200_OK)
     except requests.exceptions.RequestException as e:
         print(f"❌ Gemini API error: {str(e)}")
         return Response({

@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { schedulerService } from '../../../api/schedulerService';
 
 const CalendarWidget = () => {
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
+    const hasFetchedRef = useRef(false);
 
     useEffect(() => {
+        if (hasFetchedRef.current) return;
+        hasFetchedRef.current = true;
         fetchEvents();
     }, []);
 

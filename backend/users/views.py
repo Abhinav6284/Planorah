@@ -137,10 +137,12 @@ def verify_otp(request):
             'error': 'Email and OTP are required'
         }, status=status.HTTP_400_BAD_REQUEST)
 
+    email = email.strip().lower()
+
     try:
         # Check against OTPVerification model
         otp_record = OTPVerification.objects.filter(
-            email=email, is_used=False).latest('created_at')
+            email__iexact=email, is_used=False).latest('created_at')
 
         if otp_record.is_expired():
             return Response({'error': 'OTP has expired'}, status=status.HTTP_400_BAD_REQUEST)
@@ -288,6 +290,8 @@ def resend_otp(request):
     if not email:
         return Response({"message": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
 
+    email = email.strip().lower()
+
     try:
         user = CustomUser.objects.get(email__iexact=email)
     except CustomUser.DoesNotExist:
@@ -320,6 +324,8 @@ def request_password_reset(request):
 
     if not email:
         return Response({"message": "Email is required"}, status=400)
+
+    email = email.strip().lower()
 
     try:
         user = CustomUser.objects.get(email__iexact=email)
@@ -355,6 +361,8 @@ def verify_reset_otp(request):
     if not email or not otp:
         return Response({"message": "Email and OTP are required."}, status=400)
 
+    email = email.strip().lower()
+
     try:
         record = OTPVerification.objects.get(
             email__iexact=email, otp=otp, is_used=False)
@@ -381,6 +389,8 @@ def reset_password(request):
     if not email or not new_password:
         return Response({"message": "Email and new password required."}, status=400)
 
+    email = email.strip().lower()
+
     try:
         user = CustomUser.objects.get(email__iexact=email)
     except CustomUser.DoesNotExist:
@@ -401,85 +411,116 @@ def get_user_profile(request):
     return Response(serializer.data)
 
 
-# ---------------- UPDATE USER PROFILE ----------------
 @api_view(['POST', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def update_user_profile(request):
     """
     Update user profile details (field, role, level, skills, goal).
     """
-    user = request.user
-    # print(f"DEBUG: update_user_profile called for user: {user.username}")
-    # print(f"DEBUG: request.data: {request.data}")
+    try:
+        user = request.user
+        # print(f"DEBUG: update_user_profile called for user: {user.username}")
+        # print(f"DEBUG: request.data: {request.data}")
 
-    # Get or create profile
-    profile, created = UserProfile.objects.get_or_create(user=user)
+        # Get or create profile
+        profile, created = UserProfile.objects.get_or_create(user=user)
 
-    # Update User model fields (name)
-    full_name = request.data.get('name')
-    if full_name:
-        parts = full_name.split(' ', 1)
-        user.first_name = parts[0]
-        user.last_name = parts[1] if len(parts) > 1 else ''
+        # Update User model fields (name)
+        full_name = request.data.get('name')
+        if full_name:
+            parts = full_name.split(' ', 1)
+            user.first_name = parts[0]
+            user.last_name = parts[1] if len(parts) > 1 else ''
 
-    # Update phone and DOB on User model
-    phone = request.data.get('phone_number')
-    if phone:
-        user.phone_number = phone
+        # Update phone and DOB on User model
+        phone = request.data.get('phone_number')
+        if phone:
+            user.phone_number = phone
 
-    dob = request.data.get('date_of_birth')
-    if dob:
-        # Ensure regex or format validation in frontend, or try/except here if strict
-        user.date_of_birth = dob
+        dob = request.data.get('date_of_birth')
+        if dob:
+            try:
+                user.date_of_birth = dob
+            except (ValueError, TypeError):
+                # If date is invalid, skip setting it
+                pass
 
-    user.save()
+        user.save()
 
-    # Update UserProfile fields using serializer
-    serializer = UserProfileSerializer(
-        profile, data=request.data, partial=True)
-    if serializer.is_valid():
-        serializer.save()
-        profile.refresh_from_db()  # Refresh to get updated values
+        # Update UserProfile fields using serializer
+        serializer = UserProfileSerializer(
+            profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            profile.refresh_from_db()  # Refresh to get updated values
 
-        # Check if onboarding is complete and set flag (only sets once)
-        if not profile.onboarding_complete:
-            # Universal onboarding complete if purpose, domain, and goal_statement are set
-            universal_onboarded = all([
-                profile.purpose,
-                profile.domain,
-                profile.goal_statement
-            ])
+            # Check if onboarding is complete and set flag (only sets once)
+            if not profile.onboarding_complete:
+                # Universal onboarding complete if purpose, domain, and goal_statement are set
+                universal_onboarded = all([
+                    profile.purpose,
+                    profile.domain,
+                    profile.goal_statement
+                ])
 
-            # Legacy onboarding complete if old fields are set
-            legacy_onboarded = all([
-                profile.field_of_study,
-                profile.target_role,
-                profile.experience_level
-            ])
+                # Education-stage onboarding complete (new onboarding flow)
+                stage_requires_specific_data = profile.education_stage not in (
+                    None, "", "professional"
+                )
+                onboarding_data_present = isinstance(
+                    profile.onboarding_data, dict
+                ) and len(profile.onboarding_data) > 0
+                has_required_stage_data = (
+                    onboarding_data_present if stage_requires_specific_data else True
+                )
+                education_onboarded = all([
+                    profile.education_stage,
+                    profile.weekly_hours and profile.weekly_hours > 0,
+                    profile.validation_mode,
+                    has_required_stage_data,
+                    profile.onboarding_accepted_terms,
+                ])
 
-            if universal_onboarded or legacy_onboarded:
-                profile.onboarding_complete = True
-                # Lock goal if submitting goal_statement for the first time
-                if profile.goal_statement and not profile.goal_locked_at:
-                    profile.goal_locked_at = timezone.now()
-                profile.save()
+                # Legacy onboarding complete if old fields are set
+                legacy_onboarded = all([
+                    profile.field_of_study,
+                    profile.target_role,
+                    profile.experience_level
+                ])
 
-        # Include updated user info in response if needed, or rely on frontend refetch
+                if universal_onboarded or legacy_onboarded or education_onboarded:
+                    profile.onboarding_complete = True
+                    # Lock goal if submitting goal_statement for the first time
+                    if profile.goal_statement and not profile.goal_locked_at:
+                        profile.goal_locked_at = timezone.now()
+                    profile.save()
+
+            # Include updated user info in response if needed, or rely on frontend refetch
+            return Response({
+                "message": "Profile updated successfully",
+                "profile": serializer.data,
+                "user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name
+                },
+                "onboarding_complete": profile.onboarding_complete
+            }, status=status.HTTP_200_OK)
+
+        # Log errors and return them
+        logger.error(f"UserProfileSerializer errors: {serializer.errors}")
         return Response({
-            "message": "Profile updated successfully",
-            "profile": serializer.data,
-            "user": {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-                "first_name": user.first_name,
-                "last_name": user.last_name
-            },
-            "onboarding_complete": profile.onboarding_complete
-        }, status=status.HTTP_200_OK)
-
-    # print(f"DEBUG: Serializer errors: {serializer.errors}")
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            "error": "Failed to update profile",
+            "details": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        logger.error(f"Error in update_user_profile: {str(e)}", exc_info=True)
+        return Response({
+            "error": "Failed to update profile",
+            "details": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])

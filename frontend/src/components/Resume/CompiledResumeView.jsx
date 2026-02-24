@@ -15,6 +15,7 @@ export default function CompiledResumeView() {
 
     useEffect(() => {
         fetchResume();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [versionId]);
 
     const fetchResume = async () => {
@@ -44,7 +45,7 @@ export default function CompiledResumeView() {
         setExporting(true);
         try {
             const result = await resumeService.exportResume(versionId, format);
-            
+
             if (format === 'markdown') {
                 // Download markdown file
                 const blob = new Blob([result.markdown], { type: 'text/markdown' });
@@ -182,11 +183,10 @@ export default function CompiledResumeView() {
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className={`mb-6 p-4 rounded-xl border ${
-                            verification.all_valid
-                                ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
-                                : "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800"
-                        }`}
+                        className={`mb-6 p-4 rounded-xl border ${verification.all_valid
+                            ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                            : "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800"
+                            }`}
                     >
                         <div className="flex items-center gap-3 mb-3">
                             {verification.all_valid ? (

@@ -2,12 +2,12 @@ import api from './axios';
 
 export const userService = {
     getProfile: async () => {
-        const response = await api.get('/api/users/profile/');
+        const response = await api.get('users/profile/');
         return response.data;
     },
 
     updateProfile: async (formData) => {
-        const response = await api.patch('/api/users/update-profile/', formData, {
+        const response = await api.patch('users/update-profile/', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -16,7 +16,7 @@ export const userService = {
     },
 
     getStatistics: async () => {
-        const response = await api.get('/api/users/statistics/');
+        const response = await api.get('users/statistics/');
         return response.data;
     },
 
@@ -24,12 +24,12 @@ export const userService = {
         const payload = isOAuth
             ? { confirmation: passwordOrConfirmation }
             : { password: passwordOrConfirmation };
-        const response = await api.post('/api/users/delete-account/', payload);
+        const response = await api.post('users/delete-account/', payload);
         return response.data;
     },
 
     checkAuthType: async () => {
-        const response = await api.get('/api/users/check-auth-type/');
+        const response = await api.get('users/check-auth-type/');
         return response.data;
     },
 };

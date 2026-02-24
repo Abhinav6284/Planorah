@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { FaFileAlt, FaCheckCircle, FaSpinner, FaDownload } from "react-icons/fa";
+import { FaFileAlt, FaSpinner } from "react-icons/fa";
 import resumeService from "../../api/resumeService";
 
 export default function GenerateResumeButton({ roadmapId, onSuccess }) {
@@ -13,7 +13,7 @@ export default function GenerateResumeButton({ roadmapId, onSuccess }) {
 
         try {
             const result = await resumeService.generateResume(roadmapId);
-            
+
             if (onSuccess) {
                 onSuccess(result.resume);
             }
@@ -32,11 +32,10 @@ export default function GenerateResumeButton({ roadmapId, onSuccess }) {
                 disabled={generating}
                 whileHover={{ scale: generating ? 1 : 1.02 }}
                 whileTap={{ scale: generating ? 1 : 0.98 }}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all shadow-lg ${
-                    generating
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white"
-                }`}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all shadow-lg ${generating
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white"
+                    }`}
             >
                 {generating ? (
                     <>
