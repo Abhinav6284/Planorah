@@ -2,10 +2,11 @@
 AI Call Providers — provider-agnostic outbound call system.
 
 Supported providers:
-  • Vapi.ai        → set AI_CALL_PROVIDER=vapi
-  • Retell.ai      → set AI_CALL_PROVIDER=retell
-  • ElevenLabs     → set AI_CALL_PROVIDER=elevenlabs
-  • Bland.ai       → set AI_CALL_PROVIDER=bland
+  • Vapi.ai          → set AI_CALL_PROVIDER=vapi
+  • Retell.ai        → set AI_CALL_PROVIDER=retell
+  • ElevenLabs       → set AI_CALL_PROVIDER=elevenlabs
+  • Bland.ai         → set AI_CALL_PROVIDER=bland
+  • HuskyVoice.ai    → set AI_CALL_PROVIDER=huskyvoice
 
 Each provider implements the same interface so the service layer
 never needs to know which backend is in use.
@@ -303,6 +304,95 @@ class BlandProvider(AICallProvider):
 
 
 # ───────────────────────────────────────────────
+# HuskyVoice.ai
+# ───────────────────────────────────────────────
+
+class HuskyVoiceProvider(AICallProvider):
+    """
+    HuskyVoice.ai outbound calls.
+    India-first multilingual voice AI with API access.
+
+    Sign up at: https://studio.huskyvoice.ai/spark/login?signup=true
+    API docs:   Contact hello@huskyvoice.ai or your account manager
+
+    Required env vars:
+        HUSKY_API_KEY          — Bearer token from your HuskyVoice dashboard
+        HUSKY_AGENT_ID         — Agent ID configured in your HuskyVoice studio
+        HUSKY_FROM_NUMBER      — Caller number assigned to your account (+E.164, e.g. +917411765511)
+
+    Optional env vars:
+        HUSKY_LANGUAGE         — Language code, e.g. 'en', 'hi', 'hi-en' (default: 'en')
+    """
+
+    BASE_URL = "https://api.huskyvoice.ai/v1/calls/outbound"
+
+    def __init__(
+        self,
+        api_key: str,
+        agent_id: str,
+        from_number: str,
+        language: str = "en",
+    ):
+        self.api_key = api_key
+        self.agent_id = agent_id
+        self.from_number = from_number
+        self.language = language
+
+    def initiate_call(
+        self, to_number: str, system_prompt: str, first_message: str, metadata: dict
+    ) -> dict:
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+        payload = {
+            "agent_id": self.agent_id,
+            "to_number": to_number,
+            "from_number": self.from_number,
+            "language": self.language,
+            "first_message": first_message,
+            "dynamic_variables": {
+                "system_prompt": system_prompt,
+                **{str(k): str(v) for k, v in (metadata or {}).items()},
+            },
+            "metadata": metadata,
+        }
+
+        try:
+            resp = requests.post(
+                self.BASE_URL, json=payload, headers=headers, timeout=30
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            return {
+                "success": True,
+                "call_id": data.get("call_id") or data.get("id"),
+                "provider": "huskyvoice",
+                "error": None,
+                "raw": data,
+            }
+        except requests.exceptions.HTTPError as e:
+            body = e.response.text if e.response else str(e)
+            logger.error(f"[HuskyVoice] HTTP error: {body}")
+            return {
+                "success": False,
+                "call_id": None,
+                "provider": "huskyvoice",
+                "error": body,
+                "raw": None,
+            }
+        except Exception as e:
+            logger.error(f"[HuskyVoice] Unexpected error: {e}", exc_info=True)
+            return {
+                "success": False,
+                "call_id": None,
+                "provider": "huskyvoice",
+                "error": str(e),
+                "raw": None,
+            }
+
+
+# ───────────────────────────────────────────────
 # Factory
 # ───────────────────────────────────────────────
 
@@ -337,10 +427,17 @@ def get_provider() -> AICallProvider | None:
             api_key=os.getenv("BLAND_API_KEY", ""),
             from_number=os.getenv("BLAND_FROM_NUMBER") or None,
         )
+    elif provider_name == "huskyvoice":
+        return HuskyVoiceProvider(
+            api_key=os.getenv("HUSKY_API_KEY", ""),
+            agent_id=os.getenv("HUSKY_AGENT_ID", ""),
+            from_number=os.getenv("HUSKY_FROM_NUMBER", ""),
+            language=os.getenv("HUSKY_LANGUAGE", "en"),
+        )
     else:
         if provider_name:
             logger.warning(
-                f"[AICall] Unknown provider '{provider_name}'. Supported: vapi, retell, elevenlabs, bland.")
+                f"[AICall] Unknown provider '{provider_name}'. Supported: vapi, retell, elevenlabs, bland, huskyvoice.")
         else:
             logger.info("[AICall] AI_CALL_PROVIDER not set — calls disabled.")
         return None
