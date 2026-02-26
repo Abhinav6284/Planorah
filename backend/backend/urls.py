@@ -19,8 +19,10 @@ urlpatterns = [
     path('api/scheduler/', include('scheduler.urls')),
     path('api/', include('tasks.urls')),  # Tasks and Notes API
     path('api/assistant/', include('assistant.urls')),  # AI Assistant Chat
-    path('api/music/', include('music.urls')),  # Music Integration (Spotify/YouTube)
-    path('api/lifecycle/', include('user_lifecycle.urls')),  # Phase-gating and Lifecycle
+    # Music Integration (Spotify/YouTube)
+    path('api/music/', include('music.urls')),
+    # Phase-gating and Lifecycle
+    path('api/lifecycle/', include('user_lifecycle.urls')),
     # Career execution platform modules
     path('api/plans/', include('plans.urls')),
     path('api/subscriptions/', include('subscriptions.urls')),
@@ -28,10 +30,13 @@ urlpatterns = [
     path('api/github/', include('github_integration.urls')),
     path('api/billing/', include('billing.urls')),
     path('api/analytics/', include('analytics.urls')),
+    # AI outbound calls (onboarding guide + call logs)
+    path('api/ai-calls/', include('ai_calls.urls')),
     # JWT token endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)

@@ -16,6 +16,9 @@ from rest_framework_simplejwt.exceptions import TokenError
 # Brevo email service
 from backend.email_service import send_otp_email, send_password_reset_email, send_welcome_email, send_account_deleted_email
 
+# AI onboarding call
+from ai_calls.service import trigger_onboarding_call
+
 from .models import CustomUser, OTPVerification, UserProfile
 from .serializers import UserSerializer, UserProfileSerializer
 from .statistics import get_user_statistics
@@ -494,6 +497,13 @@ def update_user_profile(request):
                     if profile.goal_statement and not profile.goal_locked_at:
                         profile.goal_locked_at = timezone.now()
                     profile.save()
+
+                    # 🤖 Trigger AI onboarding call in background thread
+                    try:
+                        trigger_onboarding_call(user, profile)
+                    except Exception as call_err:
+                        logger.warning(
+                            f"AI onboarding call could not be triggered: {call_err}")
 
             # Include updated user info in response if needed, or rely on frontend refetch
             return Response({
