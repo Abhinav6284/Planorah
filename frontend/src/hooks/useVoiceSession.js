@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import html2canvas from 'html2canvas';
 
 /**
  * Custom hook for managing a real-time voice session
@@ -43,12 +44,11 @@ export function useVoiceSession() {
     const [error, setError] = useState('');
     const [transcript, setTranscript] = useState('');
     const [isSpeaking, setIsSpeaking] = useState(false);
-    const [isScreenSharing, setIsScreenSharing] = useState(false);
+    const [isCapturing, setIsCapturing] = useState(false);
     const [audioLevel, setAudioLevel] = useState(0);
 
     const wsRef = useRef(null);
     const micStreamRef = useRef(null);
-    const screenStreamRef = useRef(null);
     const audioContextRef = useRef(null);
     const workletNodeRef = useRef(null);
     const workletBlobUrlRef = useRef(null);
@@ -79,12 +79,6 @@ export function useVoiceSession() {
             micStreamRef.current = null;
         }
 
-        // Stop screen
-        if (screenStreamRef.current) {
-            screenStreamRef.current.getTracks().forEach(t => t.stop());
-            screenStreamRef.current = null;
-        }
-
         // Close audio contexts
         if (audioContextRef.current?.state !== 'closed') {
             audioContextRef.current?.close();
@@ -111,7 +105,7 @@ export function useVoiceSession() {
 
         audioQueueRef.current = [];
         isPlayingRef.current = false;
-        setIsScreenSharing(false);
+        setIsCapturing(false);
         setAudioLevel(0);
     }, []);
 
@@ -248,7 +242,8 @@ export function useVoiceSession() {
                 switch (data.type) {
                     case 'ready':
                         setStatus('active');
-                        // AudioWorklet sends chunks directly via its port.onmessage — no interval needed
+                        // Start capturing the Planora app automatically — no permission dialog
+                        startAppCapture();
                         break;
 
                     case 'audio':
@@ -305,107 +300,48 @@ export function useVoiceSession() {
         }
     }, [cleanup, playNextChunk, startLevelMonitor, status]);
 
-    // ── Screen sharing ──
-    const startScreenShare = useCallback(async () => {
-        try {
-            const screenStream = await navigator.mediaDevices.getDisplayMedia({
-                video: {
-                    frameRate: { ideal: 1, max: 2 },
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 },
-                },
-                audio: false,
-            });
-            screenStreamRef.current = screenStream;
-            setIsScreenSharing(true);
+    // ── App screen capture (html2canvas — captures only Planora, no permission dialog) ──
+    const startAppCapture = useCallback(() => {
+        if (screenIntervalRef.current) return; // already running
 
-            // Create a video element and wait for it to be fully ready
-            const video = document.createElement('video');
-            video.srcObject = screenStream;
-            video.muted = true; // Required for autoplay in most browsers
-            video.playsInline = true;
-
-            // Wait for the video to load metadata and start playing
-            await new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => reject(new Error('Video load timeout')), 5000);
-                video.onloadedmetadata = () => {
-                    clearTimeout(timeout);
-                    video.play()
-                        .then(resolve)
-                        .catch(reject);
-                };
-                video.onerror = (e) => {
-                    clearTimeout(timeout);
-                    reject(e);
-                };
-            });
-
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-
-            // Send an initial frame immediately
-            const captureAndSend = () => {
-                try {
-                    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
-                    if (!video || video.readyState < 2 || video.videoWidth === 0) return;
-
-                    // Maintain aspect ratio, scale down to max 1024px wide
-                    const maxWidth = 1024;
-                    const scale = Math.min(1, maxWidth / video.videoWidth);
-                    canvas.width = Math.floor(video.videoWidth * scale);
-                    canvas.height = Math.floor(video.videoHeight * scale);
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
-                    const base64 = dataUrl.split(',')[1];
-
-                    if (base64 && base64.length > 100) { // Sanity check: not an empty image
-                        wsRef.current.send(JSON.stringify({
-                            type: 'screenshot',
-                            data: base64,
-                            mimeType: 'image/jpeg',
-                        }));
-                    }
-                } catch (err) {
-                    console.error('Screen capture frame error:', err);
+        const doCapture = async () => {
+            if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
+            try {
+                const target = document.getElementById('root') || document.body;
+                const canvas = await html2canvas(target, {
+                    scale: 0.5,           // half resolution — good enough for AI context
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: false,
+                    ignoreElements: (el) => {
+                        // Skip the voice panel overlay itself so AI sees the page behind it
+                        return el.getAttribute?.('data-voice-overlay') === 'true';
+                    },
+                });
+                const base64 = canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
+                if (base64 && base64.length > 200) {
+                    wsRef.current.send(JSON.stringify({
+                        type: 'screenshot',
+                        data: base64,
+                        mimeType: 'image/jpeg',
+                    }));
                 }
-            };
-
-            // Send first frame after a short delay to ensure video is rendering
-            setTimeout(captureAndSend, 500);
-
-            // Then capture every 3 seconds
-            screenIntervalRef.current = setInterval(captureAndSend, 3000);
-
-            // Handle user stopping screen share via browser UI
-            screenStream.getVideoTracks()[0].onended = () => {
-                stopScreenShare();
-            };
-
-        } catch (err) {
-            if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
-                console.error('Screen share error:', err);
-                setError('Failed to start screen sharing: ' + (err.message || 'Unknown error'));
+            } catch (err) {
+                console.warn('App capture error:', err);
             }
-            // Clean up if it failed partway
-            if (screenStreamRef.current) {
-                screenStreamRef.current.getTracks().forEach(t => t.stop());
-                screenStreamRef.current = null;
-            }
-            setIsScreenSharing(false);
-        }
+        };
+
+        setIsCapturing(true);
+        doCapture(); // immediate first capture
+        screenIntervalRef.current = setInterval(doCapture, 4000);
     }, []);
 
-    const stopScreenShare = useCallback(() => {
+    const stopAppCapture = useCallback(() => {
         if (screenIntervalRef.current) {
             clearInterval(screenIntervalRef.current);
             screenIntervalRef.current = null;
         }
-        if (screenStreamRef.current) {
-            screenStreamRef.current.getTracks().forEach(t => t.stop());
-            screenStreamRef.current = null;
-        }
-        setIsScreenSharing(false);
+        setIsCapturing(false);
     }, []);
 
     // ── Disconnect ──
@@ -420,11 +356,10 @@ export function useVoiceSession() {
         error,
         transcript,
         isSpeaking,
-        isScreenSharing,
+        isCapturing,
         audioLevel,
         connect,
         disconnect,
-        startScreenShare,
-        stopScreenShare,
+        stopAppCapture,
     };
 }
