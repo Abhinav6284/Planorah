@@ -1,6 +1,8 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+from typing import cast
 from rest_framework.test import APIClient
+from rest_framework.response import Response
 from rest_framework import status
 from ai_mentoring.models import StudentSession
 
@@ -55,19 +57,20 @@ class MentoringAPITest(TestCase):
         self.client.force_authenticate(user=self.user)
 
     def test_create_session_missing_fields(self):
-        response = self.client.post('/api/ai-mentoring/session/', {})
+        response = cast(Response, self.client.post(
+            '/api/ai-mentoring/session/', {}))
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_list_sessions_empty(self):
-        response = self.client.get('/api/ai-mentoring/sessions/')
+        response = cast(Response, self.client.get(
+            '/api/ai-mentoring/sessions/'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, [])  # type: ignore
+        self.assertEqual(response.data, [])
 
     def test_unauthenticated_rejected(self):
-        client = APIClient()
-        response = client.post('/api/ai-mentoring/session/', {
+        unauthenticated_client = APIClient()
+        response = cast(Response, unauthenticated_client.post('/api/ai-mentoring/session/', {
             'context_source': 'roadmap',
             'transcript': 'Hello',
-        })
-        self.assertEqual(response.status_code,
-                         status.HTTP_401_UNAUTHORIZED)  # type: ignore
+        }))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
