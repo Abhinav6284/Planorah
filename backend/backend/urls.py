@@ -32,6 +32,8 @@ urlpatterns = [
     path('api/analytics/', include('analytics.urls')),
     # AI outbound calls (onboarding guide + call logs)
     path('api/ai-calls/', include('ai_calls.urls')),
+    # Reusable AI Mentoring Engine
+    path('api/ai-mentoring/', include('ai_mentoring.urls')),
     # JWT token endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

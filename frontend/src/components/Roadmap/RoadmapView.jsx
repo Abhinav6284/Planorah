@@ -5,6 +5,7 @@ import { tasksService } from "../../api/tasksService";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaCheckCircle, FaRegCircle, FaChevronDown, FaChevronUp, FaExternalLinkAlt, FaQuestionCircle, FaClock, FaTasks, FaRocket, FaCode, FaBook, FaLightbulb } from "react-icons/fa";
 import GenerateResumeButton from "../Resume/GenerateResumeButton";
+import AITalkButton from "../Mentoring/AITalkButton";
 
 // Colorful milestone icons based on phase
 const milestoneIcons = [
@@ -156,6 +157,15 @@ export default function RoadmapView() {
                         <div className="flex items-center gap-2">
                             <FaTasks className="text-green-500" /> {completedMilestones} / {totalMilestones} Milestones
                         </div>
+                    </div>
+
+                    {/* AI Mentoring Button */}
+                    <div className="mt-6 flex justify-center">
+                        <AITalkButton
+                            contextSource="roadmap"
+                            studentGoal={roadmap.title}
+                            currentProgress={`${overallProgress}% complete — ${taskProgress.completed}/${taskProgress.total} tasks done`}
+                        />
                     </div>
 
                     <div className="flex justify-center gap-4 mt-8">

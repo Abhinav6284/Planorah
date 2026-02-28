@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'projects',  # User projects from CodeSpace
     'codespace',  # Real terminal / IDE backend
     'ai_calls',   # AI outbound call system (onboarding guide)
+    'ai_mentoring',  # Reusable AI Mentoring Engine
 ]
 
 # WSGI Application (using WSGI for development instead of ASGI due to Python 3.13 compatibility)
