@@ -104,7 +104,7 @@ async def proxy_handler(client_ws):
 
         gemini_setup = {
             'setup': {
-                'model': 'models/gemini-2.0-flash-exp',
+                'model': 'models/gemini-2.5-flash-native-audio-preview-12-2025',
                 'generationConfig': {
                     'responseModalities': ['AUDIO'],
                     'speechConfig': {
@@ -227,7 +227,8 @@ async def proxy_handler(client_ws):
                     # Check for Gemini-side errors
                     if 'error' in data:
                         error_info = data['error']
-                        logger.error(f"Gemini error for {client_addr}: {error_info}")
+                        logger.error(
+                            f"Gemini error for {client_addr}: {error_info}")
                         await client_ws.send(json.dumps({
                             'type': 'error',
                             'message': f"AI service error: {error_info.get('message', str(error_info))}",

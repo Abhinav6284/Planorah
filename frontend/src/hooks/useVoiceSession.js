@@ -10,7 +10,33 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 
 const AUDIO_SAMPLE_RATE = 16000;  // What we send to Gemini
 const PLAYBACK_SAMPLE_RATE = 24000;  // What Gemini sends back
-const CHUNK_INTERVAL_MS = 250;  // Send audio every 250ms
+
+// AudioWorklet processor — runs in a separate audio thread (no deprecation warning)
+const PCM16_WORKLET_CODE = `
+class PCM16Processor extends AudioWorkletProcessor {
+  constructor() {
+    super();
+    this._buf = [];
+  }
+  process(inputs) {
+    const ch = inputs[0]?.[0];
+    if (!ch) return true;
+    for (let i = 0; i < ch.length; i++) this._buf.push(ch[i]);
+    // Flush every ~250 ms worth of samples at 16 kHz = 4000 samples
+    while (this._buf.length >= 4000) {
+      const slice = this._buf.splice(0, 4000);
+      const pcm = new Int16Array(slice.length);
+      for (let i = 0; i < slice.length; i++) {
+        const s = Math.max(-1, Math.min(1, slice[i]));
+        pcm[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+      }
+      this.port.postMessage({ pcm: pcm.buffer }, [pcm.buffer]);
+    }
+    return true;
+  }
+}
+registerProcessor('pcm16-processor', PCM16Processor);
+`;
 
 export function useVoiceSession() {
     const [status, setStatus] = useState('idle'); // idle | connecting | ready | active | error
@@ -25,23 +51,16 @@ export function useVoiceSession() {
     const screenStreamRef = useRef(null);
     const audioContextRef = useRef(null);
     const workletNodeRef = useRef(null);
+    const workletBlobUrlRef = useRef(null);
     const audioQueueRef = useRef([]);
     const isPlayingRef = useRef(false);
     const playbackCtxRef = useRef(null);
     const screenIntervalRef = useRef(null);
     const analyserRef = useRef(null);
     const animFrameRef = useRef(null);
-    const chunkBufferRef = useRef([]);
-    const sendIntervalRef = useRef(null);
 
     // ── Cleanup ──
     const cleanup = useCallback(() => {
-        // Stop send interval
-        if (sendIntervalRef.current) {
-            clearInterval(sendIntervalRef.current);
-            sendIntervalRef.current = null;
-        }
-
         // Stop screen capture interval
         if (screenIntervalRef.current) {
             clearInterval(screenIntervalRef.current);
@@ -84,9 +103,14 @@ export function useVoiceSession() {
         }
         wsRef.current = null;
 
+        // Revoke worklet blob URL
+        if (workletBlobUrlRef.current) {
+            URL.revokeObjectURL(workletBlobUrlRef.current);
+            workletBlobUrlRef.current = null;
+        }
+
         audioQueueRef.current = [];
         isPlayingRef.current = false;
-        chunkBufferRef.current = [];
         setIsScreenSharing(false);
         setAudioLevel(0);
     }, []);
@@ -182,19 +206,25 @@ export function useVoiceSession() {
             analyserRef.current = analyser;
             source.connect(analyser);
 
-            // Use ScriptProcessor for PCM capture (wider browser support)
-            const processor = audioCtx.createScriptProcessor(4096, 1, 1);
-            processor.onaudioprocess = (e) => {
-                const float32 = e.inputBuffer.getChannelData(0);
-                const int16 = new Int16Array(float32.length);
-                for (let i = 0; i < float32.length; i++) {
-                    const s = Math.max(-1, Math.min(1, float32[i]));
-                    int16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
-                }
-                chunkBufferRef.current.push(int16);
+            // AudioWorklet for PCM capture (replaces deprecated ScriptProcessorNode)
+            const blob = new Blob([PCM16_WORKLET_CODE], { type: 'application/javascript' });
+            const blobUrl = URL.createObjectURL(blob);
+            workletBlobUrlRef.current = blobUrl;
+            await audioCtx.audioWorklet.addModule(blobUrl);
+
+            const workletNode = new AudioWorkletNode(audioCtx, 'pcm16-processor');
+            workletNodeRef.current = workletNode;
+
+            workletNode.port.onmessage = (evt) => {
+                if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
+                const bytes = new Uint8Array(evt.data.pcm);
+                let binary = '';
+                for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+                wsRef.current.send(JSON.stringify({ type: 'audio', data: btoa(binary) }));
             };
-            source.connect(processor);
-            processor.connect(audioCtx.destination); // Required for processing to work
+
+            source.connect(workletNode);
+            // AudioWorkletNode does not need to connect to destination to process audio
 
             startLevelMonitor(analyser);
 
@@ -218,31 +248,7 @@ export function useVoiceSession() {
                 switch (data.type) {
                     case 'ready':
                         setStatus('active');
-                        // Start sending audio chunks at regular intervals
-                        sendIntervalRef.current = setInterval(() => {
-                            if (chunkBufferRef.current.length === 0) return;
-                            if (ws.readyState !== WebSocket.OPEN) return;
-
-                            // Merge all buffered chunks
-                            const totalLength = chunkBufferRef.current.reduce((acc, c) => acc + c.length, 0);
-                            const merged = new Int16Array(totalLength);
-                            let offset = 0;
-                            for (const chunk of chunkBufferRef.current) {
-                                merged.set(chunk, offset);
-                                offset += chunk.length;
-                            }
-                            chunkBufferRef.current = [];
-
-                            // Base64 encode
-                            const bytes = new Uint8Array(merged.buffer);
-                            let binary = '';
-                            for (let i = 0; i < bytes.length; i++) {
-                                binary += String.fromCharCode(bytes[i]);
-                            }
-                            const b64 = btoa(binary);
-
-                            ws.send(JSON.stringify({ type: 'audio', data: b64 }));
-                        }, CHUNK_INTERVAL_MS);
+                        // AudioWorklet sends chunks directly via its port.onmessage — no interval needed
                         break;
 
                     case 'audio':
