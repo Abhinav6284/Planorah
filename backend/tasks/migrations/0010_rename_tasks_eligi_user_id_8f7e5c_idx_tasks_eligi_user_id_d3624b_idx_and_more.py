@@ -10,49 +10,32 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RenameIndex(
-            model_name='eligibilityoverride',
-            new_name='tasks_eligi_user_id_d3624b_idx',
-            old_name='tasks_eligi_user_id_8f7e5c_idx',
-        ),
-        migrations.RenameIndex(
-            model_name='eligibilityoverride',
-            new_name='tasks_eligi_roadmap_ed8a86_idx',
-            old_name='tasks_eligi_roadmap_7a2d3b_idx',
-        ),
-        migrations.RenameIndex(
-            model_name='remediationaction',
-            new_name='tasks_remed_user_id_f1d0f3_idx',
-            old_name='tasks_remed_user_id_e8f05a_idx',
-        ),
-        migrations.RenameIndex(
-            model_name='remediationaction',
-            new_name='tasks_remed_status_56ecf0_idx',
-            old_name='tasks_remed_status_9c9e2a_idx',
-        ),
-        migrations.RenameIndex(
-            model_name='resumeentry',
-            new_name='tasks_resum_resume__e9f5d3_idx',
-            old_name='tasks_resum_resume__6g7h8i_idx',
-        ),
-        migrations.RenameIndex(
-            model_name='resumeentry',
-            new_name='tasks_resum_source__c8840d_idx',
-            old_name='tasks_resum_source__9j0k1l_idx',
-        ),
-        migrations.RenameIndex(
-            model_name='resumeversion',
-            new_name='tasks_resum_user_id_d4bddf_idx',
-            old_name='tasks_resum_user_id_0a1b2c_idx',
-        ),
-        migrations.RenameIndex(
-            model_name='resumeversion',
-            new_name='tasks_resum_roadmap_89ae75_idx',
-            old_name='tasks_resum_roadmap_3d4e5f_idx',
+        migrations.RunSQL(
+            """
+                ALTER INDEX tasks_eligi_user_id_8f7e5c_idx RENAME TO tasks_eligi_user_id_d3624b_idx;
+                ALTER INDEX tasks_eligi_roadmap_7a2d3b_idx RENAME TO tasks_eligi_roadmap_ed8a86_idx;
+                ALTER INDEX tasks_remed_user_id_e8f05a_idx RENAME TO tasks_remed_user_id_f1d0f3_idx;
+                ALTER INDEX tasks_remed_status_9c9e2a_idx RENAME TO tasks_remed_status_56ecf0_idx;
+                ALTER INDEX tasks_resum_resume__6g7h8i_idx RENAME TO tasks_resum_resume__e9f5d3_idx;
+                ALTER INDEX tasks_resum_source__9j0k1l_idx RENAME TO tasks_resum_source__c8840d_idx;
+                ALTER INDEX tasks_resum_user_id_0a1b2c_idx RENAME TO tasks_resum_user_id_d4bddf_idx;
+                ALTER INDEX tasks_resum_roadmap_3d4e5f_idx RENAME TO tasks_resum_roadmap_89ae75_idx;
+                """,
+            reverse_sql="""
+                ALTER INDEX tasks_eligi_user_id_d3624b_idx RENAME TO tasks_eligi_user_id_8f7e5c_idx;
+                ALTER INDEX tasks_eligi_roadmap_ed8a86_idx RENAME TO tasks_eligi_roadmap_7a2d3b_idx;
+                ALTER INDEX tasks_remed_user_id_f1d0f3_idx RENAME TO tasks_remed_user_id_e8f05a_idx;
+                ALTER INDEX tasks_remed_status_56ecf0_idx RENAME TO tasks_remed_status_9c9e2a_idx;
+                ALTER INDEX tasks_resum_resume__e9f5d3_idx RENAME TO tasks_resum_resume__6g7h8i_idx;
+                ALTER INDEX tasks_resum_source__c8840d_idx RENAME TO tasks_resum_source__9j0k1l_idx;
+                ALTER INDEX tasks_resum_user_id_d4bddf_idx RENAME TO tasks_resum_user_id_0a1b2c_idx;
+                ALTER INDEX tasks_resum_roadmap_89ae75_idx RENAME TO tasks_resum_roadmap_3d4e5f_idx;
+                """
         ),
         migrations.AlterField(
             model_name='resumesectiontemplate',
             name='sections',
-            field=models.JSONField(default=list, help_text='\n        [\n            {\n                "name": "Technical Skills",\n                "entry_type": "skill",\n                "max_entries": 10,\n                "sort_by": "score"  # or "weight", "date"\n            },\n            {\n                "name": "Projects",\n                "entry_type": "project",\n                "max_entries": 5,\n                "sort_by": "weight"\n            }\n        ]\n        '),
+            field=models.JSONField(
+                default=list, help_text='\n        [\n            {\n                "name": "Technical Skills",\n                "entry_type": "skill",\n                "max_entries": 10,\n                "sort_by": "score"  # or "weight", "date"\n            },\n            {\n                "name": "Projects",\n                "entry_type": "project",\n                "max_entries": 5,\n                "sort_by": "weight"\n            }\n        ]\n        '),
         ),
     ]

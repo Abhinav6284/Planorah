@@ -1,29 +1,103 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../../api/axios";
 
+// ─── Quicky Mascot ─────────────────────────────────────────────────────────────
+function QuickyMessage({ stepId, fd }) {
+    const getMessage = () => {
+        switch (stepId) {
+            case "life_stage":
+                return "Hi there! I'm Quicky ⚡ Let's build your perfect plan.";
+            case "school_class":
+            case "college_year":
+            case "career_shift_intent":
+                return "Great! Tell me a bit more about where you're at.";
+            case "school_stream":
+                return "Ah, streams! A big decision. 🔬📊🎨";
+            case "competitive_direction":
+                return "Thinking big? Let's figure out your competitive goals!";
+            case "jee_prep_level":
+                return "Aiming for the top! 💪 Where do you stand right now?";
+            case "non_competitive_focus":
+                return "Clarity is super important too! 🎯";
+            case "placement_skills":
+                return "Getting a job requires real skills. Let's see your arsenal! 💼";
+            case "higher_targeting":
+                return "Further studies! Expanding the brain! 🧠";
+            case "daily_time":
+                return "Action time! Be honest, how much time can you actually give? ⏱️";
+            case "dream_vs_effort":
+                if (fd.daily_time === "4plus") return "4+ hours is intense! 🔥 But is it enough for your dreams?";
+                return "Reality check! 🎯 Are your efforts matching your dreams?";
+            case "pressure_response":
+                return "Almost there! Just one more about your mindset. 🧘";
+            case "commitment_lock":
+                return "Here is your plan. Are you ready to level up? 🚀";
+            case "personal":
+                return "Just a few details to personalize your experience! 📝";
+            default:
+                return "Keep going! You're doing great! ✨";
+        }
+    };
+
+    const message = getMessage();
+    if (!message) return null;
+
+    return (
+        <AnimatePresence mode="wait">
+            <motion.div
+                key={message}
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8, y: -20 }}
+                transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                className="flex items-end gap-3 mb-8"
+            >
+                <div className="w-14 h-14 shrink-0 relative flex items-center justify-center bg-blue-100 rounded-full border-2 border-blue-200 shadow-[0_4px_0_0_rgba(191,219,254,1)]">
+                    <motion.div
+                        animate={{ y: [0, -4, 0] }}
+                        transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                        className="text-3xl"
+                    >
+                        🦉
+                    </motion.div>
+                </div>
+                <div className="bg-white border-2 border-gray-200 rounded-2xl rounded-bl-sm px-4 py-3 shadow-[0_4px_0_0_rgba(229,231,235,1)] relative flex-1">
+                    <p className="text-[15px] font-bold text-gray-800 leading-snug">{message}</p>
+                </div>
+            </motion.div>
+        </AnimatePresence>
+    );
+}
+
 // ─── Option Card ────────────────────────────────────────────────────────────────
-function OptionCard({ emoji, label, sublabel, selected, onClick }) {
+function OptionCard({ emoji, iconText, label, sublabel, selected, onClick }) {
     return (
         <motion.button
-            whileTap={{ scale: 0.96 }}
+            whileTap={{ scale: 0.98, y: 2 }}
             onClick={onClick}
-            className={`w-full p-5 rounded-2xl border-2 text-left transition-all duration-150 focus:outline-none ${selected
-                ? "border-gray-900 bg-gray-900 text-white"
-                : "border-gray-200 bg-white text-gray-900 hover:border-gray-400 hover:bg-gray-50"
+            className={`w-full p-4 rounded-2xl border-2 border-b-4 text-left transition-colors duration-200 focus:outline-none flex items-center gap-4 ${selected
+                ? "border-blue-500 bg-blue-50/50 text-blue-900 border-b-blue-600"
+                : "border-gray-200 bg-white text-gray-800 hover:border-blue-300 border-b-gray-300 hover:bg-gray-50"
                 }`}
         >
-            <div className="flex items-center gap-3">
-                {emoji && <span className="text-2xl">{emoji}</span>}
-                <div>
-                    <div className="font-semibold text-base leading-tight">{label}</div>
-                    {sublabel && (
-                        <div className={`text-xs mt-0.5 ${selected ? "text-gray-300" : "text-gray-500"}`}>
-                            {sublabel}
-                        </div>
+            {(emoji || iconText) && (
+                <div className={`w-12 h-12 shrink-0 rounded-xl flex items-center justify-center text-2xl bg-white shadow-sm border ${selected ? "border-blue-200" : "border-gray-100"}`}>
+                    {iconText ? (
+                        <span className={`font-black text-xl ${selected ? "text-blue-600" : "text-gray-400"}`}>{iconText}</span>
+                    ) : (
+                        emoji
                     )}
                 </div>
+            )}
+            <div>
+                <div className="font-bold text-[17px] leading-tight text-gray-900">{label}</div>
+                {sublabel && (
+                    <div className={`text-sm mt-1 font-medium ${selected ? "text-blue-700/80" : "text-gray-500"}`}>
+                        {sublabel}
+                    </div>
+                )}
             </div>
         </motion.button>
     );
@@ -31,27 +105,39 @@ function OptionCard({ emoji, label, sublabel, selected, onClick }) {
 
 // ─── Step builder ───────────────────────────────────────────────────────────────
 function buildSteps(fd) {
-    const steps = ["life_stage", "momentum", "goal_clarity"];
+    const steps = ["life_stage"];
     const ls = fd.life_stage;
 
     if (ls === "school") {
         steps.push("school_class");
-        if (["11", "12"].includes(fd.school_class)) steps.push("school_stream");
-        steps.push("competitive_direction");
-        if (fd.competitive_direction === "yes_serious") {
-            steps.push("jee_prep_level", "mock_test_response", "drop_year");
-        } else if (["maybe", "not_sure", "no"].includes(fd.competitive_direction)) {
-            steps.push("non_competitive_focus");
+        if (["11", "12"].includes(fd.school_class)) {
+            steps.push("school_stream");
+        }
+        if (fd.school_class) { // Proceed deeper
+            steps.push("competitive_direction");
+            const cd = fd.competitive_direction;
+            if (cd === "yes_serious") {
+                steps.push("jee_prep_level", "mock_test_response", "drop_year");
+            } else if (["maybe", "not_sure", "no"].includes(cd)) {
+                steps.push("non_competitive_focus");
+            }
         }
     } else if (ls === "college") {
-        steps.push("college_year", "college_focus");
-        if (fd.college_focus === "placement") {
-            steps.push("placement_skills", "placement_resume", "placement_interview");
-        } else if (fd.college_focus === "higher_studies") {
-            steps.push("higher_targeting", "higher_prep_stage");
+        steps.push("college_year");
+        if (fd.college_year) {
+            steps.push("college_focus");
+            const cf = fd.college_focus;
+            if (cf === "placement") {
+                steps.push("placement_skills", "placement_resume", "placement_interview");
+            } else if (cf === "higher_studies") {
+                steps.push("higher_targeting", "higher_prep_stage");
+            }
         }
     } else if (ls === "postgrad" || ls === "working") {
-        steps.push("career_shift_intent", "career_stuck_response");
+        steps.push("career_shift_intent");
+        if (fd.career_shift_intent) {
+            steps.push("career_stuck_response");
+        }
     }
 
     if (ls) steps.push("daily_time", "dream_vs_effort", "pressure_response", "commitment_lock", "personal");
@@ -60,21 +146,18 @@ function buildSteps(fd) {
 
 // ─── Summary builder ────────────────────────────────────────────────────────────
 function buildSummary(fd) {
-    let strength = "Building self-awareness";
-    if (fd.momentum === "productive") strength = "Strong execution habits";
-    else if (fd.momentum === "trying") strength = "Consistent intent & effort";
-    else if (fd.competitive_direction === "yes_serious") strength = "Competitive drive";
+    let strength = "Self-awareness & potential";
+    if (fd.competitive_direction === "yes_serious") strength = "Competitive drive & ambition";
     else if (fd.placement_skills === "already_building") strength = "Proactive skill building";
     else if (fd.career_shift_intent === "build_own") strength = "Entrepreneurial vision";
+    else if (fd.daily_time === "4plus" || fd.daily_time === "2_4hrs") strength = "Commitment to focused effort";
 
     let growth = "Structured planning";
-    if (fd.goal_clarity === "confused") growth = "Career & goal clarity";
-    else if (fd.goal_clarity === "no_idea") growth = "Direction finding";
-    else if (fd.pressure_response === "overthink") growth = "Stress & decision management";
-    else if (fd.dream_vs_effort === "far_apart") growth = "Bridging ambition with action";
-    else if (fd.momentum === "delaying") growth = "Breaking procrastination";
-    else if (fd.momentum === "distracted") growth = "Focus & consistency";
-    else if (fd.placement_resume === "dont_have") growth = "Resume & visibility";
+    if (fd.placement_resume === "dont_have") growth = "Resume & professional visibility";
+    else if (["overthink", "panic_but_act", "shut_down"].includes(fd.pressure_response)) growth = "Pressure & stress management";
+    else if (["far_apart", "needs_work"].includes(fd.dream_vs_effort)) growth = "Bridging ambition & execution";
+    else if (["feel_stressed", "avoid"].includes(fd.mock_test_response)) growth = "Mock test resilience";
+    else if (["overthink", "ignore"].includes(fd.career_stuck_response)) growth = "Decision-making agility";
 
     let direction = "Personal growth journey";
     if (fd.life_stage === "school") {
@@ -138,60 +221,40 @@ const SCREENS = {
         q: "Where are you right now?",
         field: "life_stage",
         options: [
-            { value: "school",   label: "School",   emoji: "🏫" },
-            { value: "college",  label: "College",  emoji: "🎓" },
+            { value: "school", label: "School", emoji: "🏫" },
+            { value: "college", label: "College", emoji: "🎓" },
             { value: "postgrad", label: "Postgrad", emoji: "📚" },
-            { value: "working",  label: "Working",  emoji: "💼" },
-        ],
-    },
-    momentum: {
-        q: "Last 7 days you were mostly…",
-        field: "momentum",
-        options: [
-            { value: "productive",  label: "Productive",  emoji: "🔥" },
-            { value: "trying",      label: "Trying",      emoji: "🙂" },
-            { value: "delaying",    label: "Delaying",    emoji: "😅" },
-            { value: "distracted",  label: "Distracted",  emoji: "📱" },
-        ],
-    },
-    goal_clarity: {
-        q: "When someone asks your future plan…",
-        field: "goal_clarity",
-        options: [
-            { value: "clear",     label: "Clear answer",  emoji: "😎" },
-            { value: "few_ideas", label: "2–3 ideas",     emoji: "🤔" },
-            { value: "confused",  label: "Confused",      emoji: "😬" },
-            { value: "no_idea",   label: "No idea",       emoji: "🤷" },
+            { value: "working", label: "Working", emoji: "💼" },
         ],
     },
     school_class: {
         q: "You're in?",
         field: "school_class",
         options: [
-            { value: "9",  label: "Class 9",  emoji: "9️⃣" },
-            { value: "10", label: "Class 10", emoji: "🔟" },
-            { value: "11", label: "Class 11", emoji: "1️⃣" },
-            { value: "12", label: "Class 12", emoji: "2️⃣" },
+            { value: "9", label: "Class 9", iconText: "9" },
+            { value: "10", label: "Class 10", iconText: "10" },
+            { value: "11", label: "Class 11", iconText: "11" },
+            { value: "12", label: "Class 12", iconText: "12" },
         ],
     },
     school_stream: {
         q: "Your stream?",
         field: "school_stream",
         options: [
-            { value: "science",   label: "Science",        emoji: "🔬" },
-            { value: "commerce",  label: "Commerce",       emoji: "📊" },
-            { value: "arts",      label: "Arts",           emoji: "🎨" },
+            { value: "science", label: "Science", emoji: "🔬" },
+            { value: "commerce", label: "Commerce", emoji: "📊" },
+            { value: "arts", label: "Arts", emoji: "🎨" },
             { value: "undecided", label: "Still deciding", emoji: "🤔" },
         ],
     },
     competitive_direction: {
-        q: "Are you thinking about competitive exams?",
+        q: "Are competitive exams part of your plan?",
         field: "competitive_direction",
         options: [
-            { value: "yes_serious", label: "Yes, serious", emoji: "🚀" },
-            { value: "maybe",       label: "Maybe",        emoji: "🙂" },
-            { value: "not_sure",    label: "Not sure",     emoji: "🤔" },
-            { value: "no",          label: "No",           emoji: "❌" },
+            { value: "yes_serious", label: "Yes, seriously preparing", emoji: "🚀" },
+            { value: "maybe", label: "Thinking about it", emoji: "🙂" },
+            { value: "not_sure", label: "Still deciding", emoji: "🤔" },
+            { value: "no", label: "Not planning to", emoji: "❌" },
         ],
     },
     jee_prep_level: {
@@ -199,27 +262,27 @@ const SCREENS = {
         field: "jee_prep_level",
         options: [
             { value: "already_preparing", label: "Already preparing", emoji: "🔥" },
-            { value: "just_started",      label: "Just started",      emoji: "📚" },
+            { value: "just_started", label: "Just started", emoji: "📚" },
             { value: "planning_to_start", label: "Planning to start", emoji: "😬" },
-            { value: "havent_started",    label: "Haven't started",   emoji: "🤷" },
+            { value: "havent_started", label: "Haven't started", emoji: "🤷" },
         ],
     },
     mock_test_response: {
-        q: "When mock tests get tough, you…",
+        q: "When studies get difficult, you usually…",
         field: "mock_test_response",
         options: [
-            { value: "try_harder",   label: "Try harder",      emoji: "💪" },
-            { value: "check_soln",   label: "Check solutions", emoji: "📖" },
-            { value: "feel_stressed",label: "Feel stressed",   emoji: "😓" },
-            { value: "avoid",        label: "Avoid them",      emoji: "🚪" },
+            { value: "try_harder", label: "Push harder", emoji: "💪" },
+            { value: "check_soln", label: "Look for explanations", emoji: "📖" },
+            { value: "feel_stressed", label: "Feel stressed", emoji: "😓" },
+            { value: "avoid", label: "Avoid it for a while", emoji: "🚪" },
         ],
     },
     drop_year: {
         q: "Drop year is…",
         field: "drop_year",
         options: [
-            { value: "acceptable",    label: "Acceptable",    emoji: "✅" },
-            { value: "maybe",         label: "Maybe",         emoji: "🤔" },
+            { value: "acceptable", label: "Acceptable", emoji: "✅" },
+            { value: "maybe", label: "Maybe", emoji: "🤔" },
             { value: "not_an_option", label: "Not an option", emoji: "❌" },
         ],
     },
@@ -227,68 +290,68 @@ const SCREENS = {
         q: "What matters more right now?",
         field: "non_competitive_focus",
         options: [
-            { value: "high_marks",      label: "High board marks",         emoji: "📊" },
-            { value: "concept_clarity", label: "Concept clarity",          emoji: "🧠" },
-            { value: "career_clarity",  label: "Career clarity",           emoji: "🎯" },
-            { value: "just_passing",    label: "Just passing comfortably", emoji: "🙂" },
+            { value: "high_marks", label: "High board marks", emoji: "📊" },
+            { value: "concept_clarity", label: "Concept clarity", emoji: "🧠" },
+            { value: "career_clarity", label: "Career clarity", emoji: "🎯" },
+            { value: "just_passing", label: "Just passing comfortably", emoji: "🙂" },
         ],
     },
     college_year: {
         q: "You're in your…",
         field: "college_year",
         options: [
-            { value: "1", label: "1st Year", emoji: "1️⃣" },
-            { value: "2", label: "2nd Year", emoji: "2️⃣" },
-            { value: "3", label: "3rd Year", emoji: "3️⃣" },
-            { value: "4", label: "4th Year", emoji: "4️⃣" },
+            { value: "1", label: "1st Year", iconText: "1" },
+            { value: "2", label: "2nd Year", iconText: "2" },
+            { value: "3", label: "3rd Year", iconText: "3" },
+            { value: "4", label: "4th Year", iconText: "4" },
         ],
     },
     college_focus: {
         q: "Your main focus right now?",
         field: "college_focus",
         options: [
-            { value: "placement",      label: "Placement",      emoji: "💼" },
+            { value: "placement", label: "Placement", emoji: "💼" },
             { value: "higher_studies", label: "Higher Studies", emoji: "🎓" },
-            { value: "govt_exams",     label: "Govt Exams",     emoji: "🏛" },
-            { value: "startup",        label: "Startup",        emoji: "🚀" },
+            { value: "govt_exams", label: "Govt Exams", emoji: "🏛" },
+            { value: "startup", label: "Startup", emoji: "🚀" },
         ],
     },
     placement_skills: {
         q: "When it comes to skills…",
         field: "placement_skills",
         options: [
-            { value: "already_building",   label: "Already building",    emoji: "💪" },
-            { value: "learning_basics",    label: "Learning basics",     emoji: "📚" },
+            { value: "already_building", label: "Already building", emoji: "💪" },
+            { value: "learning_basics", label: "Learning basics", emoji: "📚" },
             { value: "watching_not_doing", label: "Watching, not doing", emoji: "😅" },
-            { value: "havent_started",     label: "Haven't started",     emoji: "🤷" },
+            { value: "havent_started", label: "Haven't started", emoji: "🤷" },
         ],
     },
     placement_resume: {
         q: "Resume right now?",
         field: "placement_resume",
         options: [
-            { value: "strong",     label: "Strong",         emoji: "🔥" },
-            { value: "average",    label: "Average",        emoji: "🙂" },
-            { value: "weak",       label: "Weak",           emoji: "😬" },
-            { value: "dont_have",  label: "Don't have one", emoji: "❌" },
+            { value: "strong", label: "Strong", emoji: "🔥" },
+            { value: "average", label: "Average", emoji: "🙂" },
+            { value: "weak", label: "Weak", emoji: "😬" },
+            { value: "dont_have", label: "Don't have one", emoji: "❌" },
         ],
     },
     placement_interview: {
         q: "Interview tomorrow?",
         field: "placement_interview",
         options: [
-            { value: "confident",     label: "Confident",         emoji: "😎" },
+            { value: "confident", label: "Confident", emoji: "😎" },
             { value: "nervous_ready", label: "Nervous but ready", emoji: "🙂" },
-            { value: "underprepared", label: "Underprepared",     emoji: "😓" },
-            { value: "avoiding",      label: "Avoiding it",       emoji: "🚪" },
+            { value: "underprepared", label: "Underprepared", emoji: "😓" },
+            { value: "avoiding", label: "Avoiding it", emoji: "🚪" },
         ],
     },
     higher_targeting: {
         q: "You're targeting…",
         field: "higher_targeting",
         options: [
-            { value: "india",    label: "India",    emoji: "🇮🇳" },
-            { value: "abroad",   label: "Abroad",   emoji: "🌍" },
+            { value: "india", label: "India", emoji: "🇮🇳" },
+            { value: "abroad", label: "Abroad", emoji: "🌍" },
             { value: "not_sure", label: "Not sure", emoji: "🤔" },
         ],
     },
@@ -297,19 +360,19 @@ const SCREENS = {
         field: "higher_prep_stage",
         options: [
             { value: "actively_preparing", label: "Actively preparing", emoji: "📚" },
-            { value: "researching",        label: "Researching",        emoji: "🙂" },
-            { value: "thinking_about_it",  label: "Thinking about it",  emoji: "😅" },
-            { value: "no_idea",            label: "No idea yet",        emoji: "🤷" },
+            { value: "researching", label: "Researching", emoji: "🙂" },
+            { value: "thinking_about_it", label: "Thinking about it", emoji: "😅" },
+            { value: "no_idea", label: "No idea yet", emoji: "🤷" },
         ],
     },
     career_shift_intent: {
         q: "You want to…",
         field: "career_shift_intent",
         options: [
-            { value: "grow_same",     label: "Grow in same field", emoji: "⬆️" },
-            { value: "switch_domain", label: "Switch domain",      emoji: "🔁" },
-            { value: "academic",      label: "Go academic",        emoji: "🎓" },
-            { value: "build_own",     label: "Build own thing",    emoji: "🚀" },
+            { value: "grow_same", label: "Grow in same field", emoji: "⬆️" },
+            { value: "switch_domain", label: "Switch domain", emoji: "🔁" },
+            { value: "academic", label: "Go academic", emoji: "🎓" },
+            { value: "build_own", label: "Build own thing", emoji: "🚀" },
         ],
     },
     career_stuck_response: {
@@ -317,28 +380,28 @@ const SCREENS = {
         field: "career_stuck_response",
         options: [
             { value: "research_deeply", label: "Research deeply", emoji: "🧠" },
-            { value: "ask_others",      label: "Ask others",      emoji: "📞" },
-            { value: "overthink",       label: "Overthink",       emoji: "😓" },
-            { value: "ignore",          label: "Ignore",          emoji: "🚪" },
+            { value: "ask_others", label: "Ask others", emoji: "📞" },
+            { value: "overthink", label: "Overthink", emoji: "😓" },
+            { value: "ignore", label: "Ignore", emoji: "🚪" },
         ],
     },
     daily_time: {
         q: "Daily focused time?",
         field: "daily_time",
         options: [
-            { value: "less_1hr", label: "< 1 hr",  emoji: "😅" },
-            { value: "1_2hrs",   label: "1–2 hrs", emoji: "🙂" },
-            { value: "2_4hrs",   label: "2–4 hrs", emoji: "💪" },
-            { value: "4plus",    label: "4+ hrs",  emoji: "🔥" },
+            { value: "less_1hr", label: "< 1 hr", emoji: "😅" },
+            { value: "1_2hrs", label: "1–2 hrs", emoji: "🙂" },
+            { value: "2_4hrs", label: "2–4 hrs", emoji: "💪" },
+            { value: "4plus", label: "4+ hrs", emoji: "🔥" },
         ],
     },
     dream_vs_effort: {
         q: "Your dream vs effort match?",
         field: "dream_vs_effort",
         options: [
-            { value: "almost_equal",  label: "Almost equal",        emoji: "🎯" },
-            { value: "needs_work",    label: "Needs work",          emoji: "📉" },
-            { value: "far_apart",     label: "Far apart",           emoji: "😬" },
+            { value: "almost_equal", label: "Almost equal", emoji: "🎯" },
+            { value: "needs_work", label: "Needs work", emoji: "📉" },
+            { value: "far_apart", label: "Far apart", emoji: "😬" },
             { value: "never_thought", label: "Never thought about", emoji: "🤷" },
         ],
     },
@@ -347,9 +410,9 @@ const SCREENS = {
         field: "pressure_response",
         options: [
             { value: "perform_better", label: "Perform better", emoji: "⚡" },
-            { value: "panic_but_act",  label: "Panic but act",  emoji: "😬" },
-            { value: "overthink",      label: "Overthink",      emoji: "🌀" },
-            { value: "shut_down",      label: "Shut down",      emoji: "💤" },
+            { value: "panic_but_act", label: "Panic but act", emoji: "😬" },
+            { value: "overthink", label: "Overthink", emoji: "🌀" },
+            { value: "shut_down", label: "Shut down", emoji: "💤" },
         ],
     },
 };
@@ -360,7 +423,7 @@ export default function UniversalOnboarding() {
     const [stepIndex, setStepIndex] = useState(0);
     const [loading, setLoading] = useState(false);
     const [fd, setFd] = useState({
-        life_stage: "", momentum: "", goal_clarity: "",
+        life_stage: "",
         school_class: "", school_stream: "", competitive_direction: "",
         jee_prep_level: "", mock_test_response: "", drop_year: "",
         non_competitive_focus: "",
@@ -371,29 +434,25 @@ export default function UniversalOnboarding() {
         daily_time: "", dream_vs_effort: "", pressure_response: "",
         // commitment lock
         committed: false,
-        // personal
         name: "", phone_number: "", date_of_birth: "",
     });
 
-    const steps = useMemo(() => buildSteps(fd), [
-        fd.life_stage, fd.school_class, fd.competitive_direction, fd.college_focus,
-    ]);
+    const steps = useMemo(() => buildSteps(fd), [fd]);
 
     const currentStepId = steps[stepIndex] || "life_stage";
     const totalSteps = steps.length;
+    // Calculate progress as a percentage
     const progress = totalSteps > 1 ? (stepIndex / (totalSteps - 1)) * 100 : 0;
 
-    // Set a field and optionally reset downstream branching fields
+    // Set a field and clear downstream dependency paths based on newly selected value
     const set = (field, value) => {
         if (field === "life_stage") {
             setFd(prev => ({
                 ...prev, life_stage: value,
                 school_class: "", school_stream: "", competitive_direction: "",
-                jee_prep_level: "", mock_test_response: "", drop_year: "",
-                non_competitive_focus: "",
+                jee_prep_level: "", mock_test_response: "", drop_year: "", non_competitive_focus: "",
                 college_year: "", college_focus: "",
-                placement_skills: "", placement_resume: "", placement_interview: "",
-                higher_targeting: "", higher_prep_stage: "",
+                placement_skills: "", placement_resume: "", placement_interview: "", higher_targeting: "", higher_prep_stage: "",
                 career_shift_intent: "", career_stuck_response: "",
             }));
         } else if (field === "school_class") {
@@ -407,14 +466,13 @@ export default function UniversalOnboarding() {
         }
     };
 
-    // Auto-advance after tap (for option screens)
+    // Auto-advance after tap with a slight delay for option screens
     const pick = (field, value) => {
         set(field, value);
-        // Compute new steps based on the updated value
         const newFd = { ...fd, [field]: value };
         const newSteps = buildSteps(newFd);
         const nextIdx = Math.min(stepIndex + 1, newSteps.length - 1);
-        setTimeout(() => setStepIndex(nextIdx), 200);
+        setTimeout(() => setStepIndex(nextIdx), 300);
     };
 
     const canProceed = () => {
@@ -439,20 +497,28 @@ export default function UniversalOnboarding() {
         }
     };
 
-    // ─── Render ───────────────────────────────────────────────────────────────────
+    // ─── Render Step ─────────────────────────────────────────────────────────────
     const screen = SCREENS[currentStepId];
     const isLastStep = stepIndex === totalSteps - 1;
     const isManualStep = currentStepId === "commitment_lock" || currentStepId === "personal";
 
     const renderCurrentStep = () => {
-        // Standard 4-option tap screens
+        // Option Tap Screens
         if (screen) {
+            let optionsToRender = screen.options;
+
+            // Special rule: 12th graders shouldn't see "Still deciding" for streams
+            if (currentStepId === "school_stream" && fd.school_class === "12") {
+                optionsToRender = optionsToRender.filter(opt => opt.value !== "undecided");
+            }
+
             return (
-                <div className="space-y-3">
-                    {screen.options.map(opt => (
+                <div className="space-y-4">
+                    {optionsToRender.map(opt => (
                         <OptionCard
                             key={opt.value}
                             emoji={opt.emoji}
+                            iconText={opt.iconText}
                             label={opt.label}
                             selected={fd[screen.field] === opt.value}
                             onClick={() => pick(screen.field, opt.value)}
@@ -462,60 +528,67 @@ export default function UniversalOnboarding() {
             );
         }
 
-        // Commitment lock (summary + checkbox)
+        // Summary Screen
         if (currentStepId === "commitment_lock") {
             const { strength, growth, direction } = buildSummary(fd);
             return (
-                <div className="space-y-5">
-                    <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6 space-y-4">
+                <div className="space-y-6">
+                    <div className="bg-white border-2 border-gray-200 shadow-[0_4px_0_0_rgba(229,231,235,1)] rounded-2xl p-6 space-y-5">
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring", bounce: 0.6 }}
+                            className="text-center text-4xl mb-4"
+                        >
+                            🏆
+                        </motion.div>
                         {[
-                            { icon: "🔥", label: "Strength",    value: strength },
+                            { icon: "🔥", label: "Strength", value: strength },
                             { icon: "⚠️", label: "Growth Area", value: growth },
-                            { icon: "🎯", label: "Direction",   value: direction },
+                            { icon: "🎯", label: "Direction", value: direction },
                         ].map(row => (
-                            <div key={row.label} className="flex items-start gap-3">
-                                <span className="text-xl mt-0.5">{row.icon}</span>
+                            <div key={row.label} className="flex items-start gap-4">
+                                <span className="text-2xl mt-0.5">{row.icon}</span>
                                 <div>
-                                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{row.label}</p>
-                                    <p className="text-gray-900 font-semibold leading-snug">{row.value}</p>
+                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{row.label}</p>
+                                    <p className="text-gray-900 font-bold text-[15px] leading-snug">{row.value}</p>
                                 </div>
                             </div>
                         ))}
                     </div>
-                    <label className="flex items-start gap-4 p-5 rounded-2xl border-2 border-gray-200 cursor-pointer hover:border-gray-900 transition">
+                    <label className="flex items-start gap-4 p-5 rounded-2xl border-2 border-gray-200 cursor-pointer hover:border-blue-400 transition bg-white shadow-sm">
                         <input
                             type="checkbox"
                             checked={fd.committed}
                             onChange={e => setFd(prev => ({ ...prev, committed: e.target.checked }))}
-                            className="w-5 h-5 mt-0.5 accent-gray-900 cursor-pointer"
+                            className="w-6 h-6 mt-0.5 accent-blue-600 cursor-pointer rounded-md"
                         />
-                        <p className="text-gray-700 text-sm leading-relaxed">
-                            <span className="font-bold text-gray-900">I\'m ready for structured guidance.</span>
-                            <br />
-                            I\'ll commit to honest progress tracking and give my best.
+                        <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
+                            <span className="font-bold text-gray-900 block mb-1">I'm ready for structured guidance.</span>
+                            I'll commit to honest progress tracking and give my very best.
                         </p>
                     </label>
                 </div>
             );
         }
 
-        // Personal info
+        // Personal Info
         if (currentStepId === "personal") {
             return (
-                <div className="space-y-4">
+                <div className="space-y-5">
                     {[
-                        { label: "Full Name",      field: "name",          type: "text",  placeholder: "Enter your full name" },
-                        { label: "Phone Number",   field: "phone_number",  type: "tel",   placeholder: "+91 9876543210" },
-                        { label: "Date of Birth",  field: "date_of_birth", type: "date",  placeholder: "" },
+                        { label: "Full Name", field: "name", type: "text", placeholder: "e.g. John Doe" },
+                        { label: "Phone Number", field: "phone_number", type: "tel", placeholder: "e.g. +91 9876543210" },
+                        { label: "Date of Birth", field: "date_of_birth", type: "date", placeholder: "" },
                     ].map(inp => (
                         <div key={inp.field}>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">{inp.label}</label>
+                            <label className="block text-[15px] font-bold text-gray-800 mb-2">{inp.label}</label>
                             <input
                                 type={inp.type}
                                 value={fd[inp.field]}
                                 onChange={e => setFd(prev => ({ ...prev, [inp.field]: e.target.value }))}
                                 placeholder={inp.placeholder}
-                                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-gray-900 outline-none text-[15px] transition"
+                                className="w-full px-4 py-4 rounded-2xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none text-[16px] font-medium transition shadow-sm"
                             />
                         </div>
                     ))}
@@ -527,77 +600,87 @@ export default function UniversalOnboarding() {
     };
 
     const questionText = screen?.q
-        || (currentStepId === "commitment_lock" ? "Your personalised summary" : "Almost there — a few last details");
+        || (currentStepId === "commitment_lock" ? "Your Personalised Plan is Ready!" : "Almost there — a few last details");
 
     return (
-        <div className="min-h-screen bg-white flex flex-col">
-            {/* Progress bar */}
-            <div className="bg-gray-100 h-1.5 w-full">
-                <motion.div
-                    className="bg-gray-900 h-1.5"
-                    animate={{ width: `${progress}%` }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                />
-            </div>
-
-            {/* Top bar */}
-            <div className="px-6 py-4 flex items-center justify-between max-w-lg mx-auto w-full">
+        <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+            {/* Duolingo Style Progress Header */}
+            <div className="px-5 py-6 flex items-center justify-between mx-auto w-full max-w-xl">
                 <button
                     onClick={handleBack}
                     disabled={stepIndex === 0}
-                    className={`text-sm font-medium transition ${stepIndex === 0 ? "text-gray-300 cursor-not-allowed" : "text-gray-500 hover:text-gray-900"}`}
+                    className={`shrink-0 w-10 h-10 flex items-center justify-center rounded-full transition ${stepIndex === 0 ? "text-gray-300 cursor-not-allowed" : "text-gray-500 hover:bg-gray-200 active:scale-90"
+                        }`}
                 >
-                    ← Back
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
                 </button>
-                <p className="text-xs text-gray-400 font-medium">{stepIndex + 1} / {totalSteps}</p>
-                <div className="w-12" />
+                <div className="flex-1 px-4">
+                    <div className="bg-gray-200 h-3.5 w-full rounded-full overflow-hidden">
+                        <motion.div
+                            className="bg-[#58cc02] h-full rounded-full"
+                            animate={{ width: `${progress}%` }}
+                            transition={{ type: "spring", stiffness: 60, damping: 14 }}
+                        />
+                    </div>
+                </div>
+                <div className="w-10 flex items-center justify-end">
+                    <span className="text-sm font-bold text-gray-400">{stepIndex + 1}/{totalSteps}</span>
+                </div>
             </div>
 
-            {/* Content area */}
-            <div className="flex-1 px-6 pb-4 max-w-lg mx-auto w-full">
+            {/* Content Area */}
+            <div className="flex-1 px-5 pb-8 mx-auto w-full max-w-xl flex flex-col">
+                <QuickyMessage stepId={currentStepId} fd={fd} />
+
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={currentStepId}
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -12 }}
-                        transition={{ duration: 0.2 }}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ type: "spring", stiffness: 220, damping: 20 }}
                     >
-                        {/* Question */}
-                        <h2 className="text-[22px] font-bold text-gray-900 mb-6 leading-snug">
+                        {/* Question Title */}
+                        <h2 className="text-[26px] font-extrabold text-gray-900 mb-6 leading-tight">
                             {questionText}
                         </h2>
 
-                        {/* Step content */}
+                        {/* Step Details */}
                         {renderCurrentStep()}
                     </motion.div>
                 </AnimatePresence>
             </div>
 
-            {/* Manual-step CTA button */}
+            {/* Bottom CTA for Manual Steps */}
             {isManualStep && (
-                <div className="px-6 pb-10 max-w-lg mx-auto w-full">
-                    {isLastStep ? (
-                        <button
-                            onClick={handleSubmit}
-                            disabled={!canProceed() || loading}
-                            className={`w-full py-4 rounded-2xl font-bold text-[15px] transition-all ${canProceed() && !loading
-                                ? "bg-gray-900 text-white hover:bg-gray-800 active:scale-95"
-                                : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
-                        >
-                            {loading ? "Setting up your plan…" : "Start my journey →"}
-                        </button>
-                    ) : (
-                        <button
-                            onClick={handleNext}
-                            disabled={!canProceed()}
-                            className={`w-full py-4 rounded-2xl font-bold text-[15px] transition-all ${canProceed()
-                                ? "bg-gray-900 text-white hover:bg-gray-800 active:scale-95"
-                                : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
-                        >
-                            Continue →
-                        </button>
-                    )}
+                <div className="border-t-2 border-gray-200 bg-white p-5 sticky bottom-0 z-10 w-full">
+                    <div className="max-w-xl mx-auto">
+                        {isLastStep ? (
+                            <button
+                                onClick={handleSubmit}
+                                disabled={!canProceed() || loading}
+                                className={`w-full py-4 rounded-2xl font-bold text-[16px] uppercase tracking-wide transition-all ${canProceed() && !loading
+                                    ? "bg-[#58cc02] text-white hover:bg-[#46a302] border-b-4 border-[#46a302] active:border-b-0 active:translate-y-1"
+                                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                    }`}
+                            >
+                                {loading ? "Setting up..." : "Start Journey"}
+                            </button>
+                        ) : (
+                            <button
+                                onClick={handleNext}
+                                disabled={!canProceed()}
+                                className={`w-full py-4 rounded-2xl font-bold text-[16px] uppercase tracking-wide transition-all ${canProceed()
+                                    ? "bg-blue-500 text-white hover:bg-blue-600 border-b-4 border-blue-600 active:border-b-0 active:translate-y-1"
+                                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                    }`}
+                            >
+                                Continue
+                            </button>
+                        )}
+                    </div>
                 </div>
             )}
         </div>

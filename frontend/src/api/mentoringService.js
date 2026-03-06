@@ -22,4 +22,13 @@ export const mentoringService = {
         const response = await api.get(url);
         return response.data;
     },
+
+    /**
+     * Get voice proxy WebSocket URL and session config.
+     * @returns {Promise<Object>} { ws_url, session_memory, available_voices }
+     */
+    getVoiceConfig: async () => {
+        const response = await api.get('ai-mentoring/voice/config/');
+        return response.data;
+    },
 };

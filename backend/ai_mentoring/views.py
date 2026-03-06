@@ -1,4 +1,5 @@
 import logging
+import os
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -96,3 +97,33 @@ def list_sessions(request):
 
     serializer = StudentSessionSerializer(sessions, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def voice_config(request):
+    """
+    GET /api/ai-mentoring/voice/config/
+
+    Return WebSocket proxy URL and session configuration for real-time voice.
+    The frontend uses this to connect to the voice proxy server.
+    """
+    host = os.getenv('VOICE_PROXY_HOST', 'localhost')
+    port = os.getenv('VOICE_PROXY_PORT', '8001')
+
+    # Fetch recent sessions for memory context
+    session_memory = get_recent_sessions(request.user, limit=3)
+
+    return Response({
+        'ws_url': f'ws://{host}:{port}',
+        'session_memory': session_memory,
+        'available_voices': [
+            {'id': 'Aoede', 'name': 'Aoede', 'description': 'Warm and bright'},
+            {'id': 'Charon', 'name': 'Charon',
+                'description': 'Calm and informative'},
+            {'id': 'Fenrir', 'name': 'Fenrir',
+                'description': 'Confident and expressive'},
+            {'id': 'Kore', 'name': 'Kore', 'description': 'Clear and friendly'},
+            {'id': 'Puck', 'name': 'Puck', 'description': 'Upbeat and lively'},
+        ],
+    })
