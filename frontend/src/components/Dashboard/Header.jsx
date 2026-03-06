@@ -76,12 +76,7 @@ const Header = () => {
                 { path: "/billing/history", label: "Billing History" },
             ]
         },
-        {
-            label: "AI Help",
-            path: "/assistant",
-            type: "link",
-            icon: true
-        }
+        // AI Help removed
     ];
 
     // Helper to get display name

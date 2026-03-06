@@ -20,29 +20,31 @@ class Portfolio(models.Model):
         on_delete=models.CASCADE,
         related_name='portfolio'
     )
-    
+
     # Portfolio URL configuration
     slug = models.SlugField(max_length=100, unique=True)
-    custom_subdomain = models.CharField(max_length=50, blank=True, null=True, unique=True)
-    
+    custom_subdomain = models.CharField(
+        max_length=50, blank=True, null=True, unique=True)
+
     # Status
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='archived')
-    
+    status = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default='archived')
+
     # Content
     title = models.CharField(max_length=200, blank=True)
     bio = models.TextField(blank=True)
     headline = models.CharField(max_length=200, blank=True)
-    
+
     # Social links
     github_url = models.URLField(blank=True)
     linkedin_url = models.URLField(blank=True)
     twitter_url = models.URLField(blank=True)
     website_url = models.URLField(blank=True)
-    
+
     # Settings
     show_email = models.BooleanField(default=False)
     theme = models.CharField(max_length=50, default='default')
-    
+
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -98,9 +100,11 @@ class Portfolio(models.Model):
     def update_status_from_subscription(self, subscription):
         """Update portfolio status based on subscription status."""
         if subscription is None:
-            self.transition_to_archived()
+            # Free users get read_only: portfolio is public but limited
+            if self.status == 'archived':
+                self.transition_to_read_only()
             return
-        
+
         if subscription.is_active:
             self.transition_to_active()
         elif subscription.is_in_grace:
@@ -108,7 +112,7 @@ class Portfolio(models.Model):
         elif subscription.status == 'expired':
             self.transition_to_read_only()
         else:
-            self.transition_to_archived()
+            self.transition_to_read_only()
 
 
 class PortfolioProject(models.Model):
@@ -120,15 +124,16 @@ class PortfolioProject(models.Model):
         ('roadmap', 'Roadmap Project'),
         ('student', 'Student Project'),
     ]
-    
+
     portfolio = models.ForeignKey(
         Portfolio,
         on_delete=models.CASCADE,
         related_name='portfolio_projects'
     )
-    
+
     # Project type and references
-    project_type = models.CharField(max_length=20, choices=PROJECT_TYPE_CHOICES, default='roadmap')
+    project_type = models.CharField(
+        max_length=20, choices=PROJECT_TYPE_CHOICES, default='roadmap')
     project = models.ForeignKey(
         'roadmap_ai.Project',
         on_delete=models.CASCADE,
@@ -143,16 +148,16 @@ class PortfolioProject(models.Model):
         null=True,
         blank=True
     )
-    
+
     # Display settings
     order = models.IntegerField(default=0)
     is_featured = models.BooleanField(default=False)
     is_visible = models.BooleanField(default=True)
-    
+
     # Custom overrides for display
     custom_title = models.CharField(max_length=255, blank=True)
     custom_description = models.TextField(blank=True)
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -169,7 +174,7 @@ class PortfolioProject(models.Model):
         elif self.project_type == 'student' and self.student_project:
             return self.student_project.title
         return "Untitled Project"
-    
+
     def get_project_description(self):
         """Get the description of the linked project."""
         if self.project_type == 'roadmap' and self.project:
@@ -177,7 +182,7 @@ class PortfolioProject(models.Model):
         elif self.project_type == 'student' and self.student_project:
             return self.student_project.description
         return ""
-    
+
     def get_tech_stack(self):
         """Get the tech stack of the linked project."""
         if self.project_type == 'roadmap' and self.project:
@@ -185,7 +190,7 @@ class PortfolioProject(models.Model):
         elif self.project_type == 'student' and self.student_project:
             return self.student_project.tech_stack
         return []
-    
+
     def get_github_url(self):
         """Get the GitHub URL of the linked project."""
         if self.project_type == 'roadmap' and self.project:
@@ -193,7 +198,7 @@ class PortfolioProject(models.Model):
         elif self.project_type == 'student' and self.student_project:
             return self.student_project.github_url
         return None
-    
+
     def get_demo_url(self):
         """Get the demo URL of the linked project."""
         if self.project_type == 'student' and self.student_project:
@@ -219,20 +224,21 @@ class PortfolioAnalytics(models.Model):
         on_delete=models.CASCADE,
         related_name='analytics'
     )
-    
+
     date = models.DateField()
     page_views = models.IntegerField(default=0)
     unique_visitors = models.IntegerField(default=0)
     project_clicks = models.IntegerField(default=0)
     github_clicks = models.IntegerField(default=0)
     resume_downloads = models.IntegerField(default=0)
-    
+
     # Referrer tracking
     referrer_data = models.JSONField(default=dict)
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['portfolio', 'date'], name='unique_portfolio_date')
+            models.UniqueConstraint(
+                fields=['portfolio', 'date'], name='unique_portfolio_date')
         ]
         ordering = ['-date']
 

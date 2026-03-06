@@ -48,7 +48,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
         while Portfolio.objects.filter(slug=slug).exists():
             slug = f"{base_slug}-{counter}"
             counter += 1
-        
+
         serializer.save(user=self.request.user, slug=slug)
 
     @action(detail=False, methods=['get'])
@@ -59,14 +59,14 @@ class PortfolioViewSet(viewsets.ModelViewSet):
                 user=request.user,
                 defaults={
                     'slug': slugify(request.user.username) + '-' + str(uuid.uuid4())[:8],
-                    'status': 'archived'
+                    'status': 'read_only'
                 }
             )
-            
+
             # Update status based on subscription
             subscription = Subscription.get_active_subscription(request.user)
             portfolio.update_status_from_subscription(subscription)
-            
+
             serializer = PortfolioSerializer(portfolio)
             return Response(serializer.data)
         except Exception as e:
@@ -86,11 +86,12 @@ class PortfolioViewSet(viewsets.ModelViewSet):
     def update_settings(self, request):
         """Update portfolio settings."""
         portfolio = get_object_or_404(Portfolio, user=request.user)
-        
-        serializer = PortfolioUpdateSerializer(portfolio, data=request.data, partial=True)
+
+        serializer = PortfolioUpdateSerializer(
+            portfolio, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        
+
         return Response(PortfolioSerializer(portfolio).data)
 
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated, CanUseCustomSubdomain])
@@ -98,13 +99,13 @@ class PortfolioViewSet(viewsets.ModelViewSet):
         """Set custom subdomain for portfolio."""
         portfolio = get_object_or_404(Portfolio, user=request.user)
         subdomain = request.data.get('subdomain', '').lower().strip()
-        
+
         if not subdomain:
             return Response(
                 {"error": "Subdomain is required"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         # Validate subdomain format
         import re
         if not re.match(r'^[a-z0-9-]+$', subdomain):
@@ -112,17 +113,17 @@ class PortfolioViewSet(viewsets.ModelViewSet):
                 {"error": "Subdomain can only contain lowercase letters, numbers, and hyphens"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         # Check if subdomain is available
         if Portfolio.objects.filter(custom_subdomain=subdomain).exclude(id=portfolio.id).exists():
             return Response(
                 {"error": "Subdomain is already taken"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         portfolio.custom_subdomain = subdomain
         portfolio.save()
-        
+
         return Response(PortfolioSerializer(portfolio).data)
 
     @action(detail=False, methods=['post'])
@@ -131,33 +132,33 @@ class PortfolioViewSet(viewsets.ModelViewSet):
         portfolio = get_object_or_404(Portfolio, user=request.user)
         project_id = request.data.get('project_id')
         project_type = request.data.get('project_type', 'roadmap')
-        
+
         if not project_id:
             return Response(
                 {"error": "project_id is required"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         if project_type not in ['roadmap', 'student']:
             return Response(
                 {"error": "project_type must be 'roadmap' or 'student'"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         if project_type == 'roadmap':
             from roadmap_ai.models import Project
             project = get_object_or_404(Project, id=project_id)
-            
+
             # Verify project belongs to user's roadmap
             if project.milestone.roadmap.user != request.user:
                 return Response(
                     {"error": "Project not found"},
                     status=status.HTTP_404_NOT_FOUND
                 )
-            
+
             # Check if already added
             if PortfolioProject.objects.filter(
-                portfolio=portfolio, 
+                portfolio=portfolio,
                 project_type='roadmap',
                 project=project
             ).exists():
@@ -165,7 +166,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
                     {"error": "Project already in portfolio"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            
+
             portfolio_project = PortfolioProject.objects.create(
                 portfolio=portfolio,
                 project_type='roadmap',
@@ -174,14 +175,14 @@ class PortfolioViewSet(viewsets.ModelViewSet):
         else:  # student project
             from roadmap_ai.models import StudentProject
             student_project = get_object_or_404(StudentProject, id=project_id)
-            
+
             # Verify project belongs to user
             if student_project.user != request.user:
                 return Response(
                     {"error": "Project not found"},
                     status=status.HTTP_404_NOT_FOUND
                 )
-            
+
             # Check if already added
             if PortfolioProject.objects.filter(
                 portfolio=portfolio,
@@ -192,13 +193,13 @@ class PortfolioViewSet(viewsets.ModelViewSet):
                     {"error": "Project already in portfolio"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            
+
             portfolio_project = PortfolioProject.objects.create(
                 portfolio=portfolio,
                 project_type='student',
                 student_project=student_project
             )
-        
+
         return Response(PortfolioProjectSerializer(portfolio_project).data, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['post'])
@@ -207,7 +208,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
         portfolio = get_object_or_404(Portfolio, user=request.user)
         project_id = request.data.get('project_id')
         project_type = request.data.get('project_type', 'roadmap')
-        
+
         if project_type == 'roadmap':
             portfolio_project = get_object_or_404(
                 PortfolioProject,
@@ -222,27 +223,27 @@ class PortfolioViewSet(viewsets.ModelViewSet):
                 project_type='student',
                 student_project_id=project_id
             )
-        
+
         portfolio_project.delete()
-        
+
         return Response({"message": "Project removed from portfolio"})
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated, CanAccessPortfolioAnalytics])
     def analytics(self, request):
         """Get portfolio analytics."""
         portfolio = get_object_or_404(Portfolio, user=request.user)
-        
+
         # Get analytics for last 30 days
         from datetime import timedelta
         thirty_days_ago = timezone.now().date() - timedelta(days=30)
-        
+
         analytics = PortfolioAnalytics.objects.filter(
             portfolio=portfolio,
             date__gte=thirty_days_ago
         )
-        
+
         serializer = PortfolioAnalyticsSerializer(analytics, many=True)
-        
+
         # Calculate totals
         totals = {
             'total_page_views': sum(a.page_views for a in analytics),
@@ -251,7 +252,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
             'total_github_clicks': sum(a.github_clicks for a in analytics),
             'total_resume_downloads': sum(a.resume_downloads for a in analytics),
         }
-        
+
         return Response({
             'daily': serializer.data,
             'totals': totals
@@ -270,13 +271,13 @@ def public_portfolio(request, slug):
     - ARCHIVED: 404
     """
     portfolio = get_object_or_404(Portfolio, slug=slug)
-    
+
     if portfolio.status == 'archived':
         return Response(
             {"error": "Portfolio not found"},
             status=status.HTTP_404_NOT_FOUND
         )
-    
+
     # Track analytics
     if portfolio.status in ['active', 'grace']:
         today = timezone.now().date()
@@ -286,7 +287,7 @@ def public_portfolio(request, slug):
         )
         analytics.page_views += 1
         analytics.save()
-    
+
     serializer = PublicPortfolioSerializer(portfolio)
     return Response(serializer.data)
 
@@ -298,13 +299,13 @@ def public_portfolio_by_subdomain(request, subdomain):
     Public portfolio view by custom subdomain.
     """
     portfolio = get_object_or_404(Portfolio, custom_subdomain=subdomain)
-    
+
     if portfolio.status == 'archived':
         return Response(
             {"error": "Portfolio not found"},
             status=status.HTTP_404_NOT_FOUND
         )
-    
+
     # Track analytics
     if portfolio.status in ['active', 'grace']:
         today = timezone.now().date()
@@ -314,6 +315,6 @@ def public_portfolio_by_subdomain(request, subdomain):
         )
         analytics.page_views += 1
         analytics.save()
-    
+
     serializer = PublicPortfolioSerializer(portfolio)
     return Response(serializer.data)

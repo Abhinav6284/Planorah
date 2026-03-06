@@ -11,6 +11,7 @@ import html2canvas from 'html2canvas';
 
 const AUDIO_SAMPLE_RATE = 16000;  // What we send to Gemini
 const PLAYBACK_SAMPLE_RATE = 24000;  // What Gemini sends back
+// const CHUNK_SIZE removed - unused
 
 // AudioWorklet processor — runs in a separate audio thread (no deprecation warning)
 const PCM16_WORKLET_CODE = `
@@ -23,9 +24,9 @@ class PCM16Processor extends AudioWorkletProcessor {
     const ch = inputs[0]?.[0];
     if (!ch) return true;
     for (let i = 0; i < ch.length; i++) this._buf.push(ch[i]);
-    // Flush every ~250 ms worth of samples at 16 kHz = 4000 samples
-    while (this._buf.length >= 4000) {
-      const slice = this._buf.splice(0, 4000);
+    // Flush every ~50 ms worth of samples at 16 kHz = 800 samples (lower latency)
+    while (this._buf.length >= 800) {
+      const slice = this._buf.splice(0, 800);
       const pcm = new Int16Array(slice.length);
       for (let i = 0; i < slice.length; i++) {
         const s = Math.max(-1, Math.min(1, slice[i]));
@@ -58,9 +59,18 @@ export function useVoiceSession() {
     const screenIntervalRef = useRef(null);
     const analyserRef = useRef(null);
     const animFrameRef = useRef(null);
+    const silenceTimerRef = useRef(null);
+    const inUtteranceRef = useRef(false);
+    const statusRef = useRef(status);
 
     // ── Cleanup ──
     const cleanup = useCallback(() => {
+        if (silenceTimerRef.current) {
+            clearTimeout(silenceTimerRef.current);
+            silenceTimerRef.current = null;
+        }
+        inUtteranceRef.current = false;
+
         // Stop screen capture interval
         if (screenIntervalRef.current) {
             clearInterval(screenIntervalRef.current);
@@ -114,8 +124,13 @@ export function useVoiceSession() {
         return cleanup;
     }, [cleanup]);
 
-    // ── Audio playback (queued) ──
+    useEffect(() => {
+        statusRef.current = status;
+    }, [status]);
+
+    // ── Audio playback (queued with jitter buffer) ──
     const playNextChunk = useCallback(() => {
+        // Only play if chunks are available
         if (isPlayingRef.current || audioQueueRef.current.length === 0) {
             if (audioQueueRef.current.length === 0) {
                 setIsSpeaking(false);
@@ -127,47 +142,126 @@ export function useVoiceSession() {
         setIsSpeaking(true);
 
         const base64Data = audioQueueRef.current.shift();
-        const binaryStr = atob(base64Data);
-        const bytes = new Uint8Array(binaryStr.length);
-        for (let i = 0; i < binaryStr.length; i++) {
-            bytes[i] = binaryStr.charCodeAt(i);
-        }
+        try {
+            const binaryStr = atob(base64Data);
+            const bytes = new Uint8Array(binaryStr.length);
+            for (let i = 0; i < binaryStr.length; i++) {
+                bytes[i] = binaryStr.charCodeAt(i);
+            }
 
-        // Convert Int16 PCM to Float32
-        const int16 = new Int16Array(bytes.buffer);
-        const float32 = new Float32Array(int16.length);
-        for (let i = 0; i < int16.length; i++) {
-            float32[i] = int16[i] / 32768;
-        }
+            // Convert Int16 PCM to Float32 with optimized resampling
+            const int16 = new Int16Array(bytes.buffer);
+            // Resample from 24kHz to playback rate using linear interpolation
+            const resampleRatio = PLAYBACK_SAMPLE_RATE / 24000;
+            const resampled = new Float32Array(Math.floor(int16.length * resampleRatio));
+            for (let i = 0; i < resampled.length; i++) {
+                const srcIdx = i / resampleRatio;
+                const srcIdxInt = Math.floor(srcIdx);
+                const frac = srcIdx - srcIdxInt;
+                const s0 = int16[srcIdxInt] / 32768;
+                const s1 = (srcIdxInt + 1 < int16.length) ? int16[srcIdxInt + 1] / 32768 : 0;
+                resampled[i] = s0 * (1 - frac) + s1 * frac;
+            }
 
-        if (!playbackCtxRef.current || playbackCtxRef.current.state === 'closed') {
-            playbackCtxRef.current = new AudioContext({ sampleRate: PLAYBACK_SAMPLE_RATE });
-        }
+            if (!playbackCtxRef.current || playbackCtxRef.current.state === 'closed') {
+                playbackCtxRef.current = new AudioContext({
+                    sampleRate: PLAYBACK_SAMPLE_RATE,
+                    latencyHint: 'interactive',
+                });
+            }
 
-        const ctx = playbackCtxRef.current;
-        const buffer = ctx.createBuffer(1, float32.length, PLAYBACK_SAMPLE_RATE);
-        buffer.getChannelData(0).set(float32);
+            const ctx = playbackCtxRef.current;
+            const buffer = ctx.createBuffer(1, resampled.length, PLAYBACK_SAMPLE_RATE);
+            buffer.getChannelData(0).set(resampled);
 
-        const source = ctx.createBufferSource();
-        source.buffer = buffer;
-        source.connect(ctx.destination);
-        source.onended = () => {
+            const source = ctx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(ctx.destination);
+            source.onended = () => {
+                isPlayingRef.current = false;
+                // Auto-play next chunk if available
+                if (audioQueueRef.current.length > 0) {
+                    playNextChunk();
+                }
+            };
+            source.start(0);
+        } catch (err) {
+            console.error('Audio playback error:', err);
             isPlayingRef.current = false;
             playNextChunk();
-        };
-        source.start();
+        }
     }, []);
 
     // ── Mic level monitoring ──
     const startLevelMonitor = useCallback((analyser) => {
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        const startSilenceTimer = () => {
+            if (silenceTimerRef.current) return;
+            silenceTimerRef.current = setTimeout(() => {
+                silenceTimerRef.current = null;
+                if (!inUtteranceRef.current) return;
+                inUtteranceRef.current = false;
+                if (wsRef.current?.readyState === WebSocket.OPEN) {
+                    wsRef.current.send(JSON.stringify({ type: 'turnComplete' }));
+                }
+            }, 900);
+        };
         const update = () => {
             analyser.getByteFrequencyData(dataArray);
             const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-            setAudioLevel(Math.min(avg / 128, 1));
+            const level = Math.min(avg / 128, 1);
+            setAudioLevel(level);
+
+            if (statusRef.current === 'active' && wsRef.current?.readyState === WebSocket.OPEN) {
+                if (level > 0.12) {
+                    inUtteranceRef.current = true;
+                    if (silenceTimerRef.current) {
+                        clearTimeout(silenceTimerRef.current);
+                        silenceTimerRef.current = null;
+                    }
+                } else if (inUtteranceRef.current) {
+                    startSilenceTimer();
+                }
+            }
             animFrameRef.current = requestAnimationFrame(update);
         };
         update();
+    }, []);
+
+    // ── App screen capture (html2canvas — captures only Planora, no permission dialog) ──
+    const startAppCapture = useCallback(() => {
+        if (screenIntervalRef.current) return; // already running
+
+        const doCapture = async () => {
+            if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
+            try {
+                const target = document.getElementById('root') || document.body;
+                const canvas = await html2canvas(target, {
+                    scale: 0.5,           // half resolution — good enough for AI context
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: false,
+                    ignoreElements: (el) => {
+                        // Skip the voice panel overlay itself so AI sees the page behind it
+                        return el.getAttribute?.('data-voice-overlay') === 'true';
+                    },
+                });
+                const base64 = canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
+                if (base64 && base64.length > 200) {
+                    wsRef.current.send(JSON.stringify({
+                        type: 'screenshot',
+                        data: base64,
+                        mimeType: 'image/jpeg',
+                    }));
+                }
+            } catch (err) {
+                console.warn('App capture error:', err);
+            }
+        };
+
+        setIsCapturing(true);
+        doCapture(); // immediate first capture
+        screenIntervalRef.current = setInterval(doCapture, 4000);
     }, []);
 
     // ── Connect & Start ──
@@ -178,20 +272,24 @@ export function useVoiceSession() {
         setTranscript('');
 
         try {
-            // 1. Get microphone
+            // 1. Get microphone with aggressive noise reduction
             const micStream = await navigator.mediaDevices.getUserMedia({
                 audio: {
-                    sampleRate: AUDIO_SAMPLE_RATE,
+                    sampleRate: { ideal: AUDIO_SAMPLE_RATE },
                     channelCount: 1,
                     echoCancellation: true,
                     noiseSuppression: true,
-                    autoGainControl: true,
+                    autoGainControl: false,  // Disable AGC for better control
+                    latency: 0.01,  // Minimize latency
                 },
             });
             micStreamRef.current = micStream;
 
             // 2. Set up AudioContext for mic capture
-            const audioCtx = new AudioContext({ sampleRate: AUDIO_SAMPLE_RATE });
+            const audioCtx = new AudioContext({
+                sampleRate: AUDIO_SAMPLE_RATE,
+                latencyHint: 'interactive',
+            });
             audioContextRef.current = audioCtx;
 
             const source = audioCtx.createMediaStreamSource(micStream);
@@ -247,8 +345,12 @@ export function useVoiceSession() {
                         break;
 
                     case 'audio':
+                        // Buffer audio chunks without limit - playback auto-continues via onended
                         audioQueueRef.current.push(data.data);
-                        playNextChunk();
+                        // Trigger first chunk only when queue starts
+                        if (!isPlayingRef.current && audioQueueRef.current.length === 1) {
+                            playNextChunk();
+                        }
                         break;
 
                     case 'transcript':
@@ -298,43 +400,9 @@ export function useVoiceSession() {
             setStatus('error');
             cleanup();
         }
-    }, [cleanup, playNextChunk, startLevelMonitor, status]);
+    }, [cleanup, playNextChunk, startLevelMonitor, status, startAppCapture]);
 
-    // ── App screen capture (html2canvas — captures only Planora, no permission dialog) ──
-    const startAppCapture = useCallback(() => {
-        if (screenIntervalRef.current) return; // already running
 
-        const doCapture = async () => {
-            if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
-            try {
-                const target = document.getElementById('root') || document.body;
-                const canvas = await html2canvas(target, {
-                    scale: 0.5,           // half resolution — good enough for AI context
-                    useCORS: true,
-                    allowTaint: true,
-                    logging: false,
-                    ignoreElements: (el) => {
-                        // Skip the voice panel overlay itself so AI sees the page behind it
-                        return el.getAttribute?.('data-voice-overlay') === 'true';
-                    },
-                });
-                const base64 = canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
-                if (base64 && base64.length > 200) {
-                    wsRef.current.send(JSON.stringify({
-                        type: 'screenshot',
-                        data: base64,
-                        mimeType: 'image/jpeg',
-                    }));
-                }
-            } catch (err) {
-                console.warn('App capture error:', err);
-            }
-        };
-
-        setIsCapturing(true);
-        doCapture(); // immediate first capture
-        screenIntervalRef.current = setInterval(doCapture, 4000);
-    }, []);
 
     const stopAppCapture = useCallback(() => {
         if (screenIntervalRef.current) {

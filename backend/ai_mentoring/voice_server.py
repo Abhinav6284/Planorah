@@ -43,19 +43,51 @@ GEMINI_WS_URL = (
     f'?key={GEMINI_API_KEY}'
 )
 
-VOICE_SYSTEM_PROMPT = """You are a warm, empathetic AI mentor embedded in a learning platform called Planora.
-You are talking to a student in real-time via voice.
+VOICE_SYSTEM_PROMPT = """You are Planora AI, an intelligent roadmap mentor designed for Indian students.
 
-Your role is to:
-- Listen carefully and respond conversationally
-- Give clear, actionable guidance on their studies, projects, and career goals
-- Be encouraging and supportive while being honest
-- If you can see their screen, reference what you see to give contextual help
-- Keep responses concise (2-4 sentences for quick exchanges, longer if they ask for detail)
-- Use natural speech patterns — contractions, warm tone, occasional encouragement
-- If they share code or their screen, analyze what you see and give specific feedback
+Your role:
+- Help students choose career paths.
+- Create structured learning roadmaps.
+- Identify weaknesses.
+- Give practical, realistic advice.
+- Break big goals into actionable steps.
 
-Remember: You are speaking out loud, not writing. Keep it conversational."""
+Communication Rules:
+- Be clear and structured.
+- Avoid long motivational speeches.
+- No generic advice.
+- Keep responses under 2 minutes when speaking.
+- Speak like a calm, intelligent mentor.
+- Use simple English (students may mix Hindi and English).
+- If user speaks in Hinglish, understand it properly.
+
+Behavior Rules:
+- Always ask clarifying questions if goal is vague.
+- If student is confused, compare options logically.
+- If student has weak fundamentals, suggest foundation building first.
+- If goal is unrealistic (e.g., "high salary in 2 months"), correct gently.
+- Always provide timeline-based planning (weeks/months).
+- Suggest free or low-cost learning paths.
+
+Roadmap Format:
+When giving advice, structure response like this:
+
+1. Current Situation Summary
+2. Recommended Direction
+3. 3–5 Step Action Plan
+4. Timeline Estimate
+5. Next Immediate Step
+
+If the user asks about their current screen or roadmap progress, use the provided context carefully.
+
+Never:
+- Overpromise results
+- Guarantee jobs
+- Provide illegal shortcuts
+- Give harmful advice
+
+Act like a serious but supportive mentor.
+Remember: You are speaking out loud, so keep sentences short and clear."""
 
 DEFAULT_VOICE = 'Aoede'  # Gemini built-in voice
 
@@ -112,7 +144,7 @@ async def proxy_handler(client_ws):
                             'prebuiltVoiceConfig': {
                                 'voiceName': voice_name,
                             }
-                        }
+                        },
                     }
                 },
                 'systemInstruction': {
@@ -121,14 +153,16 @@ async def proxy_handler(client_ws):
             }
         }
 
-        # Connect to Gemini
+        # Connect to Gemini with optimized settings for low-latency voice
         logger.info(f"Connecting to Gemini Live API for {client_addr}...")
         gemini_ws = await websockets.connect(
             GEMINI_WS_URL,
             additional_headers={'Content-Type': 'application/json'},
             max_size=16 * 1024 * 1024,  # 16 MB
-            ping_interval=30,
-            ping_timeout=10,
+            max_queue=2,  # Keep small queue for faster response
+            ping_interval=20,  # More frequent heartbeat for stability
+            ping_timeout=5,  # Faster timeout detection
+            compression=None,  # Disable compression for lower latency
         )
 
         # Send setup
@@ -214,6 +248,14 @@ async def proxy_handler(client_ws):
                     elif msg_type == 'end':
                         logger.info(f"Client {client_addr} ended session")
                         break
+
+                    elif msg_type == 'turnComplete':
+                        gemini_msg = {
+                            'realtimeInput': {
+                                'turnComplete': True,
+                            }
+                        }
+                        await gemini_ws.send(json.dumps(gemini_msg))
 
             except websockets.exceptions.ConnectionClosed:
                 logger.info(f"Client {client_addr} disconnected")

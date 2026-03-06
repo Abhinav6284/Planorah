@@ -27,7 +27,7 @@ const PortfolioWidget = () => {
         const statuses = {
             active: { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-600 dark:text-emerald-400', label: 'Live' },
             grace: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-600 dark:text-yellow-400', label: 'Grace Period' },
-            read_only: { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-500', label: 'Read Only' },
+            read_only: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-600 dark:text-blue-400', label: 'Free Plan' },
             archived: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-600 dark:text-red-400', label: 'Archived' }
         };
         return statuses[portfolio.status] || statuses.archived;
@@ -96,7 +96,7 @@ const PortfolioWidget = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                             </svg>
                             <span className="text-xs text-gray-600 dark:text-gray-400 truncate flex-1 font-mono">
-                                {portfolio.custom_subdomain 
+                                {portfolio.custom_subdomain
                                     ? `${portfolio.custom_subdomain}.planorah.me`
                                     : `planorah.me/p/${portfolio.slug}`
                                 }

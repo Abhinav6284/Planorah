@@ -63,34 +63,32 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
     };
 
     return (
-        <div className="bg-white dark:bg-black text-gray-900 dark:text-white rounded-[24px] sm:rounded-[32px] p-4 sm:p-6 md:p-8 relative overflow-hidden shadow-xl sm:shadow-2xl border border-gray-100 dark:border-white/5 transition-all duration-200">
+        <div className="bg-white dark:bg-black text-gray-900 dark:text-white rounded-[24px] p-4 sm:p-5 relative overflow-hidden shadow-sm border border-gray-100 dark:border-white/5 transition-all duration-200">
 
             {/* Header: Date Strip */}
-            <div className="mb-4 sm:mb-6">
-                <div className="flex justify-between items-end mb-4 sm:mb-5">
-                    <h3 className="text-xl sm:text-2xl font-semibold tracking-tight">Schedule</h3>
-                    <div className="flex gap-4 text-sm font-medium text-gray-500">
-                        <span className="text-gray-900 dark:text-white font-semibold">Days</span>
-                    </div>
+            <div className="mb-3">
+                <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-base sm:text-lg font-semibold tracking-tight">Schedule</h3>
+                    <span className="text-xs font-medium text-gray-400">Days</span>
                 </div>
 
                 {/* Date Scroll Area */}
-                <div className="flex gap-2 sm:gap-3 overflow-x-auto py-4 sm:py-6 px-1 sm:px-2 -mx-1 sm:-mx-2 no-scrollbar" style={{ scrollbarWidth: 'none' }}>
+                <div className="flex gap-1.5 sm:gap-2 overflow-x-auto py-1 px-0.5 -mx-0.5 no-scrollbar" style={{ scrollbarWidth: 'none' }}>
                     {days.map((day) => {
                         const isSelected = selectedDate === day.isoDate;
                         return (
                             <button
                                 key={day.isoDate}
                                 onClick={() => setSelectedDate(day.isoDate)}
-                                className={`flex flex-col items-center justify-center min-w-[48px] sm:min-w-[60px] h-[72px] sm:h-[90px] rounded-[20px] sm:rounded-[30px] transition-all duration-300 flex-shrink-0 ${isSelected
-                                    ? 'bg-[#E0C8FF] text-black scale-105 sm:scale-110 z-10'
+                                className={`flex flex-col items-center justify-center min-w-[42px] sm:min-w-[50px] h-[58px] sm:h-[66px] rounded-2xl transition-all duration-200 flex-shrink-0 ${isSelected
+                                    ? 'bg-[#E0C8FF] text-black scale-105 z-10'
                                     : 'bg-gray-100 dark:bg-[#1C1C1E] text-gray-500 hover:bg-gray-200 dark:hover:bg-[#2C2C2E] hover:text-gray-900 dark:hover:text-white'
                                     }`}
                             >
-                                <span className={`text-lg sm:text-2xl font-bold mb-0.5 sm:mb-1 leading-none ${isSelected ? 'text-black' : 'text-gray-700 dark:text-gray-200'}`}>
+                                <span className={`text-sm sm:text-base font-bold leading-none mb-0.5 ${isSelected ? 'text-black' : 'text-gray-700 dark:text-gray-200'}`}>
                                     {String(day.dayNum).padStart(2, '0')}
                                 </span>
-                                <span className={`text-[10px] sm:text-[12px] font-medium tracking-wide ${isSelected ? 'text-gray-900' : 'text-gray-500 dark:text-gray-600'}`}>
+                                <span className={`text-[9px] sm:text-[10px] font-medium tracking-wide ${isSelected ? 'text-gray-900' : 'text-gray-500 dark:text-gray-600'}`}>
                                     {day.dayName}
                                 </span>
                             </button>
@@ -101,9 +99,9 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
 
 
             {/* Tasks List */}
-            <div className="mt-4">
-                <div className="flex justify-between items-center mb-4">
-                    <span className="text-lg font-semibold opacity-70 tracking-wide">Tasks ({currentTasks.length})</span>
+            <div className="mt-2">
+                <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-semibold opacity-70 tracking-wide">Tasks ({currentTasks.length})</span>
                     {currentTasks.length > 0 && (
                         <div className="flex items-center gap-3">
                             <div className="w-24 h-2 bg-gray-200 dark:bg-white/5 rounded-full overflow-hidden backdrop-blur-sm">
@@ -128,10 +126,10 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                     transition={{ delay: i * 0.05 }}
                                     key={task.id || i}
                                     onClick={() => handleTaskClick(task)}
-                                    className="group flex items-center gap-4 p-4 rounded-2xl bg-white/60 dark:bg-[#1C1C1E]/60 hover:bg-white/80 dark:hover:bg-[#2C2C2E]/80 backdrop-blur-md border border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10 transition-all hover:shadow-lg cursor-pointer"
+                                    className="group flex items-center gap-3 p-3 rounded-xl bg-white/60 dark:bg-[#1C1C1E]/60 hover:bg-white/80 dark:hover:bg-[#2C2C2E]/80 backdrop-blur-md border border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10 transition-all hover:shadow-md cursor-pointer"
                                 >
                                     {/* Task Number/Icon */}
-                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${task.status === 'completed' ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
+                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${task.status === 'completed' ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
                                         task.status === 'in_progress' ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400' :
                                             'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400'
                                         }`}>
@@ -140,7 +138,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
 
                                     {/* Task Content */}
                                     <div className="flex-1 min-w-0">
-                                        <h4 className={`text-base font-semibold text-gray-900 dark:text-white truncate ${task.status === 'completed' ? 'opacity-50 line-through' : ''}`}>
+                                        <h4 className={`text-sm font-semibold text-gray-900 dark:text-white truncate ${task.status === 'completed' ? 'opacity-50 line-through' : ''}`}>
                                             {task.title}
                                         </h4>
                                         <div className="flex items-center gap-2 mt-1 text-xs text-gray-500 dark:text-gray-400">
@@ -156,7 +154,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
 
                                     {/* Status Badge */}
                                     <div className="flex items-center gap-3 flex-shrink-0">
-                                        <span className={`text-xs px-3 py-1 rounded-full font-medium ${task.status === 'completed' ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
+                                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${task.status === 'completed' ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
                                             task.status === 'in_progress' ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400' :
                                                 'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400'
                                             }`}>
@@ -174,11 +172,11 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className="flex flex-col items-center justify-center py-8 text-center opacity-40"
+                                className="flex flex-col items-center justify-center py-6 text-center opacity-40"
                             >
-                                <span className="text-4xl mb-3 grayscale opacity-50">☕</span>
-                                <p className="text-base font-medium text-gray-900 dark:text-white">No tasks scheduled</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Time to relax or plan ahead!</p>
+                                <span className="text-3xl mb-2 grayscale opacity-50">☕</span>
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">No tasks scheduled</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Time to relax or plan ahead!</p>
                             </motion.div>
                         )}
                     </AnimatePresence>
