@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from django.core.cache import cache
 
 from .models import CustomUser
 from tasks.models import Task
@@ -19,6 +20,11 @@ def get_user_statistics(request):
     Returns task completion metrics, roadmap progress, streaks, skills, and activity data.
     """
     user = request.user
+
+    cache_key = f"user_statistics:{user.id}"
+    cached = cache.get(cache_key)
+    if cached:
+        return Response(cached, status=status.HTTP_200_OK)
     
     # Task Statistics
     total_tasks = Task.objects.filter(user=user).count()
@@ -126,7 +132,7 @@ def get_user_statistics(request):
             category_distribution[cat] = 0
         category_distribution[cat] += 1
     
-    return Response({
+    response_data = {
         'overview': {
             'total_tasks': total_tasks,
             'completed_tasks': completed_tasks,
@@ -153,4 +159,7 @@ def get_user_statistics(request):
         'recent_activity': recent_activity,
         'activity_heatmap': activity_heatmap,
         'category_distribution': category_distribution,
-    }, status=status.HTTP_200_OK)
+    }
+
+    cache.set(cache_key, response_data, 60)
+    return Response(response_data, status=status.HTTP_200_OK)

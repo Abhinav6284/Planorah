@@ -173,6 +173,10 @@ class Task(models.Model):
         self.completed_at = timezone.now()
         self.save()
 
+        # Update streak on completion (idempotent per day in update_streak)
+        from users.activity import record_activity
+        record_activity(self.user, "task_completed")
+
         # Create revision tasks
         self.create_revision_tasks()
 
@@ -247,6 +251,10 @@ class Task(models.Model):
             self.best_pass_score = passing_attempt.score
             self.best_pass_attempt = passing_attempt
             self.save()
+
+            # Update streak on first successful completion.
+            from users.activity import record_activity
+            record_activity(self.user, "task_completed")
             return
 
         # Update best score if this is better

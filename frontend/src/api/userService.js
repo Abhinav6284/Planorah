@@ -20,6 +20,11 @@ export const userService = {
         return response.data;
     },
 
+    dailyLogin: async () => {
+        const response = await api.post('users/daily-login/');
+        return response.data;
+    },
+
     deleteAccount: async (passwordOrConfirmation, isOAuth = false) => {
         const payload = isOAuth
             ? { confirmation: passwordOrConfirmation }

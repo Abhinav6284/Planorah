@@ -32,27 +32,31 @@ export default function AITalkButton({
 
     return (
         <>
-            <div className={`inline-flex items-center gap-2 ${className}`}>
-                {/* Text chat button */}
+            <div className={`flex flex-wrap items-center gap-3 ${className}`}>
+                {/* Voice chat button */}
                 <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => openText()}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => openVoice()}
+                    className="flex items-center gap-3 px-4 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700/50 rounded-full text-gray-800 dark:text-gray-200 text-[15px] font-medium shadow-sm hover:shadow transition-all"
                 >
-                    <FaBrain className="text-xs" />
-                    AI Chat
+                    <div className="relative w-6 h-6 rounded-full bg-[conic-gradient(at_center,_var(--tw-gradient-stops))] from-blue-500 via-cyan-400 to-blue-500 shadow-sm border border-blue-400/20 flex items-center justify-center overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-cyan-300/40 to-transparent mix-blend-overlay" />
+                    </div>
+                    Voice chat
                 </motion.button>
 
-                {/* Voice button */}
+                {/* Text chat button */}
                 <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => openVoice()}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => openText()}
+                    className="flex items-center gap-3 px-4 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700/50 rounded-full text-gray-800 dark:text-gray-200 text-[15px] font-medium shadow-sm hover:shadow transition-all"
                 >
-                    <FaMicrophone className="text-xs" />
-                    AI Talk
+                    <div className="relative w-6 h-6 rounded-full bg-[conic-gradient(at_center,_var(--tw-gradient-stops))] from-purple-500 via-fuchsia-400 to-purple-500 shadow-sm border border-purple-400/20 flex items-center justify-center overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-fuchsia-300/40 to-transparent mix-blend-overlay" />
+                    </div>
+                    AI Chat
                 </motion.button>
             </div>
 

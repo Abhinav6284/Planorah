@@ -3,6 +3,11 @@ from django.conf import settings
 
 
 class Task(models.Model):
+    """
+    Legacy lightweight dashboard task.
+    NOTE: This is separate from tasks.Task (roadmap tasks).
+    Prefer tasks.Task for new development.
+    """
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('in_progress', 'In Progress'),

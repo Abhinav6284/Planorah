@@ -35,21 +35,14 @@ class UserProgress(models.Model):
         return f"Progress: {self.user.username}"
 
     def update_streak(self):
-        """Update user streak based on activity."""
-        today = timezone.now().date()
-        
-        if self.last_activity_date is None:
-            self.current_streak = 1
-        elif self.last_activity_date == today:
-            pass  # Already counted today
-        elif (today - self.last_activity_date).days == 1:
-            self.current_streak += 1
-        else:
-            self.current_streak = 1
-        
-        self.last_activity_date = today
-        self.longest_streak = max(self.longest_streak, self.current_streak)
-        self.save()
+        """
+        Update user streak based on activity.
+        NOTE: UserProfile is the source of truth. This method delegates
+        to users.utils.update_streak and refreshes this cache.
+        """
+        from users.activity import record_activity
+        record_activity(self.user, "analytics_activity")
+        self.refresh_from_db()
 
 
 class RoadmapProgress(models.Model):

@@ -63,6 +63,9 @@ export default function OverviewSection() {
 
         const fetchData = async () => {
             try {
+                // Idempotent daily login ping for streak update
+                await userService.dailyLogin().catch(() => null);
+
                 const [statsData, tasksData, profileData, detailedStats] = await Promise.all([
                     schedulerService.getDashboardStats(),
                     schedulerService.getTasks(),

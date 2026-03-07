@@ -8,6 +8,7 @@ export default function TaskCard({ task, onUpdate, onComplete, onDelete, isHighl
     const [showGuidance, setShowGuidance] = useState(false);
     const [guidance, setGuidance] = useState(null);
     const [loadingGuidance, setLoadingGuidance] = useState(false);
+    const canMarkComplete = task?.can_mark_complete !== false;
 
     const statusColors = {
         'not_started': 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400',
@@ -18,6 +19,9 @@ export default function TaskCard({ task, onUpdate, onComplete, onDelete, isHighl
 
     const handleStatusChange = (newStatus) => {
         if (newStatus === 'completed') {
+            if (!canMarkComplete && task.status !== 'completed') {
+                return;
+            }
             onComplete(task.id);
         } else {
             onUpdate(task.id, { status: newStatus });
@@ -55,7 +59,9 @@ export default function TaskCard({ task, onUpdate, onComplete, onDelete, isHighl
                     {/* Checkbox */}
                     <button
                         onClick={() => handleStatusChange(task.status === 'completed' ? 'not_started' : 'completed')}
-                        className="mt-1 flex-shrink-0"
+                        className={`mt-1 flex-shrink-0 ${canMarkComplete || task.status === 'completed' ? '' : 'opacity-50 cursor-not-allowed'}`}
+                        title={canMarkComplete || task.status === 'completed' ? 'Mark complete' : 'Requires proof validation'}
+                        disabled={!canMarkComplete && task.status !== 'completed'}
                     >
                         {task.status === 'completed' ? (
                             <svg className="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
@@ -91,7 +97,7 @@ export default function TaskCard({ task, onUpdate, onComplete, onDelete, isHighl
                             >
                                 <option value="not_started">Not Started</option>
                                 <option value="in_progress">In Progress</option>
-                                <option value="completed">Completed</option>
+                                <option value="completed" disabled={!canMarkComplete && task.status !== 'completed'}>Completed</option>
                                 <option value="needs_revision">Needs Revision</option>
                             </select>
                         </div>

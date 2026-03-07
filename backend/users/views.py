@@ -7,11 +7,12 @@ from django.db import IntegrityError
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes, throttle_scope
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework.throttling import ScopedRateThrottle
 
 # Brevo email service
 from backend.email_service import send_otp_email, send_password_reset_email, send_welcome_email, send_account_deleted_email
@@ -32,6 +33,8 @@ User = get_user_model()
 # ---------------- REGISTER USER ----------------
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([ScopedRateThrottle])
+@throttle_scope('register')
 def register_user(request):
     """
     Handle user registration with email and password.
@@ -130,6 +133,8 @@ def register_user(request):
 # ---------------- VERIFY OTP ----------------
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([ScopedRateThrottle])
+@throttle_scope('otp')
 def verify_otp(request):
     data = request.data
     email = data.get('email')
@@ -202,6 +207,8 @@ def verify_otp(request):
 # ---------------- LOGIN USER ----------------
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@throttle_classes([ScopedRateThrottle])
+@throttle_scope('login')
 def login_user(request):
     """
     Handles user login using either email or username.
@@ -261,12 +268,8 @@ def login_user(request):
     access_token = str(refresh.access_token)
     refresh_token = str(refresh)
 
-    # Update Streak
-    try:
-        from .utils import update_streak
-        update_streak(user, "login")
-    except Exception as e:
-        pass  # print(f"Error updating streak: {e}")
+    from .activity import record_activity
+    record_activity(user, "login")
 
     return Response(
         {
@@ -285,8 +288,35 @@ def login_user(request):
     )
 
 
+# ---------------- DAILY LOGIN PING ----------------
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+@throttle_classes([ScopedRateThrottle])
+@throttle_scope('daily_login')
+def daily_login_ping(request):
+    """
+    Idempotent daily activity ping to keep streaks in sync
+    without relying on re-login.
+    """
+    user = request.user
+    from .activity import record_activity
+    record_activity(user, "daily_login")
+
+    profile = getattr(user, 'profile', None)
+    return Response(
+        {
+            "message": "Daily streak updated",
+            "streak": profile.streak_count if profile else 0,
+            "last_activity_date": profile.last_study_date.isoformat() if profile and profile.last_study_date else None,
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@throttle_classes([ScopedRateThrottle])
+@throttle_scope('otp')
 def resend_otp(request):
     email = request.data.get("email")
 
@@ -322,6 +352,8 @@ def resend_otp(request):
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@throttle_classes([ScopedRateThrottle])
+@throttle_scope('otp')
 def request_password_reset(request):
     email = request.data.get("email")
 
@@ -357,6 +389,8 @@ def request_password_reset(request):
 # 2️⃣ Verify reset OTP
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@throttle_classes([ScopedRateThrottle])
+@throttle_scope('otp')
 def verify_reset_otp(request):
     email = request.data.get("email")
     otp = request.data.get("otp")
@@ -385,6 +419,8 @@ def verify_reset_otp(request):
 # 3️⃣ Reset password
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@throttle_classes([ScopedRateThrottle])
+@throttle_scope('otp')
 def reset_password(request):
     email = request.data.get("email")
     new_password = request.data.get("new_password")
@@ -563,6 +599,8 @@ def logout_view(request):
 # ---------------- GOOGLE OAUTH LOGIN ----------------
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([ScopedRateThrottle])
+@throttle_scope('oauth')
 def google_oauth_login(request):
     """
     Handle Google OAuth login. Accepts a Google Access Token from the frontend,
@@ -766,6 +804,8 @@ def google_oauth_login(request):
 # ---------------- GITHUB OAUTH LOGIN ----------------
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([ScopedRateThrottle])
+@throttle_scope('oauth')
 def github_oauth_login(request):
     """
     Handle GitHub OAuth login. Accepts an authorization code from the frontend,
@@ -1030,6 +1070,8 @@ def delete_account(request):
 # ---------------- VERIFY SOCIAL OTP ----------------
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([ScopedRateThrottle])
+@throttle_scope('oauth')
 def verify_social_otp(request):
     """
     Verify OTP sent during social login (Google/GitHub).

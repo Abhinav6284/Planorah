@@ -86,12 +86,8 @@ def analyze_resume(request):
             summary_feedback=analysis_data.get('summary_feedback', '')
         )
         
-        # Update Streak
-        try:
-            from users.utils import update_streak
-            update_streak(user, "ats_scan")
-        except Exception as e:
-            pass  # print(f"Error updating streak: {e}")
+        from users.activity import record_activity
+        record_activity(user, "ats_scan")
 
         return Response(ATSAnalysisSerializer(ats_scan).data, status=201)
 
