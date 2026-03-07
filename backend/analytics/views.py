@@ -158,8 +158,8 @@ class AnalyticsViewSet(viewsets.ViewSet):
         
         daily_activity.save()
         
-        # Update user progress streak
-        progress, _ = UserProgress.objects.get_or_create(user=request.user)
-        progress.update_streak()
+        # Update streak using UserProfile as source of truth
+        from users.activity import record_activity
+        record_activity(request.user, "activity_log")
         
         return Response({'message': 'Activity logged'})

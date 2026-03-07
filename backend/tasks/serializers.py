@@ -107,26 +107,29 @@ class TaskSerializer(serializers.ModelSerializer):
     Read-only fields for validation data.
     """
 
+    id = serializers.UUIDField(source='task_id', read_only=True)
     user_status = serializers.SerializerMethodField()
     latest_attempt = serializers.SerializerMethodField()
     attempt_count = serializers.SerializerMethodField()
     can_attempt = serializers.SerializerMethodField()
+    can_mark_complete = serializers.SerializerMethodField()
 
     class Meta:
         model = Task
         fields = [
-            'task_id', 'title', 'description', 'objective',
+            'id', 'task_id', 'title', 'description', 'objective',
             'status', 'user_status', 'day', 'due_date',
             'proof_type', 'validator_type', 'acceptance_rules',
             'minimum_pass_score', 'max_attempts', 'is_core_task',
             'estimated_minutes', 'actual_minutes',
             'can_skip', 'can_edit_by_user',
             'latest_attempt', 'attempt_count', 'can_attempt',
+            'can_mark_complete',
             'notes', 'tags', 'created_at', 'updated_at'
         ]
         read_only_fields = [
-            'task_id', 'user_status', 'latest_attempt', 'attempt_count',
-            'can_attempt', 'created_at', 'updated_at'
+            'id', 'task_id', 'user_status', 'latest_attempt', 'attempt_count',
+            'can_attempt', 'can_mark_complete', 'created_at', 'updated_at'
         ]
 
     def get_user_status(self, obj):
@@ -167,6 +170,10 @@ class TaskSerializer(serializers.ModelSerializer):
             return False
 
         return obj.can_attempt(request.user)
+
+    def get_can_mark_complete(self, obj):
+        """True if task can be completed without validation."""
+        return obj.validator_type == 'none' and obj.proof_type == 'none'
 
 
 class OutputEligibilitySerializer(serializers.Serializer):

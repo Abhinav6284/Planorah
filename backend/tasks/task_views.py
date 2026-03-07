@@ -142,6 +142,33 @@ class TaskViewSet(viewsets.ReadOnlyModelViewSet):
 
         return Response(response_data, status=status.HTTP_201_CREATED)
 
+    @action(detail=True, methods=['patch'])
+    def complete(self, request, pk=None):
+        """
+        Mark a task as complete for tasks that require no validation.
+        PATCH /tasks/{task_id}/complete/
+        """
+        task = self.get_object()
+
+        # Already completed
+        if task.status == 'completed':
+            serializer = self.get_serializer(task)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        # Enforce validation requirements
+        if task.validator_type != 'none' or task.proof_type != 'none':
+            return Response(
+                {
+                    'error': 'This task requires validation. Submit proof instead.',
+                    'status': 'VALIDATION_REQUIRED'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        task.mark_complete()
+        serializer = self.get_serializer(task)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     @action(detail=False, methods=['get'])
     def pending(self, request):
         """Get all pending attempts for current user."""

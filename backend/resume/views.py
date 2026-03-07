@@ -113,12 +113,8 @@ def generate_resume(request):
             generated_content=content
         )
         
-        # Update Streak
-        try:
-            from users.utils import update_streak
-            update_streak(user, "resume_generation")
-        except Exception as e:
-            pass  # print(f"Error updating streak: {e}")
+        from users.activity import record_activity
+        record_activity(user, "resume_generation")
 
         return Response(ResumeSerializer(resume).data, status=201)
 

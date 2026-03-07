@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 
 import requests
 from django.conf import settings
+from django.core.cache import cache
 from dotenv import load_dotenv
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -16,6 +17,8 @@ from users.models import UserProfile
 
 from .models import DailySummary, Task
 from .serializers import DailySummarySerializer, TaskSerializer
+
+# NOTE: dashboard.Task is a legacy quick-task model (distinct from tasks.Task).
 
 
 load_dotenv()
@@ -413,6 +416,11 @@ def get_dashboard_stats(request):
 
         user = request.user
 
+        cache_key = f"dashboard_stats:{user.id}"
+        cached = cache.get(cache_key)
+        if cached:
+            return Response(cached)
+
         # User Profile Data
         try:
             profile = user.profile
@@ -448,7 +456,7 @@ def get_dashboard_stats(request):
             user=user).order_by('-created_at').first()
         ats_score = latest_ats.match_score if latest_ats else 0
 
-        return Response({
+        response_data = {
             "profile": {
                 "streak": streak,
                 "xp": xp,
@@ -472,7 +480,10 @@ def get_dashboard_stats(request):
                 "ats_scans": ats_scans,
                 "latest_ats_score": ats_score
             }
-        })
+        }
+
+        cache.set(cache_key, response_data, 60)
+        return Response(response_data)
     except Exception as e:
         return Response({
             "error": "Failed to fetch dashboard stats",

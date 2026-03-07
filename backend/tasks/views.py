@@ -52,7 +52,7 @@ def calculate_streak(user):
                 break
         else:
             current_date -= timedelta(days=1)
-            if (today - current_date).days > 7:  # Stop after 7 days of no tasks
+            if (today - current_date).days > 365:  # Safety cap at 1 year
                 break
 
     return streak
