@@ -33,6 +33,7 @@ ALLOWED_HOSTS = [
     "planorah.me",
     "www.planorah.me",
     "142.93.214.77",
+    ".vercel.app",
 ]
 
 # Application definition
@@ -130,6 +131,9 @@ CORS_ALLOWED_ORIGINS = [
     "https://planorah.me",
     "https://www.planorah.me",
     "http://142.93.214.77",
+    # Vercel deployments
+    "https://planorah-783xtsgk4-abhinav6284s-projects.vercel.app",
+    "https://planorah-c65p.vercel.app",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -138,6 +142,9 @@ CSRF_TRUSTED_ORIGINS = [
     "https://planorah.me",
     "https://www.planorah.me",
     "http://142.93.214.77",
+    # Vercel deployments
+    "https://planorah-783xtsgk4-abhinav6284s-projects.vercel.app",
+    "https://planorah-c65p.vercel.app",
 ]
 
 CORS_ALLOW_CREDENTIALS = True

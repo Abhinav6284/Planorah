@@ -23,6 +23,12 @@ class Settings(BaseSettings):
     max_upload_bytes: int = 8 * 1024 * 1024
     public_cache_ttl_seconds: int = 300
 
+    allowed_origins: str = "https://planorah-c65p.vercel.app,https://planorah.me"
+
+    @property
+    def allowed_origins_list(self) -> list[str]:
+        return [o.strip() for o in self.allowed_origins.split(",") if o.strip()]
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
