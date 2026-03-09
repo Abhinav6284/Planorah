@@ -2,6 +2,8 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 
+from .services import generate_public_url
+
 
 class Portfolio(models.Model):
     """
@@ -13,6 +15,11 @@ class Portfolio(models.Model):
         ('grace', 'Grace Period'),    # 7-14 days after expiry
         ('read_only', 'Read Only'),   # Public but limited
         ('archived', 'Archived'),     # Hidden, recoverable
+    ]
+    AVAILABILITY_CHOICES = [
+        ('open', 'Open to opportunities'),
+        ('interviewing', 'Interviewing'),
+        ('not_looking', 'Not actively looking'),
     ]
 
     user = models.OneToOneField(
@@ -32,26 +39,50 @@ class Portfolio(models.Model):
 
     # Content
     title = models.CharField(max_length=200, blank=True)
+    display_name = models.CharField(max_length=120, blank=True)
+    location = models.CharField(max_length=120, blank=True)
+    availability_status = models.CharField(
+        max_length=20,
+        choices=AVAILABILITY_CHOICES,
+        default='open'
+    )
     bio = models.TextField(blank=True)
     headline = models.CharField(max_length=200, blank=True)
+    skills = models.JSONField(default=list, blank=True)
 
     # Social links
     github_url = models.URLField(blank=True)
     linkedin_url = models.URLField(blank=True)
     twitter_url = models.URLField(blank=True)
     website_url = models.URLField(blank=True)
+    resume_url = models.URLField(blank=True)
+
+    # CTA and SEO
+    primary_cta_label = models.CharField(max_length=40, default='Hire Me')
+    primary_cta_url = models.URLField(blank=True)
+    seo_title = models.CharField(max_length=120, blank=True)
+    seo_description = models.CharField(max_length=180, blank=True)
+    og_image_url = models.URLField(blank=True)
 
     # Settings
     show_email = models.BooleanField(default=False)
     theme = models.CharField(max_length=50, default='default')
+    settings_json = models.JSONField(default=dict, blank=True)
 
     # Metadata
+    is_published = models.BooleanField(default=True)
+    published_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     last_status_change = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name_plural = 'Portfolios'
+        indexes = [
+            models.Index(fields=['status']),
+            models.Index(fields=['is_published']),
+            models.Index(fields=['status', 'is_published']),
+        ]
 
     def __str__(self):
         return f"{self.user.username}'s Portfolio ({self.status})"
@@ -59,9 +90,7 @@ class Portfolio(models.Model):
     @property
     def public_url(self):
         """Get the public URL for this portfolio."""
-        if self.custom_subdomain:
-            return f"https://{self.custom_subdomain}.planorah.me"
-        return f"https://planorah.me/p/{self.slug}"
+        return generate_public_url(self)
 
     @property
     def is_publicly_viewable(self):
@@ -157,6 +186,11 @@ class PortfolioProject(models.Model):
     # Custom overrides for display
     custom_title = models.CharField(max_length=255, blank=True)
     custom_description = models.TextField(blank=True)
+    role = models.CharField(max_length=120, blank=True)
+    duration_text = models.CharField(max_length=100, blank=True)
+    impact_metrics = models.JSONField(default=list, blank=True)
+    project_url = models.URLField(blank=True, null=True)
+    image_url = models.URLField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -244,3 +278,35 @@ class PortfolioAnalytics(models.Model):
 
     def __str__(self):
         return f"{self.portfolio.user.username} - {self.date}"
+
+
+class PortfolioEvent(models.Model):
+    """Lightweight event stream for conversion and engagement analytics."""
+
+    EVENT_TYPE_CHOICES = [
+        ('page_view', 'Page View'),
+        ('cta_click', 'CTA Click'),
+        ('project_click', 'Project Click'),
+        ('resume_click', 'Resume Click'),
+    ]
+
+    portfolio = models.ForeignKey(
+        Portfolio,
+        on_delete=models.CASCADE,
+        related_name='events'
+    )
+    event_type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES)
+    referrer = models.CharField(max_length=500, blank=True)
+    session_key = models.CharField(max_length=120, blank=True)
+    metadata = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['portfolio', 'event_type', 'created_at']),
+            models.Index(fields=['created_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.portfolio.user.username}::{self.event_type}"

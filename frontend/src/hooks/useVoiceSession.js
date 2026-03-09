@@ -11,6 +11,11 @@ import html2canvas from 'html2canvas';
 
 const AUDIO_SAMPLE_RATE = 16000;  // What we send to Gemini
 const PLAYBACK_SAMPLE_RATE = 24000;  // What Gemini sends back
+const MAX_AUDIO_QUEUE_CHUNKS = 20;
+const MAX_SCHEDULED_CHUNKS = 3;
+const SCREENSHOT_INTERVAL_MS = 12000;
+const RECONNECT_MAX_ATTEMPTS = 4;
+const RECONNECT_BASE_DELAY_MS = 1200;
 // const CHUNK_SIZE removed - unused
 
 // AudioWorklet processor — runs in a separate audio thread (no deprecation warning)
@@ -47,6 +52,7 @@ export function useVoiceSession() {
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [isCapturing, setIsCapturing] = useState(false);
     const [audioLevel, setAudioLevel] = useState(0);
+    const [isReconnecting, setIsReconnecting] = useState(false);
 
     const wsRef = useRef(null);
     const micStreamRef = useRef(null);
@@ -56,15 +62,30 @@ export function useVoiceSession() {
     const audioQueueRef = useRef([]);
     const isPlayingRef = useRef(false);
     const playbackCtxRef = useRef(null);
+    const playbackCursorRef = useRef(0);
+    const scheduledChunksRef = useRef(0);
+    const activeSourcesRef = useRef(new Set());
     const screenIntervalRef = useRef(null);
+    const isCapturingFrameRef = useRef(false);
+    const isSpeakingRef = useRef(false);
     const analyserRef = useRef(null);
     const animFrameRef = useRef(null);
     const silenceTimerRef = useRef(null);
     const inUtteranceRef = useRef(false);
     const statusRef = useRef(status);
+    const reconnectTimerRef = useRef(null);
+    const reconnectAttemptsRef = useRef(0);
+    const manualDisconnectRef = useRef(false);
+    const lastConnectConfigRef = useRef(null);
 
     // ── Cleanup ──
     const cleanup = useCallback(() => {
+        if (reconnectTimerRef.current) {
+            clearTimeout(reconnectTimerRef.current);
+            reconnectTimerRef.current = null;
+        }
+        setIsReconnecting(false);
+
         if (silenceTimerRef.current) {
             clearTimeout(silenceTimerRef.current);
             silenceTimerRef.current = null;
@@ -90,6 +111,15 @@ export function useVoiceSession() {
         }
 
         // Close audio contexts
+        activeSourcesRef.current.forEach((source) => {
+            try {
+                source.stop();
+            } catch (_) {
+                // ignore stale source stop errors
+            }
+        });
+        activeSourcesRef.current.clear();
+
         if (audioContextRef.current?.state !== 'closed') {
             audioContextRef.current?.close();
         }
@@ -115,6 +145,10 @@ export function useVoiceSession() {
 
         audioQueueRef.current = [];
         isPlayingRef.current = false;
+        playbackCursorRef.current = 0;
+        scheduledChunksRef.current = 0;
+        isCapturingFrameRef.current = false;
+        isSpeakingRef.current = false;
         setIsCapturing(false);
         setAudioLevel(0);
     }, []);
@@ -128,39 +162,44 @@ export function useVoiceSession() {
         statusRef.current = status;
     }, [status]);
 
-    // ── Audio playback (queued with jitter buffer) ──
-    const playNextChunk = useCallback(() => {
-        // Only play if chunks are available
-        if (isPlayingRef.current || audioQueueRef.current.length === 0) {
-            if (audioQueueRef.current.length === 0) {
-                setIsSpeaking(false);
-            }
-            return;
-        }
-
-        isPlayingRef.current = true;
-        setIsSpeaking(true);
-
-        const base64Data = audioQueueRef.current.shift();
+    const sendWsMessage = useCallback((payload) => {
+        const ws = wsRef.current;
+        if (!ws || ws.readyState !== WebSocket.OPEN) return false;
         try {
-            const binaryStr = atob(base64Data);
-            const bytes = new Uint8Array(binaryStr.length);
-            for (let i = 0; i < binaryStr.length; i++) {
-                bytes[i] = binaryStr.charCodeAt(i);
-            }
+            ws.send(JSON.stringify(payload));
+            return true;
+        } catch (err) {
+            console.warn('WebSocket send failed:', err);
+            return false;
+        }
+    }, []);
 
-            // Convert Int16 PCM to Float32 with optimized resampling
-            const int16 = new Int16Array(bytes.buffer);
-            // Resample from 24kHz to playback rate using linear interpolation
-            const resampleRatio = PLAYBACK_SAMPLE_RATE / 24000;
-            const resampled = new Float32Array(Math.floor(int16.length * resampleRatio));
-            for (let i = 0; i < resampled.length; i++) {
-                const srcIdx = i / resampleRatio;
-                const srcIdxInt = Math.floor(srcIdx);
-                const frac = srcIdx - srcIdxInt;
-                const s0 = int16[srcIdxInt] / 32768;
-                const s1 = (srcIdxInt + 1 < int16.length) ? int16[srcIdxInt + 1] / 32768 : 0;
-                resampled[i] = s0 * (1 - frac) + s1 * frac;
+    const interruptPlayback = useCallback(() => {
+        activeSourcesRef.current.forEach((source) => {
+            try {
+                source.stop(0);
+            } catch (_) {
+                // ignore
+            }
+        });
+        activeSourcesRef.current.clear();
+        audioQueueRef.current = [];
+        scheduledChunksRef.current = 0;
+        isPlayingRef.current = false;
+        isSpeakingRef.current = false;
+        setIsSpeaking(false);
+    }, []);
+
+    // ── Audio playback (queued with scheduler to avoid blocky/gappy playback) ──
+    const scheduleAudioPlayback = useCallback(() => {
+        try {
+            if (audioQueueRef.current.length === 0) {
+                if (scheduledChunksRef.current === 0) {
+                    isPlayingRef.current = false;
+                    isSpeakingRef.current = false;
+                    setIsSpeaking(false);
+                }
+                return;
             }
 
             if (!playbackCtxRef.current || playbackCtxRef.current.state === 'closed') {
@@ -168,27 +207,71 @@ export function useVoiceSession() {
                     sampleRate: PLAYBACK_SAMPLE_RATE,
                     latencyHint: 'interactive',
                 });
+                playbackCursorRef.current = playbackCtxRef.current.currentTime + 0.04;
             }
 
             const ctx = playbackCtxRef.current;
-            const buffer = ctx.createBuffer(1, resampled.length, PLAYBACK_SAMPLE_RATE);
-            buffer.getChannelData(0).set(resampled);
 
-            const source = ctx.createBufferSource();
-            source.buffer = buffer;
-            source.connect(ctx.destination);
-            source.onended = () => {
-                isPlayingRef.current = false;
-                // Auto-play next chunk if available
-                if (audioQueueRef.current.length > 0) {
-                    playNextChunk();
+            while (
+                audioQueueRef.current.length > 0 &&
+                scheduledChunksRef.current < MAX_SCHEDULED_CHUNKS
+            ) {
+                const base64Data = audioQueueRef.current.shift();
+                const binaryStr = atob(base64Data);
+                const bytes = new Uint8Array(binaryStr.length);
+                for (let i = 0; i < binaryStr.length; i++) {
+                    bytes[i] = binaryStr.charCodeAt(i);
                 }
-            };
-            source.start(0);
+
+                const int16 = new Int16Array(bytes.buffer);
+                const resampleRatio = PLAYBACK_SAMPLE_RATE / 24000;
+                const resampled = new Float32Array(Math.floor(int16.length * resampleRatio));
+                for (let i = 0; i < resampled.length; i++) {
+                    const srcIdx = i / resampleRatio;
+                    const srcIdxInt = Math.floor(srcIdx);
+                    const frac = srcIdx - srcIdxInt;
+                    const s0 = int16[srcIdxInt] / 32768;
+                    const s1 = (srcIdxInt + 1 < int16.length) ? int16[srcIdxInt + 1] / 32768 : 0;
+                    resampled[i] = s0 * (1 - frac) + s1 * frac;
+                }
+
+                const buffer = ctx.createBuffer(1, resampled.length, PLAYBACK_SAMPLE_RATE);
+                buffer.getChannelData(0).set(resampled);
+
+                const source = ctx.createBufferSource();
+                source.buffer = buffer;
+                source.connect(ctx.destination);
+                activeSourcesRef.current.add(source);
+
+                const startAt = Math.max(playbackCursorRef.current, ctx.currentTime + 0.02);
+                playbackCursorRef.current = startAt + buffer.duration;
+
+                if (!isPlayingRef.current) {
+                    isPlayingRef.current = true;
+                    isSpeakingRef.current = true;
+                    setIsSpeaking(true);
+                }
+
+                scheduledChunksRef.current += 1;
+                source.onended = () => {
+                    activeSourcesRef.current.delete(source);
+                    scheduledChunksRef.current = Math.max(0, scheduledChunksRef.current - 1);
+                    if (audioQueueRef.current.length > 0) {
+                        scheduleAudioPlayback();
+                    } else if (scheduledChunksRef.current === 0) {
+                        isPlayingRef.current = false;
+                        isSpeakingRef.current = false;
+                        setIsSpeaking(false);
+                    }
+                };
+
+                source.start(startAt);
+            }
         } catch (err) {
-            console.error('Audio playback error:', err);
+            console.error('Audio playback scheduler error:', err);
             isPlayingRef.current = false;
-            playNextChunk();
+            isSpeakingRef.current = false;
+            setIsSpeaking(false);
         }
     }, []);
 
@@ -201,9 +284,7 @@ export function useVoiceSession() {
                 silenceTimerRef.current = null;
                 if (!inUtteranceRef.current) return;
                 inUtteranceRef.current = false;
-                if (wsRef.current?.readyState === WebSocket.OPEN) {
-                    wsRef.current.send(JSON.stringify({ type: 'turnComplete' }));
-                }
+                sendWsMessage({ type: 'turnComplete' });
             }, 900);
         };
         const update = () => {
@@ -214,6 +295,9 @@ export function useVoiceSession() {
 
             if (statusRef.current === 'active' && wsRef.current?.readyState === WebSocket.OPEN) {
                 if (level > 0.12) {
+                    if (isSpeakingRef.current && level > 0.2) {
+                        interruptPlayback(); // support user barge-in during AI speech
+                    }
                     inUtteranceRef.current = true;
                     if (silenceTimerRef.current) {
                         clearTimeout(silenceTimerRef.current);
@@ -226,7 +310,7 @@ export function useVoiceSession() {
             animFrameRef.current = requestAnimationFrame(update);
         };
         update();
-    }, []);
+    }, [interruptPlayback, sendWsMessage]);
 
     // ── App screen capture (html2canvas — captures only Planora, no permission dialog) ──
     const startAppCapture = useCallback(() => {
@@ -234,10 +318,15 @@ export function useVoiceSession() {
 
         const doCapture = async () => {
             if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
+            if (isCapturingFrameRef.current) return;
+            if (wsRef.current.bufferedAmount > 256 * 1024) return; // avoid socket congestion
+            if (inUtteranceRef.current || isSpeakingRef.current) return; // prioritize audio round trip
+
+            isCapturingFrameRef.current = true;
             try {
                 const target = document.getElementById('root') || document.body;
                 const canvas = await html2canvas(target, {
-                    scale: 0.5,           // half resolution — good enough for AI context
+                    scale: 0.35,          // lower resolution to reduce CPU/network spikes
                     useCORS: true,
                     allowTaint: true,
                     logging: false,
@@ -246,30 +335,42 @@ export function useVoiceSession() {
                         return el.getAttribute?.('data-voice-overlay') === 'true';
                     },
                 });
-                const base64 = canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
+                const base64 = canvas.toDataURL('image/jpeg', 0.45).split(',')[1];
                 if (base64 && base64.length > 200) {
-                    wsRef.current.send(JSON.stringify({
+                    sendWsMessage({
                         type: 'screenshot',
                         data: base64,
                         mimeType: 'image/jpeg',
-                    }));
+                    });
                 }
             } catch (err) {
                 console.warn('App capture error:', err);
+            } finally {
+                isCapturingFrameRef.current = false;
             }
         };
 
         setIsCapturing(true);
         doCapture(); // immediate first capture
-        screenIntervalRef.current = setInterval(doCapture, 4000);
-    }, []);
+        screenIntervalRef.current = setInterval(doCapture, SCREENSHOT_INTERVAL_MS);
+    }, [sendWsMessage]);
 
     // ── Connect & Start ──
-    const connect = useCallback(async ({ wsUrl, contextSource, studentGoal, sessionMemory, voiceName }) => {
+    const connect = useCallback(async (config, isReconnect = false) => {
+        const { wsUrl, contextSource, studentGoal, sessionMemory, voiceName } = config || {};
+        lastConnectConfigRef.current = { wsUrl, contextSource, studentGoal, sessionMemory, voiceName };
+        if (!isReconnect) {
+            reconnectAttemptsRef.current = 0;
+            setIsReconnecting(false);
+        }
+        manualDisconnectRef.current = false;
+
         cleanup();
         setStatus('connecting');
         setError('');
-        setTranscript('');
+        if (!isReconnect) {
+            setTranscript('');
+        }
 
         try {
             // 1. Get microphone with aggressive noise reduction
@@ -308,11 +409,10 @@ export function useVoiceSession() {
             workletNodeRef.current = workletNode;
 
             workletNode.port.onmessage = (evt) => {
-                if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
                 const bytes = new Uint8Array(evt.data.pcm);
                 let binary = '';
                 for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-                wsRef.current.send(JSON.stringify({ type: 'audio', data: btoa(binary) }));
+                sendWsMessage({ type: 'audio', data: btoa(binary) });
             };
 
             source.connect(workletNode);
@@ -325,17 +425,25 @@ export function useVoiceSession() {
             wsRef.current = ws;
 
             ws.onopen = () => {
+                reconnectAttemptsRef.current = 0;
+                setIsReconnecting(false);
                 // Send setup message
-                ws.send(JSON.stringify({
+                sendWsMessage({
                     contextSource: contextSource || 'general',
                     studentGoal: studentGoal || '',
                     sessionMemory: sessionMemory || [],
                     voiceName: voiceName || 'Aoede',
-                }));
+                });
             };
 
             ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
+                let data = null;
+                try {
+                    data = JSON.parse(event.data);
+                } catch (err) {
+                    console.warn('Received non-JSON websocket message', err);
+                    return;
+                }
 
                 switch (data.type) {
                     case 'ready':
@@ -345,12 +453,13 @@ export function useVoiceSession() {
                         break;
 
                     case 'audio':
-                        // Buffer audio chunks without limit - playback auto-continues via onended
-                        audioQueueRef.current.push(data.data);
-                        // Trigger first chunk only when queue starts
-                        if (!isPlayingRef.current && audioQueueRef.current.length === 1) {
-                            playNextChunk();
+                        // Keep queue bounded to avoid latency buildup under bursty network conditions
+                        if (audioQueueRef.current.length >= MAX_AUDIO_QUEUE_CHUNKS) {
+                            const overflow = audioQueueRef.current.length - MAX_AUDIO_QUEUE_CHUNKS + 1;
+                            audioQueueRef.current.splice(0, overflow);
                         }
+                        audioQueueRef.current.push(data.data);
+                        scheduleAudioPlayback();
                         break;
 
                     case 'transcript':
@@ -380,12 +489,26 @@ export function useVoiceSession() {
             };
 
             ws.onerror = () => {
-                setError('WebSocket connection error. Is the voice proxy running?');
-                setStatus('error');
+                setError('WebSocket connection error. Trying to recover...');
             };
 
             ws.onclose = () => {
-                if (status !== 'error') {
+                const shouldRetry = (
+                    !manualDisconnectRef.current &&
+                    reconnectAttemptsRef.current < RECONNECT_MAX_ATTEMPTS &&
+                    lastConnectConfigRef.current
+                );
+
+                if (shouldRetry) {
+                    const delay = RECONNECT_BASE_DELAY_MS * (2 ** reconnectAttemptsRef.current);
+                    reconnectAttemptsRef.current += 1;
+                    setIsReconnecting(true);
+                    setStatus('connecting');
+                    reconnectTimerRef.current = setTimeout(() => {
+                        connect(lastConnectConfigRef.current, true);
+                    }, delay);
+                } else {
+                    setIsReconnecting(false);
                     setStatus('idle');
                 }
             };
@@ -400,7 +523,7 @@ export function useVoiceSession() {
             setStatus('error');
             cleanup();
         }
-    }, [cleanup, playNextChunk, startLevelMonitor, status, startAppCapture]);
+    }, [cleanup, scheduleAudioPlayback, sendWsMessage, startLevelMonitor, startAppCapture]);
 
 
 
@@ -414,6 +537,7 @@ export function useVoiceSession() {
 
     // ── Disconnect ──
     const disconnect = useCallback(() => {
+        manualDisconnectRef.current = true;
         cleanup();
         setStatus('idle');
         setTranscript('');
@@ -425,6 +549,7 @@ export function useVoiceSession() {
         transcript,
         isSpeaking,
         isCapturing,
+        isReconnecting,
         audioLevel,
         connect,
         disconnect,

@@ -105,6 +105,7 @@ REST_FRAMEWORK = {
         'otp': '10/min',
         'oauth': '10/min',
         'daily_login': '30/hour',
+        'portfolio_event': '120/min',
     },
 }
 
@@ -233,6 +234,18 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@planorah.me')
 
 # Gemini API Key
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+
+# Public portfolio URL configuration
+# Local default keeps portfolio links on localhost during development.
+PORTFOLIO_PUBLIC_BASE_URL = os.getenv(
+    'PORTFOLIO_PUBLIC_BASE_URL',
+    'http://localhost:3000' if DEBUG else 'https://planorah.me'
+)
+PORTFOLIO_PUBLIC_ROOT_DOMAIN = os.getenv(
+    'PORTFOLIO_PUBLIC_ROOT_DOMAIN',
+    'localhost' if DEBUG else 'planorah.me'
+)
+PORTFOLIO_V2_EDITOR = os.getenv('PORTFOLIO_V2_EDITOR', 'true').lower() == 'true'
 
 
 CORS_ALLOW_HEADERS = [
