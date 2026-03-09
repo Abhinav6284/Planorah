@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { FaBrain, FaMicrophone } from "react-icons/fa";
 import { motion } from "framer-motion";
 import AITalkPanel from "./AITalkPanel";
 import AIVoicePanel from "./AIVoicePanel";

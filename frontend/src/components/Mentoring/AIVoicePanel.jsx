@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from "react";
+mport React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaTimes } from "react-icons/fa";
 // import { Canvas } from "@react-three/fiber"; // Removed 3D Canvas
@@ -36,7 +36,6 @@ export default function AIVoicePanel({
         error,
         transcript,
         isSpeaking,
-        isCapturing,
         audioLevel,
         connect,
         disconnect,
