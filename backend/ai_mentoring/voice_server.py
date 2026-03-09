@@ -93,6 +93,16 @@ DEFAULT_VOICE = 'Aoede'  # Gemini built-in voice
 
 PROXY_HOST = os.getenv('VOICE_PROXY_HOST', 'localhost')
 PROXY_PORT = int(os.getenv('VOICE_PROXY_PORT', '8001'))
+MAX_AUDIO_BASE64_CHARS = 24000
+MAX_SCREENSHOT_BASE64_CHARS = 2_000_000
+CLIENT_IDLE_TIMEOUT_SEC = 75
+
+
+def _safe_json_loads(raw: str):
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        return None
 
 
 async def proxy_handler(client_ws):
@@ -109,11 +119,21 @@ async def proxy_handler(client_ws):
         return
 
     gemini_ws = None
+    last_audio_at = 0.0
+    last_screenshot_at = 0.0
+    last_client_activity_at = asyncio.get_running_loop().time()
 
     try:
         # Wait for the client setup message
         raw_setup = await asyncio.wait_for(client_ws.recv(), timeout=10)
-        setup_data = json.loads(raw_setup)
+        setup_data = _safe_json_loads(raw_setup)
+        if not isinstance(setup_data, dict):
+            await client_ws.send(json.dumps({
+                'type': 'error',
+                'message': 'Invalid setup payload.',
+            }))
+            await client_ws.close()
+            return
 
         # Build Gemini setup message
         voice_name = setup_data.get('voiceName', DEFAULT_VOICE)
@@ -186,24 +206,43 @@ async def proxy_handler(client_ws):
         # Bidirectional relay
         async def client_to_gemini():
             """Forward messages from the browser to Gemini."""
+            nonlocal last_audio_at, last_screenshot_at, last_client_activity_at
             try:
                 async for message in client_ws:
-                    data = json.loads(message)
+                    data = _safe_json_loads(message)
+                    if not isinstance(data, dict):
+                        continue
                     msg_type = data.get('type', '')
+                    last_client_activity_at = asyncio.get_running_loop().time()
 
                     if msg_type == 'audio':
+                        audio_b64 = data.get('data', '')
+                        if not isinstance(audio_b64, str) or len(audio_b64) > MAX_AUDIO_BASE64_CHARS:
+                            continue
+                        last_audio_at = asyncio.get_running_loop().time()
                         # Forward audio chunk via realtimeInput
                         gemini_msg = {
                             'realtimeInput': {
                                 'mediaChunks': [{
                                     'mimeType': 'audio/pcm;rate=16000',
-                                    'data': data['data'],
+                                    'data': audio_b64,
                                 }]
                             }
                         }
-                        await gemini_ws.send(json.dumps(gemini_msg))
+                        await asyncio.wait_for(gemini_ws.send(json.dumps(gemini_msg)), timeout=2.5)
 
                     elif msg_type == 'screenshot':
+                        screenshot_b64 = data.get('data', '')
+                        if not isinstance(screenshot_b64, str) or len(screenshot_b64) > MAX_SCREENSHOT_BASE64_CHARS:
+                            continue
+                        now = asyncio.get_running_loop().time()
+                        # Throttle screenshots and prioritize audio turn quality.
+                        if (now - last_screenshot_at) < 12.0:
+                            continue
+                        if (now - last_audio_at) < 2.0:
+                            continue
+                        last_screenshot_at = now
+
                         # Forward screen capture as inline image content
                         logger.info(f"Forwarding screenshot for {client_addr} "
                                     f"({len(data.get('data', ''))//1024}KB base64)")
@@ -213,11 +252,11 @@ async def proxy_handler(client_ws):
                                 'realtimeInput': {
                                     'mediaChunks': [{
                                         'mimeType': data.get('mimeType', 'image/jpeg'),
-                                        'data': data['data'],
+                                        'data': screenshot_b64,
                                     }]
                                 }
                             }
-                            await gemini_ws.send(json.dumps(gemini_msg))
+                            await asyncio.wait_for(gemini_ws.send(json.dumps(gemini_msg)), timeout=2.5)
                         except Exception as img_err:
                             logger.warning(f"realtimeInput image failed: {img_err}, "
                                            f"trying clientContent fallback")
@@ -230,7 +269,7 @@ async def proxy_handler(client_ws):
                                             'parts': [{
                                                 'inlineData': {
                                                     'mimeType': data.get('mimeType', 'image/jpeg'),
-                                                    'data': data['data'],
+                                                    'data': screenshot_b64,
                                                 }
                                             }, {
                                                 'text': 'Here is my current screen. '
@@ -240,7 +279,7 @@ async def proxy_handler(client_ws):
                                         'turnComplete': True,
                                     }
                                 }
-                                await gemini_ws.send(json.dumps(gemini_msg))
+                                await asyncio.wait_for(gemini_ws.send(json.dumps(gemini_msg)), timeout=2.5)
                             except Exception as fallback_err:
                                 logger.error(f"clientContent image fallback also failed: "
                                              f"{fallback_err}")
@@ -255,16 +294,41 @@ async def proxy_handler(client_ws):
                                 'turnComplete': True,
                             }
                         }
-                        await gemini_ws.send(json.dumps(gemini_msg))
+                        await asyncio.wait_for(gemini_ws.send(json.dumps(gemini_msg)), timeout=2.5)
+
+                    elif msg_type == 'ping':
+                        await client_ws.send(json.dumps({'type': 'pong'}))
 
             except websockets.exceptions.ConnectionClosed:
                 logger.info(f"Client {client_addr} disconnected")
+
+        async def client_idle_watchdog():
+            """Close stale sessions to avoid zombie websocket usage."""
+            nonlocal last_client_activity_at
+            try:
+                while True:
+                    await asyncio.sleep(5)
+                    now = asyncio.get_running_loop().time()
+                    if (now - last_client_activity_at) > CLIENT_IDLE_TIMEOUT_SEC:
+                        try:
+                            await client_ws.send(json.dumps({
+                                'type': 'error',
+                                'message': 'Session timed out due to inactivity.',
+                            }))
+                        except Exception:
+                            pass
+                        await client_ws.close()
+                        break
+            except asyncio.CancelledError:
+                return
 
         async def gemini_to_client():
             """Forward messages from Gemini to the browser."""
             try:
                 async for message in gemini_ws:
-                    data = json.loads(message)
+                    data = _safe_json_loads(message)
+                    if not isinstance(data, dict):
+                        continue
 
                     # Check for Gemini-side errors
                     if 'error' in data:
@@ -309,6 +373,7 @@ async def proxy_handler(client_ws):
         await asyncio.gather(
             client_to_gemini(),
             gemini_to_client(),
+            client_idle_watchdog(),
         )
 
     except asyncio.TimeoutError:

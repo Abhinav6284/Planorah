@@ -2187,3 +2187,275 @@ INFO 2026-03-08 01:58:02,982 autoreload P:\Planora\backend\tasks\models.py chang
 INFO 2026-03-08 01:58:04,215 autoreload Watching for file changes with StatReloader
 INFO 2026-03-08 01:58:08,081 autoreload P:\Planora\backend\dashboard\models.py changed, reloading.
 INFO 2026-03-08 01:58:09,734 autoreload Watching for file changes with StatReloader
+INFO 2026-03-08 02:30:22,913 autoreload P:\Planora\backend\backend\settings.py changed, reloading.
+INFO 2026-03-08 02:30:23,891 autoreload Watching for file changes with StatReloader
+INFO 2026-03-08 02:30:28,751 autoreload P:\Planora\backend\portfolio\models.py changed, reloading.
+INFO 2026-03-08 02:30:40,208 autoreload Watching for file changes with StatReloader
+INFO 2026-03-08 02:35:32,782 autoreload P:\Planora\backend\users\views.py changed, reloading.
+INFO 2026-03-08 02:35:36,616 autoreload Watching for file changes with StatReloader
+INFO 2026-03-08 02:36:39,543 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-03-08 02:36:39,543 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-03-08 02:36:40,114 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+INFO 2026-03-08 02:36:40,149 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-03-08 02:36:40,251 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+INFO 2026-03-08 02:36:40,301 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-03-08 02:37:58,598 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-03-08 02:37:58,598 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-03-08 02:37:58,721 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+INFO 2026-03-08 02:37:58,739 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-03-08 02:37:58,831 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+INFO 2026-03-08 02:37:58,882 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 471
+INFO 2026-03-08 02:39:03,546 autoreload P:\Planora\backend\portfolio\serializers.py changed, reloading.
+INFO 2026-03-08 02:39:04,508 autoreload Watching for file changes with StatReloader
+INFO 2026-03-08 02:39:09,949 autoreload P:\Planora\backend\portfolio\views.py changed, reloading.
+INFO 2026-03-08 02:39:11,231 autoreload Watching for file changes with StatReloader
+INFO 2026-03-08 02:40:25,359 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-03-08 02:40:25,363 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-03-08 02:40:25,506 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+INFO 2026-03-08 02:40:25,510 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+INFO 2026-03-08 02:40:25,655 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 473
+INFO 2026-03-08 02:40:25,665 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 473
+INFO 2026-03-08 02:40:43,985 basehttp "GET /api/portfolio/public/abhinav9729-50ac89fd/ HTTP/1.1" 200 224
+INFO 2026-03-08 02:40:44,089 basehttp "GET /api/portfolio/public/abhinav9729-50ac89fd/ HTTP/1.1" 200 224
+INFO 2026-03-08 02:46:44,281 basehttp "GET /api/portfolio/public/abhinav9729-50ac89fd/ HTTP/1.1" 200 224
+INFO 2026-03-08 02:46:44,360 basehttp "GET /api/portfolio/public/abhinav9729-50ac89fd/ HTTP/1.1" 200 224
+INFO 2026-03-08 02:46:52,328 basehttp "PATCH /api/portfolio/update_settings/ HTTP/1.1" 200 472
+INFO 2026-03-08 02:46:55,430 basehttp "GET /api/portfolio/public/abhinav9729-50ac89fd/ HTTP/1.1" 200 224
+INFO 2026-03-08 02:46:55,514 basehttp "GET /api/portfolio/public/abhinav9729-50ac89fd/ HTTP/1.1" 200 224
+INFO 2026-03-08 02:51:41,263 basehttp "PATCH /api/portfolio/update_settings/ HTTP/1.1" 200 472
+INFO 2026-03-08 02:51:43,994 basehttp "GET /api/portfolio/public/abhinav9729-50ac89fd/ HTTP/1.1" 200 224
+INFO 2026-03-08 02:51:44,080 basehttp "GET /api/portfolio/public/abhinav9729-50ac89fd/ HTTP/1.1" 200 224
+INFO 2026-03-08 03:05:49,519 autoreload P:\Planora\backend\portfolio\models.py changed, reloading.
+INFO 2026-03-08 03:05:50,311 autoreload Watching for file changes with StatReloader
+INFO 2026-03-08 03:06:43,152 autoreload P:\Planora\backend\portfolio\serializers.py changed, reloading.
+INFO 2026-03-08 03:06:44,599 autoreload Watching for file changes with StatReloader
+INFO 2026-03-08 03:08:17,369 autoreload P:\Planora\backend\portfolio\views.py changed, reloading.
+INFO 2026-03-08 03:08:18,342 autoreload Watching for file changes with StatReloader
+INFO 2026-03-08 03:08:32,228 autoreload P:\Planora\backend\portfolio\admin.py changed, reloading.
+INFO 2026-03-08 03:08:32,989 autoreload Watching for file changes with StatReloader
+INFO 2026-03-08 03:08:38,165 autoreload P:\Planora\backend\backend\settings.py changed, reloading.
+INFO 2026-03-08 03:08:39,039 autoreload Watching for file changes with StatReloader
+INFO 2026-03-08 03:08:41,993 autoreload P:\Planora\backend\portfolio\serializers.py changed, reloading.
+INFO 2026-03-08 03:08:42,948 autoreload Watching for file changes with StatReloader
+INFO 2026-03-08 03:09:04,874 autoreload P:\Planora\backend\portfolio\views.py changed, reloading.
+INFO 2026-03-08 03:09:05,782 autoreload Watching for file changes with StatReloader
+ERROR 2026-03-08 03:15:25,314 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 03:15:25,315 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 03:15:25,388 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 03:15:25,389 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 03:15:33,294 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 03:15:33,296 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 03:18:03,331 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 03:18:03,332 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 03:18:03,448 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 03:18:03,449 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 03:19:24,130 utils Failed to create streak log for user 15
+Traceback (most recent call last):
+  File "P:\Planora\.venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "users_streaklog_user_id_activity_date_2d36a5d3_uniq"
+DETAIL:  Key (user_id, activity_date)=(15, 2026-03-08) already exists.
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "P:\Planora\backend\users\utils.py", line 25, in update_streak
+    StreakLog.objects.create(
+    ~~~~~~~~~~~~~~~~~~~~~~~~^
+        user=user,
+        ^^^^^^^^^^
+        activity_type=activity_type,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        activity_date=today
+        ^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\query.py", line 663, in create
+    obj.save(force_insert=True, using=self.db)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\base.py", line 902, in save
+    self.save_base(
+    ~~~~~~~~~~~~~~^
+        using=using,
+        ^^^^^^^^^^^^
+    ...<2 lines>...
+        update_fields=update_fields,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\base.py", line 1008, in save_base
+    updated = self._save_table(
+        raw,
+    ...<4 lines>...
+        update_fields,
+    )
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\base.py", line 1169, in _save_table
+    results = self._do_insert(
+        cls._base_manager, using, fields, returning_fields, raw
+    )
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\base.py", line 1210, in _do_insert
+    return manager._insert(
+           ~~~~~~~~~~~~~~~^
+        [self],
+        ^^^^^^^
+    ...<3 lines>...
+        raw=raw,
+        ^^^^^^^^
+    )
+    ^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\query.py", line 1868, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1882, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "P:\Planora\.venv\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\Planora\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "P:\Planora\.venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+django.db.utils.IntegrityError: duplicate key value violates unique constraint "users_streaklog_user_id_activity_date_2d36a5d3_uniq"
+DETAIL:  Key (user_id, activity_date)=(15, 2026-03-08) already exists.
+
+INFO 2026-03-08 03:19:24,178 basehttp "POST /api/users/daily-login/ HTTP/1.1" 200 79
+INFO 2026-03-08 03:19:24,311 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+INFO 2026-03-08 03:19:24,315 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-03-08 03:19:24,338 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 262
+INFO 2026-03-08 03:19:24,453 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-03-08 03:19:24,694 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+ERROR 2026-03-08 03:19:24,716 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 03:19:24,720 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 03:19:24,915 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 03:19:24,918 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+INFO 2026-03-08 03:19:32,163 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 1962
+INFO 2026-03-08 03:20:56,500 autoreload P:\Planora\backend\portfolio\serializers.py changed, reloading.
+INFO 2026-03-08 03:20:57,975 autoreload Watching for file changes with StatReloader
+INFO 2026-03-08 03:21:51,716 autoreload P:\Planora\backend\portfolio\views.py changed, reloading.
+INFO 2026-03-08 03:21:53,461 autoreload Watching for file changes with StatReloader
+ERROR 2026-03-08 03:27:43,386 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 03:27:43,388 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 03:27:43,504 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 03:27:43,505 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 03:27:45,083 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 03:27:45,090 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+INFO 2026-03-08 03:32:52,925 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+ERROR 2026-03-08 03:32:53,236 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 03:32:53,240 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+INFO 2026-03-08 03:32:53,822 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+ERROR 2026-03-08 03:32:54,929 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 03:32:54,951 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+INFO 2026-03-08 03:33:03,920 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+ERROR 2026-03-08 03:33:03,980 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 03:33:04,004 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+INFO 2026-03-08 03:33:04,164 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+ERROR 2026-03-08 03:33:04,214 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 03:33:04,227 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+INFO 2026-03-08 09:44:49,167 autoreload Watching for file changes with StatReloader
+INFO 2026-03-08 09:54:12,618 basehttp "POST /api/users/login/ HTTP/1.1" 200 626
+INFO 2026-03-08 09:54:14,930 basehttp "POST /api/users/daily-login/ HTTP/1.1" 200 79
+INFO 2026-03-08 09:54:17,215 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+INFO 2026-03-08 09:54:17,262 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-03-08 09:54:17,273 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 262
+INFO 2026-03-08 09:54:17,291 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-03-08 09:54:17,316 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+INFO 2026-03-08 09:54:17,418 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+INFO 2026-03-08 09:54:17,719 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+ERROR 2026-03-08 09:54:17,741 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 09:54:17,742 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 09:54:17,812 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 09:54:17,813 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+INFO 2026-03-08 09:54:24,212 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 1962
+INFO 2026-03-08 09:54:29,187 basehttp "GET /api/ai-mentoring/voice/config/ HTTP/1.1" 200 402
+INFO 2026-03-08 09:55:33,935 basehttp "POST /api/ai-mentoring/session/ HTTP/1.1" 201 968
+INFO 2026-03-08 09:55:57,317 basehttp "POST /api/ai-mentoring/session/ HTTP/1.1" 201 1407
+INFO 2026-03-08 09:56:26,282 basehttp "POST /api/ai-mentoring/session/ HTTP/1.1" 201 1503
+ERROR 2026-03-08 09:57:11,632 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 09:57:11,633 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 09:57:11,685 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 09:57:11,686 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 09:57:13,111 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 09:57:13,112 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 09:57:13,861 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 09:57:13,862 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 09:57:14,208 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 09:57:14,208 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 09:57:14,518 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 09:57:14,519 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 09:57:14,692 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 09:57:14,693 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 09:57:15,037 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 09:57:15,038 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+INFO 2026-03-08 09:57:17,525 basehttp "POST /api/users/daily-login/ HTTP/1.1" 200 79
+INFO 2026-03-08 09:57:17,590 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 262
+INFO 2026-03-08 09:57:17,653 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-03-08 09:57:17,711 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+INFO 2026-03-08 09:57:17,783 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+ERROR 2026-03-08 09:57:17,880 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 09:57:17,880 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+INFO 2026-03-08 09:57:17,905 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+ERROR 2026-03-08 09:57:17,945 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 09:57:17,946 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 09:57:19,573 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 09:57:19,574 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 09:57:19,628 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 09:57:19,629 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+ERROR 2026-03-08 09:57:20,842 log Internal Server Error: /api/portfolio/my_portfolio/
+ERROR 2026-03-08 09:57:20,843 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 500 52
+INFO 2026-03-08 09:57:24,885 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 1962
+INFO 2026-03-08 10:02:15,639 autoreload Watching for file changes with StatReloader
+INFO 2026-03-08 10:02:19,255 basehttp "POST /api/users/daily-login/ HTTP/1.1" 200 79
+INFO 2026-03-08 10:02:19,331 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-03-08 10:02:19,391 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+INFO 2026-03-08 10:02:19,433 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 262
+INFO 2026-03-08 10:02:19,465 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-03-08 10:02:19,588 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-03-08 10:02:19,623 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 725
+INFO 2026-03-08 10:02:19,717 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 725
+INFO 2026-03-08 10:02:25,511 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 725
+INFO 2026-03-08 10:02:25,587 basehttp "GET /api/portfolio/completeness/ HTTP/1.1" 200 631
+INFO 2026-03-08 10:02:25,588 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 725
+INFO 2026-03-08 10:02:25,678 basehttp "GET /api/portfolio/completeness/ HTTP/1.1" 200 631
+INFO 2026-03-08 10:02:26,670 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 1962
+INFO 2026-03-08 10:02:38,414 basehttp "GET /api/ai-mentoring/voice/config/ HTTP/1.1" 200 2163
+INFO 2026-03-08 10:03:37,704 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-03-08 10:03:37,708 basehttp "GET /api/subscriptions/current/ HTTP/1.1" 200 58
+INFO 2026-03-08 10:03:37,978 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+INFO 2026-03-08 10:03:38,040 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+INFO 2026-03-08 10:03:38,053 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 725
+INFO 2026-03-08 10:03:38,064 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 725
+INFO 2026-03-08 10:03:38,193 basehttp "GET /api/portfolio/completeness/ HTTP/1.1" 200 631
+INFO 2026-03-08 10:03:38,339 basehttp "GET /api/portfolio/completeness/ HTTP/1.1" 200 631
+INFO 2026-03-08 10:03:42,057 basehttp "GET /api/ai-mentoring/voice/config/ HTTP/1.1" 200 2163
+INFO 2026-03-08 10:04:22,307 basehttp "GET /api/portfolio/public/abhinav9729-50ac89fd/ HTTP/1.1" 200 486
+INFO 2026-03-08 10:04:22,397 basehttp "GET /api/portfolio/public/abhinav9729-50ac89fd/ HTTP/1.1" 200 486
+INFO 2026-03-08 10:04:22,450 basehttp "POST /api/portfolio/track_event/ HTTP/1.1" 202 11
+INFO 2026-03-08 10:04:22,472 basehttp "POST /api/portfolio/track_event/ HTTP/1.1" 202 11
+INFO 2026-03-08 10:04:30,415 basehttp "POST /api/users/daily-login/ HTTP/1.1" 200 79
+INFO 2026-03-08 10:04:30,496 basehttp "GET /api/tasks/ HTTP/1.1" 200 2
+INFO 2026-03-08 10:04:30,501 basehttp "GET /api/dashboard/stats/ HTTP/1.1" 200 262
+INFO 2026-03-08 10:04:30,585 basehttp "GET /api/users/statistics/ HTTP/1.1" 200 428
+INFO 2026-03-08 10:04:30,655 basehttp "GET /api/users/profile/ HTTP/1.1" 200 759
+INFO 2026-03-08 10:04:30,803 basehttp "GET /api/scheduler/events/ HTTP/1.1" 200 2
+INFO 2026-03-08 10:04:30,820 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 725
+INFO 2026-03-08 10:04:30,934 basehttp "GET /api/portfolio/my_portfolio/ HTTP/1.1" 200 725
+INFO 2026-03-08 10:04:37,335 basehttp "GET /api/dashboard/onboarding-insights/ HTTP/1.1" 200 1962

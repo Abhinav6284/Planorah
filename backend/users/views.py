@@ -7,7 +7,7 @@ from django.db import IntegrityError
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes, throttle_classes, throttle_scope
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -28,6 +28,17 @@ from .statistics import get_user_statistics
 logger = logging.getLogger(__name__)
 
 User = get_user_model()
+
+
+def throttle_scope(scope_name):
+    """
+    Attach DRF throttle scope to function-based views.
+    DRF does not provide a built-in throttle_scope decorator for FBVs.
+    """
+    def decorator(view_func):
+        setattr(view_func, "throttle_scope", scope_name)
+        return view_func
+    return decorator
 
 
 # ---------------- REGISTER USER ----------------

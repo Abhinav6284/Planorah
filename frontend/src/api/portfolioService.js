@@ -17,6 +17,24 @@ export const portfolioService = {
         return response.data;
     },
 
+    // Autosave portfolio draft changes
+    autosave: async (data) => {
+        const response = await api.post('portfolio/autosave/', data);
+        return response.data;
+    },
+
+    // Publish/unpublish portfolio
+    publish: async (isPublished = true) => {
+        const response = await api.post('portfolio/publish/', { is_published: isPublished });
+        return response.data;
+    },
+
+    // Portfolio completeness
+    getCompleteness: async () => {
+        const response = await api.get('portfolio/completeness/');
+        return response.data;
+    },
+
     // Set custom subdomain (requires Placement Pro plan)
     setSubdomain: async (subdomain) => {
         const response = await api.post('portfolio/set_subdomain/', { subdomain });
@@ -57,5 +75,11 @@ export const portfolioService = {
     getPublicBySubdomain: async (subdomain) => {
         const response = await api.get(`portfolio/subdomain/${subdomain}/`);
         return response.data;
-    }
+    },
+
+    // Track public portfolio events
+    trackEvent: async (payload) => {
+        const response = await api.post('portfolio/track_event/', payload);
+        return response.data;
+    },
 };

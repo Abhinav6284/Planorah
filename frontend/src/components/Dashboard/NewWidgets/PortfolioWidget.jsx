@@ -42,6 +42,10 @@ const PortfolioWidget = () => {
     }
 
     const statusBadge = getStatusBadge();
+    const publicUrl = portfolio?.public_url || '';
+    const publicUrlLabel = publicUrl
+        ? publicUrl.replace(/^https?:\/\//, '')
+        : '';
 
     return (
         <div className="bg-white dark:bg-[#1C1C1E] rounded-[28px] p-5 h-full flex flex-col relative overflow-hidden border border-gray-100 dark:border-gray-800">
@@ -96,13 +100,10 @@ const PortfolioWidget = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                             </svg>
                             <span className="text-xs text-gray-600 dark:text-gray-400 truncate flex-1 font-mono">
-                                {portfolio.custom_subdomain
-                                    ? `${portfolio.custom_subdomain}.planorah.me`
-                                    : `planorah.me/p/${portfolio.slug}`
-                                }
+                                {publicUrlLabel}
                             </span>
                             <a
-                                href={portfolio.public_url}
+                                href={publicUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
@@ -123,7 +124,7 @@ const PortfolioWidget = () => {
                             Edit Portfolio
                         </Link>
                         <a
-                            href={portfolio.public_url}
+                            href={publicUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"

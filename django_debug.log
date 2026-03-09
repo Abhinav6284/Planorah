@@ -1,0 +1,9 @@
+WARNING 2026-03-08 03:10:39,101 log Not Found: /api/portfolio/public/testuser-abcd1234/
+WARNING 2026-03-08 03:10:39,784 log Bad Request: /api/portfolio/publish/
+WARNING 2026-03-08 03:10:42,137 log Bad Request: /api/portfolio/update_settings/
+WARNING 2026-03-08 03:21:19,303 log Not Found: /api/portfolio/public/testuser-abcd1234/
+WARNING 2026-03-08 03:21:20,011 log Bad Request: /api/portfolio/publish/
+WARNING 2026-03-08 03:21:22,296 log Bad Request: /api/portfolio/update_settings/
+WARNING 2026-03-08 03:22:18,628 log Not Found: /api/portfolio/public/testuser-abcd1234/
+WARNING 2026-03-08 03:22:19,432 log Bad Request: /api/portfolio/publish/
+WARNING 2026-03-08 03:22:22,688 log Bad Request: /api/portfolio/update_settings/
