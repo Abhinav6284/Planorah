@@ -47,6 +47,19 @@ class Migration(migrations.Migration):
             name='taskattempt',
             unique_together=set(),
         ),
+        # Drop FK constraints that reference tasks_task.id before we remove it.
+        # PostgreSQL refuses to drop a PK column while FK constraints depend on it.
+        migrations.RunSQL(
+            sql="""
+                ALTER TABLE tasks_task
+                    DROP CONSTRAINT IF EXISTS tasks_task_original_task_id_5fd355c6_fk_tasks_task_id;
+                ALTER TABLE scheduler_event
+                    DROP CONSTRAINT IF EXISTS scheduler_event_linked_task_id_75557d58_fk_tasks_task_id;
+                ALTER TABLE tasks_taskattempt
+                    DROP CONSTRAINT IF EXISTS tasks_taskattempt_task_id_8de28949_fk_tasks_task_id;
+            """,
+            reverse_sql=migrations.RunSQL.noop,
+        ),
         migrations.RemoveField(
             model_name='task',
             name='id',
@@ -80,6 +93,37 @@ class Migration(migrations.Migration):
             name='task_id',
             field=models.UUIDField(
                 default=uuid.uuid4, editable=False, primary_key=True, serialize=False),
+        ),
+        # The three FK columns that referenced the old integer tasks_task.id are now
+        # orphaned (their FK constraints were dropped above and the target column is gone).
+        # Recreate them as UUID columns pointing to the new task_id PK.
+        migrations.RunSQL(
+            sql="""
+                ALTER TABLE tasks_task DROP COLUMN IF EXISTS original_task_id;
+                ALTER TABLE tasks_task ADD COLUMN original_task_id uuid NULL;
+                ALTER TABLE tasks_task
+                    ADD CONSTRAINT tasks_task_original_task_id_fk
+                    FOREIGN KEY (original_task_id)
+                    REFERENCES tasks_task(task_id)
+                    DEFERRABLE INITIALLY DEFERRED;
+
+                ALTER TABLE scheduler_event DROP COLUMN IF EXISTS linked_task_id;
+                ALTER TABLE scheduler_event ADD COLUMN linked_task_id uuid NULL;
+                ALTER TABLE scheduler_event
+                    ADD CONSTRAINT scheduler_event_linked_task_id_fk
+                    FOREIGN KEY (linked_task_id)
+                    REFERENCES tasks_task(task_id)
+                    DEFERRABLE INITIALLY DEFERRED;
+
+                ALTER TABLE tasks_taskattempt DROP COLUMN IF EXISTS task_id;
+                ALTER TABLE tasks_taskattempt ADD COLUMN task_id uuid NULL;
+                ALTER TABLE tasks_taskattempt
+                    ADD CONSTRAINT tasks_taskattempt_task_id_fk
+                    FOREIGN KEY (task_id)
+                    REFERENCES tasks_task(task_id)
+                    DEFERRABLE INITIALLY DEFERRED;
+            """,
+            reverse_sql=migrations.RunSQL.noop,
         ),
         migrations.AddField(
             model_name='task',
