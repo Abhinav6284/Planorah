@@ -252,7 +252,8 @@ PORTFOLIO_PUBLIC_ROOT_DOMAIN = os.getenv(
     'PORTFOLIO_PUBLIC_ROOT_DOMAIN',
     'localhost' if DEBUG else 'planorah.me'
 )
-PORTFOLIO_V2_EDITOR = os.getenv('PORTFOLIO_V2_EDITOR', 'true').lower() == 'true'
+PORTFOLIO_V2_EDITOR = os.getenv(
+    'PORTFOLIO_V2_EDITOR', 'true').lower() == 'true'
 
 
 CORS_ALLOW_HEADERS = [
