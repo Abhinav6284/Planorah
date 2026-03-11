@@ -12,7 +12,7 @@ def get_portfolio_base_url(request=None) -> str:
     base_url = getattr(
         settings,
         "PORTFOLIO_PUBLIC_BASE_URL",
-        "https://planorah.me",
+        "https://portfolio.planorah.me",
     ).rstrip("/")
 
     if not request:
@@ -85,4 +85,3 @@ def compute_portfolio_completeness(portfolio) -> dict[str, Any]:
             for key, passed, weight in checks
         ],
     }
-

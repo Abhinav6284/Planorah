@@ -32,8 +32,8 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "planorah.me",
     "www.planorah.me",
+    "portfolio.planorah.me",
     "142.93.214.77",
-    ".vercel.app",
 ]
 
 # Application definition
@@ -130,10 +130,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "https://planorah.me",
     "https://www.planorah.me",
+    "https://portfolio.planorah.me",
     "http://142.93.214.77",
-    # Vercel deployments
-    "https://planorah-783xtsgk4-abhinav6284s-projects.vercel.app",
-    "https://planorah-c65p.vercel.app",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -141,10 +139,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:3000",
     "https://planorah.me",
     "https://www.planorah.me",
+    "https://portfolio.planorah.me",
     "http://142.93.214.77",
-    # Vercel deployments
-    "https://planorah-783xtsgk4-abhinav6284s-projects.vercel.app",
-    "https://planorah-c65p.vercel.app",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -246,7 +242,7 @@ GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 # Local default keeps portfolio links on localhost during development.
 PORTFOLIO_PUBLIC_BASE_URL = os.getenv(
     'PORTFOLIO_PUBLIC_BASE_URL',
-    'http://localhost:3000' if DEBUG else 'https://planorah.me'
+    'http://localhost:3000' if DEBUG else 'https://portfolio.planorah.me'
 )
 PORTFOLIO_PUBLIC_ROOT_DOMAIN = os.getenv(
     'PORTFOLIO_PUBLIC_ROOT_DOMAIN',
