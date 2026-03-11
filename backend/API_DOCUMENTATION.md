@@ -132,7 +132,7 @@ Get or create user's portfolio.
   "headline": "Software Developer",
   "github_url": "",
   "linkedin_url": "",
-  "public_url": "https://planorah.me/p/username",
+  "public_url": "https://portfolio.planorah.me/p/username",
   "is_publicly_viewable": true,
   "is_fully_accessible": true,
   "portfolio_projects": []

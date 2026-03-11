@@ -69,11 +69,12 @@ export default function App() {
   // On local: username.localhost (if configured)
   const isLocal = hostname.includes('localhost') || hostname.includes('127.0.0.1');
   const domainParts = isLocal ? 1 : 2; // planorah.me (2) vs localhost (1)
+  const reservedSubdomains = new Set(['www', 'planorah', 'portfolio']);
 
   let subdomain = null;
   if (parts.length > domainParts) {
     const potentialSubdomain = parts[0];
-    if (potentialSubdomain !== 'www' && potentialSubdomain !== 'planorah') {
+    if (!reservedSubdomains.has(potentialSubdomain)) {
       subdomain = potentialSubdomain;
     }
   }

@@ -3,7 +3,7 @@
 This package provides a complete SaaS-grade portfolio system design and scaffold for Planorah.
 
 It is designed for:
-- large-scale public portfolio delivery (`planorah.me/username`, `planorah.me/p/{slug}`)
+- large-scale public portfolio delivery (`portfolio.planorah.me/username`, `portfolio.planorah.me/p/{slug}`)
 - modular editing dashboard
 - secure media uploads
 - high-performance rendering
@@ -211,4 +211,3 @@ Pluggable without schema redesign:
 - S3 + CDN (CloudFront/Cloudflare)
 - Background workers for image jobs
 - Blue/green deploys + structured logging + tracing
-

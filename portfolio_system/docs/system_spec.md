@@ -1,8 +1,8 @@
 # Portfolio System Spec (Decision Complete)
 
 ## Public URL Strategy
-- Primary: `planorah.me/{username}` (edge route resolver)
-- Fallback: `planorah.me/p/{slug}`
+- Primary: `portfolio.planorah.me/{username}` (edge route resolver)
+- Fallback: `portfolio.planorah.me/p/{slug}`
 
 ## Visibility Rules
 - `public`: discoverable and indexable

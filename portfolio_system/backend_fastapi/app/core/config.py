@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     max_upload_bytes: int = 8 * 1024 * 1024
     public_cache_ttl_seconds: int = 300
 
-    allowed_origins: str = "https://planorah-c65p.vercel.app,https://planorah.me"
+    allowed_origins: str = "https://portfolio.planorah.me,https://planorah.me"
 
     @property
     def allowed_origins_list(self) -> list[str]:
