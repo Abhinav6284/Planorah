@@ -9,13 +9,17 @@ import PricingSection from "./landing/PricingSection";
 import CTASection from "./landing/CTASection";
 import Footer from "./landing/Footer";
 
+const SCROLL_SPRING_CONFIG = {
+  stiffness: 140,
+  damping: 30,
+  mass: 0.2,
+};
+
+const SECTION_PERSPECTIVE = "1200px";
+
 export default function LandingPage() {
   const { scrollYProgress } = useScroll();
-  const scrollProgress = useSpring(scrollYProgress, {
-    stiffness: 140,
-    damping: 30,
-    mass: 0.2,
-  });
+  const scrollProgress = useSpring(scrollYProgress, SCROLL_SPRING_CONFIG);
   const glowY = useTransform(scrollYProgress, [0, 1], [-180, 220]);
   const glowScale = useTransform(scrollYProgress, [0, 1], [0.9, 1.25]);
 
@@ -34,6 +38,20 @@ export default function LandingPage() {
     }),
   };
 
+  const AnimatedSection = ({ index, children }) => (
+    <motion.div
+      custom={index}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
+      variants={sectionVariants}
+      style={{ perspective: SECTION_PERSPECTIVE }}
+      className="relative z-10"
+    >
+      {children}
+    </motion.div>
+  );
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 font-sans selection:bg-violet-600 selection:text-white transition-colors duration-300 relative overflow-x-clip">
       <motion.div
@@ -47,61 +65,21 @@ export default function LandingPage() {
       />
       <Navbar />
       <HeroSection />
-      <motion.div
-        custom={1}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={sectionVariants}
-        style={{ transformPerspective: 1200 }}
-        className="relative z-10"
-      >
+      <AnimatedSection index={1}>
         <FeaturesSection />
-      </motion.div>
-      <motion.div
-        custom={2}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={sectionVariants}
-        style={{ transformPerspective: 1200 }}
-        className="relative z-10"
-      >
+      </AnimatedSection>
+      <AnimatedSection index={2}>
         <ProductDemo />
-      </motion.div>
-      <motion.div
-        custom={3}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={sectionVariants}
-        style={{ transformPerspective: 1200 }}
-        className="relative z-10"
-      >
+      </AnimatedSection>
+      <AnimatedSection index={3}>
         <StatsSection />
-      </motion.div>
-      <motion.div
-        custom={4}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={sectionVariants}
-        style={{ transformPerspective: 1200 }}
-        className="relative z-10"
-      >
+      </AnimatedSection>
+      <AnimatedSection index={4}>
         <PricingSection />
-      </motion.div>
-      <motion.div
-        custom={5}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={sectionVariants}
-        style={{ transformPerspective: 1200 }}
-        className="relative z-10"
-      >
+      </AnimatedSection>
+      <AnimatedSection index={5}>
         <CTASection />
-      </motion.div>
+      </AnimatedSection>
       <Footer />
     </div>
   );
