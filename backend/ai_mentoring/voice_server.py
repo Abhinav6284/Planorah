@@ -93,6 +93,12 @@ DEFAULT_VOICE = 'Aoede'  # Gemini built-in voice
 
 PROXY_HOST = os.getenv('VOICE_PROXY_HOST', 'localhost')
 PROXY_PORT = int(os.getenv('VOICE_PROXY_PORT', '8001'))
+
+# Allowed WebSocket origins (comma-separated). Leave empty to allow all (dev only).
+_ALLOWED_ORIGINS_RAW = os.getenv('VOICE_PROXY_ALLOWED_ORIGINS', '')
+ALLOWED_ORIGINS: set = {o.strip()
+                        for o in _ALLOWED_ORIGINS_RAW.split(',') if o.strip()}
+
 MAX_AUDIO_BASE64_CHARS = 24000
 MAX_SCREENSHOT_BASE64_CHARS = 2_000_000
 CLIENT_IDLE_TIMEOUT_SEC = 75
@@ -109,6 +115,15 @@ async def proxy_handler(client_ws):
     """Handle one client WebSocket connection."""
     client_addr = client_ws.remote_address
     logger.info(f"Client connected: {client_addr}")
+
+    # Origin validation — reject connections from unauthorized origins
+    if ALLOWED_ORIGINS:
+        origin = client_ws.request_headers.get('Origin', '')
+        if origin not in ALLOWED_ORIGINS:
+            logger.warning(
+                f"Rejected connection from unauthorized origin: '{origin}' ({client_addr})")
+            await client_ws.close(1008, 'Unauthorized origin')
+            return
 
     if not GEMINI_API_KEY:
         await client_ws.send(json.dumps({

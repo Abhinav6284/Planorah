@@ -30,9 +30,11 @@ DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
+    "api.planorah.me",
     "planorah.me",
     "www.planorah.me",
     "portfolio.planorah.me",
+    "voice.planorah.me",
     "142.93.214.77",
 ]
 
@@ -128,18 +130,22 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://api.planorah.me",
     "https://planorah.me",
     "https://www.planorah.me",
     "https://portfolio.planorah.me",
+    "https://voice.planorah.me",
     "http://142.93.214.77",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "https://api.planorah.me",
     "https://planorah.me",
     "https://www.planorah.me",
     "https://portfolio.planorah.me",
+    "https://voice.planorah.me",
     "http://142.93.214.77",
 ]
 
@@ -283,7 +289,7 @@ SIMPLE_JWT = {
 GOOGLE_OAUTH_CLIENT_ID = os.getenv('GOOGLE_OAUTH_CLIENT_ID', '')
 GOOGLE_OAUTH_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH_CLIENT_SECRET', '')
 GOOGLE_OAUTH_REDIRECT_URI = os.getenv(
-    'GOOGLE_OAUTH_REDIRECT_URI', 'https://planorah.me')
+    'GOOGLE_OAUTH_REDIRECT_URI', 'https://api.planorah.me/api/users/google/callback/')
 
 # GitHub OAuth Settings
 GITHUB_OAUTH_CLIENT_ID = os.getenv('GITHUB_OAUTH_CLIENT_ID', '')
