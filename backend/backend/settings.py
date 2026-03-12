@@ -106,6 +106,7 @@ REST_FRAMEWORK = {
         'login': '10/min',
         'register': '5/min',
         'otp': '10/min',
+        'otp_resend': '5/hour',
         'oauth': '10/min',
         'daily_login': '30/hour',
         'portfolio_event': '120/min',

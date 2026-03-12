@@ -19,6 +19,8 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
+        extra_fields.setdefault("is_verified", True)
+        extra_fields.setdefault("status", "active")
 
         extra_fields.setdefault("first_name", username)
 
@@ -26,6 +28,18 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+    STATUS_PENDING = 'pending'
+    STATUS_ACTIVE = 'active'
+    STATUS_SUSPENDED = 'suspended'
+    STATUS_DELETED = 'deleted'
+
+    STATUS_CHOICES = (
+        (STATUS_PENDING, 'Pending'),
+        (STATUS_ACTIVE, 'Active'),
+        (STATUS_SUSPENDED, 'Suspended'),
+        (STATUS_DELETED, 'Deleted'),
+    )
+
     # Core user info
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
@@ -39,6 +53,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # OTP and verification fields
     otp = models.CharField(max_length=6, blank=True, null=True)
     is_verified = models.BooleanField(default=False)
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDING,
+        db_index=True,
+    )
 
     # Django auth-related fields
     is_active = models.BooleanField(default=True)
