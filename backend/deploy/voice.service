@@ -26,10 +26,10 @@ ExecStart=/home/ubuntu/Planora/backend/venv/bin/python manage.py run_voice_proxy
 Restart=on-failure
 RestartSec=5s
 
-# Log to systemd journal (view with: journalctl -u planora-voice-proxy -f)
+# Log to systemd journal (view with: journalctl -u voice -f)
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=planora-voice-proxy
+SyslogIdentifier=voice
 
 # Harden the process
 NoNewPrivileges=true
