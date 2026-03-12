@@ -8,17 +8,17 @@ After=network.target
 [Service]
 Type=simple
 
-# ── Change these to match your server user / deploy path ──────────────────
-User=ubuntu
-Group=ubuntu
-WorkingDirectory=/home/ubuntu/Planora/backend
+# ── Adjust these if your deploy layout differs ───────────────────────────
+User=root
+Group=root
+WorkingDirectory=/var/www/planorah/Planorah/backend
 # ──────────────────────────────────────────────────────────────────────────
 
 # Load all env vars from the Django .env file (includes GEMINI_API_KEY etc.)
-EnvironmentFile=/home/ubuntu/Planora/backend/.env
+EnvironmentFile=/var/www/planorah/Planorah/backend/.env
 
 # Binds to 127.0.0.1 only — nginx is the public-facing TLS terminator
-ExecStart=/home/ubuntu/Planora/backend/venv/bin/python manage.py run_voice_proxy \
+ExecStart=/var/www/planorah/venv/bin/python3 manage.py run_voice_proxy \
     --host 127.0.0.1 \
     --port 8001
 
