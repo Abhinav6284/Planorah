@@ -1,9 +1,28 @@
 // src/api.js
 import axios from "axios";
+import { API_BASE_URL } from "./config/api";
+
+const isAbsoluteUrl = (url = "") => /^https?:\/\//i.test(url);
+
+const normalizeApiPathForBase = (url = "") => {
+    if (!url || isAbsoluteUrl(url)) {
+        return url;
+    }
+
+    const withLeadingSlash = url.startsWith("/") ? url : `/${url}`;
+    if (withLeadingSlash === "/api") {
+        return "";
+    }
+
+    if (withLeadingSlash.startsWith("/api/")) {
+        return withLeadingSlash.slice(5);
+    }
+    return withLeadingSlash.slice(1);
+};
 
 // ✅ Create an Axios instance
 const api = axios.create({
-    baseURL: "/api/", // Proxy handles the domain
+    baseURL: API_BASE_URL,
     headers: {
         "Content-Type": "application/json",
     },
@@ -12,6 +31,8 @@ const api = axios.create({
 // ✅ Add a request interceptor to include JWT token (if available)
 api.interceptors.request.use(
     (config) => {
+        config.url = normalizeApiPathForBase(config.url);
+
         const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
         if (process.env.REACT_APP_API_DEBUG === "true") {
             console.log("API Request:", config.url, "Token exists:", !!token);

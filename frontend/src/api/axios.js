@@ -1,9 +1,28 @@
 import axios from 'axios';
 import { isSessionExpired, clearTokens } from '../utils/auth';
+import { API_BASE_URL } from '../config/api';
 
-// Create axios instance using proxy in package.json
+const isAbsoluteUrl = (url = '') => /^https?:\/\//i.test(url);
+
+const normalizeApiPathForBase = (url = '') => {
+    if (!url || isAbsoluteUrl(url)) {
+        return url;
+    }
+
+    const withLeadingSlash = url.startsWith('/') ? url : `/${url}`;
+    if (withLeadingSlash === '/api') {
+        return '';
+    }
+
+    if (withLeadingSlash.startsWith('/api/')) {
+        return withLeadingSlash.slice(5);
+    }
+    return withLeadingSlash.slice(1);
+};
+
+// Create axios instance pointing to backend API host
 const axiosInstance = axios.create({
-    baseURL: '/api/', // Proxy to backend handles the full URL
+    baseURL: API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -12,6 +31,8 @@ const axiosInstance = axios.create({
 // Request interceptor to add token and check session expiry
 axiosInstance.interceptors.request.use(
     (config) => {
+        config.url = normalizeApiPathForBase(config.url);
+
         // Check if session has expired (15 days for Remember Me)
         if (isSessionExpired()) {
             clearTokens();
@@ -61,7 +82,7 @@ axiosInstance.interceptors.response.use(
                 }
 
                 // Try to refresh the token
-                const response = await axios.post('/api/token/refresh/', {
+                const response = await axios.post(`${API_BASE_URL}token/refresh/`, {
                     refresh: refreshToken
                 });
 

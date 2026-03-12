@@ -1,3 +1,5 @@
+import { API_ORIGIN } from './api';
+
 /**
  * Environment configuration.
  * Centralizes all environment-dependent values to avoid hardcoding secrets in components.
@@ -11,7 +13,7 @@ const env = {
   GOOGLE_CLIENT_ID: process.env.REACT_APP_GOOGLE_CLIENT_ID || '',
 
   // API
-  API_BASE_URL: process.env.REACT_APP_API_BASE_URL || '/api/',
+  API_BASE_URL: process.env.REACT_APP_API_BASE_URL || API_ORIGIN,
 
   // App
   APP_NAME: 'Planorah',
