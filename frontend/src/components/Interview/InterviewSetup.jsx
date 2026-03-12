@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import axios from "axios";
+import axios from "../../api/axios";
 
 export default function InterviewSetup() {
     const navigate = useNavigate();
@@ -85,3 +85,4 @@ export default function InterviewSetup() {
         </div>
     );
 }
+

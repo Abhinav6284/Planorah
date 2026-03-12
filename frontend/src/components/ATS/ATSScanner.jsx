@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import axios from "axios";
+import axios from "../../api/axios";
 import CircularGauge from "../common/CircularGauge";
 
 export default function ATSScanner() {
@@ -270,3 +270,4 @@ export default function ATSScanner() {
         </div>
     );
 }
+

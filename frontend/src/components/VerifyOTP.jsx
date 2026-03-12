@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import axios from "axios";
+import axios from "../api/axios";
 import { setTokens, getRememberMePreference, clearRememberMePreference } from "../utils/auth";
 
 export default function VerifyOTP() {
@@ -254,3 +254,4 @@ export default function VerifyOTP() {
     </div>
   );
 }
+

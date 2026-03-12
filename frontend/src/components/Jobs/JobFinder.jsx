@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import axios from "axios";
+import axios from "../../api/axios";
 
 export default function JobFinder() {
     const [role, setRole] = useState("");
@@ -133,3 +133,4 @@ export default function JobFinder() {
         </div>
     );
 }
+

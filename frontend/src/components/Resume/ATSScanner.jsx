@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import axios from 'axios';
+import axios from '../../api/axios';
 
 // Circular Score Component
 const CircularScore = ({ score, size = 160, strokeWidth = 12 }) => {
@@ -510,3 +510,4 @@ export default function ATSScanner() {
         </div>
     );
 }
+

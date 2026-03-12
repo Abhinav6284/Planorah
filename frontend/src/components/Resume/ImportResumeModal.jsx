@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import axios from 'axios';
+import axios from '../../api/axios';
 
 export default function ImportResumeModal({ isOpen, onClose, onSuccess }) {
     const [file, setFile] = useState(null);
@@ -345,3 +345,4 @@ export default function ImportResumeModal({ isOpen, onClose, onSuccess }) {
         </AnimatePresence>
     );
 }
+

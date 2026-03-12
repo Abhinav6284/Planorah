@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import axios from "axios";
+import axios from "../../api/axios";
 import { getTemplateById } from "./templates";
 import TemplateModal from "./TemplateModal";
 
@@ -540,3 +540,4 @@ export default function ResumeBuilder() {
         </div>
     );
 }
+

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../api/axios';
 import { setTokens, getRememberMePreference, clearRememberMePreference } from "../utils/auth";
 
 export default function GitHubCallback() {
@@ -92,3 +92,4 @@ export default function GitHubCallback() {
         </div>
     );
 }
+

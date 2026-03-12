@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import axios from 'axios';
+import axios from '../../api/axios';
 
 // Semi-circular Score Gauge Component
 const ScoreGauge = ({ score, size = 120 }) => {
@@ -625,3 +625,4 @@ export default function ResumeList() {
         </div>
     );
 }
+
