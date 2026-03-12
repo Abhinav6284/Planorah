@@ -29,9 +29,7 @@ export default function AIRoadmapGenerator() {
 
     const fetchRoadmaps = async () => {
         try {
-            // console.log('📥 Fetching roadmaps...');
             const res = await axiosInstance.get("/api/roadmap/list/");
-            // console.log('✅ Roadmaps fetched:', res.data.length);
             setRoadmaps(res.data);
         } catch (err) {
             console.error("❌ Failed to fetch roadmaps:", err);
@@ -62,12 +60,7 @@ export default function AIRoadmapGenerator() {
         setMessage("🔄 Generating your personalized roadmap...");
 
         try {
-            // console.log("📤 Sending request to generate roadmap...");
-            // console.log("📦 Request data:", formData);
-
             const res = await axiosInstance.post("/api/roadmap/generate/", formData);
-
-            // console.log("✅ Roadmap generated:", res.data);
             setMessage("✅ Roadmap generated successfully!");
             setSelectedRoadmap(res.data);
             fetchRoadmaps();
@@ -90,9 +83,7 @@ export default function AIRoadmapGenerator() {
 
     const viewRoadmapDetail = async (roadmapId) => {
         try {
-            // console.log('📥 Fetching roadmap detail:', roadmapId);
             const res = await axiosInstance.get(`/api/roadmap/${roadmapId}/`);
-            // console.log('✅ Roadmap detail fetched');
             setSelectedRoadmap(res.data);
         } catch (err) {
             console.error("❌ Failed to fetch roadmap details:", err);
@@ -104,9 +95,7 @@ export default function AIRoadmapGenerator() {
         if (!window.confirm("Delete this roadmap?")) return;
 
         try {
-            // console.log('🗑️ Deleting roadmap:', roadmapId);
             await axiosInstance.delete(`/api/roadmap/${roadmapId}/delete/`);
-            // console.log('✅ Roadmap deleted');
             fetchRoadmaps();
             if (selectedRoadmap?.id === roadmapId) setSelectedRoadmap(null);
             setMessage("✅ Roadmap deleted");
@@ -118,12 +107,10 @@ export default function AIRoadmapGenerator() {
 
     const toggleMilestoneCompletion = async (milestoneId, currentStatus) => {
         try {
-            // console.log('🔄 Toggling milestone:', milestoneId);
             await axiosInstance.patch(
                 `/api/roadmap/milestone/${milestoneId}/progress/`,
                 { completed: !currentStatus }
             );
-            // console.log('✅ Milestone updated');
             if (selectedRoadmap) {
                 viewRoadmapDetail(selectedRoadmap.id);
             }

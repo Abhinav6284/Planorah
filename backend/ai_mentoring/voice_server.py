@@ -29,7 +29,7 @@ if ENV_PATH.exists():
 try:
     import websockets
 except ImportError:
-    print("ERROR: 'websockets' package is required. Install it with: pip install websockets")
+    sys.stderr.write("ERROR: 'websockets' package is required. Install it with: pip install websockets\n")
     sys.exit(1)
 
 logger = logging.getLogger('voice_proxy')

@@ -67,7 +67,6 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
         try {
             setLoading(true);
             const data = await schedulerService.getEvents();
-            console.log('Fetched events:', data); // Debug log
             const formattedEvents = data.map(e => ({
                 ...e,
                 start: new Date(e.start_time),

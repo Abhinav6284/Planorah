@@ -90,7 +90,6 @@ const env = Object.freeze({
   API_ORIGIN: apiOrigin,
   API_BASE_URL: apiBaseUrl,
   USE_RELATIVE_API_PATH: usesRelativePath,
-  API_DEBUG: trimEnvValue(process.env.REACT_APP_API_DEBUG).toLowerCase() === 'true',
 
   APP_NAME: 'Planorah',
   APP_URL: trimEnvValue(process.env.REACT_APP_URL) || (typeof window !== 'undefined' ? window.location.origin : ''),

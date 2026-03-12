@@ -118,8 +118,8 @@ export default function StepForm() {
                     experience_level: data.experience_level || prev.experience_level,
                     career_intent: data.career_intent || prev.career_intent
                 }));
-            } catch (err) {
-                console.log("No existing profile data found/fetched");
+            } catch {
+                // Keep defaults if profile is not yet available.
             }
         };
         fetchProfile();

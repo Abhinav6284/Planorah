@@ -186,7 +186,7 @@ def verify_otp(request):
     try:
         send_welcome_email(user.email, user.username)
     except Exception as e:
-        print(f"Failed to send welcome email: {e}")
+        logger.warning("Failed to send welcome email: %s", e)
 
     # Mark used or delete record
     try:
@@ -355,7 +355,7 @@ def resend_otp(request):
         if not email_sent:
             return Response({"message": "Failed to send OTP email"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     except Exception as e:
-        print(f"Resend OTP email failed: {e}")
+        logger.warning("Resend OTP email failed: %s", e)
         return Response({"message": "Failed to send OTP email"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({"message": "New OTP sent successfully"}, status=status.HTTP_200_OK)
@@ -391,7 +391,7 @@ def request_password_reset(request):
         if not email_sent:
             return Response({"message": "Failed to send password reset email"}, status=500)
     except Exception as e:
-        print(f"Password reset email failed: {e}")
+        logger.warning("Password reset email failed: %s", e)
         return Response({"message": "Failed to send password reset email"}, status=500)
 
     return Response({"message": "Password reset OTP sent to your email."}, status=200)
@@ -469,8 +469,6 @@ def update_user_profile(request):
     """
     try:
         user = request.user
-        # print(f"DEBUG: update_user_profile called for user: {user.username}")
-        # print(f"DEBUG: request.data: {request.data}")
 
         # Get or create profile
         profile, created = UserProfile.objects.get_or_create(user=user)
@@ -617,32 +615,32 @@ def google_oauth_login(request):
     Handle Google OAuth login. Accepts a Google Access Token from the frontend,
     verifies it via Google's userinfo endpoint, and creates/logs in the user.
     """
-    print(f"\n{'='*80}")
-    print(f"[GOOGLE_OAUTH] Step 1: Function called")
-    print(f"[GOOGLE_OAUTH] Request method: {request.method}")
-    print(f"[GOOGLE_OAUTH] Request data keys: {list(request.data.keys())}")
-    print(f"[GOOGLE_OAUTH] Request content type: {request.content_type}")
+    logger.debug(f"\n{'='*80}")
+    logger.debug(f"[GOOGLE_OAUTH] Step 1: Function called")
+    logger.debug(f"[GOOGLE_OAUTH] Request method: {request.method}")
+    logger.debug(f"[GOOGLE_OAUTH] Request data keys: {list(request.data.keys())}")
+    logger.debug(f"[GOOGLE_OAUTH] Request content type: {request.content_type}")
 
     try:
         import requests as http_requests
-        print(f"[GOOGLE_OAUTH] Step 2: requests library imported successfully")
+        logger.debug(f"[GOOGLE_OAUTH] Step 2: requests library imported successfully")
     except ImportError as e:
-        print(f"[GOOGLE_OAUTH] FATAL: Failed to import requests: {e}")
+        logger.debug(f"[GOOGLE_OAUTH] FATAL: Failed to import requests: {e}")
         return Response({"error": "Server configuration error", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     token = request.data.get('token')
-    print(f"[GOOGLE_OAUTH] Step 3: Token extraction")
-    print(f"[GOOGLE_OAUTH] Token present: {bool(token)}")
-    print(f"[GOOGLE_OAUTH] Token length: {len(token) if token else 0}")
-    print(
+    logger.debug(f"[GOOGLE_OAUTH] Step 3: Token extraction")
+    logger.debug(f"[GOOGLE_OAUTH] Token present: {bool(token)}")
+    logger.debug(f"[GOOGLE_OAUTH] Token length: {len(token) if token else 0}")
+    logger.debug(
         f"[GOOGLE_OAUTH] Token preview: {str(token)[:30] if token else 'None'}...")
 
     if not token:
-        print(f"[GOOGLE_OAUTH] ERROR: No token provided in request")
+        logger.debug(f"[GOOGLE_OAUTH] ERROR: No token provided in request")
         return Response({"error": "Google token is required"}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        print(f"[GOOGLE_OAUTH] Step 4: Calling Google UserInfo API")
+        logger.debug(f"[GOOGLE_OAUTH] Step 4: Calling Google UserInfo API")
         # Verify the Google Access Token via UserInfo Endpoint
         userinfo_response = http_requests.get(
             f'https://www.googleapis.com/oauth2/v3/userinfo',
@@ -650,24 +648,24 @@ def google_oauth_login(request):
             timeout=10
         )
 
-        print(f"[GOOGLE_OAUTH] Step 5: Google API response received")
-        print(
+        logger.debug(f"[GOOGLE_OAUTH] Step 5: Google API response received")
+        logger.debug(
             f"[GOOGLE_OAUTH] Response status: {userinfo_response.status_code}")
-        print(
+        logger.debug(
             f"[GOOGLE_OAUTH] Response headers: {dict(userinfo_response.headers)}")
-        print(
+        logger.debug(
             f"[GOOGLE_OAUTH] Response body preview: {userinfo_response.text[:500]}")
 
         if userinfo_response.status_code != 200:
-            print(f"[GOOGLE_OAUTH] ERROR: Google API returned non-200 status")
+            logger.debug(f"[GOOGLE_OAUTH] ERROR: Google API returned non-200 status")
             return Response({
                 "error": "Invalid Google token",
                 "details": f"Google API returned status {userinfo_response.status_code}: {userinfo_response.text}"
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        print(f"[GOOGLE_OAUTH] Step 6: Parsing JSON response")
+        logger.debug(f"[GOOGLE_OAUTH] Step 6: Parsing JSON response")
         idinfo = userinfo_response.json()
-        print(f"[GOOGLE_OAUTH] UserInfo keys: {list(idinfo.keys())}")
+        logger.debug(f"[GOOGLE_OAUTH] UserInfo keys: {list(idinfo.keys())}")
 
         # Extract user info
         email = idinfo.get('email')
@@ -677,14 +675,14 @@ def google_oauth_login(request):
         name = idinfo.get('name', '')
         picture = idinfo.get('picture', '')
 
-        print(f"[GOOGLE_OAUTH] Step 7: Extracted user info")
-        print(f"[GOOGLE_OAUTH] Email: {email}")
-        print(f"[GOOGLE_OAUTH] Email verified: {email_verified}")
-        print(f"[GOOGLE_OAUTH] Name: {name}")
-        print(f"[GOOGLE_OAUTH] Picture: {bool(picture)}")
+        logger.debug(f"[GOOGLE_OAUTH] Step 7: Extracted user info")
+        logger.debug(f"[GOOGLE_OAUTH] Email: {email}")
+        logger.debug(f"[GOOGLE_OAUTH] Email verified: {email_verified}")
+        logger.debug(f"[GOOGLE_OAUTH] Name: {name}")
+        logger.debug(f"[GOOGLE_OAUTH] Picture: {bool(picture)}")
 
         if not email:
-            print(f"[GOOGLE_OAUTH] ERROR: No email in Google response")
+            logger.debug(f"[GOOGLE_OAUTH] ERROR: No email in Google response")
             return Response({"error": "No email received from Google", "details": f"Response: {idinfo}"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Normalize email
@@ -698,7 +696,7 @@ def google_oauth_login(request):
         try:
             user = CustomUser.objects.get(email=email)
             created = False
-            print(
+            logger.debug(
                 # type: ignore[attr-defined]
                 f"[GOOGLE_OAUTH] User found: {user.username} (ID: {user.id})")
 
@@ -706,7 +704,7 @@ def google_oauth_login(request):
             # because Google has verified this email.
             # because Google has verified this email.
             if not user.is_active or not user.is_verified:
-                print(
+                logger.debug(
                     f"[GOOGLE_OAUTH] Activating existing inactive user and clearing legacy password")
                 user.is_active = True
                 user.is_verified = True
@@ -719,7 +717,7 @@ def google_oauth_login(request):
             mode = request.data.get('mode', 'login')
 
             if mode == 'signup':
-                print(
+                logger.debug(
                     f"[GOOGLE_OAUTH] User not found, creating new user (signup mode)")
                 # Generate a unique username from email
                 base_username = email.split('@')[0].lower()
@@ -742,11 +740,11 @@ def google_oauth_login(request):
                     # Don't set name from Google - let user fill it during onboarding
                     user.save()
 
-                    print(
+                    logger.debug(
                         # type: ignore[attr-defined]
                         f"[GOOGLE_OAUTH] User created successfully (ID: {user.id})")
                 except Exception as create_err:
-                    print(
+                    logger.debug(
                         f"[GOOGLE_OAUTH] ERROR creating user: {type(create_err).__name__}: {create_err}")
                     return Response({
                         "error": "Failed to create account",
@@ -754,7 +752,7 @@ def google_oauth_login(request):
                     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
                 # Login mode - user must already exist
-                print(
+                logger.debug(
                     f"[GOOGLE_OAUTH] User not found - signup required (login mode)")
                 return Response({
                     "error": "Account not found",
@@ -764,7 +762,7 @@ def google_oauth_login(request):
                 }, status=status.HTTP_404_NOT_FOUND)
 
         # --- 2FA ENFORCEMENT START ---
-        print(f"[GOOGLE_OAUTH] Step 11: 2FA Enforcement - Generating OTP")
+        logger.debug(f"[GOOGLE_OAUTH] Step 11: 2FA Enforcement - Generating OTP")
         try:
             # Generate OTP
             otp = str(random.randint(100000, 999999))
@@ -776,7 +774,7 @@ def google_oauth_login(request):
             OTPVerification.objects.create(email=email, otp=otp)
 
             # Send Email
-            print(f"[GOOGLE_OAUTH] Sending OTP email to {email}")
+            logger.debug(f"[GOOGLE_OAUTH] Sending OTP email to {email}")
             send_otp_email(email, otp, user.username)
 
             response_data = {
@@ -784,31 +782,28 @@ def google_oauth_login(request):
                 "two_factor_required": True,
                 "email": email
             }
-            print(f"[GOOGLE_OAUTH] 2FA required. Returning 200 OK")
-            print(f"{'='*80}\n")
+            logger.debug(f"[GOOGLE_OAUTH] 2FA required. Returning 200 OK")
+            logger.debug(f"{'='*80}\n")
             return Response(response_data, status=status.HTTP_200_OK)
 
         except Exception as otp_err:
-            print(f"[GOOGLE_OAUTH] ERROR in 2FA step: {otp_err}")
+            logger.debug(f"[GOOGLE_OAUTH] ERROR in 2FA step: {otp_err}")
             return Response({"error": "Failed to send 2FA OTP"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         # --- 2FA ENFORCEMENT END ---
 
         # (Original Token Generation Code is effectively replaced/bypassed)
         # To keep code clean, I am removing the old token generation block below.
-        print(f"[GOOGLE_OAUTH] SUCCESS: Returning 200 OK")
-        print(f"{'='*80}\n")
+        logger.debug(f"[GOOGLE_OAUTH] SUCCESS: Returning 200 OK")
+        logger.debug(f"{'='*80}\n")
         return Response(response_data, status=status.HTTP_200_OK)
 
     except ValueError as e:
-        print(f"[GOOGLE_OAUTH] ValueError: {e}")
-        print(f"{'='*80}\n")
+        logger.debug(f"[GOOGLE_OAUTH] ValueError: {e}")
+        logger.debug(f"{'='*80}\n")
         return Response({"error": "Invalid Google token", "details": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        print(f"[GOOGLE_OAUTH] EXCEPTION: {type(e).__name__}: {e}")
-        import traceback
-        print(f"[GOOGLE_OAUTH] Traceback:")
-        traceback.print_exc()
-        print(f"{'='*80}\n")
+        logger.exception("[GOOGLE_OAUTH] EXCEPTION: %s: %s", type(e).__name__, e)
+        logger.debug(f"{'='*80}\n")
         return Response({"error": "Google authentication failed", "details": f"{type(e).__name__}: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -848,12 +843,12 @@ def github_oauth_login(request):
         token_data = token_response.json()
 
         # Debug logging
-        print(
+        logger.debug(
             f"[GITHUB_OAUTH_DEBUG] Client ID: {settings.GITHUB_OAUTH_CLIENT_ID}")
-        print(f"[GITHUB_OAUTH_DEBUG] Redirect URI used: {redirect_uri}")
-        print(
+        logger.debug(f"[GITHUB_OAUTH_DEBUG] Redirect URI used: {redirect_uri}")
+        logger.debug(
             f"[GITHUB_OAUTH_DEBUG] Token response status: {token_response.status_code}")
-        print(f"[GITHUB_OAUTH_DEBUG] Token data: {token_data}")
+        logger.debug(f"[GITHUB_OAUTH_DEBUG] Token data: {token_data}")
 
         if 'error' in token_data:
             return Response({
@@ -932,7 +927,7 @@ def github_oauth_login(request):
             mode = request.data.get('mode', 'login')
 
             if mode == 'signup':
-                print(
+                logger.debug(
                     f"[GITHUB_OAUTH] User not found, creating new user (signup mode)")
                 # Generate a unique username
                 base_username = github_username.lower(
@@ -956,11 +951,11 @@ def github_oauth_login(request):
                     # Don't set name from GitHub - let user fill it during onboarding
                     user.save()
 
-                    print(
+                    logger.debug(
                         # type: ignore[attr-defined]
                         f"[GITHUB_OAUTH] User created successfully (ID: {user.id})")
                 except Exception as create_err:
-                    print(
+                    logger.debug(
                         f"[GITHUB_OAUTH] ERROR creating user: {type(create_err).__name__}: {create_err}")
                     return Response({
                         "error": "Failed to create account",
@@ -968,7 +963,7 @@ def github_oauth_login(request):
                     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
                 # Login mode - user must already exist
-                print(
+                logger.debug(
                     f"[GITHUB_OAUTH] User not found - signup required (login mode)")
                 return Response({
                     "error": "Account not found",
@@ -978,7 +973,7 @@ def github_oauth_login(request):
                 }, status=status.HTTP_404_NOT_FOUND)
 
         # --- 2FA ENFORCEMENT START ---
-        print(f"[GITHUB_OAUTH] 2FA Enforcement - Generating OTP")
+        logger.debug(f"[GITHUB_OAUTH] 2FA Enforcement - Generating OTP")
         try:
             # Generate OTP
             otp = str(random.randint(100000, 999999))
@@ -990,7 +985,7 @@ def github_oauth_login(request):
             OTPVerification.objects.create(email=email, otp=otp)
 
             # Send Email
-            print(f"[GITHUB_OAUTH] Sending OTP email to {email}")
+            logger.debug(f"[GITHUB_OAUTH] Sending OTP email to {email}")
             send_otp_email(email, otp, user.username)
 
             response_data = {
@@ -1001,7 +996,7 @@ def github_oauth_login(request):
             return Response(response_data, status=status.HTTP_200_OK)
 
         except Exception as otp_err:
-            print(f"[GITHUB_OAUTH] ERROR in 2FA step: {otp_err}")
+            logger.debug(f"[GITHUB_OAUTH] ERROR in 2FA step: {otp_err}")
             return Response({"error": "Failed to send 2FA OTP"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         # --- 2FA ENFORCEMENT END ---
 
@@ -1091,13 +1086,13 @@ def verify_social_otp(request):
     email = request.data.get("email")
     otp_in = request.data.get("otp")
 
-    print(f"\n{'='*80}")
-    print(f"[SOCIAL_OTP] Step 1: Verification request")
-    print(f"[SOCIAL_OTP] Email: {email}")
-    print(f"[SOCIAL_OTP] OTP input: {otp_in}")
+    logger.debug(f"\n{'='*80}")
+    logger.debug(f"[SOCIAL_OTP] Step 1: Verification request")
+    logger.debug(f"[SOCIAL_OTP] Email: {email}")
+    logger.debug(f"[SOCIAL_OTP] OTP input: {otp_in}")
 
     if not email or not otp_in:
-        print(f"[SOCIAL_OTP] ERROR: Missing email or OTP")
+        logger.debug(f"[SOCIAL_OTP] ERROR: Missing email or OTP")
         return Response({"message": "Email and OTP are required"}, status=status.HTTP_400_BAD_REQUEST)
 
     email = email.lower().strip()
@@ -1105,29 +1100,29 @@ def verify_social_otp(request):
 
     # Find unused OTPs for this email (case-insensitive)
     otp_qs = OTPVerification.objects.filter(email__iexact=email)
-    print(f"[SOCIAL_OTP] OTPs found: {otp_qs.count()}")
+    logger.debug(f"[SOCIAL_OTP] OTPs found: {otp_qs.count()}")
 
     if not otp_qs.exists():
-        print(f"[SOCIAL_OTP] ERROR: No OTP record found for {email}")
+        logger.debug(f"[SOCIAL_OTP] ERROR: No OTP record found for {email}")
         return Response({"message": "Invalid OTP or email"}, status=status.HTTP_400_BAD_REQUEST)
 
     # Prefer the latest unused OTP record
     otp_record = otp_qs.filter(is_used=False).order_by('-created_at').first()
 
     if not otp_record:
-        print(f"[SOCIAL_OTP] ERROR: All OTPs used or none available")
+        logger.debug(f"[SOCIAL_OTP] ERROR: All OTPs used or none available")
         return Response({"message": "Invalid OTP or it has been used"}, status=status.HTTP_400_BAD_REQUEST)
 
     # Compare values
-    print(
+    logger.debug(
         f"[SOCIAL_OTP] Comparing DB '{str(otp_record.otp).strip()}' vs Input '{otp}'")
     if str(otp_record.otp).strip() != otp:
-        print(f"[SOCIAL_OTP] ERROR: Mismatch")
+        logger.debug(f"[SOCIAL_OTP] ERROR: Mismatch")
         return Response({"message": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
 
     # Check expiry
     if hasattr(otp_record, "is_expired") and otp_record.is_expired():
-        print(f"[SOCIAL_OTP] ERROR: OTP Expired")
+        logger.debug(f"[SOCIAL_OTP] ERROR: OTP Expired")
         otp_record.delete()
         return Response({"message": "OTP expired, please request a new one"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1141,9 +1136,9 @@ def verify_social_otp(request):
     # Retrieve User
     try:
         user = CustomUser.objects.get(email=email)
-        print(f"[SOCIAL_OTP] User found: {user.username}")
+        logger.debug(f"[SOCIAL_OTP] User found: {user.username}")
     except CustomUser.DoesNotExist:
-        print(f"[SOCIAL_OTP] ERROR: User not found in DB")
+        logger.debug(f"[SOCIAL_OTP] ERROR: User not found in DB")
         return Response({"message": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
     # Generate tokens
@@ -1152,7 +1147,7 @@ def verify_social_otp(request):
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
     except Exception as e:
-        print(f"[SOCIAL_OTP] ERROR generating tokens: {e}")
+        logger.debug(f"[SOCIAL_OTP] ERROR generating tokens: {e}")
         return Response({"message": "Failed to generate tokens"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     # Check onboarding status
@@ -1191,3 +1186,4 @@ def check_auth_type(request):
         "has_password": has_password,
         "is_oauth": not has_password
     }, status=status.HTTP_200_OK)
+

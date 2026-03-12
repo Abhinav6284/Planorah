@@ -111,9 +111,8 @@ def get_user_statistics(request):
             count=Count('id')
         )
         activity_heatmap = {item['date'].isoformat(): item['count'] for item in daily_activity if item['date']}
-    except Exception as e:
+    except Exception:
         pass # Error logging removed
-        # print(f"Error generating activity heatmap: {e}")
         activity_heatmap = {}
     
     # Weekly Stats (last 7 days)

@@ -5,6 +5,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 import requests
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(['POST'])
@@ -42,7 +45,7 @@ def search_jobs(request):
                     'posted': job.get('publication_date', '')[:10] if job.get('publication_date') else ''
                 })
     except Exception as e:
-        print(f"Remotive API error: {e}")
+        logger.warning("Remotive API error: %s", e)
     
     # 2. Arbeitnow API (Free job listings)
     try:
@@ -63,7 +66,7 @@ def search_jobs(request):
                     'posted': job.get('created_at', '')[:10] if job.get('created_at') else ''
                 })
     except Exception as e:
-        print(f"Arbeitnow API error: {e}")
+        logger.warning("Arbeitnow API error: %s", e)
     
     # 3. GitHub Jobs alternative - Himalayas.app (Free)
     try:
@@ -84,7 +87,7 @@ def search_jobs(request):
                     'posted': ''
                 })
     except Exception as e:
-        print(f"Himalayas API error: {e}")
+        logger.warning("Himalayas API error: %s", e)
     
     # 4. Add fallback links to major job boards
     if len(jobs) < 5:

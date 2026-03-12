@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 import requests # Added requests import
+import logging
 from .models import Event
 from .google_calendar import GoogleCalendarService
 from .serializers import EventSerializer # Assuming you have one, or we'll make a simple one inline if needed
@@ -103,6 +104,8 @@ from django.core import signing
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import get_user_model
 
+logger = logging.getLogger(__name__)
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def spotify_auth_url(request):
@@ -140,12 +143,10 @@ def spotify_callback(request):
         )
         return redirect("http://localhost:3000/dashboard")
     except signing.BadSignature:
-        print("Spotify Callback Error: Invalid state signature")
+        logger.warning("Spotify Callback Error: Invalid state signature")
         return Response({"error": "Invalid or expired state"}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        # print(f"Spotify Callback Error: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        logger.exception("Spotify Callback Error: %s", e)
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
@@ -170,10 +171,10 @@ def get_current_song(request):
             # Suppress 403 Forbidden errors (common for non-premium users)
             pass
         else:
-            print(f"Spotify API Error (Current Song): {e}")
+            logger.error("Spotify API Error (Current Song): %s", e)
         return Response({"error": str(e)}, status=e.response.status_code)
     except Exception as e:
-        # print(f"Spotify Internal Error (Current Song): {e}")
+        logger.exception("Spotify Internal Error (Current Song): %s", e)
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
@@ -197,12 +198,10 @@ def get_queue(request):
             # Suppress 403 Forbidden errors (common for non-premium users)
             pass
         else:
-            print(f"Spotify API Error (Queue): {e}")
+            logger.error("Spotify API Error (Queue): %s", e)
         return Response({"error": str(e)}, status=e.response.status_code)
     except Exception as e:
-        # print(f"Spotify Internal Error (Queue): {e}")
-        import traceback
-        traceback.print_exc()
+        logger.exception("Spotify Internal Error (Queue): %s", e)
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])

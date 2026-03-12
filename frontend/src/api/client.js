@@ -121,11 +121,6 @@ client.interceptors.request.use(
       requestConfig.headers.Authorization = `Bearer ${token}`;
     }
 
-    if (env.API_DEBUG) {
-      // eslint-disable-next-line no-console
-      console.log('API Request:', requestConfig.method?.toUpperCase(), requestConfig.url);
-    }
-
     return requestConfig;
   },
   (error) => Promise.reject(error)

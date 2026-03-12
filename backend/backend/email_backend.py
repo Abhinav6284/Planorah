@@ -2,6 +2,7 @@
 Custom email backend using Resend API (HTTP-based, bypasses SMTP blocks)
 """
 import os
+import logging
 from django.core.mail.backends.base import BaseEmailBackend
 
 try:
@@ -9,6 +10,8 @@ try:
     RESEND_AVAILABLE = True
 except ImportError:
     RESEND_AVAILABLE = False
+
+logger = logging.getLogger(__name__)
 
 
 class ResendEmailBackend(BaseEmailBackend):
@@ -59,6 +62,6 @@ class ResendEmailBackend(BaseEmailBackend):
             except Exception as e:
                 if not self.fail_silently:
                     raise
-                print(f"Resend email error: {e}")
+                logger.warning("Resend email error: %s", e)
         
         return num_sent

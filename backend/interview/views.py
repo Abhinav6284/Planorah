@@ -1,10 +1,13 @@
 import os
+import logging
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .models import InterviewSession, InterviewMessage
 from .serializers import InterviewSessionSerializer, InterviewMessageSerializer
+
+logger = logging.getLogger(__name__)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -100,7 +103,7 @@ def send_message(request, session_id):
                 ai_response_text = raw_text
                 
     except Exception as e:
-        print(f"AI Error: {e}")
+        logger.warning("Interview AI fallback due to error: %s", e)
             
     # Save AI response (as feedback to user, or next question? Model supports feedback field on user msg? 
     # Actually my model has feedback on specific message. 
