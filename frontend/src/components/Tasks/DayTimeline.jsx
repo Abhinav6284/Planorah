@@ -13,6 +13,8 @@ export default function DayTimeline() {
             setTasks(response.data);
         } catch (error) {
             console.error('Failed to fetch day tasks:', error);
+        } finally {
+            setLoading(false);
         }
     }, [selectedDay]);
 
