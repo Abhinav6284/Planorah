@@ -35,6 +35,7 @@ ALLOWED_HOSTS = [
     "portfolio.planorah.me",
     "api.planorah.me",
     "142.93.214.77",
+    "146.190.11.120",
 ]
 
 # Application definition
