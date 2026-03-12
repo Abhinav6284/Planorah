@@ -33,6 +33,7 @@ ALLOWED_HOSTS = [
     "planorah.me",
     "www.planorah.me",
     "portfolio.planorah.me",
+    "api.planorah.me",
     "142.93.214.77",
 ]
 
@@ -131,6 +132,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://planorah.me",
     "https://www.planorah.me",
     "https://portfolio.planorah.me",
+    "https://api.planorah.me",
     "http://142.93.214.77",
 ]
 
@@ -140,6 +142,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://planorah.me",
     "https://www.planorah.me",
     "https://portfolio.planorah.me",
+    "https://api.planorah.me",
     "http://142.93.214.77",
 ]
 
