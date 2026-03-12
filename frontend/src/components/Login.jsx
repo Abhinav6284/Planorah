@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axios from "../api/axios";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useGoogleLogin } from '@react-oauth/google';
@@ -36,6 +36,14 @@ export default function Login() {
         setTimeout(() => navigate("/onboarding"), 1500);
       }
     } catch (err) {
+      const verifyRequired = err.response?.data?.verify_required;
+      const verifyEmail = err.response?.data?.email;
+      if (verifyRequired && verifyEmail) {
+        setMessage("success:Please verify your email. Redirecting to OTP...");
+        setTimeout(() => navigate("/verify-otp", { state: { email: verifyEmail } }), 1200);
+        return;
+      }
+
       const serverMsg = err.response?.data?.error || err.response?.data?.message;
       setMessage(serverMsg || "Invalid credentials.");
     } finally {
@@ -322,3 +330,4 @@ export default function Login() {
     </div>
   );
 }
+

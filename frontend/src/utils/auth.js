@@ -1,7 +1,4 @@
 // simple auth helper: get token, clear tokens, and logout (call backend to blacklist refresh)
-import axios from "axios";
-
-const API_BASE = '/api/'; // Using proxy in package.json
 
 // Maximum session duration for "Remember Me" - 15 days in milliseconds
 export const MAX_SESSION_DAYS = 15;
@@ -99,7 +96,9 @@ export async function logoutBackend() {
     if (!refresh) return null;
 
     try {
-        const res = await axios.post(`${API_BASE}/api/users/logout/`, { refresh }, {
+        const { default: apiClient } = await import("../api/client");
+        const res = await apiClient.post("users/logout/", { refresh }, {
+            skipAuthRefresh: true,
             headers: {
                 "Content-Type": "application/json",
                 // no Authorization required for logout blacklisting, token is in body

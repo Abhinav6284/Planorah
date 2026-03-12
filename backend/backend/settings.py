@@ -36,6 +36,7 @@ ALLOWED_HOSTS = [
     "portfolio.planorah.me",
     "voice.planorah.me",
     "142.93.214.77",
+    "146.190.11.120",
 ]
 
 # Application definition
@@ -106,6 +107,7 @@ REST_FRAMEWORK = {
         'login': '10/min',
         'register': '5/min',
         'otp': '10/min',
+        'otp_resend': '5/hour',
         'oauth': '10/min',
         'daily_login': '30/hour',
         'portfolio_event': '120/min',
@@ -319,26 +321,20 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'django_debug.log',
             'formatter': 'verbose',
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': 'INFO',
             'propagate': True,
         },
         'users': {  # Your app name
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG',
+            'handlers': ['console'],
+            'level': 'INFO',
             'propagate': True,
         },
     },

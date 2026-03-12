@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../../api/axios";
 import { motion, AnimatePresence } from "framer-motion";
 import OnboardingLayout from "./OnboardingLayout";
 
@@ -118,8 +118,8 @@ export default function StepForm() {
                     experience_level: data.experience_level || prev.experience_level,
                     career_intent: data.career_intent || prev.career_intent
                 }));
-            } catch (err) {
-                console.log("No existing profile data found/fetched");
+            } catch {
+                // Keep defaults if profile is not yet available.
             }
         };
         fetchProfile();
@@ -264,3 +264,4 @@ export default function StepForm() {
         </OnboardingLayout>
     );
 }
+

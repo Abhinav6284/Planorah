@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 import requests
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -16,6 +17,7 @@ load_dotenv()
 
 # Get API key
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") or getattr(settings, 'GEMINI_API_KEY', None)
+logger = logging.getLogger(__name__)
 
 
 def build_user_context(user):
@@ -178,13 +180,13 @@ def call_gemini_api(prompt, max_retries=3):
             
         except requests.exceptions.SSLError as e:
             last_error = e
-            print(f"⚠️ SSL error on attempt {attempt + 1}/{max_retries}: {str(e)}")
+            logger.warning("SSL error on attempt %s/%s: %s", attempt + 1, max_retries, e)
             import time
             time.sleep(1)  # Wait before retry
             continue
         except requests.exceptions.ConnectionError as e:
             last_error = e
-            print(f"⚠️ Connection error on attempt {attempt + 1}/{max_retries}: {str(e)}")
+            logger.warning("Connection error on attempt %s/%s: %s", attempt + 1, max_retries, e)
             import time
             time.sleep(1)
             continue
@@ -237,7 +239,7 @@ Assistant Response:"""
         })
         
     except GeminiAPIError as e:
-        print(f"⚠️ Gemini API error: {str(e)}")
+        logger.warning("Gemini API warning: %s", e)
         return Response({
             "message": "I'm getting too many requests right now. Please wait a minute and try again. In the meantime, focus on your top pending task and complete one small milestone.",
             "error": str(e),
@@ -245,15 +247,13 @@ Assistant Response:"""
             "rate_limited": True
         }, status=status.HTTP_200_OK)
     except requests.exceptions.RequestException as e:
-        print(f"❌ Gemini API error: {str(e)}")
+        logger.error("Gemini API request error: %s", e)
         return Response({
             "error": "Sorry, I couldn't connect to the AI service. Please try again.",
             "details": str(e)
         }, status=status.HTTP_502_BAD_GATEWAY)
     except Exception as e:
-        print(f"❌ Assistant error: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        logger.exception("Assistant error: %s", e)
         return Response({
             "error": "Sorry, I encountered an error. Please try again.",
             "details": str(e)

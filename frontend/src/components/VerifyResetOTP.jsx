@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import axios from "../api/axios";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -12,6 +12,7 @@ export default function VerifyResetOTP() {
     const inputRefs = useRef([]);
     const [message, setMessage] = useState({ text: "", type: "" });
     const [loading, setLoading] = useState(false);
+    const [resending, setResending] = useState(false);
 
     useEffect(() => {
         // Parse Query Params (Magic Link Support)
@@ -42,6 +43,14 @@ export default function VerifyResetOTP() {
         }
 
     }, [effectiveEmail, navigate, urlOtp, otp]);
+
+    const extractErrorMessage = (err, fallback) => {
+        const responseData = err?.response?.data;
+        if (typeof responseData === "string" && responseData.trim()) {
+            return responseData;
+        }
+        return responseData?.message || responseData?.error || responseData?.detail || fallback;
+    };
 
     const handleOtpChange = (index, value) => {
         if (value.length > 1) return;
@@ -82,7 +91,7 @@ export default function VerifyResetOTP() {
             setTimeout(() => navigate("/reset-password", { state: { email: effectiveEmail } }), 1500);
         } catch (err) {
             setMessage({
-                text: err.response?.data?.message || "Invalid OTP. Try again.",
+                text: extractErrorMessage(err, "Invalid OTP. Try again."),
                 type: "error",
             });
             setOtp(["", "", "", "", "", ""]);
@@ -93,13 +102,26 @@ export default function VerifyResetOTP() {
     };
 
     const handleResend = async () => {
+        setResending(true);
+        setMessage({ text: "", type: "" });
+
         try {
             await axios.post(`/api/users/request-password-reset/`, { email: effectiveEmail });
             setMessage({ text: "A new OTP has been sent to your email.", type: "success" });
             setOtp(["", "", "", "", "", ""]);
             inputRefs.current[0]?.focus();
         } catch (err) {
-            setMessage({ text: "Error resending OTP.", type: "error" });
+            const retryAfterSeconds = Number(err?.response?.headers?.["retry-after"]);
+            const throttledMessage = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
+                ? `Too many requests. Try again in ${Math.ceil(retryAfterSeconds)} seconds.`
+                : "Error resending OTP.";
+
+            setMessage({
+                text: extractErrorMessage(err, throttledMessage),
+                type: "error"
+            });
+        } finally {
+            setResending(false);
         }
     };
 
@@ -169,10 +191,10 @@ export default function VerifyResetOTP() {
                         <button
                             type="button"
                             onClick={handleResend}
-                            disabled={loading}
+                            disabled={loading || resending}
                             className="text-sm font-medium transition-colors text-black hover:text-gray-600"
                         >
-                            Resend OTP
+                            {resending ? "Sending..." : "Resend OTP"}
                         </button>
                     </div>
                 </form>
@@ -189,3 +211,4 @@ export default function VerifyResetOTP() {
         </div>
     );
 }
+

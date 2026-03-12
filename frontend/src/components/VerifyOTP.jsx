@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import axios from "axios";
+import axios from "../api/axios";
 import { setTokens, getRememberMePreference, clearRememberMePreference } from "../utils/auth";
 
 export default function VerifyOTP() {
@@ -31,6 +31,16 @@ export default function VerifyOTP() {
       return () => clearTimeout(timer);
     }
   }, [countdown]);
+
+  const extractErrorMessage = (err, fallback) => {
+    const responseData = err?.response?.data;
+
+    if (typeof responseData === "string" && responseData.trim()) {
+      return responseData;
+    }
+
+    return responseData?.message || responseData?.error || responseData?.detail || fallback;
+  };
 
   const handleOtpChange = (index, value) => {
     // Only allow digits
@@ -109,7 +119,7 @@ export default function VerifyOTP() {
         }
       }
     } catch (error) {
-      const errorMsg = error.response?.data?.message || error.response?.data?.error || "Invalid OTP. Please try again.";
+      const errorMsg = extractErrorMessage(error, "Invalid OTP. Please try again.");
       setMessage({ text: errorMsg, type: "error" });
       // Clear OTP on error
       setOtp(["", "", "", "", "", ""]);
@@ -132,7 +142,15 @@ export default function VerifyOTP() {
       setOtp(["", "", "", "", "", ""]);
       inputRefs.current[0]?.focus();
     } catch (err) {
-      setMessage({ text: "Failed to resend OTP. Please try again.", type: "error" });
+      const retryAfterSeconds = Number(err?.response?.headers?.["retry-after"]);
+      if (err?.response?.status === 429 && Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0) {
+        setCountdown(Math.min(retryAfterSeconds, 120));
+      }
+
+      setMessage({
+        text: extractErrorMessage(err, "Failed to resend OTP. Please try again."),
+        type: "error"
+      });
     } finally {
       setResending(false);
     }
@@ -254,3 +272,4 @@ export default function VerifyOTP() {
     </div>
   );
 }
+

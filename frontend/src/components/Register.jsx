@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axios from "../api/axios";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useGoogleLogin } from '@react-oauth/google';
@@ -28,9 +28,13 @@ export default function Register() {
     setLoading(true);
     try {
       const res = await axios.post(`/api/users/register/`, formData);
-      setMessage("success:" + (res.data.message || "OTP sent successfully!"));
-      if (res.data.message.includes("OTP")) {
-        setTimeout(() => navigate("/verify-otp", { state: { ...formData } }), 1500);
+      const responseMessage = res.data.message || "OTP sent successfully!";
+      setMessage(`success:${responseMessage}`);
+      if (res.data.verify_required || /otp/i.test(responseMessage)) {
+        setTimeout(
+          () => navigate("/verify-otp", { state: { email: res.data.email || formData.email } }),
+          1200
+        );
       }
     } catch (err) {
       const serverMsg = err.response?.data?.error || err.response?.data?.message;
@@ -297,3 +301,4 @@ export default function Register() {
     </div>
   );
 }
+

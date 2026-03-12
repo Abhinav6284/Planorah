@@ -1,268 +1,86 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import React from "react";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import Navbar from "./landing/Navbar";
+import HeroSection from "./landing/HeroSection";
+import FeaturesSection from "./landing/FeaturesSection";
+import ProductDemo from "./landing/ProductDemo";
+import StatsSection from "./landing/StatsSection";
+import PricingSection from "./landing/PricingSection";
+import CTASection from "./landing/CTASection";
+import Footer from "./landing/Footer";
+
+const SCROLL_SPRING_CONFIG = {
+  stiffness: 140,
+  damping: 30,
+  mass: 0.2,
+};
+
+const SECTION_PERSPECTIVE = "1200px";
 
 export default function LandingPage() {
-  const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 500], [0, 200]);
-  const y2 = useTransform(scrollY, [0, 500], [0, -150]);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { scrollYProgress } = useScroll();
+  const scrollProgress = useSpring(scrollYProgress, SCROLL_SPRING_CONFIG);
+  const glowY = useTransform(scrollYProgress, [0, 1], [-180, 220]);
+  const glowScale = useTransform(scrollYProgress, [0, 1], [0.9, 1.25]);
 
-  const features = [
-    {
-      title: "Universal Validation",
-      description: "For students, researchers, designers, professors — anyone building verified work.",
-      icon: "🎓",
-    },
-    {
-      title: "Proof-Based System",
-      description: "Every task requires evidence. No claims without verification.",
-      icon: "🔒",
-    },
-    {
-      title: "Compiled Outputs",
-      description: "Auto-generate portfolios, resumes, research logs from your validated work.",
-      icon: "📊",
-    },
-    {
-      title: "Goal Enforcement",
-      description: "Lock your goal, track progress, no fantasy — just execution.",
-      icon: "🎯",
-    },
-  ];
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 70, scale: 0.97, rotateX: 5 },
+    visible: (index) => ({
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      rotateX: 0,
+      transition: {
+        delay: 0.05 * index,
+        duration: 0.9,
+        ease: [0.22, 1, 0.36, 1],
+      },
+    }),
+  };
+
+  const AnimatedSection = ({ index, children }) => (
+    <motion.div
+      custom={index}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
+      variants={sectionVariants}
+      style={{ perspective: SECTION_PERSPECTIVE }}
+      className="relative z-10"
+    >
+      {children}
+    </motion.div>
+  );
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 font-sans selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black transition-colors duration-300">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
-          <Link to="/" className="text-xl md:text-2xl font-serif font-bold tracking-tight text-gray-900 dark:text-white">
-            Planorah<span className="text-gray-400">.</span>
-          </Link>
-
-          <div className="hidden md:flex gap-8 text-sm font-medium text-gray-500 dark:text-gray-400">
-            <a href="#features" className="hover:text-black dark:hover:text-white transition-colors">Features</a>
-            <a href="#pricing" className="hover:text-black dark:hover:text-white transition-colors">Pricing</a>
-            <a href="#testimonials" className="hover:text-black dark:hover:text-white transition-colors">Stories</a>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link to="/login" className="hidden sm:block">
-              <button className="px-5 md:px-6 py-2 md:py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-full text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-all shadow-lg shadow-black/20 dark:shadow-white/10">
-                Get Started
-              </button>
-            </Link>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(true)}
-              className="md:hidden flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800"
-            >
-              <svg className="w-5 h-5 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      {/* Mobile Navigation Drawer */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
-            />
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed top-0 right-0 bottom-0 w-72 bg-white dark:bg-gray-900 z-50 shadow-2xl"
-            >
-              <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800">
-                <span className="text-lg font-serif font-bold text-gray-900 dark:text-white">Menu</span>
-                <button
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center"
-                >
-                  <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              <div className="p-6 space-y-2">
-                <a
-                  href="#features"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium"
-                >
-                  Features
-                </a>
-                <a
-                  href="#pricing"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium"
-                >
-                  Pricing
-                </a>
-                <a
-                  href="#testimonials"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium"
-                >
-                  Stories
-                </a>
-              </div>
-              <div className="p-6 border-t border-gray-100 dark:border-gray-800">
-                <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
-                  <button className="w-full py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl font-medium">
-                    Get Started
-                  </button>
-                </Link>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#374151_1px,transparent_1px)] [background-size:16px_16px] opacity-30" />
-
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <span className="inline-block px-4 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-sm font-medium mb-8">
-              ✨ Turn Goals into Verified Work
-            </span>
-            <h1 className="text-5xl md:text-7xl font-serif font-medium text-gray-900 dark:text-white mb-8 leading-tight tracking-tight">
-              Proof, Not Promises<span className="text-gray-400 dark:text-gray-500">.</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-500 dark:text-gray-400 mb-6 max-w-3xl mx-auto font-light leading-relaxed">
-              Planorah helps you turn goals into verified work — with proof, not promises.
-            </p>
-            <div className="flex flex-wrap justify-center gap-6 mb-12 text-gray-600 dark:text-gray-400 font-medium">
-              <span className="flex items-center gap-2">
-                <span className="text-green-500">✓</span> Learn skills
-              </span>
-              <span className="flex items-center gap-2">
-                <span className="text-green-500">✓</span> Build projects
-              </span>
-              <span className="flex items-center gap-2">
-                <span className="text-green-500">✓</span> Do research
-              </span>
-              <span className="flex items-center gap-2">
-                <span className="text-green-500">✓</span> Track execution
-              </span>
-              <span className="flex items-center gap-2">
-                <span className="text-green-500">✓</span> Generate outcomes
-              </span>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link to="/register">
-                <button className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-2xl text-lg font-medium hover:scale-105 transition-transform shadow-xl shadow-black/10 dark:shadow-white/5">
-                  Start Your Journey
-                </button>
-              </Link>
-              <a href="#features">
-                <button className="px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-2xl text-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                  Learn More
-                </button>
-              </a>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Floating Elements */}
-        <motion.div style={{ y: y1 }} className="absolute top-1/4 left-10 md:left-20 w-64 h-64 bg-purple-100 dark:bg-purple-900/20 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opacity-30" />
-        <motion.div style={{ y: y2 }} className="absolute bottom-1/4 right-10 md:right-20 w-64 h-64 bg-blue-100 dark:bg-blue-900/20 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opacity-30" />
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="py-32 px-6 bg-gray-50 dark:bg-gray-800/50 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-serif font-medium text-gray-900 dark:text-white mb-6">One System, All Goals</h2>
-            <p className="text-xl text-gray-500 dark:text-gray-400 font-light">Whether you code, research, design, or teach — same validation engine.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white dark:bg-gray-800 p-8 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
-              >
-                <div className="text-4xl mb-6">{feature.icon}</div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{feature.title}</h3>
-                <p className="text-gray-500 dark:text-gray-400 leading-relaxed">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section id="pricing" className="py-32 px-6 bg-white dark:bg-gray-900 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-serif font-medium text-gray-900 dark:text-white mb-6">Simple Pricing</h2>
-            <p className="text-xl text-gray-500 dark:text-gray-400 font-light">Invest in your future.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              { name: "Starter", price: "Free", desc: "Perfect for getting started", features: ["5 Projects", "Basic Analytics", "Community Support"] },
-              { name: "Pro", price: "$9", desc: "For serious creators", features: ["Unlimited Projects", "Advanced Analytics", "Priority Support", "Custom Domain"], popular: true },
-              { name: "Team", price: "$29", desc: "For ambitious groups", features: ["Everything in Pro", "Unlimited Team Members", "Dedicated Support"] }
-            ].map((plan, index) => (
-              <div key={index} className={`p-8 rounded-3xl border ${plan.popular ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black ring-4 ring-black/5 dark:ring-white/10' : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 text-gray-900 dark:text-white'} relative flex flex-col transition-colors duration-300`}>
-                {plan.popular && <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-1 rounded-full text-xs font-bold tracking-wide">MOST POPULAR</span>}
-                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                <p className={`mb-8 ${plan.popular ? 'text-gray-400 dark:text-gray-600' : 'text-gray-500 dark:text-gray-400'}`}>{plan.desc}</p>
-                <div className="text-4xl font-serif font-medium mb-8">{plan.price}</div>
-                <ul className="space-y-4 mb-8 flex-1">
-                  {plan.features.map((f, i) => (
-                    <li key={i} className="flex items-center gap-3 text-sm">
-                      <span className="text-green-500">✓</span> {f}
-                    </li>
-                  ))}
-                </ul>
-                <button className={`w-full py-4 rounded-2xl font-medium transition-transform active:scale-95 ${plan.popular ? 'bg-white dark:bg-black text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-900' : 'bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200'}`}>
-                  Choose {plan.name}
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 py-20 px-6 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-3">
-            <span className="text-gray-400 font-serif">Planorah © 2025</span>
-          </div>
-          <div className="flex gap-8 text-sm text-gray-500 dark:text-gray-400">
-            <a href="#!" className="hover:text-black dark:hover:text-white transition-colors">Privacy</a>
-            <a href="#!" className="hover:text-black dark:hover:text-white transition-colors">Terms</a>
-            <a href="#!" className="hover:text-black dark:hover:text-white transition-colors">Twitter</a>
-            <a href="#!" className="hover:text-black dark:hover:text-white transition-colors">Instagram</a>
-          </div>
-        </div>
-      </footer>
+    <div className="min-h-screen bg-white dark:bg-gray-900 font-sans selection:bg-violet-600 selection:text-white transition-colors duration-300 relative overflow-x-clip">
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 z-[60] origin-left bg-gradient-to-r from-violet-500 via-purple-500 to-indigo-500"
+        style={{ scaleX: scrollProgress }}
+      />
+      <motion.div
+        aria-hidden="true"
+        className="fixed top-24 left-1/2 -translate-x-1/2 w-[55rem] h-[22rem] rounded-full bg-gradient-to-r from-violet-500/20 via-indigo-500/20 to-fuchsia-500/10 dark:from-violet-500/15 dark:via-indigo-500/15 dark:to-fuchsia-500/5 blur-3xl pointer-events-none z-0"
+        style={{ y: glowY, scale: glowScale }}
+      />
+      <Navbar />
+      <HeroSection />
+      <AnimatedSection index={1}>
+        <FeaturesSection />
+      </AnimatedSection>
+      <AnimatedSection index={2}>
+        <ProductDemo />
+      </AnimatedSection>
+      <AnimatedSection index={3}>
+        <StatsSection />
+      </AnimatedSection>
+      <AnimatedSection index={4}>
+        <PricingSection />
+      </AnimatedSection>
+      <AnimatedSection index={5}>
+        <CTASection />
+      </AnimatedSection>
+      <Footer />
     </div>
   );
 }

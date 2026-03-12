@@ -41,6 +41,48 @@ def throttle_scope(scope_name):
     return decorator
 
 
+def _resolve_user_status(user: CustomUser) -> str:
+    known_statuses = {choice for choice, _ in CustomUser.STATUS_CHOICES}
+    raw_status = (getattr(user, "status", "") or "").strip().lower()
+    if raw_status in known_statuses:
+        return raw_status
+
+    if user.is_verified and user.is_active:
+        return CustomUser.STATUS_ACTIVE
+    if not user.is_verified:
+        return CustomUser.STATUS_PENDING
+    return CustomUser.STATUS_SUSPENDED
+
+
+def _set_user_pending(user: CustomUser) -> None:
+    user.status = CustomUser.STATUS_PENDING
+    user.is_active = False
+    user.is_verified = False
+
+
+def _set_user_active(user: CustomUser) -> None:
+    user.status = CustomUser.STATUS_ACTIVE
+    user.is_active = True
+    user.is_verified = True
+
+
+def _send_fresh_otp(user: CustomUser) -> bool:
+    otp = str(random.randint(100000, 999999))
+    OTPVerification.objects.filter(email__iexact=user.email).delete()
+    OTPVerification.objects.create(
+        email=user.email,
+        otp=otp,
+        is_used=False,
+        created_at=timezone.now(),
+    )
+
+    try:
+        return bool(send_otp_email(user.email, otp, user.username))
+    except Exception as exc:
+        logger.warning("OTP email send failed for %s: %s", user.email, exc)
+        return False
+
+
 # ---------------- REGISTER USER ----------------
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -62,70 +104,92 @@ def register_user(request):
             'error': 'Email, username, and password are required'
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    # Normalize email
+    # Normalize input
     email = email.lower().strip()
     username = username.strip()
+    identifier = email
 
     # Clean up DeletedUser record if exists (allow re-registration)
     from .models import DeletedUser
-    DeletedUser.objects.filter(email=email).delete()
+    DeletedUser.objects.filter(email__iexact=email).delete()
 
-    # Check if email already exists
-    if CustomUser.objects.filter(email__iexact=email).exists():
+    existing_user = CustomUser.objects.filter(email__iexact=identifier).first()
+    if existing_user:
+        existing_status = _resolve_user_status(existing_user)
+
+        if existing_status == CustomUser.STATUS_PENDING or not existing_user.is_verified:
+            username_taken = CustomUser.objects.filter(
+                username__iexact=username
+            ).exclude(id=existing_user.id).exists()
+            if username_taken:
+                return Response({
+                    'error': 'Username already taken'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            existing_user.username = username
+            existing_user.set_password(password)
+            _set_user_pending(existing_user)
+            existing_user.save(
+                update_fields=['username', 'password', 'status', 'is_active', 'is_verified', 'updated_at']
+            )
+
+            otp_sent = _send_fresh_otp(existing_user)
+            message = (
+                'Account exists but is pending verification. A new OTP has been sent.'
+                if otp_sent else
+                'Account exists but failed to send OTP. Please use resend OTP.'
+            )
+            return Response({
+                'message': message,
+                'email': existing_user.email,
+                'verify_required': True,
+                'existing_pending_account': True,
+            }, status=status.HTTP_200_OK)
+
+        if existing_status == CustomUser.STATUS_SUSPENDED:
+            return Response({
+                'error': 'This account is suspended. Please contact support.'
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        if existing_status == CustomUser.STATUS_DELETED:
+            return Response({
+                'error': 'This account is deleted. Contact support to restore access.'
+            }, status=status.HTTP_403_FORBIDDEN)
+
         return Response({
             'error': 'Email already registered'
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    # Check if username already exists
+    # Check if username already exists for new account creation
     if CustomUser.objects.filter(username__iexact=username).exists():
         return Response({
             'error': 'Username already taken'
         }, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        # Create user (inactive until OTP verification)
+        # Create user in pending state until OTP verification
         user = CustomUser.objects.create(
-            email=email,
+            email=identifier,
             username=username,
+            status=CustomUser.STATUS_PENDING,
             is_active=False,
             is_verified=False,
         )
         user.set_password(password)
-        user.save()
+        user.save(update_fields=['password', 'updated_at'])
 
-        # Generate OTP
-        otp = str(random.randint(100000, 999999))
-
-        # Delete any existing OTPs for this email
-        OTPVerification.objects.filter(email__iexact=email).delete()
-
-        # Create new OTP record
-        OTPVerification.objects.create(
-            email=email,
-            otp=otp,
-            is_used=False,
-            created_at=timezone.now()
-        )
-
-        # Send OTP via email
-        try:
-            email_sent = send_otp_email(email, otp, username)
-            if not email_sent:
-                # User created but email failed - they can use resend
-                return Response({
-                    'message': 'Account created but failed to send OTP. Please use resend OTP.',
-                    'email': email
-                }, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            logger.error(f"Failed to send registration OTP email: {e}")
+        otp_sent = _send_fresh_otp(user)
+        if not otp_sent:
             return Response({
                 'message': 'Account created but failed to send OTP. Please use resend OTP.',
-                'email': email
+                'email': user.email,
+                'verify_required': True,
             }, status=status.HTTP_201_CREATED)
 
         return Response({
             'message': 'Registration initiated. Please verify your email with the OTP sent.',
-            'email': email
+            'email': user.email,
+            'verify_required': True,
         }, status=status.HTTP_201_CREATED)
 
     except IntegrityError as e:
@@ -174,19 +238,34 @@ def verify_otp(request):
 
     # Find the user and activate
     try:
-        user = CustomUser.objects.get(email__iexact=email, is_active=False)
+        user = CustomUser.objects.get(email__iexact=email)
     except CustomUser.DoesNotExist:
-        return Response({"message": "User not found or already verified"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "User not found"}, status=status.HTTP_400_BAD_REQUEST)
 
-    user.is_active = True
-    user.is_verified = True
-    user.save()
+    if _resolve_user_status(user) == CustomUser.STATUS_ACTIVE and user.is_verified:
+        refresh = RefreshToken.for_user(user)
+        onboarding_complete = False
+        if hasattr(user, 'profile'):
+            onboarding_complete = user.profile.onboarding_complete  # type: ignore
+
+        return Response(
+            {
+                "message": "Account already verified.",
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+                "onboarding_complete": onboarding_complete,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    _set_user_active(user)
+    user.save(update_fields=['status', 'is_active', 'is_verified', 'updated_at'])
 
     # Send Welcome Email
     try:
         send_welcome_email(user.email, user.username)
     except Exception as e:
-        print(f"Failed to send welcome email: {e}")
+        logger.warning("Failed to send welcome email: %s", e)
 
     # Mark used or delete record
     try:
@@ -212,7 +291,7 @@ def verify_otp(request):
         "access": str(refresh.access_token),
         "refresh": str(refresh),
         "onboarding_complete": onboarding_complete
-    }, status=status.HTTP_201_CREATED)
+    }, status=status.HTTP_200_OK)
 
 
 # ---------------- LOGIN USER ----------------
@@ -235,19 +314,52 @@ def login_user(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # Note: DeletedUser check removed to allow re-registered users to log in normally
+    identifier = identifier.strip()
 
     # Find the user by email or username
-    User = get_user_model()
     try:
         if "@" in identifier:
-            user_obj = User.objects.get(email__iexact=identifier.strip())
+            user_obj = User.objects.get(email__iexact=identifier)
         else:
-            user_obj = User.objects.get(username__iexact=identifier.strip())
+            user_obj = User.objects.get(username__iexact=identifier)
     except User.DoesNotExist:
         return Response(
             {"error": "Invalid credentials"},
             status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    user_status = _resolve_user_status(user_obj)
+
+    if user_status in {CustomUser.STATUS_SUSPENDED, CustomUser.STATUS_DELETED}:
+        return Response(
+            {"error": "This account is currently unavailable. Please contact support."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    # Django's authenticate() rejects inactive users early, so validate pending
+    # users manually first and trigger OTP re-verification.
+    if user_status == CustomUser.STATUS_PENDING or not user_obj.is_verified:
+        if not user_obj.has_usable_password() or not user_obj.check_password(password):
+            return Response(
+                {"error": "Invalid credentials"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        _set_user_pending(user_obj)
+        user_obj.save(update_fields=['status', 'is_active', 'is_verified', 'updated_at'])
+        otp_sent = _send_fresh_otp(user_obj)
+        message = (
+            "Please verify your email before login. A new OTP has been sent."
+            if otp_sent else
+            "Please verify your email before login. Failed to send OTP email, please use resend OTP."
+        )
+        return Response(
+            {
+                "error": message,
+                "verify_required": True,
+                "email": user_obj.email,
+            },
+            status=status.HTTP_403_FORBIDDEN,
         )
 
     # Authenticate using username (Django default)
@@ -261,16 +373,9 @@ def login_user(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # Account state checks
-    if not user.is_active:
+    if _resolve_user_status(user) != CustomUser.STATUS_ACTIVE or not user.is_active or getattr(user, "is_verified", False) is False:
         return Response(
-            {"error": "Account not active. Please verify your OTP first."},
-            status=status.HTTP_403_FORBIDDEN,
-        )
-
-    if getattr(user, "is_verified", False) is False:
-        return Response(
-            {"error": "Account not verified. Please complete OTP verification."},
+            {"error": "Please verify your email before login.", "verify_required": True, "email": user.email},
             status=status.HTTP_403_FORBIDDEN,
         )
 
@@ -327,7 +432,7 @@ def daily_login_ping(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 @throttle_classes([ScopedRateThrottle])
-@throttle_scope('otp')
+@throttle_scope('otp_resend')
 def resend_otp(request):
     email = request.data.get("email")
 
@@ -341,21 +446,18 @@ def resend_otp(request):
     except CustomUser.DoesNotExist:
         return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    # delete old OTPs for this email
-    OTPVerification.objects.filter(email__iexact=email).delete()
+    user_status = _resolve_user_status(user)
+    if user_status in {CustomUser.STATUS_SUSPENDED, CustomUser.STATUS_DELETED}:
+        return Response({"message": "This account is unavailable. Contact support."}, status=status.HTTP_403_FORBIDDEN)
 
-    # generate new OTP
-    otp = str(random.randint(100000, 999999))
-    OTPVerification.objects.create(
-        email=email, otp=otp, is_used=False, created_at=timezone.now())
+    if user_status == CustomUser.STATUS_ACTIVE and user.is_verified:
+        return Response({"message": "Account is already verified. Please login."}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Send OTP via Brevo
-    try:
-        email_sent = send_otp_email(email, otp, user.username)
-        if not email_sent:
-            return Response({"message": "Failed to send OTP email"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    except Exception as e:
-        print(f"Resend OTP email failed: {e}")
+    _set_user_pending(user)
+    user.save(update_fields=['status', 'is_active', 'is_verified', 'updated_at'])
+
+    email_sent = _send_fresh_otp(user)
+    if not email_sent:
         return Response({"message": "Failed to send OTP email"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({"message": "New OTP sent successfully"}, status=status.HTTP_200_OK)
@@ -378,6 +480,9 @@ def request_password_reset(request):
     except CustomUser.DoesNotExist:
         return Response({"message": "No account found with that email."}, status=404)
 
+    if _resolve_user_status(user) != CustomUser.STATUS_ACTIVE or not user.is_verified:
+        return Response({"message": "Please verify your email before resetting password."}, status=400)
+
     # Delete old OTPs
     OTPVerification.objects.filter(email__iexact=email).delete()
 
@@ -391,7 +496,7 @@ def request_password_reset(request):
         if not email_sent:
             return Response({"message": "Failed to send password reset email"}, status=500)
     except Exception as e:
-        print(f"Password reset email failed: {e}")
+        logger.warning("Password reset email failed: %s", e)
         return Response({"message": "Failed to send password reset email"}, status=500)
 
     return Response({"message": "Password reset OTP sent to your email."}, status=200)
@@ -469,8 +574,6 @@ def update_user_profile(request):
     """
     try:
         user = request.user
-        # print(f"DEBUG: update_user_profile called for user: {user.username}")
-        # print(f"DEBUG: request.data: {request.data}")
 
         # Get or create profile
         profile, created = UserProfile.objects.get_or_create(user=user)
@@ -617,32 +720,32 @@ def google_oauth_login(request):
     Handle Google OAuth login. Accepts a Google Access Token from the frontend,
     verifies it via Google's userinfo endpoint, and creates/logs in the user.
     """
-    print(f"\n{'='*80}")
-    print(f"[GOOGLE_OAUTH] Step 1: Function called")
-    print(f"[GOOGLE_OAUTH] Request method: {request.method}")
-    print(f"[GOOGLE_OAUTH] Request data keys: {list(request.data.keys())}")
-    print(f"[GOOGLE_OAUTH] Request content type: {request.content_type}")
+    logger.debug(f"\n{'='*80}")
+    logger.debug(f"[GOOGLE_OAUTH] Step 1: Function called")
+    logger.debug(f"[GOOGLE_OAUTH] Request method: {request.method}")
+    logger.debug(f"[GOOGLE_OAUTH] Request data keys: {list(request.data.keys())}")
+    logger.debug(f"[GOOGLE_OAUTH] Request content type: {request.content_type}")
 
     try:
         import requests as http_requests
-        print(f"[GOOGLE_OAUTH] Step 2: requests library imported successfully")
+        logger.debug(f"[GOOGLE_OAUTH] Step 2: requests library imported successfully")
     except ImportError as e:
-        print(f"[GOOGLE_OAUTH] FATAL: Failed to import requests: {e}")
+        logger.debug(f"[GOOGLE_OAUTH] FATAL: Failed to import requests: {e}")
         return Response({"error": "Server configuration error", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     token = request.data.get('token')
-    print(f"[GOOGLE_OAUTH] Step 3: Token extraction")
-    print(f"[GOOGLE_OAUTH] Token present: {bool(token)}")
-    print(f"[GOOGLE_OAUTH] Token length: {len(token) if token else 0}")
-    print(
+    logger.debug(f"[GOOGLE_OAUTH] Step 3: Token extraction")
+    logger.debug(f"[GOOGLE_OAUTH] Token present: {bool(token)}")
+    logger.debug(f"[GOOGLE_OAUTH] Token length: {len(token) if token else 0}")
+    logger.debug(
         f"[GOOGLE_OAUTH] Token preview: {str(token)[:30] if token else 'None'}...")
 
     if not token:
-        print(f"[GOOGLE_OAUTH] ERROR: No token provided in request")
+        logger.debug(f"[GOOGLE_OAUTH] ERROR: No token provided in request")
         return Response({"error": "Google token is required"}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        print(f"[GOOGLE_OAUTH] Step 4: Calling Google UserInfo API")
+        logger.debug(f"[GOOGLE_OAUTH] Step 4: Calling Google UserInfo API")
         # Verify the Google Access Token via UserInfo Endpoint
         userinfo_response = http_requests.get(
             f'https://www.googleapis.com/oauth2/v3/userinfo',
@@ -650,24 +753,24 @@ def google_oauth_login(request):
             timeout=10
         )
 
-        print(f"[GOOGLE_OAUTH] Step 5: Google API response received")
-        print(
+        logger.debug(f"[GOOGLE_OAUTH] Step 5: Google API response received")
+        logger.debug(
             f"[GOOGLE_OAUTH] Response status: {userinfo_response.status_code}")
-        print(
+        logger.debug(
             f"[GOOGLE_OAUTH] Response headers: {dict(userinfo_response.headers)}")
-        print(
+        logger.debug(
             f"[GOOGLE_OAUTH] Response body preview: {userinfo_response.text[:500]}")
 
         if userinfo_response.status_code != 200:
-            print(f"[GOOGLE_OAUTH] ERROR: Google API returned non-200 status")
+            logger.debug(f"[GOOGLE_OAUTH] ERROR: Google API returned non-200 status")
             return Response({
                 "error": "Invalid Google token",
                 "details": f"Google API returned status {userinfo_response.status_code}: {userinfo_response.text}"
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        print(f"[GOOGLE_OAUTH] Step 6: Parsing JSON response")
+        logger.debug(f"[GOOGLE_OAUTH] Step 6: Parsing JSON response")
         idinfo = userinfo_response.json()
-        print(f"[GOOGLE_OAUTH] UserInfo keys: {list(idinfo.keys())}")
+        logger.debug(f"[GOOGLE_OAUTH] UserInfo keys: {list(idinfo.keys())}")
 
         # Extract user info
         email = idinfo.get('email')
@@ -677,14 +780,14 @@ def google_oauth_login(request):
         name = idinfo.get('name', '')
         picture = idinfo.get('picture', '')
 
-        print(f"[GOOGLE_OAUTH] Step 7: Extracted user info")
-        print(f"[GOOGLE_OAUTH] Email: {email}")
-        print(f"[GOOGLE_OAUTH] Email verified: {email_verified}")
-        print(f"[GOOGLE_OAUTH] Name: {name}")
-        print(f"[GOOGLE_OAUTH] Picture: {bool(picture)}")
+        logger.debug(f"[GOOGLE_OAUTH] Step 7: Extracted user info")
+        logger.debug(f"[GOOGLE_OAUTH] Email: {email}")
+        logger.debug(f"[GOOGLE_OAUTH] Email verified: {email_verified}")
+        logger.debug(f"[GOOGLE_OAUTH] Name: {name}")
+        logger.debug(f"[GOOGLE_OAUTH] Picture: {bool(picture)}")
 
         if not email:
-            print(f"[GOOGLE_OAUTH] ERROR: No email in Google response")
+            logger.debug(f"[GOOGLE_OAUTH] ERROR: No email in Google response")
             return Response({"error": "No email received from Google", "details": f"Response: {idinfo}"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Normalize email
@@ -698,7 +801,7 @@ def google_oauth_login(request):
         try:
             user = CustomUser.objects.get(email=email)
             created = False
-            print(
+            logger.debug(
                 # type: ignore[attr-defined]
                 f"[GOOGLE_OAUTH] User found: {user.username} (ID: {user.id})")
 
@@ -706,12 +809,11 @@ def google_oauth_login(request):
             # because Google has verified this email.
             # because Google has verified this email.
             if not user.is_active or not user.is_verified:
-                print(
+                logger.debug(
                     f"[GOOGLE_OAUTH] Activating existing inactive user and clearing legacy password")
-                user.is_active = True
-                user.is_verified = True
+                _set_user_active(user)
                 user.set_unusable_password()  # Clear any old password from previous life
-                user.save()
+                user.save(update_fields=['status', 'is_active', 'is_verified', 'password', 'updated_at'])
 
         except CustomUser.DoesNotExist:
             # Check if this is a signup or login attempt
@@ -719,7 +821,7 @@ def google_oauth_login(request):
             mode = request.data.get('mode', 'login')
 
             if mode == 'signup':
-                print(
+                logger.debug(
                     f"[GOOGLE_OAUTH] User not found, creating new user (signup mode)")
                 # Generate a unique username from email
                 base_username = email.split('@')[0].lower()
@@ -734,19 +836,20 @@ def google_oauth_login(request):
                     user = CustomUser.objects.create(
                         email=email,
                         username=username,
+                        status=CustomUser.STATUS_ACTIVE,
                         is_active=True,
                         is_verified=True,
                     )
                     user.set_unusable_password()
 
                     # Don't set name from Google - let user fill it during onboarding
-                    user.save()
+                    user.save(update_fields=['password', 'updated_at'])
 
-                    print(
+                    logger.debug(
                         # type: ignore[attr-defined]
                         f"[GOOGLE_OAUTH] User created successfully (ID: {user.id})")
                 except Exception as create_err:
-                    print(
+                    logger.debug(
                         f"[GOOGLE_OAUTH] ERROR creating user: {type(create_err).__name__}: {create_err}")
                     return Response({
                         "error": "Failed to create account",
@@ -754,7 +857,7 @@ def google_oauth_login(request):
                     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
                 # Login mode - user must already exist
-                print(
+                logger.debug(
                     f"[GOOGLE_OAUTH] User not found - signup required (login mode)")
                 return Response({
                     "error": "Account not found",
@@ -764,7 +867,7 @@ def google_oauth_login(request):
                 }, status=status.HTTP_404_NOT_FOUND)
 
         # --- 2FA ENFORCEMENT START ---
-        print(f"[GOOGLE_OAUTH] Step 11: 2FA Enforcement - Generating OTP")
+        logger.debug(f"[GOOGLE_OAUTH] Step 11: 2FA Enforcement - Generating OTP")
         try:
             # Generate OTP
             otp = str(random.randint(100000, 999999))
@@ -776,7 +879,7 @@ def google_oauth_login(request):
             OTPVerification.objects.create(email=email, otp=otp)
 
             # Send Email
-            print(f"[GOOGLE_OAUTH] Sending OTP email to {email}")
+            logger.debug(f"[GOOGLE_OAUTH] Sending OTP email to {email}")
             send_otp_email(email, otp, user.username)
 
             response_data = {
@@ -784,31 +887,28 @@ def google_oauth_login(request):
                 "two_factor_required": True,
                 "email": email
             }
-            print(f"[GOOGLE_OAUTH] 2FA required. Returning 200 OK")
-            print(f"{'='*80}\n")
+            logger.debug(f"[GOOGLE_OAUTH] 2FA required. Returning 200 OK")
+            logger.debug(f"{'='*80}\n")
             return Response(response_data, status=status.HTTP_200_OK)
 
         except Exception as otp_err:
-            print(f"[GOOGLE_OAUTH] ERROR in 2FA step: {otp_err}")
+            logger.debug(f"[GOOGLE_OAUTH] ERROR in 2FA step: {otp_err}")
             return Response({"error": "Failed to send 2FA OTP"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         # --- 2FA ENFORCEMENT END ---
 
         # (Original Token Generation Code is effectively replaced/bypassed)
         # To keep code clean, I am removing the old token generation block below.
-        print(f"[GOOGLE_OAUTH] SUCCESS: Returning 200 OK")
-        print(f"{'='*80}\n")
+        logger.debug(f"[GOOGLE_OAUTH] SUCCESS: Returning 200 OK")
+        logger.debug(f"{'='*80}\n")
         return Response(response_data, status=status.HTTP_200_OK)
 
     except ValueError as e:
-        print(f"[GOOGLE_OAUTH] ValueError: {e}")
-        print(f"{'='*80}\n")
+        logger.debug(f"[GOOGLE_OAUTH] ValueError: {e}")
+        logger.debug(f"{'='*80}\n")
         return Response({"error": "Invalid Google token", "details": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        print(f"[GOOGLE_OAUTH] EXCEPTION: {type(e).__name__}: {e}")
-        import traceback
-        print(f"[GOOGLE_OAUTH] Traceback:")
-        traceback.print_exc()
-        print(f"{'='*80}\n")
+        logger.exception("[GOOGLE_OAUTH] EXCEPTION: %s: %s", type(e).__name__, e)
+        logger.debug(f"{'='*80}\n")
         return Response({"error": "Google authentication failed", "details": f"{type(e).__name__}: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -848,12 +948,12 @@ def github_oauth_login(request):
         token_data = token_response.json()
 
         # Debug logging
-        print(
+        logger.debug(
             f"[GITHUB_OAUTH_DEBUG] Client ID: {settings.GITHUB_OAUTH_CLIENT_ID}")
-        print(f"[GITHUB_OAUTH_DEBUG] Redirect URI used: {redirect_uri}")
-        print(
+        logger.debug(f"[GITHUB_OAUTH_DEBUG] Redirect URI used: {redirect_uri}")
+        logger.debug(
             f"[GITHUB_OAUTH_DEBUG] Token response status: {token_response.status_code}")
-        print(f"[GITHUB_OAUTH_DEBUG] Token data: {token_data}")
+        logger.debug(f"[GITHUB_OAUTH_DEBUG] Token data: {token_data}")
 
         if 'error' in token_data:
             return Response({
@@ -921,10 +1021,9 @@ def github_oauth_login(request):
             # because GitHub has verified this email.
             # because GitHub has verified this email.
             if not user.is_active or not user.is_verified:
-                user.is_active = True
-                user.is_verified = True
+                _set_user_active(user)
                 user.set_unusable_password()  # Clear any old password from previous life
-                user.save()
+                user.save(update_fields=['status', 'is_active', 'is_verified', 'password', 'updated_at'])
 
         except CustomUser.DoesNotExist:
             # Check if this is a signup or login attempt
@@ -932,7 +1031,7 @@ def github_oauth_login(request):
             mode = request.data.get('mode', 'login')
 
             if mode == 'signup':
-                print(
+                logger.debug(
                     f"[GITHUB_OAUTH] User not found, creating new user (signup mode)")
                 # Generate a unique username
                 base_username = github_username.lower(
@@ -948,19 +1047,20 @@ def github_oauth_login(request):
                     user = CustomUser.objects.create(
                         email=email,
                         username=username,
+                        status=CustomUser.STATUS_ACTIVE,
                         is_active=True,
                         is_verified=True,
                     )
                     user.set_unusable_password()
 
                     # Don't set name from GitHub - let user fill it during onboarding
-                    user.save()
+                    user.save(update_fields=['password', 'updated_at'])
 
-                    print(
+                    logger.debug(
                         # type: ignore[attr-defined]
                         f"[GITHUB_OAUTH] User created successfully (ID: {user.id})")
                 except Exception as create_err:
-                    print(
+                    logger.debug(
                         f"[GITHUB_OAUTH] ERROR creating user: {type(create_err).__name__}: {create_err}")
                     return Response({
                         "error": "Failed to create account",
@@ -968,7 +1068,7 @@ def github_oauth_login(request):
                     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
                 # Login mode - user must already exist
-                print(
+                logger.debug(
                     f"[GITHUB_OAUTH] User not found - signup required (login mode)")
                 return Response({
                     "error": "Account not found",
@@ -978,7 +1078,7 @@ def github_oauth_login(request):
                 }, status=status.HTTP_404_NOT_FOUND)
 
         # --- 2FA ENFORCEMENT START ---
-        print(f"[GITHUB_OAUTH] 2FA Enforcement - Generating OTP")
+        logger.debug(f"[GITHUB_OAUTH] 2FA Enforcement - Generating OTP")
         try:
             # Generate OTP
             otp = str(random.randint(100000, 999999))
@@ -990,7 +1090,7 @@ def github_oauth_login(request):
             OTPVerification.objects.create(email=email, otp=otp)
 
             # Send Email
-            print(f"[GITHUB_OAUTH] Sending OTP email to {email}")
+            logger.debug(f"[GITHUB_OAUTH] Sending OTP email to {email}")
             send_otp_email(email, otp, user.username)
 
             response_data = {
@@ -1001,7 +1101,7 @@ def github_oauth_login(request):
             return Response(response_data, status=status.HTTP_200_OK)
 
         except Exception as otp_err:
-            print(f"[GITHUB_OAUTH] ERROR in 2FA step: {otp_err}")
+            logger.debug(f"[GITHUB_OAUTH] ERROR in 2FA step: {otp_err}")
             return Response({"error": "Failed to send 2FA OTP"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         # --- 2FA ENFORCEMENT END ---
 
@@ -1091,13 +1191,13 @@ def verify_social_otp(request):
     email = request.data.get("email")
     otp_in = request.data.get("otp")
 
-    print(f"\n{'='*80}")
-    print(f"[SOCIAL_OTP] Step 1: Verification request")
-    print(f"[SOCIAL_OTP] Email: {email}")
-    print(f"[SOCIAL_OTP] OTP input: {otp_in}")
+    logger.debug(f"\n{'='*80}")
+    logger.debug(f"[SOCIAL_OTP] Step 1: Verification request")
+    logger.debug(f"[SOCIAL_OTP] Email: {email}")
+    logger.debug(f"[SOCIAL_OTP] OTP input: {otp_in}")
 
     if not email or not otp_in:
-        print(f"[SOCIAL_OTP] ERROR: Missing email or OTP")
+        logger.debug(f"[SOCIAL_OTP] ERROR: Missing email or OTP")
         return Response({"message": "Email and OTP are required"}, status=status.HTTP_400_BAD_REQUEST)
 
     email = email.lower().strip()
@@ -1105,29 +1205,29 @@ def verify_social_otp(request):
 
     # Find unused OTPs for this email (case-insensitive)
     otp_qs = OTPVerification.objects.filter(email__iexact=email)
-    print(f"[SOCIAL_OTP] OTPs found: {otp_qs.count()}")
+    logger.debug(f"[SOCIAL_OTP] OTPs found: {otp_qs.count()}")
 
     if not otp_qs.exists():
-        print(f"[SOCIAL_OTP] ERROR: No OTP record found for {email}")
+        logger.debug(f"[SOCIAL_OTP] ERROR: No OTP record found for {email}")
         return Response({"message": "Invalid OTP or email"}, status=status.HTTP_400_BAD_REQUEST)
 
     # Prefer the latest unused OTP record
     otp_record = otp_qs.filter(is_used=False).order_by('-created_at').first()
 
     if not otp_record:
-        print(f"[SOCIAL_OTP] ERROR: All OTPs used or none available")
+        logger.debug(f"[SOCIAL_OTP] ERROR: All OTPs used or none available")
         return Response({"message": "Invalid OTP or it has been used"}, status=status.HTTP_400_BAD_REQUEST)
 
     # Compare values
-    print(
+    logger.debug(
         f"[SOCIAL_OTP] Comparing DB '{str(otp_record.otp).strip()}' vs Input '{otp}'")
     if str(otp_record.otp).strip() != otp:
-        print(f"[SOCIAL_OTP] ERROR: Mismatch")
+        logger.debug(f"[SOCIAL_OTP] ERROR: Mismatch")
         return Response({"message": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
 
     # Check expiry
     if hasattr(otp_record, "is_expired") and otp_record.is_expired():
-        print(f"[SOCIAL_OTP] ERROR: OTP Expired")
+        logger.debug(f"[SOCIAL_OTP] ERROR: OTP Expired")
         otp_record.delete()
         return Response({"message": "OTP expired, please request a new one"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1141,10 +1241,14 @@ def verify_social_otp(request):
     # Retrieve User
     try:
         user = CustomUser.objects.get(email=email)
-        print(f"[SOCIAL_OTP] User found: {user.username}")
+        logger.debug(f"[SOCIAL_OTP] User found: {user.username}")
     except CustomUser.DoesNotExist:
-        print(f"[SOCIAL_OTP] ERROR: User not found in DB")
+        logger.debug(f"[SOCIAL_OTP] ERROR: User not found in DB")
         return Response({"message": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if _resolve_user_status(user) != CustomUser.STATUS_ACTIVE or not user.is_active or not user.is_verified:
+        _set_user_active(user)
+        user.save(update_fields=['status', 'is_active', 'is_verified', 'updated_at'])
 
     # Generate tokens
     try:
@@ -1152,7 +1256,7 @@ def verify_social_otp(request):
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
     except Exception as e:
-        print(f"[SOCIAL_OTP] ERROR generating tokens: {e}")
+        logger.debug(f"[SOCIAL_OTP] ERROR generating tokens: {e}")
         return Response({"message": "Failed to generate tokens"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     # Check onboarding status
@@ -1191,3 +1295,4 @@ def check_auth_type(request):
         "has_password": has_password,
         "is_oauth": not has_password
     }, status=status.HTTP_200_OK)
+

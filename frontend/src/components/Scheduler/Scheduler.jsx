@@ -126,7 +126,6 @@ export default function Scheduler() {
 
     const onDragEnd = (result) => {
         if (!result.destination) return;
-        // console.log("Dragged", result);
     };
 
     const formatTime = (seconds) => {
@@ -142,7 +141,6 @@ export default function Scheduler() {
     };
 
     const handleEventClick = (event) => {
-        console.log("Event clicked:", event);
         // Navigate to tasks section
         if (event.task_id) {
             // Navigate to specific task if linked

@@ -1,11 +1,14 @@
 import os
 import json
+import logging
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Roadmap, Milestone, Project
 from .serializers import RoadmapSerializer, RoadmapDetailSerializer
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(['POST'])
@@ -30,7 +33,7 @@ def generate_roadmap(request):
 
     # Configure Gemini with API key
     genai.configure(api_key=api_key)
-    print(f"🔑 Gemini API configured with key: {api_key[:10]}...{api_key[-4:]}")
+    logger.debug(f"🔑 Gemini API configured with key: {api_key[:10]}...{api_key[-4:]}")
 
     user = request.user
     goal = request.data.get('goal', '')
@@ -370,7 +373,7 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
         # Using Gemini 2.5 Flash Lite - lightweight and cost-effective
         model = genai.GenerativeModel(
             'gemini-2.5-flash-lite')  # type: ignore
-        print(f"🤖 Using model: gemini-2.5-flash-lite")
+        logger.debug(f"🤖 Using model: gemini-2.5-flash-lite")
 
         # Use proper GenerationConfig
         generation_config = GenerationConfig(
@@ -380,9 +383,9 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
         )
 
         # Generate content and assign to response variable
-        print(f"📝 Generating roadmap for goal: {goal[:50]}...")
+        logger.debug(f"📝 Generating roadmap for goal: {goal[:50]}...")
         response = model.generate_content(prompt, generation_config=generation_config)
-        print(f"✅ Response received successfully")
+        logger.debug(f"✅ Response received successfully")
 
         # Safety check: Ensure valid response from AI
         if not response or not hasattr(response, "text") or not response.text:
@@ -434,7 +437,7 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
 
         # type: ignore[attr-defined]
         # type: ignore[attr-defined]
-        # print(f"✅ Roadmap created: ID={roadmap.id}")
+        # logger.debug(f"✅ Roadmap created: ID={roadmap.id}")
 
         # Create Milestones and Projects
         milestones_data = roadmap_data.get('milestones', [])
@@ -449,7 +452,7 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
                 resources=milestone_data.get('resources', [])
             )
 
-            print(f"  ✅ Milestone {idx + 1} created: {milestone.title}")
+            logger.debug(f"  ✅ Milestone {idx + 1} created: {milestone.title}")
 
             # Create projects for this milestone
             projects_data = milestone_data.get('projects', [])
@@ -469,22 +472,21 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
                     tech_stack=project_data.get('tech_stack', []),
                     learning_outcomes=project_data.get('learning_outcomes', [])
                 )
-                print(
+                logger.debug(
                     f"    ✅ Project {pidx + 1} created: {project_data.get('title', 'Untitled')}")
 
-        print("=" * 70)
-        print("🎉 Roadmap generation completed successfully!")
-        print("=" * 70)
+        logger.debug("=" * 70)
+        logger.debug("🎉 Roadmap generation completed successfully!")
+        logger.debug("=" * 70)
         
         # Auto-generate tasks from roadmap
         try:
             from tasks.task_generator import auto_create_tasks_from_roadmap
             created_tasks = auto_create_tasks_from_roadmap(roadmap)
-            print(f"✅ Auto-generated {len(created_tasks)} tasks from roadmap!")
+            logger.debug(f"✅ Auto-generated {len(created_tasks)} tasks from roadmap!")
         except Exception as task_error:
-            print(f"⚠️ Task generation failed: {str(task_error)}")
-            import traceback
-            traceback.print_exc()
+            logger.debug(f"⚠️ Task generation failed: {str(task_error)}")
+            logger.exception("Task generation failed for roadmap %s", roadmap.id)
             # Don't fail the whole request if task generation fails
 
         serializer = RoadmapDetailSerializer(roadmap)
@@ -495,8 +497,8 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
         }, status=status.HTTP_201_CREATED)
 
     except json.JSONDecodeError as e:
-        print(f"❌ JSON Parse Error: {str(e)}")
-        print(
+        logger.debug(f"❌ JSON Parse Error: {str(e)}")
+        logger.debug(
             f"Response text: {response_text[:1000] if 'response_text' in locals() else 'N/A'}")
         return Response({
             "error": "Failed to parse AI response",
@@ -505,9 +507,8 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     except Exception as e:
-        print(f"❌ Unexpected Error: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        logger.debug(f"❌ Unexpected Error: {str(e)}")
+        logger.exception("Unexpected error during roadmap generation")
         return Response({
             "error": "Failed to generate roadmap",
             "details": str(e),
@@ -527,7 +528,7 @@ def get_user_roadmaps(request):
         serializer = RoadmapSerializer(roadmaps, many=True)
         return Response(serializer.data)
     except Exception as e:
-        print(f"❌ Error fetching roadmaps: {str(e)}")
+        logger.debug(f"❌ Error fetching roadmaps: {str(e)}")
         return Response({
             "error": "Failed to fetch roadmaps",
             "details": str(e)
@@ -545,7 +546,7 @@ def get_roadmap_detail(request, roadmap_id):
     except Roadmap.DoesNotExist:
         return Response({"error": "Roadmap not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        print(f"❌ Error fetching roadmap detail: {str(e)}")
+        logger.debug(f"❌ Error fetching roadmap detail: {str(e)}")
         return Response({
             "error": "Failed to fetch roadmap details",
             "details": str(e)
@@ -559,12 +560,12 @@ def delete_roadmap(request, roadmap_id):
     try:
         roadmap = Roadmap.objects.get(id=roadmap_id, user=request.user)
         roadmap.delete()
-        print(f"✅ Roadmap {roadmap_id} deleted by {request.user.username}")
+        logger.debug(f"✅ Roadmap {roadmap_id} deleted by {request.user.username}")
         return Response({"message": "Roadmap deleted successfully"}, status=status.HTTP_200_OK)
     except Roadmap.DoesNotExist:
         return Response({"error": "Roadmap not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        print(f"❌ Error deleting roadmap: {str(e)}")
+        logger.debug(f"❌ Error deleting roadmap: {str(e)}")
         return Response({
             "error": "Failed to delete roadmap",
             "details": str(e)
@@ -582,13 +583,13 @@ def update_milestone_progress(request, milestone_id):
 
         # Update completed_at timestamp
         milestone.save()
-        print(
+        logger.debug(
             f"✅ Milestone {milestone_id} updated: completed={milestone.is_completed}")
         return Response({"message": "Milestone updated"}, status=status.HTTP_200_OK)
     except Milestone.DoesNotExist:
         return Response({"error": "Milestone not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        print(f"❌ Error updating milestone: {str(e)}")
+        logger.debug(f"❌ Error updating milestone: {str(e)}")
         return Response({
             "error": "Failed to update milestone",
             "details": str(e)
@@ -666,7 +667,7 @@ def schedule_roadmap(request, roadmap_id):
                 linked_task=task,  # Link to navigate from calendar to task
             )
             
-            print(f"  ✅ Created event {event.id}: {task.title} on {task_date}")
+            logger.debug(f"  ✅ Created event {event.id}: {task.title} on {task_date}")
             created_events.append(event.id)
             
             scheduled_tasks.append({
@@ -705,7 +706,7 @@ def schedule_roadmap(request, roadmap_id):
             milestone.save()
             current_date = milestone.end_date + timedelta(days=1)
 
-        print(f"✅ Scheduled roadmap {roadmap_id} with {len(created_events)} task events")
+        logger.debug(f"✅ Scheduled roadmap {roadmap_id} with {len(created_events)} task events")
         
         return Response({
             "message": f"Roadmap scheduled successfully! {len(created_events)} tasks added to calendar.",
@@ -717,9 +718,8 @@ def schedule_roadmap(request, roadmap_id):
     except Roadmap.DoesNotExist:
         return Response({"error": "Roadmap not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        print(f"❌ Error scheduling roadmap: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        logger.debug(f"❌ Error scheduling roadmap: {str(e)}")
+        logger.exception("Error scheduling roadmap %s", roadmap_id)
         return Response({
             "error": "Failed to schedule roadmap",
             "details": str(e)
@@ -790,9 +790,8 @@ def get_roadmap_projects(request):
         return Response(all_projects)
         
     except Exception as e:
-        print(f"❌ Error fetching roadmap projects: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        logger.debug(f"❌ Error fetching roadmap projects: {str(e)}")
+        logger.exception("Error fetching roadmap projects for user %s", request.user.id)
         return Response({
             "error": "Failed to fetch projects",
             "details": str(e)
@@ -840,7 +839,7 @@ def get_roadmap_progress(request):
         return Response(progress_data)
         
     except Exception as e:
-        print(f"❌ Error fetching roadmap progress: {str(e)}")
+        logger.debug(f"❌ Error fetching roadmap progress: {str(e)}")
         return Response({
             "error": "Failed to fetch progress",
             "details": str(e)
@@ -886,4 +885,5 @@ class StudentProjectViewSet(viewsets.ModelViewSet):
             'public_projects': public,
             'private_projects': total - public,
         })
+
 

@@ -5,6 +5,7 @@ HTTP-based email sending that bypasses SMTP restrictions
 import os
 from pathlib import Path
 import requests
+import logging
 
 # Load environment variables from .env file
 from dotenv import load_dotenv
@@ -12,6 +13,8 @@ env_path = Path(__file__).resolve().parent.parent / '.env'
 load_dotenv(env_path)
 
 BREVO_API_URL = "https://api.brevo.com/v3/smtp/email"
+BREVO_TIMEOUT_SECONDS = 15
+logger = logging.getLogger(__name__)
 
 
 def get_otp_email_template(otp_code, username=None):
@@ -163,42 +166,60 @@ def send_email_via_brevo(to_email, subject, html_content, text_content=None):
     Returns:
         bool: True if email sent successfully, False otherwise
     """
-    api_key = os.getenv('BREVO_API_KEY')
-    
+    api_key = (os.getenv('BREVO_API_KEY') or '').strip()
+
     if not api_key:
-        print("BREVO_API_KEY not set in environment variables")
+        logger.error("BREVO_API_KEY not set in environment variables")
         return False
-    
+
+    sender_email = (
+        os.getenv('BREVO_SENDER_EMAIL')
+        or os.getenv('DEFAULT_FROM_EMAIL')
+        or 'noreply@planorah.me'
+    ).strip()
+    sender_name = (os.getenv('BREVO_SENDER_NAME') or 'Planorah').strip()
+
     headers = {
         "accept": "application/json",
         "api-key": api_key,
         "content-type": "application/json"
     }
-    
+
     payload = {
         "sender": {
-            "name": "Planorah",
-            "email": "abhinav@planorah.me"
+            "name": sender_name,
+            "email": sender_email
         },
         "to": [{"email": to_email}],
         "subject": subject,
         "htmlContent": html_content
     }
-    
+
     if text_content:
         payload["textContent"] = text_content
-    
+
     try:
-        response = requests.post(BREVO_API_URL, json=payload, headers=headers)
-        
+        response = requests.post(
+            BREVO_API_URL,
+            json=payload,
+            headers=headers,
+            timeout=BREVO_TIMEOUT_SECONDS,
+        )
+
         if response.status_code in [200, 201, 202]:
-            print(f"Email sent successfully to {to_email}")
+            logger.info("Email sent successfully to %s", to_email)
             return True
         else:
-            print(f"Failed to send email: {response.status_code} - {response.text}")
+            logger.error("Failed to send email: %s - %s", response.status_code, response.text)
             return False
+    except requests.Timeout:
+        logger.error("Brevo email request timed out after %s seconds", BREVO_TIMEOUT_SECONDS)
+        return False
+    except requests.RequestException as e:
+        logger.exception("HTTP error sending email via Brevo: %s", e)
+        return False
     except Exception as e:
-        print(f"Error sending email via Brevo: {e}")
+        logger.exception("Error sending email via Brevo: %s", e)
         return False
 
 

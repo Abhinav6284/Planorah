@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     app_name: str = "planorah-portfolio-api"
     env: str = "development"
-    debug: bool = True
+    debug: bool = False
     api_v1_prefix: str = "/v1"
 
     jwt_secret_key: str
