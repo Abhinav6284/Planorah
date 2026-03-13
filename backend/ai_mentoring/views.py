@@ -108,14 +108,19 @@ def voice_config(request):
     Return WebSocket proxy URL and session configuration for real-time voice.
     The frontend uses this to connect to the voice proxy server.
     """
-    host = os.getenv('VOICE_PROXY_HOST', 'localhost')
-    port = os.getenv('VOICE_PROXY_PORT', '8001')
+    # In production set VOICE_PROXY_PUBLIC_URL=wss://voice.planorah.me/ws/voice
+    # In dev it falls back to the raw host:port
+    public_url = os.getenv('VOICE_PROXY_PUBLIC_URL', '')
+    if not public_url:
+        host = os.getenv('VOICE_PROXY_HOST', 'localhost')
+        port = os.getenv('VOICE_PROXY_PORT', '8001')
+        public_url = f'ws://{host}:{port}/ws/voice'
 
     # Fetch recent sessions for memory context
     session_memory = get_recent_sessions(request.user, limit=3)
 
     return Response({
-        'ws_url': f'ws://{host}:{port}',
+        'ws_url': public_url,
         'session_memory': session_memory,
         'available_voices': [
             {'id': 'Aoede', 'name': 'Aoede', 'description': 'Warm and bright'},
