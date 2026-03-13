@@ -11,10 +11,26 @@ export default function ResourceHub() {
             icon: "💻",
             color: "blue",
             items: [
-                { name: "Google Colab", url: "https://colab.research.google.com/", desc: "Best for coding practice, Python, ML exercises" },
-                { name: "Colab Blank Notebook", url: "https://colab.research.google.com/#create=true", desc: "Start a new notebook instantly" },
+                { name: "Google Colab", url: "https://colab.research.google.com/", desc: "Best for coding practice, Python, ML exercises (Free)" },
+                { name: "Colab Blank Notebook", url: "https://colab.research.google.com/#create=true", desc: "Start a new notebook instantly (Free)" },
                 { name: "Kaggle Notebooks", url: "https://www.kaggle.com/code", desc: "Free GPU coding environment" },
-                { name: "Jupyter Notebook", url: "https://jupyter.org/", desc: "Official Jupyter platform" }
+                { name: "Jupyter Notebook", url: "https://jupyter.org/", desc: "Official Jupyter platform" },
+                { name: "Scratch", url: "https://scratch.mit.edu/", desc: "Block-based coding platform for STEM creation (Free)" },
+                { name: "Code.org", url: "https://code.org/", desc: "Interactive coding courses and computer science activities (Free)" }
+            ]
+        },
+        virtual_labs: {
+            title: "Virtual Lab Platforms",
+            icon: "🧪",
+            color: "teal",
+            items: [
+                { name: "PhET Interactive Simulations", url: "https://phet.colorado.edu/", desc: "Physics, chemistry, biology, earth science, and math simulations (Free)" },
+                { name: "LabXchange Virtual Labs", url: "https://www.labxchange.org/", desc: "Harvard mini-labs for biology and chemistry with guided protocols (Free, account required)" },
+                { name: "ExploreLearning Gizmos", url: "https://www.explorelearning.com/", desc: "550+ science and math simulations for grades 3-12 (Paid, free samples/trial)" },
+                { name: "NOVA Labs", url: "https://www.pbslearningmedia.org/collection/nova-labs/", desc: "PBS science simulations and games tied to documentary content (Free)" },
+                { name: "Concord Consortium", url: "https://learn.concord.org/", desc: "NGSS-aligned STEM interactives with data-driven inquiry (Free)" },
+                { name: "Inq-ITS", url: "https://www.inqits.com/", desc: "Inquiry-based virtual science labs with self-grading and classroom integration (Free tier + Paid)" },
+                { name: "3M Young Scientist Lab", url: "https://www.youngscientistlab.com/", desc: "Middle-school virtual experiments including wind energy design labs (Free)" }
             ]
         },
         math: {
@@ -24,8 +40,10 @@ export default function ResourceHub() {
             items: [
                 { name: "Desmos Graphing", url: "https://www.desmos.com/calculator", desc: "Graph equations, visualize curves" },
                 { name: "Desmos Geometry", url: "https://www.desmos.com/geometry", desc: "Geometric constructions" },
-                { name: "GeoGebra", url: "https://www.geogebra.org/", desc: "Math + Geometry + 3D + CAS" },
-                { name: "Symbolab", url: "https://www.symbolab.com/", desc: "Math solver with steps" }
+                { name: "GeoGebra", url: "https://www.geogebra.org/", desc: "Math + Geometry + 3D + CAS (Free)" },
+                { name: "Symbolab", url: "https://www.symbolab.com/", desc: "Math solver with steps" },
+                { name: "Wolfram|Alpha", url: "https://www.wolframalpha.com/", desc: "Computational engine for math and science queries (Free + Paid Pro)" },
+                { name: "Wolfram Demonstrations", url: "https://demonstrations.wolfram.com/", desc: "Interactive STEM models across math, physics, and chemistry (Free)" }
             ]
         },
         science: {
@@ -35,7 +53,8 @@ export default function ResourceHub() {
             items: [
                 { name: "PhET Simulations", url: "https://phet.colorado.edu/", desc: "Physics, Chemistry, Biology simulations" },
                 { name: "MolView", url: "https://molview.org/", desc: "Chemical structures in 3D" },
-                { name: "ChemDraw Online", url: "https://web.chemdraw.com/", desc: "Chemical drawing tool" }
+                { name: "ChemDraw Online", url: "https://web.chemdraw.com/", desc: "Chemical drawing tool" },
+                { name: "NASA Eyes", url: "https://eyes.nasa.gov/", desc: "Explore Earth, the solar system, and missions in interactive 3D (Free)" }
             ]
         },
         biology: {
@@ -43,9 +62,38 @@ export default function ResourceHub() {
             icon: "🧬",
             color: "red",
             items: [
-                { name: "BioDigital Human", url: "https://www.biodigital.com/", desc: "3D Anatomy Explorer" },
-                { name: "Visible Body", url: "https://www.visiblebody.com/", desc: "Premium 3D anatomy models" },
-                { name: "OpenStax Biology", url: "https://openstax.org/details/books/biology-2e", desc: "Free biology textbook" }
+                { name: "BioDigital Human", url: "https://www.biodigital.com/", desc: "3D Anatomy Explorer (Free basic + Paid premium)" },
+                { name: "Visible Body", url: "https://www.visiblebody.com/", desc: "Premium 3D anatomy models (Paid)" },
+                { name: "OpenStax Biology", url: "https://openstax.org/details/books/biology-2e", desc: "Free biology textbook" },
+                { name: "Zygote Body", url: "https://zygotebody.com/", desc: "Free web-based 3D human anatomy atlas" },
+                { name: "CellCraft", url: "https://www.cellcraft.io/", desc: "Game-based cell biology simulation where students build and manage a cell (Free)" },
+                { name: "HHMI BioInteractive", url: "https://www.biointeractive.org/", desc: "Virtual labs, animations, and interactives for biology and life science (Free)" }
+            ]
+        },
+        chemistry: {
+            title: "Chemistry Resources",
+            icon: "⚗️",
+            color: "indigo",
+            items: [
+                { name: "PubChem", url: "https://pubchem.ncbi.nlm.nih.gov/", desc: "Chemical database" },
+                { name: "ChemSpider", url: "https://www.chemspider.com/", desc: "Compound data & spectra" },
+                { name: "ChemCollective Virtual Lab", url: "https://chemcollective.org/vlab", desc: "Browser-based chemistry lab for reactions, pH, temperature, and titrations (Free)" },
+                { name: "ChemCollective Simulations", url: "https://chemcollective.org/activities/simulations", desc: "Chemistry concept applets: periodic trends, titration curves, equilibrium, and more (Free)" },
+                { name: "ChemViz3D", url: "https://www.chemviz3d.com/", desc: "Interactive 3D chemistry visualization and reaction animation tool (Free personal use)" },
+                { name: "PhET Chemistry Sims", url: "https://phet.colorado.edu/en/simulations/filter?subjects=chemistry", desc: "Chemistry-focused PhET simulations (Free)" }
+            ]
+        },
+        physics_engineering: {
+            title: "Physics, Circuits & Engineering",
+            icon: "⚙️",
+            color: "orange",
+            items: [
+                { name: "Tinkercad Circuits", url: "https://www.tinkercad.com/circuits", desc: "Browser electronics and Arduino simulation with drag-drop components (Free, account required)" },
+                { name: "EveryCircuit", url: "https://everycircuit.com/", desc: "Real-time animated analog and digital circuit simulator (Free limited + Paid)" },
+                { name: "Falstad Circuit Simulator", url: "https://falstad.com/circuit/", desc: "Classic free browser circuit simulator with live current visualization" },
+                { name: "DCACLab", url: "https://dcaclab.com/", desc: "Virtual breadboard lab with multimeter and oscilloscope tools (Free for students)" },
+                { name: "PhET Circuit Construction Kit", url: "https://phet.colorado.edu/en/simulation/circuit-construction-kit-dc", desc: "Build and test DC/AC circuits interactively (Free)" },
+                { name: "Algodoo", url: "https://www.algodoo.com/", desc: "2D physics sandbox for mechanics and experiment-style simulations (Free)" }
             ]
         },
         reference: {
@@ -57,15 +105,6 @@ export default function ResourceHub() {
                 { name: "OpenStax", url: "https://openstax.org/subjects", desc: "Free textbooks for all major subjects" },
                 { name: "Khan Academy", url: "https://www.khanacademy.org/", desc: "Learn anything, for free" }
             ]
-        },
-        chemistry: {
-            title: "Chemistry Resources",
-            icon: "⚗️",
-            color: "indigo",
-            items: [
-                { name: "PubChem", url: "https://pubchem.ncbi.nlm.nih.gov/", desc: "Chemical database" },
-                { name: "ChemSpider", url: "https://www.chemspider.com/", desc: "Compound data & spectra" }
-            ]
         }
     };
 
@@ -75,7 +114,9 @@ export default function ResourceHub() {
         green: "bg-green-50 text-green-600 border-green-100",
         red: "bg-red-50 text-red-600 border-red-100",
         yellow: "bg-yellow-50 text-yellow-600 border-yellow-100",
-        indigo: "bg-indigo-50 text-indigo-600 border-indigo-100"
+        indigo: "bg-indigo-50 text-indigo-600 border-indigo-100",
+        teal: "bg-teal-50 text-teal-600 border-teal-100",
+        orange: "bg-orange-50 text-orange-600 border-orange-100"
     };
 
     const filteredResources = () => {
