@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     database_url: str
     jwt_secret: str
     jwt_algorithm: str = "HS256"
+    auto_create_schema: bool = False
 
     media_root: str = "/var/www/planorah/media"
     media_url_path: str = "/media"

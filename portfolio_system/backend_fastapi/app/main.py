@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 
 from app.api.routes.portfolios import router as portfolios_router
 from app.api.routes.public import router as public_router
@@ -25,10 +26,27 @@ app.include_router(public_router, prefix=settings.api_v1_prefix)
 app.include_router(uploads_router, prefix=settings.api_v1_prefix)
 
 
+def initialize_schema_if_enabled() -> None:
+    if not settings.auto_create_schema:
+        return
+
+    if engine.dialect.name == "postgresql":
+        lock_id = 8451723491001
+        with engine.begin() as connection:
+            connection.execute(text("SELECT pg_advisory_lock(:lock_id)"), {"lock_id": lock_id})
+            try:
+                Base.metadata.create_all(bind=connection, checkfirst=True)
+            finally:
+                connection.execute(text("SELECT pg_advisory_unlock(:lock_id)"), {"lock_id": lock_id})
+        return
+
+    Base.metadata.create_all(bind=engine, checkfirst=True)
+
+
 @app.on_event("startup")
 def startup_event() -> None:
-    Base.metadata.create_all(bind=engine)
     upload_service.ensure_media_directories()
+    initialize_schema_if_enabled()
 
 
 @app.get("/health")

@@ -85,6 +85,7 @@ Optional with defaults:
 - `MEDIA_URL_PATH=/media`
 - `PUBLIC_API_BASE_URL=https://api.planorah.me`
 - `API_V1_PREFIX=/v1`
+- `AUTO_CREATE_SCHEMA=false`
 - `ALLOWED_ORIGINS=...`
 - `VERCEL_ORIGIN_REGEX=https://.*\\.vercel\\.app`
 
