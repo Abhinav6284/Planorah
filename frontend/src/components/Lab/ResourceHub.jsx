@@ -95,6 +95,56 @@ export default function ResourceHub() {
                 { name: "Algodoo", url: "https://www.algodoo.com/", desc: "2D physics sandbox for mechanics and experiment-style simulations (Free)" }
             ]
         },
+        reference_management: {
+            title: "Reference Management",
+            icon: "🗂️",
+            color: "teal",
+            items: [
+                { name: "Zotero", url: "https://www.zotero.org/", desc: "Free, open-source reference manager with 9,000+ citation styles and group libraries" },
+                { name: "Mendeley", url: "https://www.mendeley.com/", desc: "Reference manager with PDF annotation, citation tools, and cloud sync (Free + Paid)" },
+                { name: "EndNote", url: "https://endnote.com/", desc: "Advanced commercial reference manager with desktop, web, and AI-assisted features (Paid)" },
+                { name: "Paperpile", url: "https://paperpile.com/", desc: "Chrome-based reference manager integrated with Google Docs and Drive (Trial + Paid)" },
+                { name: "Qiqqa", url: "https://www.qiqqa.com/", desc: "PDF-focused research manager with tagging, metadata extraction, and bibliography generation (Free)" },
+                { name: "Docear", url: "https://www.docear.org/", desc: "Open-source literature suite combining reference management and mind mapping (Free)" }
+            ]
+        },
+        literature_discovery: {
+            title: "Literature Discovery",
+            icon: "🔎",
+            color: "green",
+            items: [
+                { name: "Google Scholar", url: "https://scholar.google.com/", desc: "Free academic search engine for papers, theses, books, and conference literature" },
+                { name: "Semantic Scholar", url: "https://www.semanticscholar.org/", desc: "AI-powered scholarly search and topic discovery across scientific literature (Free)" },
+                { name: "ResearchRabbit", url: "https://www.researchrabbit.ai/", desc: "Visual research maps for papers, authors, and citation networks (Free tier)" },
+                { name: "Connected Papers", url: "https://www.connectedpapers.com/", desc: "Graph-based tool to explore related papers and citation clusters (Free tier)" },
+                { name: "Unpaywall", url: "https://unpaywall.org/", desc: "Browser extension that finds legal open-access versions of paywalled papers (Free)" },
+                { name: "Scite", url: "https://scite.ai/", desc: "Smart citation index showing supporting, contrasting, and mentioning citation contexts (Free + Paid)" }
+            ]
+        },
+        notes_organization: {
+            title: "Notes & Organization",
+            icon: "📝",
+            color: "purple",
+            items: [
+                { name: "Evernote", url: "https://evernote.com/", desc: "Notebook-style notes, web clipping, and task organization with search and sync (Free + Paid)" },
+                { name: "Microsoft OneNote", url: "https://www.onenote.com/", desc: "Free digital notebooks with sections, handwriting, and multimedia notes" },
+                { name: "Notion", url: "https://www.notion.so/", desc: "All-in-one workspace for notes, databases, tasks, and collaboration (Free personal plan)" },
+                { name: "Obsidian", url: "https://obsidian.md/", desc: "Markdown knowledge-base app with backlink graphs for connected research notes (Free + Paid sync/publish)" }
+            ]
+        },
+        writing_productivity: {
+            title: "Writing & Productivity",
+            icon: "✍️",
+            color: "indigo",
+            items: [
+                { name: "Grammarly", url: "https://www.grammarly.com/", desc: "AI writing assistant for grammar, clarity, tone, and citation support (Free + Paid)" },
+                { name: "Overleaf", url: "https://www.overleaf.com/", desc: "Cloud LaTeX editor for collaborative STEM writing and publication workflows (Free + Paid)" },
+                { name: "Google Docs", url: "https://docs.google.com/", desc: "Real-time collaborative writing with comments, suggestions, and add-ons (Free)" },
+                { name: "ChatGPT", url: "https://chatgpt.com/", desc: "AI assistant for brainstorming, outlining, and explaining difficult concepts" },
+                { name: "arXiv", url: "https://arxiv.org/", desc: "Open-access preprint repository for physics, math, CS, and related fields (Free)" },
+                { name: "IEEE Xplore", url: "https://ieeexplore.ieee.org/", desc: "Engineering and technology research database (Institutional/Paid access)" }
+            ]
+        },
         reference: {
             title: "Reference Libraries",
             icon: "📚",
