@@ -1,0 +1,40 @@
+[Unit]
+Description=Planora Voice Proxy — Gemini Live WebSocket proxy
+Documentation=https://github.com/your-org/planora
+After=network.target
+# Start after the main Django/Gunicorn service if you have one
+# After=planora-api.service
+
+[Service]
+Type=simple
+
+# ── Adjust these if your deploy layout differs ───────────────────────────
+User=root
+Group=root
+WorkingDirectory=/var/www/planorah/Planorah/backend
+# ──────────────────────────────────────────────────────────────────────────
+
+# Load all env vars from the Django .env file (includes GEMINI_API_KEY etc.)
+EnvironmentFile=/var/www/planorah/Planorah/backend/.env
+
+# Binds to 127.0.0.1 only — nginx is the public-facing TLS terminator
+ExecStart=/var/www/planorah/venv/bin/python3 manage.py run_voice_proxy \
+    --host 127.0.0.1 \
+    --port 8001
+
+# Restart on any failure; wait 5 s before retrying
+Restart=on-failure
+RestartSec=5s
+
+# Log to systemd journal (view with: journalctl -u voice -f)
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=voice
+
+# Harden the process
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

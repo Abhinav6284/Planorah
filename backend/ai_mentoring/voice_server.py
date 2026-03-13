@@ -104,10 +104,12 @@ MAX_SCREENSHOT_BASE64_CHARS = 2_000_000
 CLIENT_IDLE_TIMEOUT_SEC = 75
 
 
-def _safe_json_loads(raw: str):
+def _safe_json_loads(raw):
     try:
+        if isinstance(raw, bytes):
+            raw = raw.decode('utf-8')
         return json.loads(raw)
-    except json.JSONDecodeError:
+    except (json.JSONDecodeError, UnicodeDecodeError):
         return None
 
 
