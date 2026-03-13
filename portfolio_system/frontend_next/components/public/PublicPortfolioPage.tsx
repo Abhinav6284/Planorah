@@ -30,7 +30,9 @@ export default function PublicPortfolioPage({ portfolio }: { portfolio: PublicPo
             <article key={project.title} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12 }}>
               <h3>{project.title}</h3>
               <p>{project.short_description}</p>
-              <p style={{ color: "#64748b" }}>{project.technologies.join(", ")}</p>
+              {project.image_url && (
+                <p style={{ color: "#64748b", wordBreak: "break-word" }}>{project.image_url}</p>
+              )}
               <div style={{ display: "flex", gap: 10 }}>
                 {project.github_url && <a href={project.github_url}>GitHub</a>}
                 {project.live_url && <a href={project.live_url}>Live Demo</a>}

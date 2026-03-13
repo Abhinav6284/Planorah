@@ -2,8 +2,8 @@
 const nextConfig = {
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "cdn.planorah.me" },
-      { protocol: "https", hostname: "**.amazonaws.com" }
+      { protocol: "https", hostname: "api.planorah.me" },
+      { protocol: "http", hostname: "localhost" }
     ]
   }
 };

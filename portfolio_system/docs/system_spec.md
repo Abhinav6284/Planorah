@@ -1,39 +1,29 @@
-# Portfolio System Spec (Decision Complete)
+# Portfolio System Spec (VPS Implementation)
 
 ## Public URL Strategy
-- Primary: `portfolio.planorah.me/{username}` (edge route resolver)
-- Fallback: `portfolio.planorah.me/p/{slug}`
+- API base: `https://api.planorah.me/v1`
+- Public portfolio payload: `GET /v1/public/portfolio/{slug}`
 
 ## Visibility Rules
-- `public`: discoverable and indexable
-- `unlisted`: accessible by URL, no index
-- `private`: owner only
+- `public`: visible to all
+- `unlisted`: visible by URL
+- `private`: hidden from public endpoint
 
 ## Upload Rules
 - Types: `jpeg`, `png`, `webp`, `avif`
 - Max size: 8 MB (configurable)
-- Upload flow: signed URL only, no direct API file payload
-
-## Theme Keys
-- `minimal`
-- `developer-dark`
-- `modern-gradient`
+- Upload endpoint: `POST /v1/upload/image`
+- Storage root: `/var/www/planorah/media`
 
 ## Security Controls
-- JWT auth with role claims (`student`, `admin`)
-- Ownership checks on all write APIs
-- Validation + sanitization before persist
-- Rate-limit public and upload endpoints
-- Log request-id + user-id + source IP for audits
+- JWT auth with bearer tokens
+- Ownership checks on write APIs
+- CORS allowlist + Vercel regex support
 
-## Performance Targets
-- Public page TTFB p95 < 250ms from edge
-- Portfolio payload API p95 < 120ms (cache hit path)
-- Cache hit ratio > 90% for public reads
+## Data Stores
+- PostgreSQL (`planorah_portfolio`)
+- Local filesystem for media
 
-## Future Extensions
-- GitHub repo auto-import
-- Progress graph from Planorah roadmap
-- AI headline/bio generation
-- Resume PDF generation
-- Portfolio analytics dashboard
+## Frontend Contract
+- Next.js on Vercel consumes JSON APIs at `https://api.planorah.me/v1/`
+- Public page fetch path: `/v1/public/portfolio/{slug}`

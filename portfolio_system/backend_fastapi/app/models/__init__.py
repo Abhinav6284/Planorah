@@ -1,29 +1,12 @@
-from app.models.portfolio import (
-    Certificate,
-    Portfolio,
-    PortfolioSection,
-    PortfolioSettings,
-    PortfolioSkill,
-    PortfolioViewEvent,
-    Project,
-    ProjectImage,
-    ProjectTechnology,
-    Skill,
-    SocialLink,
-    Technology,
-)
+from app.models.portfolio import Certificate, Portfolio, SocialLink, User
+from app.models.project import Project
+from app.models.skill import Skill
 
 __all__ = [
+    "User",
     "Portfolio",
-    "PortfolioSection",
-    "PortfolioSettings",
     "Project",
-    "ProjectImage",
-    "ProjectTechnology",
-    "Technology",
     "Skill",
-    "PortfolioSkill",
     "Certificate",
     "SocialLink",
-    "PortfolioViewEvent",
 ]
