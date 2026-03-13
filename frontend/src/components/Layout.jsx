@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Dashboard/Header';
 import AITalkPanel from './Mentoring/AITalkPanel';
 import AIVoicePanel from './Mentoring/AIVoicePanel';
+import WelcomeCoach from './Onboarding/WelcomeCoach';
 import { FaBrain, FaMicrophone } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -27,8 +28,14 @@ const Layout = () => {
     const [chatOpen, setChatOpen] = useState(false);
     const [voiceOpen, setVoiceOpen] = useState(false);
     const [fabExpanded, setFabExpanded] = useState(false);
+    const [welcomeUser, setWelcomeUser] = useState(null);
     const location = useLocation();
     const contextSource = getContextSource(location.pathname);
+
+    useEffect(() => {
+        const flag = sessionStorage.getItem('show_welcome_coach');
+        if (flag) setWelcomeUser(flag === 'true' ? '' : flag);
+    }, []);
 
     return (
         <div className="min-h-screen bg-[#F5F5F7] dark:bg-gray-900 transition-colors duration-200 font-sans flex flex-col">
@@ -89,6 +96,14 @@ const Layout = () => {
                     )}
                 </motion.button>
             </div>
+
+            {/* Welcome coach overlay — shown once after onboarding */}
+            {welcomeUser !== null && (
+                <WelcomeCoach
+                    userName={welcomeUser}
+                    onDone={() => setWelcomeUser(null)}
+                />
+            )}
 
             {/* Panels */}
             <AITalkPanel

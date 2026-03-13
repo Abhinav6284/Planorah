@@ -488,6 +488,7 @@ export default function UniversalOnboarding() {
         setLoading(true);
         try {
             await api.patch("users/update-profile/", mapToBackend(fd));
+            sessionStorage.setItem("show_welcome_coach", fd.name?.split(" ")[0] || "true");
             navigate("/dashboard");
         } catch (err) {
             console.error("Onboarding error:", err);
