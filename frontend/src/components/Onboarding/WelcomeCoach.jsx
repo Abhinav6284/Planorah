@@ -43,13 +43,14 @@ export default function WelcomeCoach({ userName = "", onDone }) {
     // Queue intro messages
     useEffect(() => {
         if (phase !== "intro") return;
+        const timers = timersRef.current;
         MESSAGES.forEach(({ delay, text }) => {
             const t = setTimeout(() => {
                 setVisibleMessages(prev => [...prev, text]);
             }, delay);
-            timersRef.current.push(t);
+            timers.push(t);
         });
-        return () => timersRef.current.forEach(clearTimeout);
+        return () => timers.forEach(clearTimeout);
     }, [phase]);
 
     const handleStartTour = () => {
