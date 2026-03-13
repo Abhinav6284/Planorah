@@ -24,7 +24,6 @@ export default function ResourceHub() {
             icon: "🧪",
             color: "teal",
             items: [
-                { name: "PhET Interactive Simulations", url: "https://phet.colorado.edu/", desc: "Physics, chemistry, biology, earth science, and math simulations (Free)" },
                 { name: "LabXchange Virtual Labs", url: "https://www.labxchange.org/", desc: "Harvard mini-labs for biology and chemistry with guided protocols (Free, account required)" },
                 { name: "ExploreLearning Gizmos", url: "https://www.explorelearning.com/", desc: "550+ science and math simulations for grades 3-12 (Paid, free samples/trial)" },
                 { name: "NOVA Labs", url: "https://www.pbslearningmedia.org/collection/nova-labs/", desc: "PBS science simulations and games tied to documentary content (Free)" },
