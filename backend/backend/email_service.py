@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import requests
 import logging
+from django.core.mail import EmailMultiAlternatives
 
 # Load environment variables from .env file
 from dotenv import load_dotenv
@@ -15,6 +16,32 @@ load_dotenv(env_path)
 BREVO_API_URL = "https://api.brevo.com/v3/smtp/email"
 BREVO_TIMEOUT_SECONDS = 15
 logger = logging.getLogger(__name__)
+
+
+def send_email_via_smtp_fallback(to_email, subject, html_content, text_content=None):
+    """
+    Fallback sender using Django's configured SMTP backend.
+    """
+    try:
+        from_email = (
+            os.getenv('DEFAULT_FROM_EMAIL')
+            or os.getenv('EMAIL_HOST_USER')
+            or 'noreply@planorah.me'
+        ).strip()
+        body_text = text_content or "Please view this email in an HTML-capable client."
+        message = EmailMultiAlternatives(
+            subject=subject,
+            body=body_text,
+            from_email=from_email,
+            to=[to_email],
+        )
+        message.attach_alternative(html_content, "text/html")
+        message.send(fail_silently=False)
+        logger.info("SMTP fallback email sent successfully to %s", to_email)
+        return True
+    except Exception as exc:
+        logger.exception("SMTP fallback failed for %s: %s", to_email, exc)
+        return False
 
 
 def get_otp_email_template(otp_code, username=None):
@@ -169,8 +196,8 @@ def send_email_via_brevo(to_email, subject, html_content, text_content=None):
     api_key = (os.getenv('BREVO_API_KEY') or '').strip()
 
     if not api_key:
-        logger.error("BREVO_API_KEY not set in environment variables")
-        return False
+        logger.warning("BREVO_API_KEY not set; using SMTP fallback")
+        return send_email_via_smtp_fallback(to_email, subject, html_content, text_content)
 
     sender_email = (
         os.getenv('BREVO_SENDER_EMAIL')
@@ -210,17 +237,17 @@ def send_email_via_brevo(to_email, subject, html_content, text_content=None):
             logger.info("Email sent successfully to %s", to_email)
             return True
         else:
-            logger.error("Failed to send email: %s - %s", response.status_code, response.text)
-            return False
+            logger.error("Brevo send failed: %s - %s", response.status_code, response.text)
+            return send_email_via_smtp_fallback(to_email, subject, html_content, text_content)
     except requests.Timeout:
         logger.error("Brevo email request timed out after %s seconds", BREVO_TIMEOUT_SECONDS)
-        return False
+        return send_email_via_smtp_fallback(to_email, subject, html_content, text_content)
     except requests.RequestException as e:
         logger.exception("HTTP error sending email via Brevo: %s", e)
-        return False
+        return send_email_via_smtp_fallback(to_email, subject, html_content, text_content)
     except Exception as e:
         logger.exception("Error sending email via Brevo: %s", e)
-        return False
+        return send_email_via_smtp_fallback(to_email, subject, html_content, text_content)
 
 
 def send_otp_email(to_email, otp_code, username=None):
