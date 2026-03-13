@@ -445,7 +445,7 @@ const XTerminal = ({
                     term.writeln('[main abc1234] commit message');
                 } else if (cmdArgs[0] === 'log') {
                     term.writeln('\x1b[33mcommit abc1234\x1b[0m');
-                    term.writeln('Author: You <you@planorah.me>');
+                    term.writeln('Author: You <support@planorah.me>');
                     term.writeln('    Initial commit');
                 }
                 break;

@@ -26,7 +26,7 @@ def send_email_via_smtp_fallback(to_email, subject, html_content, text_content=N
         from_email = (
             os.getenv('DEFAULT_FROM_EMAIL')
             or os.getenv('EMAIL_HOST_USER')
-            or 'noreply@planorah.me'
+            or 'support@planorah.me'
         ).strip()
         body_text = text_content or "Please view this email in an HTML-capable client."
         message = EmailMultiAlternatives(
@@ -202,7 +202,7 @@ def send_email_via_brevo(to_email, subject, html_content, text_content=None):
     sender_email = (
         os.getenv('BREVO_SENDER_EMAIL')
         or os.getenv('DEFAULT_FROM_EMAIL')
-        or 'noreply@planorah.me'
+        or 'support@planorah.me'
     ).strip()
     sender_name = (os.getenv('BREVO_SENDER_NAME') or 'Planorah').strip()
 

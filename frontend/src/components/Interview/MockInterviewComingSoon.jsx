@@ -179,7 +179,7 @@ export default function MockInterviewComingSoon() {
                     </Link>
 
                     <button
-                        onClick={() => window.open('mailto:support@planorah.com?subject=Notify%20me%20about%20Mock%20Interview', '_blank')}
+                        onClick={() => window.open('mailto:support@planorah.me?subject=Notify%20me%20about%20Mock%20Interview', '_blank')}
                         className="inline-flex items-center gap-2 px-8 py-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-300 rounded-2xl font-semibold border border-gray-200 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-800 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
                     >
                         <span>🔔</span>

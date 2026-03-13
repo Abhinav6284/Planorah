@@ -40,8 +40,8 @@ class ResendEmailBackend(BaseEmailBackend):
         num_sent = 0
         for message in email_messages:
             try:
-                # Resend requires a verified domain, or use onboarding@resend.dev for testing
-                from_email = message.from_email or os.getenv('DEFAULT_FROM_EMAIL', 'onboarding@resend.dev')
+                # Resend requires a verified domain; fallback to support sender.
+                from_email = message.from_email or os.getenv('DEFAULT_FROM_EMAIL', 'support@planorah.me')
                 
                 params = {
                     "from": from_email,

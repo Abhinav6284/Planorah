@@ -177,7 +177,7 @@ const Header = () => {
                     <div className="absolute top-full right-0 mt-3 w-60 bg-white dark:bg-[#1C1C1E] rounded-2xl shadow-xl border border-gray-100 dark:border-white/10 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right z-50">
                         <div className="px-4 py-3 border-b border-gray-100 dark:border-white/5 mb-1">
                             <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{displayName}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email || "student@planorah.com"}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email || "support@planorah.me"}</p>
                         </div>
                         <Link
                             to="/profile"

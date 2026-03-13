@@ -203,7 +203,7 @@ export default function PricingSection() {
           className="text-center text-sm text-gray-400 dark:text-gray-500 mt-10"
         >
           Need a custom plan?{" "}
-          <a href="mailto:hello@planorah.com" className="text-violet-600 dark:text-violet-400 hover:underline font-medium">
+          <a href="mailto:support@planorah.me" className="text-violet-600 dark:text-violet-400 hover:underline font-medium">
             Contact us
           </a>{" "}
           for enterprise pricing.

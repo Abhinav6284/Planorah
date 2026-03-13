@@ -50,6 +50,24 @@ const isAuthFreeEndpoint = (url = '') => {
 
 const shouldSkipAuthGuards = (config = {}) => config.skipAuthRefresh === true || isAuthFreeEndpoint(config.url);
 
+const deriveNetworkFallbackBaseUrl = () => {
+  if (typeof window === 'undefined') {
+    return '';
+  }
+
+  const configuredBaseUrl = String(env.API_BASE_URL || '').toLowerCase();
+  const hostname = window.location.hostname.toLowerCase();
+  const isPrimaryWebHost = hostname === 'planorah.me' || hostname === 'www.planorah.me';
+
+  if (isPrimaryWebHost && configuredBaseUrl.includes('api.planorah.me')) {
+    return `${window.location.origin}/api/`;
+  }
+
+  return '';
+};
+
+const NETWORK_FALLBACK_BASE_URL = deriveNetworkFallbackBaseUrl();
+
 const handleSessionExpiry = () => {
   clearTokens();
 
@@ -78,8 +96,8 @@ const refreshAccessToken = async () => {
       throw new Error('No refresh token available');
     }
 
-    refreshTokenRequest = axios.post(
-      `${env.API_BASE_URL}token/refresh/`,
+    refreshTokenRequest = client.post(
+      'token/refresh/',
       { refresh: refreshToken },
       { timeout: 20000, skipAuthRefresh: true }
     )
@@ -130,6 +148,12 @@ client.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
+    if (!error.response && originalRequest && NETWORK_FALLBACK_BASE_URL && originalRequest._networkFallbackTried !== true) {
+      originalRequest._networkFallbackTried = true;
+      originalRequest.baseURL = NETWORK_FALLBACK_BASE_URL;
+      return client(originalRequest);
+    }
 
     if (!originalRequest || !error.response) {
       return Promise.reject(error);
