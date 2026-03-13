@@ -29,7 +29,8 @@ if ENV_PATH.exists():
 try:
     import websockets
 except ImportError:
-    sys.stderr.write("ERROR: 'websockets' package is required. Install it with: pip install websockets\n")
+    sys.stderr.write(
+        "ERROR: 'websockets' package is required. Install it with: pip install websockets\n")
     sys.exit(1)
 
 logger = logging.getLogger('voice_proxy')
@@ -120,7 +121,8 @@ async def proxy_handler(client_ws):
 
     # Origin validation — reject connections from unauthorized origins
     if ALLOWED_ORIGINS:
-        origin = client_ws.request_headers.get('Origin', '')
+        headers = getattr(client_ws.request, 'headers', None) or getattr(client_ws, 'request_headers', {})
+        origin = headers.get('Origin', '')
         if origin not in ALLOWED_ORIGINS:
             logger.warning(
                 f"Rejected connection from unauthorized origin: '{origin}' ({client_addr})")
