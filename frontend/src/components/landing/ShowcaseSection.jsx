@@ -25,8 +25,13 @@ const showcases = [
 
 export default function ShowcaseSection() {
   return (
-    <section id="showcase" className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+    <section id="showcase" className="relative py-24 overflow-hidden bg-gradient-to-b from-white/70 via-slate-50/55 to-cyan-50/45">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-14 left-[12%] h-56 w-56 rounded-full bg-cyan-100/45 blur-3xl" />
+        <div className="absolute bottom-[-6rem] right-[8%] h-72 w-72 rounded-full bg-sky-100/35 blur-3xl" />
+        <div className="absolute inset-0 opacity-[0.1] [background-image:radial-gradient(rgba(15,23,42,0.12)_1px,transparent_1px)] [background-size:34px_34px]" />
+      </div>
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -55,9 +60,9 @@ export default function ShowcaseSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.6 }}
-              className="bg-white border border-gray-200/60 rounded-[2rem] p-8 md:p-12 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col items-center text-center group hover:shadow-[0_8px_30px_-10px_rgba(0,0,0,0.08)] transition-all"
+              className="bg-white/80 backdrop-blur-sm border border-slate-200/70 rounded-[2rem] p-8 md:p-12 shadow-[0_10px_35px_-16px_rgba(15,23,42,0.2)] overflow-hidden flex flex-col items-center text-center group hover:shadow-[0_20px_45px_-18px_rgba(15,23,42,0.24)] transition-all"
             >
-              <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-50 to-cyan-50 border border-slate-100 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
                 <item.icon className="w-8 h-8 text-black" strokeWidth={1.5} />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">{item.title}</h3>

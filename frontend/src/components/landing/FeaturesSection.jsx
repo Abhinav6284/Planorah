@@ -44,8 +44,13 @@ const features = [
 
 export default function FeaturesSection() {
   return (
-    <section id="features" className="py-24 bg-[#FAFAFA] border-y border-gray-100">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+    <section id="features" className="relative py-24 overflow-hidden bg-gradient-to-b from-slate-50/70 via-white/70 to-blue-50/50 border-y border-slate-200/60">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-20 -left-20 h-64 w-64 rounded-full bg-cyan-100/45 blur-3xl" />
+        <div className="absolute bottom-0 right-[-6rem] h-72 w-72 rounded-full bg-indigo-100/35 blur-3xl" />
+        <div className="absolute inset-0 opacity-[0.12] [background-image:radial-gradient(rgba(15,23,42,0.12)_1px,transparent_1px)] [background-size:30px_30px]" />
+      </div>
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
@@ -74,9 +79,9 @@ export default function FeaturesSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 + 0.2 }}
-              className="group bg-white rounded-2xl p-8 border border-gray-200/60 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.06)] hover:border-gray-200 transition-all duration-300"
+              className="group bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/70 shadow-[0_8px_30px_-14px_rgba(15,23,42,0.14)] hover:shadow-[0_18px_45px_-16px_rgba(15,23,42,0.2)] hover:border-slate-200 transition-all duration-300"
             >
-              <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-50 to-sky-50 border border-slate-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                 <feature.icon className="w-6 h-6 text-gray-900" strokeWidth={1.5} />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>

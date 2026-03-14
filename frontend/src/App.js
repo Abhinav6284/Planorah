@@ -59,6 +59,23 @@ const PortfolioEditor = lazy(() => import('./components/Portfolio').then(m => ({
 const ProjectManager = lazy(() => import('./components/Portfolio').then(m => ({ default: m.ProjectManager })));
 const PublicPortfolio = lazy(() => import('./components/Portfolio').then(m => ({ default: m.PublicPortfolio })));
 
+function GlobalDevelopmentBanner() {
+  return (
+    <div className="sticky top-0 z-[1000] w-full border-b border-amber-200 bg-amber-50/95 px-3 py-2 text-center text-xs sm:text-sm font-medium text-amber-900 backdrop-blur">
+      This app is under development. Please contact support and share feedback with the admin.
+      {" "}
+      <a
+        href="https://planorah.me/support"
+        target="_blank"
+        rel="noreferrer"
+        className="font-semibold underline decoration-amber-500 underline-offset-2 hover:text-amber-700"
+      >
+        Contact support
+      </a>
+    </div>
+  );
+}
+
 export default function App() {
   // Subdomain detection logic
   const hostname = window.location.hostname;
@@ -86,6 +103,7 @@ export default function App() {
         <ToastProvider>
           <SubscriptionProvider>
             <Router>
+              <GlobalDevelopmentBanner />
               <ErrorBoundary>
                 <Suspense fallback={<DashboardSkeleton />}>
                   <Routes>
@@ -105,6 +123,7 @@ export default function App() {
       <ToastProvider>
         <SubscriptionProvider>
           <Router>
+            <GlobalDevelopmentBanner />
             <ErrorBoundary>
               <Suspense fallback={<DashboardSkeleton />}>
                 <Routes>

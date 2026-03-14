@@ -120,10 +120,13 @@ export default function HeroSection() {
   const activeMockup = mockupStates[currentMockupIndex];
 
   return (
-    <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden bg-white">
-      {/* Subtle Background Elements */}
+    <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden bg-gradient-to-b from-white/90 via-sky-50/55 to-emerald-50/25">
+      {/* Ambient Background */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-gray-50/50 rounded-full blur-3xl opacity-50" />
+        <div className="absolute -top-24 left-[8%] h-72 w-72 rounded-full bg-sky-200/35 blur-3xl" />
+        <div className="absolute top-10 right-[8%] h-64 w-64 rounded-full bg-teal-200/30 blur-3xl" />
+        <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 h-80 w-[36rem] rounded-full bg-amber-100/45 blur-3xl" />
+        <div className="absolute inset-0 opacity-[0.14] [background-image:radial-gradient(rgba(15,23,42,0.12)_1px,transparent_1px)] [background-size:26px_26px]" />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 flex flex-col lg:flex-row items-center gap-16 lg:gap-8">

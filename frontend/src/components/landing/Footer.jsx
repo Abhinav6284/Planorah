@@ -23,8 +23,12 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-white border-t border-gray-100 pt-16 pb-8">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+    <footer className="relative overflow-hidden bg-gradient-to-b from-slate-50/90 via-white/90 to-emerald-50/35 border-t border-slate-200/70 pt-16 pb-8">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-20 right-[10%] h-56 w-56 rounded-full bg-cyan-100/30 blur-3xl" />
+        <div className="absolute bottom-[-5rem] left-[12%] h-64 w-64 rounded-full bg-amber-100/35 blur-3xl" />
+      </div>
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12 mb-16">
           
           {/* Brand Column */}

@@ -20,15 +20,20 @@ const testimonials = [
     quote: "The interface is gorgeous. It feels like using a premium product, yet it's focused entirely on my educational growth. Highly recommended for anyone serious about upskilling.",
     name: "Michael Torres",
     role: "Bootcamp Graduate",
-    avatar: "bg-purple-100 text-purple-600",
+    avatar: "bg-amber-100 text-amber-600",
     initials: "MT"
   }
 ];
 
 export default function TestimonialsSection() {
   return (
-    <section className="py-24 bg-[#FAFAFA] border-y border-gray-100">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+    <section className="relative py-24 overflow-hidden bg-gradient-to-b from-slate-50/60 via-white/80 to-emerald-50/45 border-y border-slate-200/60">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-10 left-[8%] h-52 w-52 rounded-full bg-blue-100/35 blur-3xl" />
+        <div className="absolute bottom-[-4rem] right-[10%] h-64 w-64 rounded-full bg-emerald-100/35 blur-3xl" />
+        <div className="absolute inset-0 opacity-[0.1] [background-image:radial-gradient(rgba(15,23,42,0.12)_1px,transparent_1px)] [background-size:34px_34px]" />
+      </div>
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         <div className="text-center mb-16">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -48,7 +53,7 @@ export default function TestimonialsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="bg-white border border-gray-200/60 rounded-2xl p-8 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.06)] transition-all flex flex-col justify-between"
+              className="bg-white/85 backdrop-blur-sm border border-slate-200/70 rounded-2xl p-8 shadow-[0_10px_35px_-18px_rgba(15,23,42,0.2)] hover:shadow-[0_20px_45px_-18px_rgba(15,23,42,0.24)] transition-all flex flex-col justify-between"
             >
               <div className="mb-8">
                 <div className="flex gap-1 mb-4 text-black">

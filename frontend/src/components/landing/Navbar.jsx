@@ -31,16 +31,8 @@ export default function Navbar() {
               : "bg-gray-100/70 backdrop-blur-sm"
           }`}
         >
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 flex-shrink-0">
-            <img src="/planorah-logo.png" alt="Planorah" className="w-8 h-8 object-contain" />
-            <span className="font-bold text-lg md:text-xl font-serif tracking-tight text-gray-900 whitespace-nowrap">
-              Planorah
-            </span>
-          </Link>
-
           {/* Desktop: Nav Links + Actions */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-6 ml-auto">
             {navLinks.map((link) => (
               <a
                 key={link.name}
@@ -66,7 +58,7 @@ export default function Navbar() {
 
           {/* Mobile Menu Toggle */}
           <button
-            className="md:hidden p-1.5 text-gray-600 hover:text-gray-900"
+            className="md:hidden ml-auto p-1.5 text-gray-600 hover:text-gray-900"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
