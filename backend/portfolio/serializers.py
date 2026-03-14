@@ -243,36 +243,10 @@ class PortfolioUpdateSerializer(serializers.ModelSerializer, URLValidationMixin)
         return self.normalize_url(value)
 
     def validate_og_image_url(self, value):
-        value = self.normalize_url(value)
-        if value:
-            path = urlparse(value).path.lower()
-            valid_ext = ('.png', '.jpg', '.jpeg', '.webp')
-            if path and not path.endswith(valid_ext):
-                raise serializers.ValidationError("OG image URL should end with png/jpg/jpeg/webp.")
-        return value
-
-    def validate(self, attrs):
-        final_label = attrs.get(
-            'primary_cta_label',
-            getattr(self.instance, 'primary_cta_label', ''),
-        )
-        final_url = attrs.get(
-            'primary_cta_url',
-            getattr(self.instance, 'primary_cta_url', ''),
-        )
-        label_in_payload = 'primary_cta_label' in attrs
-        url_in_payload = 'primary_cta_url' in attrs
-
-        if label_in_payload and final_label and not final_url and final_label not in {'Hire Me', 'Contact'}:
-            raise serializers.ValidationError(
-                {"primary_cta_url": "CTA URL is required when CTA label is set."}
-            )
-
-        if url_in_payload and final_url and not final_label:
-            raise serializers.ValidationError(
-                {"primary_cta_label": "CTA label is required when CTA URL is set."}
-            )
-        return attrs
+        # Only validate that it is a well-formed http/https URL.
+        # Extension checks are intentionally omitted because CDN and
+        # Cloudinary URLs often lack a file extension in the path.
+        return self.normalize_url(value)
 
 
 class PublicPortfolioSerializer(serializers.ModelSerializer):
