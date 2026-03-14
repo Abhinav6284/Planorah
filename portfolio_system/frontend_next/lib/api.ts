@@ -12,7 +12,7 @@ const DJANGO_API_BASE = process.env.NEXT_PUBLIC_DJANGO_API_BASE || "https://api.
 
 export async function fetchPublicPortfolio(slug: string): Promise<PublicPortfolio | null> {
   const res = await fetch(`${DJANGO_API_BASE}/api/portfolio/public/${slug}/`, {
-    next: { revalidate: 300 },
+    cache: 'no-store',
   });
 
   if (res.status === 404) return null;
