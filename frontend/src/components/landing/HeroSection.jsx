@@ -13,22 +13,8 @@ const FloatingCard = ({ className, children, delay = 0 }) => (
   </motion.div>
 );
 
-const Orb = ({ className, style }) => (
-  <motion.div
-    animate={{
-      scale: [1, 1.1, 1],
-      opacity: [0.4, 0.6, 0.4],
-    }}
-    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-    className={className}
-    style={style}
-  />
-);
-
 export default function HeroSection() {
   const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 600], [0, 180]);
-  const y2 = useTransform(scrollY, [0, 600], [0, -120]);
   const heroOpacity = useTransform(scrollY, [0, 400], [1, 0]);
   const heroY = useTransform(scrollY, [0, 400], [0, 80]);
 
@@ -48,20 +34,11 @@ export default function HeroSection() {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-24 pb-16 overflow-hidden">
-      {/* Background gradient mesh */}
-      <div className="absolute inset-0 bg-gradient-to-br from-violet-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900" />
+      {/* Background */}
+      <div className="absolute inset-0 bg-white dark:bg-gray-900" />
 
       {/* Grid overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] [background-size:48px_48px]" />
-
-      {/* Animated orbs */}
-      <motion.div style={{ y: y1 }} className="absolute top-20 left-1/4 w-96 h-96 pointer-events-none">
-        <Orb className="w-full h-full rounded-full bg-gradient-to-br from-violet-400/30 to-purple-400/20 dark:from-violet-600/20 dark:to-purple-600/10 blur-3xl" />
-      </motion.div>
-      <motion.div style={{ y: y2 }} className="absolute bottom-10 right-1/4 w-80 h-80 pointer-events-none">
-        <Orb className="w-full h-full rounded-full bg-gradient-to-br from-indigo-400/30 to-blue-400/20 dark:from-indigo-600/20 dark:to-blue-600/10 blur-3xl" />
-      </motion.div>
-      <div className="absolute top-1/3 right-10 w-64 h-64 rounded-full bg-gradient-to-br from-pink-300/20 to-rose-300/10 dark:from-pink-600/10 dark:to-rose-600/5 blur-3xl pointer-events-none" />
 
       {/* Main content */}
       <motion.div
@@ -76,10 +53,10 @@ export default function HeroSection() {
         >
           {/* Badge */}
           <motion.div variants={itemVariants}>
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-100 dark:bg-violet-900/40 border border-violet-200 dark:border-violet-700/50 text-violet-700 dark:text-violet-300 text-sm font-medium mb-8">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-medium mb-8">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gray-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-gray-500 dark:bg-gray-400"></span>
               </span>
               Turn Goals into Verified Work
             </span>
@@ -92,14 +69,14 @@ export default function HeroSection() {
           >
             Proof,{" "}
             <span className="relative">
-              <span className="bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+              <span className="text-gray-900 dark:text-white">
                 Not Promises
               </span>
               <motion.span
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ delay: 1, duration: 0.6, ease: "easeOut" }}
-                className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-full origin-left"
+                className="absolute -bottom-2 left-0 right-0 h-[3px] bg-gray-900 dark:bg-white rounded-full origin-left"
               />
             </span>
             <span className="text-gray-300 dark:text-gray-600">.</span>
@@ -123,7 +100,7 @@ export default function HeroSection() {
                 transition={{ delay: 0.8 + i * 0.07 }}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full text-sm text-gray-700 dark:text-gray-300 shadow-sm"
               >
-                <svg className="w-3.5 h-3.5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                 </svg>
                 {tag}
@@ -135,9 +112,9 @@ export default function HeroSection() {
           <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link to="/register">
               <motion.button
-                whileHover={{ scale: 1.04, boxShadow: "0 20px 40px -12px rgba(139,92,246,0.4)" }}
+                whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.97 }}
-                className="group px-8 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-2xl text-base font-semibold shadow-xl shadow-violet-500/30 flex items-center gap-2"
+                className="group px-8 py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-2xl text-base font-semibold shadow-sm flex items-center gap-2 hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors"
               >
                 Start Your Journey
                 <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,7 +128,7 @@ export default function HeroSection() {
                 whileTap={{ scale: 0.97 }}
                 className="group px-8 py-4 bg-white dark:bg-gray-800 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-2xl text-base font-semibold hover:border-gray-300 dark:hover:border-gray-600 shadow-sm flex items-center gap-2"
               >
-                <svg className="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -171,7 +148,7 @@ export default function HeroSection() {
                   key={i}
                   className="w-8 h-8 rounded-full border-2 border-white dark:border-gray-900 flex items-center justify-center text-xs font-bold text-white"
                   style={{
-                    background: `hsl(${250 + i * 25}, 70%, 60%)`,
+                    background: `hsl(0, 0%, ${35 + i * 8}%)`,
                   }}
                 >
                   {letter}
@@ -228,9 +205,9 @@ export default function HeroSection() {
           <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3">This Week</div>
           <div className="space-y-2">
             {[
-              { label: "Code commits", value: "12", color: "bg-violet-500" },
-              { label: "Tasks done", value: "8", color: "bg-indigo-500" },
-              { label: "Hours focused", value: "24", color: "bg-blue-500" },
+              { label: "Code commits", value: "12", color: "bg-gray-800 dark:bg-gray-200" },
+              { label: "Tasks done", value: "8", color: "bg-gray-500" },
+              { label: "Hours focused", value: "24", color: "bg-gray-300 dark:bg-gray-600" },
             ].map((stat) => (
               <div key={stat.label} className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${stat.color}`} />
@@ -251,7 +228,7 @@ export default function HeroSection() {
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
           className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 px-4 py-3 flex items-center gap-3 w-52"
         >
-          <div className="w-9 h-9 rounded-xl bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center flex-shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
             <span className="text-lg">🏆</span>
           </div>
           <div>

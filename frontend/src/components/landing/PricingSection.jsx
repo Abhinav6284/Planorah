@@ -39,8 +39,8 @@ export default function PricingSection() {
       cta: "Start Pro Trial",
       href: "/register",
       popular: true,
-      gradient: "from-violet-600 to-indigo-600",
-      border: "border-violet-500/20",
+      gradient: "from-gray-50 to-gray-100 dark:from-gray-800/60 dark:to-gray-800/40",
+      border: "border-gray-800",
     },
     {
       name: "Team",
@@ -65,11 +65,10 @@ export default function PricingSection() {
 
   return (
     <section id="pricing" className="py-28 md:py-36 px-4 md:px-8 bg-gray-50 dark:bg-gray-800/30 relative overflow-hidden">
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-violet-200 dark:via-violet-800 to-transparent" />
-      <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-violet-200 dark:via-violet-800 to-transparent" />
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent" />
+      <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent" />
 
-      {/* Decorative orb */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-48 bg-gradient-to-t from-violet-500/10 to-transparent blur-3xl pointer-events-none" />
+      {/* No decorative orb */}
 
       <div className="max-w-6xl mx-auto relative">
         {/* Header */}
@@ -78,7 +77,7 @@ export default function PricingSection() {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-block px-4 py-1.5 rounded-full bg-violet-50 dark:bg-violet-900/30 border border-violet-100 dark:border-violet-800/50 text-violet-600 dark:text-violet-400 text-sm font-medium mb-4"
+            className="inline-block px-4 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm font-medium mb-4"
           >
             Simple pricing
           </motion.span>
@@ -90,7 +89,7 @@ export default function PricingSection() {
             className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-5 tracking-tight"
           >
             Invest in your{" "}
-            <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
+            <span className="text-gray-900 dark:text-white">
               future
             </span>
           </motion.h2>
@@ -119,7 +118,7 @@ export default function PricingSection() {
             >
               {plan.popular && (
                 <div className="absolute -top-4 inset-x-0 flex justify-center z-10">
-                  <span className="px-4 py-1 bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-xs font-bold rounded-full shadow-lg shadow-violet-500/40 tracking-wide uppercase">
+                  <span className="px-4 py-1 bg-gray-900 text-white text-xs font-bold rounded-full shadow-sm tracking-wide uppercase">
                     Most Popular
                   </span>
                 </div>
@@ -128,7 +127,7 @@ export default function PricingSection() {
               <div
                 className={`relative rounded-2xl border ${plan.border} overflow-hidden ${
                   plan.popular
-                    ? "bg-gradient-to-br from-violet-600 to-indigo-700 text-white shadow-2xl shadow-violet-500/30 pt-6"
+                    ? "bg-gray-900 dark:bg-black text-white shadow-2xl pt-6"
                     : `bg-gradient-to-br ${plan.gradient} shadow-sm pt-0`
                 } p-8 flex flex-col h-full`}
               >
@@ -137,7 +136,7 @@ export default function PricingSection() {
                   <h3 className={`text-lg font-bold mb-1 ${plan.popular ? "text-white" : "text-gray-900 dark:text-white"}`}>
                     {plan.name}
                   </h3>
-                  <p className={`text-sm mb-6 ${plan.popular ? "text-violet-200" : "text-gray-500 dark:text-gray-400"}`}>
+                  <p className={`text-sm mb-6 ${plan.popular ? "text-gray-400" : "text-gray-500 dark:text-gray-400"}`}>
                     {plan.desc}
                   </p>
                   <div className="flex items-end gap-1">
@@ -145,7 +144,7 @@ export default function PricingSection() {
                       {plan.price}
                     </span>
                     {plan.period && (
-                      <span className={`text-sm mb-1 ${plan.popular ? "text-violet-200" : "text-gray-500 dark:text-gray-400"}`}>
+                      <span className={`text-sm mb-1 ${plan.popular ? "text-gray-400" : "text-gray-500 dark:text-gray-400"}`}>
                         {plan.period}
                       </span>
                     )}
@@ -157,10 +156,10 @@ export default function PricingSection() {
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-center gap-3">
                       <div className={`w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center ${
-                        plan.popular ? "bg-white/20" : "bg-violet-100 dark:bg-violet-900/40"
+                        plan.popular ? "bg-white/20" : "bg-gray-100 dark:bg-gray-700"
                       }`}>
                         <svg
-                          className={`w-3 h-3 ${plan.popular ? "text-white" : "text-violet-600 dark:text-violet-400"}`}
+                          className={`w-3 h-3 ${plan.popular ? "text-white" : "text-gray-500 dark:text-gray-400"}`}
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -168,7 +167,7 @@ export default function PricingSection() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
-                      <span className={`text-sm ${plan.popular ? "text-violet-100" : "text-gray-600 dark:text-gray-300"}`}>
+                      <span className={`text-sm ${plan.popular ? "text-gray-200" : "text-gray-600 dark:text-gray-300"}`}>
                         {feature}
                       </span>
                     </li>
@@ -182,8 +181,8 @@ export default function PricingSection() {
                     whileTap={{ scale: 0.97 }}
                     className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all ${
                       plan.popular
-                        ? "bg-white text-violet-700 hover:bg-violet-50 shadow-lg"
-                        : "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50"
+                        ? "bg-white text-gray-900 hover:bg-gray-100 shadow-sm"
+                        : "bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-100"
                     }`}
                   >
                     {plan.cta}
@@ -203,7 +202,7 @@ export default function PricingSection() {
           className="text-center text-sm text-gray-400 dark:text-gray-500 mt-10"
         >
           Need a custom plan?{" "}
-          <a href="mailto:support@planorah.me" className="text-violet-600 dark:text-violet-400 hover:underline font-medium">
+            <a href="mailto:support@planorah.me" className="text-gray-900 dark:text-white hover:underline font-medium">
             Contact us
           </a>{" "}
           for enterprise pricing.

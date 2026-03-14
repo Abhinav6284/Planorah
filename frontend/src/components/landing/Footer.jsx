@@ -73,11 +73,11 @@ export default function Footer() {
           {/* Brand column */}
           <div className="col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4 group">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
-                <span className="text-white font-bold text-sm">P</span>
+              <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
+                <span className="text-gray-900 font-bold text-sm">P</span>
               </div>
               <span className="text-lg font-bold text-white tracking-tight">
-                Planorah<span className="text-violet-400">.</span>
+                Planorah<span className="text-gray-500">.</span>
               </span>
             </Link>
             <p className="text-sm leading-relaxed mb-6 max-w-xs">
@@ -92,7 +92,7 @@ export default function Footer() {
                   aria-label={social.label}
                   whileHover={{ scale: 1.1, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  className="w-9 h-9 rounded-xl bg-gray-800 hover:bg-violet-600/20 border border-gray-700 hover:border-violet-500/50 flex items-center justify-center text-gray-400 hover:text-violet-400 transition-all"
+                  className="w-9 h-9 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-gray-500 flex items-center justify-center text-gray-400 hover:text-white transition-all"
                 >
                   {social.icon}
                 </motion.a>
@@ -127,7 +127,7 @@ export default function Footer() {
           </p>
           <p className="text-sm text-gray-600">
             Built with{" "}
-            <span className="text-violet-400">♥</span>{" "}
+            <span className="text-gray-500">♥</span>{" "}
             for builders everywhere
           </p>
         </div>

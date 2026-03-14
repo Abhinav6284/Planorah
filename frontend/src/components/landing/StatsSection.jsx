@@ -32,10 +32,10 @@ function AnimatedCounter({ end, duration = 2, suffix = "" }) {
 }
 
 const stats = [
-  { value: 2400, suffix: "+", label: "Active Builders", icon: "👥", color: "from-violet-500 to-purple-600" },
-  { value: 18000, suffix: "+", label: "Tasks Verified", icon: "✅", color: "from-emerald-500 to-teal-600" },
-  { value: 4200, suffix: "+", label: "Portfolios Created", icon: "🏆", color: "from-amber-500 to-orange-600" },
-  { value: 98, suffix: "%", label: "Satisfaction Rate", icon: "⭐", color: "from-blue-500 to-indigo-600" },
+  { value: 2400, suffix: "+", label: "Active Builders", icon: "👥" },
+  { value: 18000, suffix: "+", label: "Tasks Verified", icon: "✅" },
+  { value: 4200, suffix: "+", label: "Portfolios Created", icon: "🏆" },
+  { value: 98, suffix: "%", label: "Satisfaction Rate", icon: "⭐" },
 ];
 
 const testimonials = [
@@ -44,29 +44,28 @@ const testimonials = [
     author: "Priya S.",
     role: "CS Student, IIT Delhi",
     avatar: "P",
-    color: "from-violet-500 to-purple-600",
+    color: "neutral",
   },
   {
     quote: "The AI roadmap feature is genuinely impressive. It built a 12-week ML plan tailored to my background and I can see exactly how far I've come.",
     author: "Marcus T.",
     role: "Self-taught Developer",
     avatar: "M",
-    color: "from-emerald-500 to-teal-600",
+    color: "neutral",
   },
   {
     quote: "I used to struggle showing recruiters my work. Now my Planorah portfolio does all the talking. Got two interviews from it this month alone.",
     author: "Aisha K.",
     role: "Aspiring Data Scientist",
     avatar: "A",
-    color: "from-amber-500 to-orange-600",
+    color: "neutral",
   },
 ];
 
 export default function StatsSection() {
   return (
     <section id="testimonials" className="py-28 md:py-36 px-4 md:px-8 bg-white dark:bg-gray-900 relative overflow-hidden">
-      {/* Decorative background */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.06),transparent_60%)] dark:bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.1),transparent_60%)]" />
+      {/* No decorative background */}
 
       <div className="max-w-7xl mx-auto relative">
         {/* Stats */}
@@ -75,7 +74,7 @@ export default function StatsSection() {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-block px-4 py-1.5 rounded-full bg-violet-50 dark:bg-violet-900/30 border border-violet-100 dark:border-violet-800/50 text-violet-600 dark:text-violet-400 text-sm font-medium mb-4"
+            className="inline-block px-4 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm font-medium mb-4"
           >
             Trusted worldwide
           </motion.span>
@@ -87,7 +86,7 @@ export default function StatsSection() {
             className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-5 tracking-tight"
           >
             Builders{" "}
-            <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
+            <span className="text-gray-900 dark:text-white">
               love it
             </span>
           </motion.h2>
@@ -113,9 +112,9 @@ export default function StatsSection() {
               transition={{ delay: index * 0.1, duration: 0.6 }}
               className="relative bg-white dark:bg-gray-800/60 rounded-2xl border border-gray-100 dark:border-gray-700/60 p-6 text-center overflow-hidden group hover:shadow-lg hover:shadow-gray-100/80 dark:hover:shadow-gray-900/80 transition-shadow"
             >
-              <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-[0.04] dark:group-hover:opacity-[0.08] transition-opacity rounded-2xl`} />
+              <div className="absolute inset-0 bg-gray-500 opacity-0 group-hover:opacity-[0.03] dark:group-hover:opacity-[0.06] transition-opacity rounded-2xl" />
               <div className="text-3xl mb-3">{stat.icon}</div>
-              <div className={`text-3xl md:text-4xl font-bold mb-1 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
+              <div className="text-3xl md:text-4xl font-bold mb-1 text-gray-900 dark:text-white">
                 <AnimatedCounter end={stat.value} suffix={stat.suffix} />
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{stat.label}</p>
@@ -136,7 +135,7 @@ export default function StatsSection() {
               className="bg-white dark:bg-gray-800/60 rounded-2xl border border-gray-100 dark:border-gray-700/60 p-6 shadow-sm relative overflow-hidden group"
             >
               {/* Quote mark */}
-              <div className={`absolute -top-2 -right-2 text-8xl font-bold bg-gradient-to-br ${t.color} bg-clip-text text-transparent opacity-10 group-hover:opacity-20 transition-opacity`}>
+              <div className="absolute -top-2 -right-2 text-8xl font-bold text-gray-200 dark:text-gray-700 opacity-60 group-hover:opacity-100 transition-opacity">
                 "
               </div>
               {/* Stars */}
@@ -151,7 +150,7 @@ export default function StatsSection() {
                 "{t.quote}"
               </blockquote>
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
+                <div className="w-10 h-10 rounded-full bg-gray-900 dark:bg-gray-700 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                   {t.avatar}
                 </div>
                 <div>
