@@ -53,10 +53,16 @@ export default function LandingPage() {
   );
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 font-sans selection:bg-gray-900 selection:text-white dark:selection:bg-white dark:selection:text-gray-900 transition-colors duration-300 relative overflow-x-clip">
+    <div className="min-h-screen bg-white dark:bg-gray-950 font-sans selection:bg-violet-600 selection:text-white transition-colors duration-300 relative overflow-x-clip">
       <motion.div
-        className="fixed top-0 left-0 right-0 h-[2px] z-[60] origin-left bg-gray-900 dark:bg-white"
+        className="fixed top-0 left-0 right-0 h-[2px] z-[60] origin-left bg-gradient-to-r from-violet-500 via-fuchsia-500 to-indigo-500"
         style={{ scaleX: scrollProgress }}
+      />
+      {/* Subtle ambient glow — barely visible, adds depth */}
+      <motion.div
+        aria-hidden="true"
+        className="fixed top-32 left-1/2 -translate-x-1/2 w-[60rem] h-[28rem] rounded-full bg-gradient-to-r from-violet-400/8 via-indigo-400/8 to-violet-400/8 dark:from-violet-500/10 dark:via-indigo-500/10 dark:to-violet-500/10 blur-3xl pointer-events-none z-0"
+        style={{ y: glowY, scale: glowScale }}
       />
       <Navbar />
       <HeroSection />
