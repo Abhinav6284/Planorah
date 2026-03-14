@@ -9,7 +9,7 @@ import ProjectsTab from './editor/ProjectsTab';
 import SettingsTab from './editor/SettingsTab';
 import PreviewPanel from './editor/PreviewPanel';
 import CompletenessCard from './editor/CompletenessCard';
-import { getLocalCompleteness, tabs, updatePayloadFromPortfolio } from './editor/portfolioEditorUtils';
+import { getLocalCompleteness, parseFieldErrors, tabs, updatePayloadFromPortfolio } from './editor/portfolioEditorUtils';
 
 function getStatusBadge(portfolio) {
   if (!portfolio) return { badge: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400', label: 'Loading' };
@@ -37,6 +37,7 @@ export default function PortfolioEditorV2() {
   const [dirty, setDirty] = useState(false);
   const [autosaveStatus, setAutosaveStatus] = useState('');
   const [completeness, setCompleteness] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
   const autosaveTimerRef = useRef(null);
   const isAutosavingRef = useRef(false);
 
@@ -88,6 +89,10 @@ export default function PortfolioEditorV2() {
       setCompleteness(getLocalCompleteness(next));
       return next;
     });
+    // Clear the error for this field as soon as the user edits it
+    if (fieldErrors[field]) {
+      setFieldErrors((prev) => { const next = { ...prev }; delete next[field]; return next; });
+    }
     setDirty(true);
     setAutosaveStatus('Unsaved changes');
   };
@@ -112,15 +117,40 @@ export default function PortfolioEditorV2() {
       await refreshCompleteness();
     } catch (err) {
       const backendError = err.response?.data;
-      const text =
-        backendError?.error ||
-        backendError?.detail ||
-        (typeof backendError === 'string' ? backendError : null) ||
-        'Failed to save changes.';
-      if (autosave) {
-        setAutosaveStatus('Autosave failed');
+      const parsed = parseFieldErrors(backendError);
+      const hasFieldErrors = Object.keys(parsed).filter((k) => k !== '_general').length > 0;
+
+      if (hasFieldErrors) {
+        // Show inline field errors and switch to the relevant tab
+        setFieldErrors(parsed);
+        const fieldToTab = {
+          title: 'general', display_name: 'general', headline: 'general',
+          location: 'general', bio: 'general', skills: 'general', availability_status: 'general',
+          github_url: 'social', linkedin_url: 'social', twitter_url: 'social',
+          website_url: 'social', resume_url: 'social',
+          primary_cta_label: 'social', primary_cta_url: 'social',
+          seo_title: 'settings', seo_description: 'settings', og_image_url: 'settings',
+          show_email: 'settings', theme: 'settings',
+        };
+        const firstErrorField = Object.keys(parsed).find((k) => k !== '_general' && fieldToTab[k]);
+        if (firstErrorField) setActiveTab(fieldToTab[firstErrorField]);
+        if (autosave) {
+          setAutosaveStatus('Fix highlighted fields');
+        } else {
+          setMessage({ type: 'error', text: 'Please fix the highlighted fields.' });
+          setTimeout(() => setMessage(null), 4000);
+        }
       } else {
-        setMessage({ type: 'error', text });
+        const text =
+          parsed._general ||
+          (typeof backendError === 'string' ? backendError : null) ||
+          'Failed to save changes.';
+        if (autosave) {
+          setAutosaveStatus('Autosave failed');
+        } else {
+          setMessage({ type: 'error', text });
+          setTimeout(() => setMessage(null), 4000);
+        }
       }
     } finally {
       setSaving(false);
@@ -334,10 +364,10 @@ export default function PortfolioEditorV2() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-5">
             {activeTab === 'general' && (
-              <GeneralTab portfolio={portfolio} onFieldChange={handleFieldChange} />
+              <GeneralTab portfolio={portfolio} onFieldChange={handleFieldChange} fieldErrors={fieldErrors} />
             )}
             {activeTab === 'social' && (
-              <SocialTab portfolio={portfolio} onFieldChange={handleFieldChange} />
+              <SocialTab portfolio={portfolio} onFieldChange={handleFieldChange} fieldErrors={fieldErrors} />
             )}
             {activeTab === 'projects' && (
               <ProjectsTab portfolio={portfolio} />
@@ -346,6 +376,7 @@ export default function PortfolioEditorV2() {
               <SettingsTab
                 portfolio={portfolio}
                 onFieldChange={handleFieldChange}
+                fieldErrors={fieldErrors}
                 canUseSubdomain={canAccess('custom_subdomain')}
                 portfolioRootDomain={portfolioRootDomain}
                 newSubdomain={newSubdomain}

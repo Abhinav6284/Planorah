@@ -1,8 +1,16 @@
 import React from 'react';
 
 const inputCls = 'w-full px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-colors text-sm';
+const inputErrCls = 'w-full px-4 py-2.5 bg-white dark:bg-gray-900 border border-red-400 dark:border-red-500 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-red-500 outline-none transition-colors text-sm';
 
-export default function SocialTab({ portfolio, onFieldChange }) {
+function FieldError({ error }) {
+  if (!error) return null;
+  return <p className="mt-1 text-xs text-red-500 dark:text-red-400">{error}</p>;
+}
+
+export default function SocialTab({ portfolio, onFieldChange, fieldErrors = {} }) {
+  const cls = (field) => fieldErrors[field] ? inputErrCls : inputCls;
+
   const fields = [
     { name: 'github_url', label: 'GitHub', placeholder: 'https://github.com/username' },
     { name: 'linkedin_url', label: 'LinkedIn', placeholder: 'https://linkedin.com/in/username' },
@@ -25,9 +33,10 @@ export default function SocialTab({ portfolio, onFieldChange }) {
                 name={name}
                 value={portfolio?.[name] || ''}
                 onChange={(e) => onFieldChange(name, e.target.value)}
-                className={inputCls}
+                className={cls(name)}
                 placeholder={placeholder}
               />
+              <FieldError error={fieldErrors[name]} />
             </div>
           ))}
         </div>
@@ -42,9 +51,10 @@ export default function SocialTab({ portfolio, onFieldChange }) {
               name="primary_cta_label"
               value={portfolio?.primary_cta_label || ''}
               onChange={(e) => onFieldChange('primary_cta_label', e.target.value)}
-              className={inputCls}
+              className={cls('primary_cta_label')}
               placeholder="Hire Me"
             />
+            <FieldError error={fieldErrors.primary_cta_label} />
           </div>
           <div>
             <label className="block text-gray-500 dark:text-gray-400 text-xs font-medium mb-1.5 uppercase tracking-wide">CTA URL</label>
@@ -52,9 +62,10 @@ export default function SocialTab({ portfolio, onFieldChange }) {
               name="primary_cta_url"
               value={portfolio?.primary_cta_url || ''}
               onChange={(e) => onFieldChange('primary_cta_url', e.target.value)}
-              className={inputCls}
+              className={cls('primary_cta_url')}
               placeholder="https://example.com/contact"
             />
+            <FieldError error={fieldErrors.primary_cta_url} />
           </div>
         </div>
       </div>

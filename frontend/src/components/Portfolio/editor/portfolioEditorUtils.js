@@ -5,6 +5,32 @@ export const tabs = [
   { id: 'settings', label: 'Settings' },
 ];
 
+/**
+ * Parse a DRF validation error response body into a flat field → message map.
+ *
+ * DRF can return:
+ *   { "github_url": ["GitHub URL must point to github.com."] }
+ *   { "non_field_errors": ["..."] }
+ *   { "detail": "..." }
+ *   "plain string"
+ *
+ * Returns an object like:
+ *   { github_url: "GitHub URL must point to github.com.", _general: "..." }
+ */
+export const parseFieldErrors = (responseData) => {
+  if (!responseData || typeof responseData === 'string') return {};
+  const errors = {};
+  for (const [key, value] of Object.entries(responseData)) {
+    const msg = Array.isArray(value) ? value[0] : String(value);
+    if (key === 'non_field_errors' || key === 'detail') {
+      errors._general = msg;
+    } else {
+      errors[key] = msg;
+    }
+  }
+  return errors;
+};
+
 export const normalizeUrl = (value) => {
   if (!value) return '';
   const trimmed = value.trim();

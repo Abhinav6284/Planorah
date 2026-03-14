@@ -1,10 +1,17 @@
 import React from 'react';
 
 const inputCls = 'w-full px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-colors text-sm';
+const inputErrCls = 'w-full px-4 py-2.5 bg-white dark:bg-gray-900 border border-red-400 dark:border-red-500 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-red-500 outline-none transition-colors text-sm';
+
+function FieldError({ error }) {
+  if (!error) return null;
+  return <p className="mt-1 text-xs text-red-500 dark:text-red-400">{error}</p>;
+}
 
 export default function SettingsTab({
   portfolio,
   onFieldChange,
+  fieldErrors = {},
   canUseSubdomain,
   portfolioRootDomain,
   newSubdomain,
@@ -12,6 +19,7 @@ export default function SettingsTab({
   onSetSubdomain,
   subdomainLoading,
 }) {
+  const cls = (field) => fieldErrors[field] ? inputErrCls : inputCls;
   return (
     <div className="space-y-5">
       <div className="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
@@ -62,9 +70,10 @@ export default function SettingsTab({
               name="seo_title"
               value={portfolio?.seo_title || ''}
               onChange={(e) => onFieldChange('seo_title', e.target.value)}
-              className={inputCls}
+              className={cls('seo_title')}
               placeholder="John Doe - Full Stack Developer"
             />
+            <FieldError error={fieldErrors.seo_title} />
           </div>
           <div>
             <label className="block text-gray-500 dark:text-gray-400 text-xs font-medium mb-1.5 uppercase tracking-wide">SEO Description</label>
@@ -73,9 +82,10 @@ export default function SettingsTab({
               value={portfolio?.seo_description || ''}
               onChange={(e) => onFieldChange('seo_description', e.target.value)}
               rows={3}
-              className={`${inputCls} resize-none`}
+              className={`${cls('seo_description')} resize-none`}
               placeholder="Portfolio of John Doe with featured projects and contact details."
             />
+            <FieldError error={fieldErrors.seo_description} />
           </div>
           <div>
             <label className="block text-gray-500 dark:text-gray-400 text-xs font-medium mb-1.5 uppercase tracking-wide">OG Image URL</label>
@@ -83,9 +93,10 @@ export default function SettingsTab({
               name="og_image_url"
               value={portfolio?.og_image_url || ''}
               onChange={(e) => onFieldChange('og_image_url', e.target.value)}
-              className={inputCls}
+              className={cls('og_image_url')}
               placeholder="https://example.com/og-image.png"
             />
+            <FieldError error={fieldErrors.og_image_url} />
           </div>
         </div>
       </div>
