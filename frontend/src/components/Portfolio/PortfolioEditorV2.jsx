@@ -377,7 +377,7 @@ export default function PortfolioEditorV2() {
                 portfolio={portfolio}
                 onFieldChange={handleFieldChange}
                 fieldErrors={fieldErrors}
-                canUseSubdomain={canAccess('custom_subdomain')}
+                canUseSubdomain={true}
                 portfolioRootDomain={portfolioRootDomain}
                 newSubdomain={newSubdomain}
                 onNewSubdomainChange={(value) => setNewSubdomain(value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
