@@ -1,19 +1,22 @@
 import type { CustomDomain, DomainInstructions, PublicPortfolio } from "./types";
 
+// Used for FastAPI portfolio-system endpoints (domain management, custom domain SSR)
 const API_BASE = process.env.NEXT_PUBLIC_PORTFOLIO_API_BASE || "http://localhost:8000/v1";
 
+// Used for Django backend endpoints (actual portfolio data)
+const DJANGO_API_BASE = process.env.NEXT_PUBLIC_DJANGO_API_BASE || "https://api.planorah.me";
+
 // ---------------------------------------------------------------------------
-// Public portfolio by slug
+// Public portfolio by slug — served from Django backend
 // ---------------------------------------------------------------------------
 
-export async function fetchPublicPortfolio(slug: string): Promise<PublicPortfolio> {
-  const res = await fetch(`${API_BASE}/public/portfolio/${slug}`, {
-    next: { revalidate: 300 }
+export async function fetchPublicPortfolio(slug: string): Promise<PublicPortfolio | null> {
+  const res = await fetch(`${DJANGO_API_BASE}/api/portfolio/public/${slug}/`, {
+    next: { revalidate: 300 },
   });
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch portfolio");
-  }
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`Portfolio fetch failed: ${res.status}`);
 
   return res.json();
 }
