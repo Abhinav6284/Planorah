@@ -44,27 +44,27 @@ const testimonials = [
     author: "Priya S.",
     role: "CS Student, IIT Delhi",
     avatar: "P",
-    color: "neutral",
+    color: "from-violet-500 to-purple-600",
   },
   {
     quote: "The AI roadmap feature is genuinely impressive. It built a 12-week ML plan tailored to my background and I can see exactly how far I've come.",
     author: "Marcus T.",
     role: "Self-taught Developer",
     avatar: "M",
-    color: "neutral",
+    color: "from-emerald-500 to-teal-600",
   },
   {
     quote: "I used to struggle showing recruiters my work. Now my Planorah portfolio does all the talking. Got two interviews from it this month alone.",
     author: "Aisha K.",
     role: "Aspiring Data Scientist",
     avatar: "A",
-    color: "neutral",
+    color: "from-amber-500 to-orange-600",
   },
 ];
 
 export default function StatsSection() {
   return (
-    <section id="testimonials" className="py-28 md:py-36 px-4 md:px-8 bg-white dark:bg-gray-900 relative overflow-hidden">
+    <section id="testimonials" className="py-28 md:py-36 px-4 md:px-8 bg-white dark:bg-gray-950 relative overflow-hidden">
       {/* No decorative background */}
 
       <div className="max-w-7xl mx-auto relative">
@@ -74,7 +74,7 @@ export default function StatsSection() {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-block px-4 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm font-medium mb-4"
+            className="inline-block px-4 py-1.5 rounded-full bg-violet-50 dark:bg-violet-950/50 border border-violet-100 dark:border-violet-800/50 text-violet-700 dark:text-violet-300 text-sm font-medium mb-4"
           >
             Trusted worldwide
           </motion.span>
@@ -86,7 +86,7 @@ export default function StatsSection() {
             className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-5 tracking-tight"
           >
             Builders{" "}
-            <span className="text-gray-900 dark:text-white">
+            <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
               love it
             </span>
           </motion.h2>
@@ -150,7 +150,7 @@ export default function StatsSection() {
                 "{t.quote}"
               </blockquote>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gray-900 dark:bg-gray-700 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
                   {t.avatar}
                 </div>
                 <div>
