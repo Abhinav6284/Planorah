@@ -1,8 +1,8 @@
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 
-import PublicPortfolioPage from "../../../../components/public/PublicPortfolioPage";
-import { fetchPortfolioByHost } from "../../../../lib/api";
+import PublicPortfolioPage from "../../../components/public/PublicPortfolioPage";
+import { fetchPortfolioByHost } from "../../../lib/api";
 
 /**
  * This page is never navigated to directly by users.
