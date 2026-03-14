@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import {
     Search, ChevronDown, ExternalLink, Send, CheckCircle2,
     BookOpen, Map, Code2, FileText, Calendar, CreditCard,
     Bug, Lightbulb, MessageSquare, Mail, AlertCircle,
     ThumbsUp, ThumbsDown, Sparkles, Activity,
-    HelpCircle, Rocket, Shield, RefreshCw
+    HelpCircle, Rocket, Shield, RefreshCw, ArrowLeft
 } from 'lucide-react';
 
 // ─── DATA ──────────────────────────────────────────────────────────
@@ -137,6 +138,8 @@ export default function SupportPage() {
     const [formType, setFormType] = useState('feedback');
     const [formData, setFormData] = useState({ subject: '', message: '', priority: 'normal', email: '' });
     const [formState, setFormState] = useState('idle'); // idle | loading | success | error
+    const [formError, setFormError] = useState('');
+    const [submissionMeta, setSubmissionMeta] = useState({ ticketId: '', acknowledgementSent: null });
     const faqRef = useRef(null);
     const formRef = useRef(null);
     const searchRef = useRef(null);
@@ -178,20 +181,28 @@ export default function SupportPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setFormState('loading');
+        setFormError('');
+        setSubmissionMeta({ ticketId: '', acknowledgementSent: null });
         try {
-            // Attempt real API call
             const { default: api } = await import('../../api/axios');
-            await api.post('/support/tickets/', { type: formType, ...formData });
+            const response = await api.post('/support/tickets/', { type: formType, ...formData });
+            setSubmissionMeta({
+                ticketId: response?.data?.ticket_id || '',
+                acknowledgementSent: response?.data?.acknowledgement_sent ?? null,
+            });
             setFormState('success');
-        } catch {
-            // Graceful fallback — show success even if endpoint doesn't exist yet
-            await new Promise(r => setTimeout(r, 1200));
-            setFormState('success');
+            setTimeout(() => {
+                setFormState('idle');
+                setFormData({ subject: '', message: '', priority: 'normal', email: '' });
+                setSubmissionMeta({ ticketId: '', acknowledgementSent: null });
+            }, 4000);
+        } catch (err) {
+            const message = err?.response?.data?.error
+                || err?.response?.data?.detail
+                || 'Message could not be sent right now. Please try again or email support@planorah.me.';
+            setFormError(message);
+            setFormState('error');
         }
-        setTimeout(() => {
-            setFormState('idle');
-            setFormData({ subject: '', message: '', priority: 'normal', email: '' });
-        }, 3000);
     };
 
     const handleQuickAction = (type) => {
@@ -217,6 +228,20 @@ export default function SupportPage() {
                             <Sparkles className="w-3 h-3" />
                             Help Center
                         </span>
+                    </motion.div>
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.05 }}
+                        className="mb-4"
+                    >
+                        <Link
+                            to="/"
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-[#141414] border border-gray-200 dark:border-gray-800 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1A1A1A] transition-all"
+                        >
+                            <ArrowLeft className="w-4 h-4" />
+                            Back to Home
+                        </Link>
                     </motion.div>
 
                     <motion.h1
@@ -391,9 +416,23 @@ export default function SupportPage() {
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Message Sent!</h3>
                                 <p className="text-gray-500 dark:text-gray-400 text-sm">We've received your message and will get back to you shortly.</p>
+                                {submissionMeta.ticketId && (
+                                    <p className="text-xs text-gray-400 mt-2">Ticket ID: {submissionMeta.ticketId}</p>
+                                )}
+                                {submissionMeta.acknowledgementSent === false && (
+                                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
+                                        We received your ticket, but acknowledgement email could not be delivered.
+                                    </p>
+                                )}
                             </motion.div>
                         ) : (
                             <>
+                                {formState === 'error' && formError && (
+                                    <div className="mx-5 mt-5 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">
+                                        {formError}
+                                    </div>
+                                )}
+
                                 {/* Type Selector */}
                                 <div className="p-5 border-b border-gray-100 dark:border-gray-800">
                                     <div className="flex flex-wrap gap-2">

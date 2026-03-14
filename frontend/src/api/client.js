@@ -18,6 +18,7 @@ const AUTH_FREE_ENDPOINTS = new Set([
   'users/request-password-reset/',
   'users/verify-reset-otp/',
   'users/reset-password/',
+  'support/tickets/',
   'token/refresh/',
 ]);
 
