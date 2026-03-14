@@ -109,12 +109,24 @@ def voice_config(request):
     The frontend uses this to connect to the voice proxy server.
     """
     # In production set VOICE_PROXY_PUBLIC_URL=wss://voice.planorah.me/ws/voice
-    # In dev it falls back to the raw host:port
+    # If unset, prefer VOICE_PROXY_HOST/VOICE_PROXY_PORT when provided;
+    # otherwise derive a usable same-origin ws/wss fallback.
     public_url = os.getenv('VOICE_PROXY_PUBLIC_URL', '')
     if not public_url:
-        host = os.getenv('VOICE_PROXY_HOST', 'localhost')
-        port = os.getenv('VOICE_PROXY_PORT', '8001')
-        public_url = f'ws://{host}:{port}/ws/voice'
+        host = os.getenv('VOICE_PROXY_HOST', '').strip()
+        port = os.getenv('VOICE_PROXY_PORT', '8001').strip() or '8001'
+
+        if host:
+            public_url = f'ws://{host}:{port}/ws/voice'
+        else:
+            req_host = request.get_host()
+            req_host_only = req_host.split(':')[0].lower()
+            is_local = req_host_only in {'localhost', '127.0.0.1', '::1'}
+            if is_local:
+                public_url = f'ws://{req_host_only}:{port}/ws/voice'
+            else:
+                scheme = 'wss' if request.is_secure() else 'ws'
+                public_url = f'{scheme}://{req_host}/ws/voice'
 
     # Fetch recent sessions for memory context
     session_memory = get_recent_sessions(request.user, limit=3)

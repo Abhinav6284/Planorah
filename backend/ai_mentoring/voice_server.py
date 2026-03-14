@@ -145,6 +145,8 @@ ALLOWED_ORIGINS: set = {o.strip()
 MAX_AUDIO_BASE64_CHARS = 24000
 MAX_SCREENSHOT_BASE64_CHARS = 2_000_000
 CLIENT_IDLE_TIMEOUT_SEC = 75
+CLIENT_SETUP_TIMEOUT_SEC = int(os.getenv('VOICE_PROXY_CLIENT_SETUP_TIMEOUT_SEC', '10'))
+GEMINI_SETUP_TIMEOUT_SEC = int(os.getenv('VOICE_PROXY_GEMINI_SETUP_TIMEOUT_SEC', '20'))
 
 
 def _safe_json_loads(raw):
@@ -187,7 +189,17 @@ async def proxy_handler(client_ws):
 
     try:
         # Wait for the client setup message
-        raw_setup = await asyncio.wait_for(client_ws.recv(), timeout=10)
+        try:
+            raw_setup = await asyncio.wait_for(client_ws.recv(), timeout=CLIENT_SETUP_TIMEOUT_SEC)
+        except asyncio.TimeoutError:
+            logger.error(f"Timeout waiting for client setup payload from {client_addr}")
+            await client_ws.send(json.dumps({
+                'type': 'error',
+                'message': 'Client setup payload timed out.',
+            }))
+            await client_ws.close()
+            return
+
         setup_data = _safe_json_loads(raw_setup)
         if not isinstance(setup_data, dict):
             await client_ws.send(json.dumps({
@@ -251,8 +263,17 @@ async def proxy_handler(client_ws):
         await gemini_ws.send(json.dumps(gemini_setup))
 
         # Wait for setup completion from Gemini
-        setup_response = await asyncio.wait_for(gemini_ws.recv(), timeout=10)
-        setup_resp_data = json.loads(setup_response)
+        try:
+            setup_response = await asyncio.wait_for(gemini_ws.recv(), timeout=GEMINI_SETUP_TIMEOUT_SEC)
+            setup_resp_data = json.loads(setup_response)
+        except asyncio.TimeoutError:
+            logger.error(f"Timeout waiting for Gemini setup completion for {client_addr}")
+            await client_ws.send(json.dumps({
+                'type': 'error',
+                'message': 'AI setup response timed out.',
+            }))
+            await client_ws.close()
+            return
 
         if 'setupComplete' in setup_resp_data:
             logger.info(f"Gemini session established for {client_addr}")
@@ -438,12 +459,6 @@ async def proxy_handler(client_ws):
             client_idle_watchdog(),
         )
 
-    except asyncio.TimeoutError:
-        logger.error(f"Timeout during setup for {client_addr}")
-        await client_ws.send(json.dumps({
-            'type': 'error',
-            'message': 'Connection timed out.',
-        }))
     except Exception as e:
         logger.error(f"Error for {client_addr}: {e}")
         try:

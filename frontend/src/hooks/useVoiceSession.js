@@ -16,6 +16,9 @@ const MAX_SCHEDULED_CHUNKS = 3;
 const SCREENSHOT_INTERVAL_MS = 12000;
 const RECONNECT_MAX_ATTEMPTS = 4;
 const RECONNECT_BASE_DELAY_MS = 1200;
+const VAD_START_THRESHOLD = 0.08;
+const VAD_BARGE_IN_THRESHOLD = 0.16;
+const VAD_SILENCE_MS = 700;
 // const CHUNK_SIZE removed - unused
 
 // AudioWorklet processor — runs in a separate audio thread (no deprecation warning)
@@ -211,6 +214,12 @@ export function useVoiceSession() {
             }
 
             const ctx = playbackCtxRef.current;
+            if (ctx.state === 'suspended') {
+                // Browsers can keep playback contexts suspended until resumed explicitly.
+                ctx.resume().catch((resumeErr) => {
+                    console.warn('Playback context resume failed:', resumeErr);
+                });
+            }
 
             while (
                 audioQueueRef.current.length > 0 &&
@@ -285,7 +294,7 @@ export function useVoiceSession() {
                 if (!inUtteranceRef.current) return;
                 inUtteranceRef.current = false;
                 sendWsMessage({ type: 'turnComplete' });
-            }, 900);
+            }, VAD_SILENCE_MS);
         };
         const update = () => {
             analyser.getByteFrequencyData(dataArray);
@@ -294,8 +303,8 @@ export function useVoiceSession() {
             setAudioLevel(level);
 
             if (statusRef.current === 'active' && wsRef.current?.readyState === WebSocket.OPEN) {
-                if (level > 0.12) {
-                    if (isSpeakingRef.current && level > 0.2) {
+                if (level > VAD_START_THRESHOLD) {
+                    if (isSpeakingRef.current && level > VAD_BARGE_IN_THRESHOLD) {
                         interruptPlayback(); // support user barge-in during AI speech
                     }
                     inUtteranceRef.current = true;

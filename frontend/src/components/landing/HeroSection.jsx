@@ -1,262 +1,246 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, Play, CheckCircle2, Target, Cpu, Calendar, TrendingUp, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
 
-const FloatingCard = ({ className, children, delay = 0 }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 24, scale: 0.95 }}
-    animate={{ opacity: 1, y: 0, scale: 1 }}
-    transition={{ delay, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-    className={className}
-  >
-    {children}
-  </motion.div>
-);
+const mockupStates = [
+  {
+    id: "goal",
+    header: "What's your learning goal?",
+    sub: "Tell Planorah exactly what you want to achieve.",
+    content: (
+      <div className="space-y-4">
+        <div className="h-12 w-full bg-gray-50 border border-gray-200 rounded-xl flex items-center px-4 text-sm text-gray-400">
+          e.g. Master Full Stack Development
+        </div>
+        <div className="h-12 w-full bg-black rounded-xl flex items-center justify-center text-white text-sm font-medium shadow-sm gap-2">
+          <Target className="w-4 h-4" /> Generate Path
+        </div>
+      </div>
+    )
+  },
+  {
+    id: "roadmap",
+    header: "Planorah is building your path...",
+    sub: "Analyzing current skills and breaking down milestones.",
+    content: (
+      <div className="space-y-3">
+        {[1, 2, 3].map((i) => (
+           <motion.div 
+             key={i} 
+             initial={{ opacity: 0, x: -10 }} 
+             animate={{ opacity: 1, x: 0 }} 
+             transition={{ delay: i * 0.15 }}
+             className="bg-gray-50/80 rounded-xl border border-gray-100 p-3 flex gap-4 items-center"
+           >
+             <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-sm">
+               M{i}
+             </div>
+             <div className="flex-1 space-y-2">
+               <div className="h-2 bg-gray-200 rounded-full w-3/4" />
+               <div className="h-2 bg-gray-100 rounded-full w-1/2" />
+             </div>
+           </motion.div>
+        ))}
+      </div>
+    )
+  },
+  {
+    id: "tasks",
+    header: "Today's Tasks",
+    sub: "Structured, byte-sized learning for today.",
+    content: (
+      <div className="space-y-3">
+        {[
+          { t: "Read: React Context API", st: "done" },
+          { t: "Practice: Auth Wrapper", st: "current" },
+          { t: "Quiz: State Management", st: "upcoming" }
+        ].map((item, i) => (
+          <div key={i} className="flex gap-4 p-3 rounded-xl border border-gray-100 bg-gray-50/50 items-center">
+            <div className={`mt-0.5 flex-shrink-0 ${item.st === 'done' ? 'text-gray-900' : item.st === 'current' ? 'text-blue-500' : 'text-gray-300'}`}>
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+            <div className="flex-1">
+              <h4 className={`text-sm font-medium ${item.st === 'upcoming' ? 'text-gray-500' : 'text-gray-900'}`}>{item.t}</h4>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  },
+  {
+    id: "progress",
+    header: "Frontend Masterclass",
+    sub: "45% Completed • 12 Days Left",
+    content: (
+      <div className="flex justify-center py-6">
+        <div className="relative w-32 h-32 rounded-full border-[8px] border-gray-50 flex items-center justify-center">
+          <svg className="absolute inset-0 w-full h-full -rotate-90">
+            <circle cx="64" cy="64" r="56" stroke="currentColor" strokeWidth="8" fill="none" className="text-emerald-500" strokeDasharray="351" strokeDashoffset="193" strokeLinecap="round" />
+          </svg>
+          <div className="text-center mt-1">
+            <span className="text-3xl font-bold text-gray-900">45%</span>
+          </div>
+        </div>
+      </div>
+    )
+  },
+  {
+    id: "mastery",
+    header: "Goal Accomplished!",
+    sub: "You've mastered Full Stack Development.",
+    content: (
+      <div className="flex flex-col items-center justify-center py-4 text-center">
+        <motion.div 
+          initial={{ scale: 0.8 }} 
+          animate={{ scale: 1 }} 
+          transition={{ type: "spring", bounce: 0.5 }}
+          className="w-16 h-16 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mb-4 shadow-sm"
+        >
+          <Trophy className="w-8 h-8" />
+        </motion.div>
+        <button className="px-5 py-2 bg-black text-white rounded-lg text-sm font-medium shadow-sm">
+          View Certificate
+        </button>
+      </div>
+    )
+  }
+];
 
 export default function HeroSection() {
-  const { scrollY } = useScroll();
-  const heroOpacity = useTransform(scrollY, [0, 400], [1, 0]);
-  const heroY = useTransform(scrollY, [0, 400], [0, 80]);
+  const [currentMockupIndex, setCurrentMockupIndex] = useState(0);
 
-  const tags = ["Learn skills", "Build projects", "Do research", "Track execution", "Generate outcomes"];
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentMockupIndex((prev) => (prev + 1) % mockupStates.length);
+    }, 4000); // switch every 4 seconds
+    return () => clearInterval(interval);
+  }, []);
 
-  const containerVariants = {
-    hidden: {},
-    visible: {
-      transition: { staggerChildren: 0.12, delayChildren: 0.2 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] } },
-  };
+  const activeMockup = mockupStates[currentMockupIndex];
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-24 pb-16 overflow-hidden">
-      {/* Soft background — light warm white */}
-      <div className="absolute inset-0 bg-[#FAFAFA] dark:bg-gray-950" />
+    <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden bg-white">
+      {/* Subtle Background Elements */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-gray-50/50 rounded-full blur-3xl opacity-50" />
+      </div>
 
-      {/* Very subtle dot grid */}
-      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#1f2937_1px,transparent_1px)] [background-size:28px_28px] opacity-60" />
-
-      {/* Radial fade at center so text pops */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_40%,rgba(255,255,255,0.9)_0%,transparent_100%)] dark:bg-[radial-gradient(ellipse_80%_60%_at_50%_40%,rgba(3,7,18,0.9)_0%,transparent_100%)]" />
-
-      {/* Main content */}
-      <motion.div
-        style={{ opacity: heroOpacity, y: heroY }}
-        className="relative z-10 max-w-6xl mx-auto px-4 md:px-8 text-center"
-      >
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="flex flex-col items-center"
-        >
-          {/* Badge */}
-          <motion.div variants={itemVariants}>
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-50 dark:bg-violet-950/60 border border-violet-200/70 dark:border-violet-700/50 text-violet-700 dark:text-violet-300 text-sm font-medium mb-8">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-500 opacity-60"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
-              </span>
-              Turn Goals into Verified Work
-            </span>
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 flex flex-col lg:flex-row items-center gap-16 lg:gap-8">
+        
+        {/* Left Content */}
+        <div className="flex-1 text-center lg:text-left">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 border border-gray-200 text-sm font-medium text-gray-600 mb-8"
+          >
+            <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse"></span>
+            Planorah 2.0 is live
           </motion.div>
 
-          {/* Headline */}
           <motion.h1
-            variants={itemVariants}
-            className="text-5xl sm:text-6xl md:text-7xl lg:text-[88px] font-bold text-gray-900 dark:text-white mb-6 leading-[1.05] tracking-tight"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+            className="text-5xl md:text-6xl lg:text-7xl font-bold font-serif tracking-tight text-gray-900 leading-[1.1] mb-6"
           >
-            Proof,{" "}
-            <span className="relative inline-block">
-              <span className="bg-gradient-to-r from-violet-600 via-fuchsia-600 to-indigo-600 bg-clip-text text-transparent">
-                Not Promises
-              </span>
-              <motion.span
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 1, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                className="absolute -bottom-1 left-0 right-0 h-[3px] bg-gradient-to-r from-violet-600 to-indigo-600 rounded-full origin-left"
-              />
+            Your Personal <br className="hidden md:block" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-gray-700 to-gray-500">
+              AI Learning Roadmap
             </span>
-            <span className="text-gray-200 dark:text-gray-700">.</span>
           </motion.h1>
 
-          {/* Subheadline */}
           <motion.p
-            variants={itemVariants}
-            className="text-lg md:text-xl lg:text-2xl text-gray-500 dark:text-gray-400 mb-8 max-w-3xl font-light leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+            className="text-lg md:text-xl text-gray-500 mb-10 max-w-2xl mx-auto lg:mx-0 font-medium"
           >
-            Planorah transforms your goals into verified, documented outcomes — building a portfolio of proof that speaks louder than any resume.
+            Planorah helps students build highly structured, personalized learning paths and track daily progress effortlessly. Stop wondering what to learn next.
           </motion.p>
 
-          {/* Tags */}
-          <motion.div variants={itemVariants} className="flex flex-wrap justify-center gap-2 mb-10">
-            {tags.map((tag, i) => (
-              <motion.span
-                key={tag}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.8 + i * 0.07 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full text-sm text-gray-700 dark:text-gray-300 shadow-sm"
-              >
-                <svg className="w-3.5 h-3.5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                </svg>
-                {tag}
-              </motion.span>
-            ))}
-          </motion.div>
-
-          {/* CTA buttons */}
-          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link to="/register">
-              <motion.button
-                whileHover={{ scale: 1.04, boxShadow: "0 16px 32px -8px rgba(124,58,237,0.4)" }}
-                whileTap={{ scale: 0.97 }}
-                className="group px-8 py-4 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl text-base font-semibold shadow-lg shadow-violet-500/25 flex items-center gap-2 transition-all"
-              >
-                Start Your Journey
-                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </motion.button>
-            </Link>
-            <a href="#demo">
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="group px-8 py-4 bg-white dark:bg-gray-800 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-2xl text-base font-semibold hover:border-gray-300 dark:hover:border-gray-600 shadow-sm flex items-center gap-2"
-              >
-                <svg className="w-4 h-4 text-violet-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Watch Demo
-              </motion.button>
-            </a>
-          </motion.div>
-
-          {/* Social proof */}
           <motion.div
-            variants={itemVariants}
-            className="mt-12 flex flex-col sm:flex-row items-center gap-4 text-sm text-gray-500 dark:text-gray-400"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+            className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
           >
-            <div className="flex -space-x-2">
-              {["V", "S", "A", "M", "K"].map((letter, i) => (
-                <div
-                  key={i}
-                  className="w-8 h-8 rounded-full border-2 border-white dark:border-gray-900 flex items-center justify-center text-xs font-bold text-white"
-                  style={{
-                  background: `hsl(${258 + i * 22}, 72%, ${58 + i * 4}%)`,
-                  }}
-                >
-                  {letter}
-                </div>
-              ))}
-            </div>
-            <span>Join <strong className="text-gray-900 dark:text-white">2,400+</strong> builders already on Planorah</span>
+            <Link
+              to="/signup"
+              className="w-full sm:w-auto px-8 py-3.5 bg-black text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition-all hover:scale-[1.02] shadow-sm shadow-gray-200"
+            >
+              Start Your Roadmap
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              to="#features"
+              className="w-full sm:w-auto px-8 py-3.5 bg-white text-gray-800 rounded-xl font-medium border border-gray-200 flex items-center justify-center gap-2 hover:bg-gray-50 transition-all shadow-sm shadow-gray-100"
+            >
+              <Play className="w-4 h-4 fill-current opacity-70" />
+              Explore Features
+            </Link>
           </motion.div>
-        </motion.div>
-      </motion.div>
-
-      {/* Floating UI preview cards */}
-      <FloatingCard
-        delay={1.2}
-        className="absolute left-4 md:left-12 top-1/3 hidden lg:block"
-      >
-        <motion.div
-          animate={{ y: [0, -8, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-4 w-52"
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
-              <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-gray-800 dark:text-gray-200">Task Verified</p>
-              <p className="text-xs text-gray-400">React Project</p>
-            </div>
-          </div>
-          <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: "78%" }}
-              transition={{ delay: 1.5, duration: 1, ease: "easeOut" }}
-              className="h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full"
-            />
-          </div>
-          <p className="text-xs text-gray-400 mt-1.5">78% Complete</p>
-        </motion.div>
-      </FloatingCard>
-
-      <FloatingCard
-        delay={1.4}
-        className="absolute right-4 md:right-12 top-1/3 hidden lg:block"
-      >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-4 w-52"
-        >
-          <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3">This Week</div>
-          <div className="space-y-2">
-            {[
-              { label: "Code commits", value: "12", color: "bg-violet-500" },
-              { label: "Tasks done", value: "8", color: "bg-indigo-400" },
-              { label: "Hours focused", value: "24", color: "bg-sky-400" },
-            ].map((stat) => (
-              <div key={stat.label} className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${stat.color}`} />
-                <span className="text-xs text-gray-600 dark:text-gray-400 flex-1">{stat.label}</span>
-                <span className="text-xs font-bold text-gray-800 dark:text-gray-200">{stat.value}</span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      </FloatingCard>
-
-      <FloatingCard
-        delay={1.6}
-        className="absolute left-4 md:left-20 bottom-24 hidden lg:block"
-      >
-        <motion.div
-          animate={{ y: [0, -6, 0] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 px-4 py-3 flex items-center gap-3 w-52"
-        >
-          <div className="w-9 h-9 rounded-xl bg-violet-50 dark:bg-violet-950/50 flex items-center justify-center flex-shrink-0">
-            <span className="text-lg">🏆</span>
-          </div>
-          <div>
-            <p className="text-xs font-semibold text-gray-800 dark:text-gray-200">Goal Achieved!</p>
-            <p className="text-xs text-gray-400">ML Course completed</p>
-          </div>
-        </motion.div>
-      </FloatingCard>
-
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-      >
-        <span className="text-xs text-gray-400 dark:text-gray-600 font-medium tracking-wider uppercase">Scroll</span>
-        <div className="w-5 h-8 rounded-full border-2 border-gray-300 dark:border-gray-700 flex items-start justify-center p-1">
-          <motion.div
-            animate={{ y: [0, 12, 0], opacity: [1, 0, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-600"
-          />
         </div>
-      </motion.div>
+
+        {/* Right Content / Dashboard Mockup Auto-Carousel */}
+        <motion.div
+          initial={{ opacity: 0, x: 20, rotateY: 10 }}
+          animate={{ opacity: 1, x: 0, rotateY: 0 }}
+          transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+          className="flex-1 w-full max-w-lg lg:max-w-none relative perspective-1000"
+        >
+          {/* Subtle decoration behind mockup */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-gray-100 to-white rounded-3xl transform rotate-3 scale-105 border border-gray-100 shadow-[0_4px_40px_-10px_rgba(0,0,0,0.03)] pointer-events-none" />
+          
+          <div className="relative bg-white border border-gray-200/60 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] overflow-hidden h-[380px] flex flex-col">
+            {/* Mockup Header */}
+            <div className="h-12 border-b border-gray-100 flex items-center px-4 gap-2 bg-gray-50/50 flex-shrink-0">
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-gray-200" />
+                <div className="w-3 h-3 rounded-full bg-gray-200" />
+                <div className="w-3 h-3 rounded-full bg-gray-200" />
+              </div>
+              
+              {/* Progress dots indicating state */}
+              <div className="ml-auto flex gap-1.5 items-center bg-white px-2 py-1 rounded-md border border-gray-100 shadow-sm h-6">
+                 {mockupStates.map((_, i) => (
+                   <div 
+                     key={i} 
+                     className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${i === currentMockupIndex ? 'bg-black' : 'bg-gray-200'}`} 
+                   />
+                 ))}
+              </div>
+            </div>
+            
+            {/* Mockup Body with Animated Presence */}
+            <div className="flex-1 p-6 bg-white relative">
+               <AnimatePresence mode="wait">
+                 <motion.div
+                   key={activeMockup.id}
+                   initial={{ opacity: 0, y: 10 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   exit={{ opacity: 0, y: -10 }}
+                   transition={{ duration: 0.3 }}
+                   className="absolute inset-6 flex flex-col"
+                 >
+                    {/* Header line */}
+                    <div className="mb-6">
+                      <h3 className="text-base font-bold text-gray-900">{activeMockup.header}</h3>
+                      <p className="text-xs text-gray-500 mt-1">{activeMockup.sub}</p>
+                    </div>
+                    {/* Unique Content */}
+                    <div className="flex-1 flex flex-col justify-center">
+                      {activeMockup.content}
+                    </div>
+                 </motion.div>
+               </AnimatePresence>
+            </div>
+          </div>
+        </motion.div>
+        
+      </div>
     </section>
   );
 }
