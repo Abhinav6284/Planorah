@@ -17,6 +17,9 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     portfolio: Mapped["Portfolio | None"] = relationship(back_populates="user", uselist=False)
+    custom_domains: Mapped[list["CustomDomain"]] = relationship(  # type: ignore[name-defined]
+        "CustomDomain", back_populates="user", cascade="all, delete-orphan"
+    )
 
 
 class Portfolio(Base):

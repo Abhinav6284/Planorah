@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import CustomDomainManager from "./CustomDomainManager";
 import LivePreview from "./LivePreview";
 
-const tabs = ["General", "Social Links", "Projects", "Skills", "Certificates", "Settings"];
+const tabs = ["General", "Social Links", "Projects", "Skills", "Certificates", "Custom Domain", "Settings"];
 
 export default function PortfolioEditor() {
   const [activeTab, setActiveTab] = useState("General");
@@ -44,6 +45,8 @@ export default function PortfolioEditor() {
             <label>Bio</label>
             <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={6} />
           </div>
+        ) : activeTab === "Custom Domain" ? (
+          <CustomDomainManager />
         ) : (
           <p>{activeTab} management form goes here (connected to API).</p>
         )}

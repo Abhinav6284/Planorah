@@ -65,3 +65,15 @@ CREATE TABLE IF NOT EXISTS social_links (
     url VARCHAR(500) NOT NULL,
     CONSTRAINT uq_portfolio_social_platform UNIQUE (portfolio_id, platform)
 );
+
+-- Custom domain support
+CREATE TABLE IF NOT EXISTS custom_domains (
+    id          BIGSERIAL PRIMARY KEY,
+    user_id     BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    domain      VARCHAR(253) NOT NULL,
+    verified    BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_custom_domains_domain UNIQUE (domain)
+);
+CREATE INDEX IF NOT EXISTS idx_custom_domains_user    ON custom_domains(user_id);
+CREATE INDEX IF NOT EXISTS idx_custom_domains_verified ON custom_domains(domain, verified);

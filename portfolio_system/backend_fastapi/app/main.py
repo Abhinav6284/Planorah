@@ -2,15 +2,21 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
+from app.api.routes.domains import public_router as domains_public_router
+from app.api.routes.domains import router as domains_router
 from app.api.routes.portfolios import router as portfolios_router
 from app.api.routes.public import router as public_router
 from app.api.routes.uploads import router as uploads_router
 from app.core.config import settings
 from app.db.base import Base
 from app.db.session import engine
+from app.middleware.custom_domain import CustomDomainMiddleware
 from app.services.upload_service import upload_service
 
 app = FastAPI(title=settings.app_name)
+
+# Custom-domain middleware must run before CORS so that CORS sees the real host
+app.add_middleware(CustomDomainMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,6 +30,8 @@ app.add_middleware(
 app.include_router(portfolios_router, prefix=settings.api_v1_prefix)
 app.include_router(public_router, prefix=settings.api_v1_prefix)
 app.include_router(uploads_router, prefix=settings.api_v1_prefix)
+app.include_router(domains_router, prefix=settings.api_v1_prefix)
+app.include_router(domains_public_router, prefix=settings.api_v1_prefix)
 
 
 def initialize_schema_if_enabled() -> None:

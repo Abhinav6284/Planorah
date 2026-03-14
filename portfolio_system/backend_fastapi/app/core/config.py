@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     public_api_base_url: str = "https://api.planorah.me"
     max_upload_bytes: int = 8 * 1024 * 1024
 
+    # Custom domain feature
+    vps_public_ip: str = ""          # e.g. "198.51.100.42" — set in .env
+    max_custom_domains_per_user: int = 3
+
     allowed_origins: str = (
         "https://portfolio.planorah.me,"
         "https://planorah.me,"

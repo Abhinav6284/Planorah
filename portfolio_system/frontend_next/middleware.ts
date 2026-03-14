@@ -11,14 +11,24 @@ const RESERVED_SUBDOMAINS = new Set(
 
 const PORTFOLIO_SLUG_REGEX = /^[a-z0-9](?:[a-z0-9-]{0,118}[a-z0-9])?$/;
 
+const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1"]);
+
 function getRequestHostname(request: NextRequest): string {
   const forwardedHost = request.headers.get("x-forwarded-host");
   const hostHeader = (forwardedHost || request.headers.get("host") || "").split(",")[0]?.trim() || "";
   return hostHeader.split(":")[0].toLowerCase();
 }
 
+/** Return true when the hostname is entirely unrelated to planorah.me — i.e. a user custom domain. */
+function isCustomDomain(hostname: string): boolean {
+  if (!hostname || LOCAL_HOSTS.has(hostname)) return false;
+  if (hostname === ROOT_DOMAIN) return false;
+  if (hostname.endsWith(`.${ROOT_DOMAIN}`)) return false;
+  return true;
+}
+
 function resolveSubdomainSlug(hostname: string): string | null {
-  if (!hostname || hostname === "localhost" || hostname === "127.0.0.1") {
+  if (!hostname || LOCAL_HOSTS.has(hostname)) {
     return null;
   }
 
@@ -47,11 +57,29 @@ function resolveSubdomainSlug(hostname: string): string | null {
 }
 
 export function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname !== "/") {
+  const hostname = getRequestHostname(request);
+  const { pathname } = request.nextUrl;
+
+  // ── Custom domain (e.g. abhinavgoyal.dev) ──────────────────────────────
+  // We only serve the root path as the portfolio page; all other paths
+  // (assets, _next, api) pass through unchanged.
+  if (isCustomDomain(hostname) && (pathname === "/" || pathname === "")) {
+    const rewriteUrl = request.nextUrl.clone();
+    rewriteUrl.pathname = "/p/_custom";
+
+    // Forward the original host to the SSR page so it can query FastAPI
+    const reqHeaders = new Headers(request.headers);
+    reqHeaders.set("x-custom-domain", hostname);
+
+    return NextResponse.rewrite(rewriteUrl, { request: { headers: reqHeaders } });
+  }
+
+  // ── Planorah subdomain (e.g. alice.planorah.me) ────────────────────────
+  if (pathname !== "/") {
     return NextResponse.next();
   }
 
-  const slug = resolveSubdomainSlug(getRequestHostname(request));
+  const slug = resolveSubdomainSlug(hostname);
   if (!slug) {
     return NextResponse.next();
   }
@@ -62,5 +90,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/"],
+  matcher: ["/", "/((?!_next/static|_next/image|favicon.ico|api/).*)"],
 };
