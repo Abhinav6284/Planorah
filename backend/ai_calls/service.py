@@ -243,4 +243,4 @@ def trigger_onboarding_call(user, profile) -> None:
     thread = threading.Thread(
         target=_run_call, daemon=True, name=f"ai_call_{user.id}")
     thread.start()
-    logger.debug(f"[AICall] Background call thread started for {user.email}.")
+    logger.info(f"[AICall] Background call thread started for {user.email}.")

@@ -59,7 +59,7 @@ class CustomDomainMiddleware(BaseHTTPMiddleware):
                     cd = get_domain_by_host(db, host)
                     if cd is not None:
                         request.state.custom_domain_user_id = cd.user_id
-                        logger.debug(
+                        logger.info(
                             "Custom domain '%s' resolved to user_id=%s",
                             host,
                             cd.user_id,

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { useScroll, useTransform, motion, useMotionValueEvent, AnimatePresence } from "framer-motion";
+import { useScroll, motion, useMotionValueEvent, AnimatePresence } from "framer-motion";
 import { Target, Cpu, Calendar, TrendingUp, Trophy, CheckCircle2, BookOpen, Code2, Brain, Star, Flame, ArrowRight } from "lucide-react";
 
 /* ─── Step Content Panels (rich mockups) ─── */
@@ -371,8 +371,6 @@ export default function ProductDemo() {
     else if (latest < 0.8) setActiveStep(3);
     else setActiveStep(4);
   });
-
-  const progressHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   return (
     <section

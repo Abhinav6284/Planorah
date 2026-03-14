@@ -4,6 +4,8 @@ import { Twitter, Github, Linkedin } from "lucide-react";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const toPath = (label) =>
+    `/${label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
   
   const columns = [
     {
@@ -37,9 +39,9 @@ export default function Footer() {
               Your personal AI learning roadmap. Structure your knowledge and achieve your goals faster.
             </p>
             <div className="flex items-center gap-4 text-gray-400">
-              <a href="#" className="hover:text-gray-900 transition-colors"><Twitter className="w-5 h-5" /></a>
-              <a href="#" className="hover:text-gray-900 transition-colors"><Github className="w-5 h-5" /></a>
-              <a href="#" className="hover:text-gray-900 transition-colors"><Linkedin className="w-5 h-5" /></a>
+              <a href="https://x.com" target="_blank" rel="noreferrer" aria-label="Planorah on X" className="hover:text-gray-900 transition-colors"><Twitter className="w-5 h-5" /></a>
+              <a href="https://github.com" target="_blank" rel="noreferrer" aria-label="Planorah on GitHub" className="hover:text-gray-900 transition-colors"><Github className="w-5 h-5" /></a>
+              <a href="https://www.linkedin.com" target="_blank" rel="noreferrer" aria-label="Planorah on LinkedIn" className="hover:text-gray-900 transition-colors"><Linkedin className="w-5 h-5" /></a>
             </div>
           </div>
 
@@ -50,9 +52,9 @@ export default function Footer() {
               <ul className="space-y-3">
                 {col.links.map((link, lIdx) => (
                   <li key={lIdx}>
-                    <a href="#" className="text-gray-500 hover:text-gray-900 font-medium transition-colors">
+                    <Link to={toPath(link)} className="text-gray-500 hover:text-gray-900 font-medium transition-colors">
                       {link}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -65,8 +67,8 @@ export default function Footer() {
         <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500 font-medium">
           <p>© {currentYear} Planorah Inc. All rights reserved.</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-gray-900 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-gray-900 transition-colors">Terms of Service</a>
+            <Link to="/privacy-policy" className="hover:text-gray-900 transition-colors">Privacy Policy</Link>
+            <Link to="/terms-of-service" className="hover:text-gray-900 transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>

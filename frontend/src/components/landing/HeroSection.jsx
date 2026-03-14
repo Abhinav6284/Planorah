@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Play, CheckCircle2, Target, Cpu, Calendar, TrendingUp, Trophy } from "lucide-react";
+import { ArrowRight, Play, CheckCircle2, Target, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const mockupStates = [

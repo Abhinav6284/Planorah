@@ -33,7 +33,7 @@ def generate_roadmap(request):
 
     # Configure Gemini with API key
     genai.configure(api_key=api_key)
-    logger.debug(f"🔑 Gemini API configured with key: {api_key[:10]}...{api_key[-4:]}")
+    logger.info("Gemini configured for roadmap generation")
 
     user = request.user
     goal = request.data.get('goal', '')
@@ -373,7 +373,7 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
         # Using Gemini 2.5 Flash Lite - lightweight and cost-effective
         model = genai.GenerativeModel(
             'gemini-2.5-flash-lite')  # type: ignore
-        logger.debug(f"🤖 Using model: gemini-2.5-flash-lite")
+        logger.info("Using Gemini model gemini-2.5-flash-lite")
 
         # Use proper GenerationConfig
         generation_config = GenerationConfig(
@@ -383,9 +383,8 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
         )
 
         # Generate content and assign to response variable
-        logger.debug(f"📝 Generating roadmap for goal: {goal[:50]}...")
+        logger.info("Generating roadmap for user_id=%s category=%s", user.id, category)
         response = model.generate_content(prompt, generation_config=generation_config)
-        logger.debug(f"✅ Response received successfully")
 
         # Safety check: Ensure valid response from AI
         if not response or not hasattr(response, "text") or not response.text:
@@ -437,7 +436,6 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
 
         # type: ignore[attr-defined]
         # type: ignore[attr-defined]
-        # logger.debug(f"✅ Roadmap created: ID={roadmap.id}")
 
         # Create Milestones and Projects
         milestones_data = roadmap_data.get('milestones', [])
@@ -451,8 +449,6 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
                 topics=milestone_data.get('topics', []),
                 resources=milestone_data.get('resources', [])
             )
-
-            logger.debug(f"  ✅ Milestone {idx + 1} created: {milestone.title}")
 
             # Create projects for this milestone
             projects_data = milestone_data.get('projects', [])
@@ -472,20 +468,14 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
                     tech_stack=project_data.get('tech_stack', []),
                     learning_outcomes=project_data.get('learning_outcomes', [])
                 )
-                logger.debug(
-                    f"    ✅ Project {pidx + 1} created: {project_data.get('title', 'Untitled')}")
-
-        logger.debug("=" * 70)
-        logger.debug("🎉 Roadmap generation completed successfully!")
-        logger.debug("=" * 70)
         
         # Auto-generate tasks from roadmap
         try:
             from tasks.task_generator import auto_create_tasks_from_roadmap
             created_tasks = auto_create_tasks_from_roadmap(roadmap)
-            logger.debug(f"✅ Auto-generated {len(created_tasks)} tasks from roadmap!")
+            logger.info("Auto-generated %s tasks for roadmap_id=%s", len(created_tasks), roadmap.id)
         except Exception as task_error:
-            logger.debug(f"⚠️ Task generation failed: {str(task_error)}")
+            logger.warning("Task auto-generation failed for roadmap_id=%s: %s", roadmap.id, task_error)
             logger.exception("Task generation failed for roadmap %s", roadmap.id)
             # Don't fail the whole request if task generation fails
 
@@ -497,9 +487,7 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
         }, status=status.HTTP_201_CREATED)
 
     except json.JSONDecodeError as e:
-        logger.debug(f"❌ JSON Parse Error: {str(e)}")
-        logger.debug(
-            f"Response text: {response_text[:1000] if 'response_text' in locals() else 'N/A'}")
+        logger.warning("JSON parse error while generating roadmap: %s", e)
         return Response({
             "error": "Failed to parse AI response",
             "details": f"JSON parsing failed: {str(e)}",
@@ -507,7 +495,6 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     except Exception as e:
-        logger.debug(f"❌ Unexpected Error: {str(e)}")
         logger.exception("Unexpected error during roadmap generation")
         return Response({
             "error": "Failed to generate roadmap",
@@ -528,7 +515,7 @@ def get_user_roadmaps(request):
         serializer = RoadmapSerializer(roadmaps, many=True)
         return Response(serializer.data)
     except Exception as e:
-        logger.debug(f"❌ Error fetching roadmaps: {str(e)}")
+        logger.exception("Failed to fetch roadmaps for user_id=%s", request.user.id)
         return Response({
             "error": "Failed to fetch roadmaps",
             "details": str(e)
@@ -546,7 +533,7 @@ def get_roadmap_detail(request, roadmap_id):
     except Roadmap.DoesNotExist:
         return Response({"error": "Roadmap not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        logger.debug(f"❌ Error fetching roadmap detail: {str(e)}")
+        logger.exception("Failed to fetch roadmap detail roadmap_id=%s user_id=%s", roadmap_id, request.user.id)
         return Response({
             "error": "Failed to fetch roadmap details",
             "details": str(e)
@@ -560,12 +547,12 @@ def delete_roadmap(request, roadmap_id):
     try:
         roadmap = Roadmap.objects.get(id=roadmap_id, user=request.user)
         roadmap.delete()
-        logger.debug(f"✅ Roadmap {roadmap_id} deleted by {request.user.username}")
+        logger.info("Roadmap deleted roadmap_id=%s user_id=%s", roadmap_id, request.user.id)
         return Response({"message": "Roadmap deleted successfully"}, status=status.HTTP_200_OK)
     except Roadmap.DoesNotExist:
         return Response({"error": "Roadmap not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        logger.debug(f"❌ Error deleting roadmap: {str(e)}")
+        logger.exception("Failed to delete roadmap roadmap_id=%s user_id=%s", roadmap_id, request.user.id)
         return Response({
             "error": "Failed to delete roadmap",
             "details": str(e)
@@ -583,13 +570,12 @@ def update_milestone_progress(request, milestone_id):
 
         # Update completed_at timestamp
         milestone.save()
-        logger.debug(
-            f"✅ Milestone {milestone_id} updated: completed={milestone.is_completed}")
+        logger.info("Milestone updated milestone_id=%s completed=%s", milestone_id, milestone.is_completed)
         return Response({"message": "Milestone updated"}, status=status.HTTP_200_OK)
     except Milestone.DoesNotExist:
         return Response({"error": "Milestone not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        logger.debug(f"❌ Error updating milestone: {str(e)}")
+        logger.exception("Failed to update milestone milestone_id=%s user_id=%s", milestone_id, request.user.id)
         return Response({
             "error": "Failed to update milestone",
             "details": str(e)
@@ -666,8 +652,7 @@ def schedule_roadmap(request, roadmap_id):
                 end_time=end_datetime,
                 linked_task=task,  # Link to navigate from calendar to task
             )
-            
-            logger.debug(f"  ✅ Created event {event.id}: {task.title} on {task_date}")
+
             created_events.append(event.id)
             
             scheduled_tasks.append({
@@ -706,7 +691,7 @@ def schedule_roadmap(request, roadmap_id):
             milestone.save()
             current_date = milestone.end_date + timedelta(days=1)
 
-        logger.debug(f"✅ Scheduled roadmap {roadmap_id} with {len(created_events)} task events")
+        logger.info("Scheduled roadmap roadmap_id=%s user_id=%s events=%s", roadmap_id, request.user.id, len(created_events))
         
         return Response({
             "message": f"Roadmap scheduled successfully! {len(created_events)} tasks added to calendar.",
@@ -718,7 +703,6 @@ def schedule_roadmap(request, roadmap_id):
     except Roadmap.DoesNotExist:
         return Response({"error": "Roadmap not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        logger.debug(f"❌ Error scheduling roadmap: {str(e)}")
         logger.exception("Error scheduling roadmap %s", roadmap_id)
         return Response({
             "error": "Failed to schedule roadmap",
@@ -790,7 +774,6 @@ def get_roadmap_projects(request):
         return Response(all_projects)
         
     except Exception as e:
-        logger.debug(f"❌ Error fetching roadmap projects: {str(e)}")
         logger.exception("Error fetching roadmap projects for user %s", request.user.id)
         return Response({
             "error": "Failed to fetch projects",
@@ -839,7 +822,7 @@ def get_roadmap_progress(request):
         return Response(progress_data)
         
     except Exception as e:
-        logger.debug(f"❌ Error fetching roadmap progress: {str(e)}")
+        logger.exception("Error fetching roadmap progress for user %s", request.user.id)
         return Response({
             "error": "Failed to fetch progress",
             "details": str(e)
