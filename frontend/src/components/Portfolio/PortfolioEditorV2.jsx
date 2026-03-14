@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { portfolioService } from '../../api/portfolioService';
-import { useSubscription } from '../../context/SubscriptionContext';
 import GeneralTab from './editor/GeneralTab';
 import SocialTab from './editor/SocialTab';
 import ProjectsTab from './editor/ProjectsTab';
@@ -23,7 +22,6 @@ function getStatusBadge(portfolio) {
 }
 
 export default function PortfolioEditorV2() {
-  const { canAccess } = useSubscription();
   const [portfolio, setPortfolio] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
