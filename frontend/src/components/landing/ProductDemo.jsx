@@ -375,10 +375,10 @@ export default function ProductDemo() {
   return (
     <section
       ref={containerRef}
-      className="relative overflow-hidden bg-gradient-to-b from-white/80 via-indigo-50/35 to-emerald-50/35"
+      className="relative bg-gradient-to-b from-white/80 via-indigo-50/35 to-emerald-50/35"
       style={{ height: "500vh" }}
     >
-      <div className="pointer-events-none absolute inset-0">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute top-10 left-[8%] h-64 w-64 rounded-full bg-sky-100/45 blur-3xl" />
         <div className="absolute top-1/3 right-[-5rem] h-80 w-80 rounded-full bg-violet-100/30 blur-3xl" />
         <div className="absolute bottom-16 left-1/3 h-72 w-72 rounded-full bg-emerald-100/35 blur-3xl" />

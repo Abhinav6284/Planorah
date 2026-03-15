@@ -3,7 +3,6 @@ import Navbar from "./landing/Navbar";
 import HeroSection from "./landing/HeroSection";
 import FeaturesSection from "./landing/FeaturesSection";
 import ProductDemo from "./landing/ProductDemo";
-import PricingSection from "./landing/PricingSection";
 import ShowcaseSection from "./landing/ShowcaseSection";
 import TestimonialsSection from "./landing/TestimonialsSection";
 import CTASection from "./landing/CTASection";
@@ -24,7 +23,6 @@ export default function LandingPage() {
           <HeroSection />
           <FeaturesSection />
           <ProductDemo />
-          <PricingSection />
           <ShowcaseSection />
           <TestimonialsSection />
           <CTASection />

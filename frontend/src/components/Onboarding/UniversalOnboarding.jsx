@@ -589,7 +589,7 @@ export default function UniversalOnboarding() {
                                 value={fd[inp.field]}
                                 onChange={e => setFd(prev => ({ ...prev, [inp.field]: e.target.value }))}
                                 placeholder={inp.placeholder}
-                                className="w-full px-4 py-4 rounded-2xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none text-[16px] font-medium transition shadow-sm"
+                                className="w-full px-4 py-4 rounded-2xl border-2 border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none text-[16px] font-medium transition shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-400"
                             />
                         </div>
                     ))}
