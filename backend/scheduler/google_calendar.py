@@ -10,7 +10,11 @@ from .models import GoogleCredential
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
 # Redirect URI (must match Google Console)
-REDIRECT_URI = os.environ.get("GOOGLE_OAUTH_REDIRECT_URI", 'https://planorah.me/google-callback')
+REDIRECT_URI = (
+    os.environ.get("GOOGLE_CALENDAR_REDIRECT_URI")
+    or os.environ.get("GOOGLE_OAUTH_REDIRECT_URI")
+    or 'https://planorah.me/scheduler'
+)
 
 
 class GoogleCalendarService:
@@ -23,10 +27,26 @@ class GoogleCalendarService:
         # For now, we assume env vars or a config file
         # We'll construct a client config dict for simplicity if env vars are present
         
+        client_id = (
+            os.environ.get("GOOGLE_CALENDAR_CLIENT_ID")
+            or os.environ.get("GOOGLE_CLIENT_ID")
+            or os.environ.get("GOOGLE_OAUTH_CLIENT_ID")
+        )
+        client_secret = (
+            os.environ.get("GOOGLE_CALENDAR_CLIENT_SECRET")
+            or os.environ.get("GOOGLE_CLIENT_SECRET")
+            or os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET")
+        )
+
+        if not client_id or not client_secret:
+            raise ValueError(
+                "Google Calendar OAuth credentials are missing. Set GOOGLE_CALENDAR_CLIENT_ID/SECRET or GOOGLE_OAUTH_CLIENT_ID/SECRET environment variables."
+            )
+
         client_config = {
             "web": {
-                "client_id": os.environ.get("GOOGLE_CLIENT_ID"),
-                "client_secret": os.environ.get("GOOGLE_CLIENT_SECRET"),
+                "client_id": client_id,
+                "client_secret": client_secret,
                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                 "token_uri": "https://oauth2.googleapis.com/token",
             }
