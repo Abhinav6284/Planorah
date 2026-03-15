@@ -2,6 +2,15 @@ import api from "../api";
 
 const ROADMAP_GENERATION_TIMEOUT_MS = 120000;
 
+const normalizeArrayPayload = (payload, keys = []) => {
+    if (Array.isArray(payload)) return payload;
+    for (const key of keys) {
+        if (Array.isArray(payload?.[key])) return payload[key];
+    }
+    if (Array.isArray(payload?.results)) return payload.results;
+    return [];
+};
+
 export const roadmapService = {
     // Generate a new roadmap
     generateRoadmap: async (data) => {
@@ -14,7 +23,7 @@ export const roadmapService = {
     // Get all roadmaps for the user
     getUserRoadmaps: async () => {
         const response = await api.get("roadmap/list/");
-        return response.data;
+        return normalizeArrayPayload(response?.data, ["roadmaps", "items"]);
     },
 
     // Get a specific roadmap detail
@@ -48,7 +57,7 @@ export const roadmapService = {
     // Get all roadmap projects (for Projects tab)
     getRoadmapProjects: async () => {
         const response = await api.get("roadmap/projects/");
-        return response.data;
+        return normalizeArrayPayload(response?.data, ["projects", "items"]);
     },
 
     // Get progress for all roadmaps
