@@ -25,7 +25,7 @@ const showcases = [
 
 export default function ShowcaseSection() {
   return (
-    <section id="showcase" className="relative py-24 overflow-hidden bg-gradient-to-b from-white/70 via-slate-50/55 to-cyan-50/45">
+    <section id="showcase" className="relative scroll-mt-36 py-24 overflow-hidden bg-gradient-to-b from-white/70 via-slate-50/55 to-cyan-50/45">
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute -top-14 left-[12%] h-56 w-56 rounded-full bg-cyan-100/45 blur-3xl" />
         <div className="absolute bottom-[-6rem] right-[8%] h-72 w-72 rounded-full bg-sky-100/35 blur-3xl" />

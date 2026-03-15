@@ -64,7 +64,7 @@ export default function PricingSection() {
   ];
 
   return (
-    <section id="pricing" className="py-28 md:py-36 px-4 md:px-8 bg-[#F5F5F7] dark:bg-gray-950/50 relative overflow-hidden">
+    <section id="pricing" className="scroll-mt-36 py-28 md:py-36 px-4 md:px-8 bg-[#F5F5F7] dark:bg-gray-950/50 relative overflow-hidden">
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent" />
       <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent" />
 

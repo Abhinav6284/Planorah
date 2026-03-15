@@ -44,7 +44,7 @@ const features = [
 
 export default function FeaturesSection() {
   return (
-    <section id="features" className="relative py-24 overflow-hidden bg-gradient-to-b from-slate-50/70 via-white/70 to-blue-50/50 border-y border-slate-200/60">
+    <section id="features" className="relative scroll-mt-36 py-24 overflow-hidden bg-gradient-to-b from-slate-50/70 via-white/70 to-blue-50/50 border-y border-slate-200/60">
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute -top-20 -left-20 h-64 w-64 rounded-full bg-cyan-100/45 blur-3xl" />
         <div className="absolute bottom-0 right-[-6rem] h-72 w-72 rounded-full bg-indigo-100/35 blur-3xl" />

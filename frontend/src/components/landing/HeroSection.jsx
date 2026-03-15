@@ -177,13 +177,13 @@ export default function HeroSection() {
               Start Your Roadmap
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link
-              to="#features"
+            <a
+              href="#features"
               className="w-full sm:w-auto px-8 py-3.5 bg-white text-gray-800 rounded-xl font-medium border border-gray-200 flex items-center justify-center gap-2 hover:bg-gray-50 transition-all shadow-sm shadow-gray-100"
             >
               <Play className="w-4 h-4 fill-current opacity-70" />
               Explore Features
-            </Link>
+            </a>
           </motion.div>
         </div>
 
