@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../../api/axios";
 
+const ROADMAP_GENERATION_TIMEOUT_MS = 120000;
+
 export default function AIRoadmapGenerator() {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
@@ -60,7 +62,9 @@ export default function AIRoadmapGenerator() {
         setMessage("🔄 Generating your personalized roadmap...");
 
         try {
-            const res = await axiosInstance.post("/api/roadmap/generate/", formData);
+            const res = await axiosInstance.post("/api/roadmap/generate/", formData, {
+                timeout: ROADMAP_GENERATION_TIMEOUT_MS,
+            });
             setMessage("✅ Roadmap generated successfully!");
             setSelectedRoadmap(res.data);
             fetchRoadmaps();

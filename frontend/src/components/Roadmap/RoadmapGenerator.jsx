@@ -50,7 +50,10 @@ export default function RoadmapGenerator() {
             navigate(`/roadmap/${data.id}`);
         } catch (err) {
             console.error(err);
-            setError("Failed to generate roadmap. Please try again.");
+            const isTimeout = err?.code === "ECONNABORTED" || /timeout/i.test(err?.message || "");
+            setError(isTimeout
+                ? "Roadmap generation is taking longer than expected. Please try again in a moment."
+                : "Failed to generate roadmap. Please try again.");
         } finally {
             setLoading(false);
         }

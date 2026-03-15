@@ -1,9 +1,13 @@
 import api from "../api";
 
+const ROADMAP_GENERATION_TIMEOUT_MS = 120000;
+
 export const roadmapService = {
     // Generate a new roadmap
     generateRoadmap: async (data) => {
-        const response = await api.post("roadmap/generate/", data);
+        const response = await api.post("roadmap/generate/", data, {
+            timeout: ROADMAP_GENERATION_TIMEOUT_MS,
+        });
         return response.data;
     },
 
