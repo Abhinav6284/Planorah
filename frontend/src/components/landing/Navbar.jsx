@@ -57,7 +57,7 @@ export default function Navbar() {
               Log in
             </Link>
             <Link
-              to="/signup"
+              to="/register"
               className="px-5 py-2 text-sm font-semibold text-white bg-gray-900 rounded-full hover:bg-black transition-colors whitespace-nowrap"
             >
               Join for free
@@ -103,7 +103,7 @@ export default function Navbar() {
                   Log in
                 </Link>
                 <Link
-                  to="/signup"
+                  to="/register"
                   onClick={() => setMobileMenuOpen(false)}
                   className="text-center py-3 bg-black text-white rounded-full font-medium"
                 >

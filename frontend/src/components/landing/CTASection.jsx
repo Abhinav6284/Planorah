@@ -30,7 +30,7 @@ export default function CTASection() {
             Join thousands of ambitious students organizing their learning journey effortlessly.
           </p>
           <Link
-            to="/signup"
+            to="/register"
             className="inline-flex items-center gap-2 px-8 py-4 bg-black text-white rounded-xl font-medium text-lg hover:bg-gray-800 transition-all hover:scale-[1.02] shadow-sm shadow-gray-200"
           >
             Create My Roadmap

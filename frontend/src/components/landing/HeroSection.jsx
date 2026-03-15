@@ -171,7 +171,7 @@ export default function HeroSection() {
             className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
           >
             <Link
-              to="/signup"
+              to="/register"
               className="w-full sm:w-auto px-8 py-3.5 bg-black text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition-all hover:scale-[1.02] shadow-sm shadow-gray-200"
             >
               Start Your Roadmap
