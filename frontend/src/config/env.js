@@ -22,6 +22,19 @@ const normalizeApiConfig = (input) => {
 
   if (trimmedInput === '/api') {
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const hostname = typeof window !== 'undefined' ? window.location.hostname.toLowerCase() : '';
+    const isPrimaryWebHost = hostname === 'planorah.me' || hostname === 'www.planorah.me';
+
+    // Production frontend host should call the API domain directly.
+    // This avoids relying on frontend-domain /api proxies that can reject POST requests.
+    if (isPrimaryWebHost) {
+      return {
+        apiOrigin: PRODUCTION_API_FALLBACK,
+        apiBaseUrl: `${PRODUCTION_API_FALLBACK}/api/`,
+        usesRelativePath: false,
+      };
+    }
+
     return {
       apiOrigin: origin,
       apiBaseUrl: '/api/',

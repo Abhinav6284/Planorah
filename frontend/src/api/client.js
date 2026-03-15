@@ -69,6 +69,11 @@ const deriveNetworkFallbackBaseUrl = () => {
 
 const NETWORK_FALLBACK_BASE_URL = deriveNetworkFallbackBaseUrl();
 
+const isSafeFallbackMethod = (method = '') => {
+  const normalized = String(method || '').toLowerCase();
+  return normalized === '' || normalized === 'get' || normalized === 'head';
+};
+
 const handleSessionExpiry = () => {
   clearTokens();
 
@@ -150,7 +155,13 @@ client.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (!error.response && originalRequest && NETWORK_FALLBACK_BASE_URL && originalRequest._networkFallbackTried !== true) {
+    if (
+      !error.response
+      && originalRequest
+      && NETWORK_FALLBACK_BASE_URL
+      && originalRequest._networkFallbackTried !== true
+      && isSafeFallbackMethod(originalRequest.method)
+    ) {
       originalRequest._networkFallbackTried = true;
       originalRequest.baseURL = NETWORK_FALLBACK_BASE_URL;
       return client(originalRequest);
