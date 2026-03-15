@@ -91,7 +91,7 @@ def get_user_statistics(request):
     recent_activity = []
     for task in recent_tasks:
         recent_activity.append({
-            'id': task.id,
+            'id': str(task.task_id),
             'title': task.title,
             'status': task.status,
             'roadmap': task.roadmap.title if task.roadmap else None,

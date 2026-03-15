@@ -192,6 +192,86 @@ class TaskViewSet(viewsets.ReadOnlyModelViewSet):
             completed_tasks, many=True, context={'request': request})
         return Response(serializer.data)
 
+    @action(detail=True, methods=['get'])
+    def guidance(self, request, pk=None):
+        """
+        Return lightweight, deterministic guidance for a task.
+        Frontend expects this endpoint at: /tasks/{task_id}/guidance/
+        """
+        task = self.get_object()
+
+        objective = task.objective or task.description or f"Complete: {task.title}"
+
+        time_breakdown = [
+            {
+                'duration': f"{max(5, int((task.estimated_minutes or 60) * 0.15))} min",
+                'activity': 'Review objective and success criteria'
+            },
+            {
+                'duration': f"{max(15, int((task.estimated_minutes or 60) * 0.7))} min",
+                'activity': 'Execute focused work on the core task'
+            },
+            {
+                'duration': f"{max(5, int((task.estimated_minutes or 60) * 0.15))} min",
+                'activity': 'Validate output and document what you finished'
+            },
+        ]
+
+        acceptance_rules = task.acceptance_rules if isinstance(task.acceptance_rules, dict) else {}
+
+        steps = [
+            {
+                'step': 1,
+                'title': 'Clarify Target Outcome',
+                'description': objective,
+            },
+            {
+                'step': 2,
+                'title': 'Prepare Inputs',
+                'description': 'Open the required tools/resources and define a small, shippable scope for this session.',
+            },
+            {
+                'step': 3,
+                'title': 'Execute and Validate',
+                'description': 'Complete the core work, then verify against task rules before marking progress.',
+            },
+            {
+                'step': 4,
+                'title': 'Log Progress',
+                'description': 'Capture what changed, blockers, and your next action so momentum is preserved.',
+            },
+        ]
+
+        best_practices = [
+            'Work in one focused block without multitasking.',
+            'Validate deliverables against acceptance criteria before finishing.',
+            'Leave a short note for your next session to reduce restart time.',
+        ]
+
+        common_mistakes = [
+            'Starting without defining what done looks like.',
+            'Over-scoping the session and not finishing a concrete output.',
+            'Skipping validation/proof checks at the end.',
+        ]
+
+        if acceptance_rules:
+            best_practices.append('Use the task acceptance rules as a final checklist.')
+
+        response_data = {
+            'generated': True,
+            'objective': objective,
+            'time_breakdown': time_breakdown,
+            'steps': steps,
+            'best_practices': best_practices,
+            'common_mistakes': common_mistakes,
+            'expected_outcome': f"A completed output for '{task.title}' that meets validation requirements.",
+            'proof_type': task.proof_type,
+            'validator_type': task.validator_type,
+            'acceptance_rules': acceptance_rules,
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
     @action(detail=False, methods=['get'])
     def failed(self, request):
         """Get all tasks with recent failures (no pass yet)."""
