@@ -10,10 +10,10 @@ from .models import GoogleCredential
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
 # Redirect URI (must match Google Console)
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://planorah.me").rstrip("/")
 REDIRECT_URI = (
     os.environ.get("GOOGLE_CALENDAR_REDIRECT_URI")
-    or os.environ.get("GOOGLE_OAUTH_REDIRECT_URI")
-    or 'https://planorah.me/scheduler'
+    or f"{FRONTEND_URL}/scheduler"
 )
 
 
@@ -26,7 +26,7 @@ class GoogleCalendarService:
         # In production, use client_secrets.json or env vars
         # For now, we assume env vars or a config file
         # We'll construct a client config dict for simplicity if env vars are present
-        
+
         client_id = (
             os.environ.get("GOOGLE_CALENDAR_CLIENT_ID")
             or os.environ.get("GOOGLE_CLIENT_ID")
@@ -43,6 +43,11 @@ class GoogleCalendarService:
                 "Google Calendar OAuth credentials are missing. Set GOOGLE_CALENDAR_CLIENT_ID/SECRET or GOOGLE_OAUTH_CLIENT_ID/SECRET environment variables."
             )
 
+        if "/api/users/google/callback" in REDIRECT_URI:
+            raise ValueError(
+                "GOOGLE_CALENDAR_REDIRECT_URI is misconfigured for the scheduler flow. Use the frontend callback route, e.g. https://planorah.me/scheduler."
+            )
+
         client_config = {
             "web": {
                 "client_id": client_id,
@@ -51,7 +56,7 @@ class GoogleCalendarService:
                 "token_uri": "https://oauth2.googleapis.com/token",
             }
         }
-        
+
         flow = Flow.from_client_config(
             client_config,
             scopes=SCOPES,
