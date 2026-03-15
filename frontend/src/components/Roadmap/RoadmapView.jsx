@@ -26,6 +26,13 @@ export default function RoadmapView() {
     const [expandedFAQ, setExpandedFAQ] = useState(null);
     const [taskProgress, setTaskProgress] = useState({ total: 0, completed: 0 });
 
+    const extractTasksArray = (payload) => {
+        if (Array.isArray(payload)) return payload;
+        if (Array.isArray(payload?.results)) return payload.results;
+        if (Array.isArray(payload?.tasks)) return payload.tasks;
+        return [];
+    };
+
     const fetchRoadmap = useCallback(async () => {
         try {
             const data = await roadmapService.getRoadmapDetail(id);
@@ -40,7 +47,7 @@ export default function RoadmapView() {
     const fetchTaskProgress = useCallback(async () => {
         try {
             const response = await tasksService.getTasks({ roadmap: id });
-            const tasks = response.data || [];
+            const tasks = extractTasksArray(response?.data);
             const completed = tasks.filter(t => t.status === 'completed').length;
             setTaskProgress({ total: tasks.length, completed });
         } catch (err) {

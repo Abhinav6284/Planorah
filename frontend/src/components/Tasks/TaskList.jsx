@@ -22,6 +22,15 @@ export default function TaskList() {
     const undoTimeoutRef = useRef(null);
     const taskRefs = useRef({});
 
+    const extractArrayPayload = (payload, keys = []) => {
+        if (Array.isArray(payload)) return payload;
+        for (const key of keys) {
+            if (Array.isArray(payload?.[key])) return payload[key];
+        }
+        if (Array.isArray(payload?.results)) return payload.results;
+        return [];
+    };
+
     // Handle taskId from URL (from calendar navigation)
     useEffect(() => {
         const taskId = searchParams.get('taskId');
@@ -48,7 +57,7 @@ export default function TaskList() {
     const fetchRoadmaps = useCallback(async () => {
         try {
             const data = await roadmapService.getUserRoadmaps();
-            setRoadmaps(data);
+            setRoadmaps(extractArrayPayload(data, ['roadmaps', 'items']));
         } catch (error) {
             console.error('Failed to fetch roadmaps:', error);
         }
@@ -60,7 +69,7 @@ export default function TaskList() {
             if (filter !== 'all') filters.status = filter;
             if (selectedRoadmap !== 'all') filters.roadmap = selectedRoadmap;
             const response = await tasksService.getTasks(filters);
-            setTasks(response.data);
+            setTasks(extractArrayPayload(response?.data, ['tasks', 'items']));
         } catch (error) {
             console.error('Failed to fetch tasks:', error);
         } finally {
