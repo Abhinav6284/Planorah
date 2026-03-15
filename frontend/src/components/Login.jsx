@@ -36,6 +36,14 @@ export default function Login() {
         setTimeout(() => navigate("/onboarding"), 1500);
       }
     } catch (err) {
+      const signupRequired = err.response?.data?.signup_required;
+      const signupEmail = err.response?.data?.email;
+      if (signupRequired && signupEmail) {
+        setMessage("success:No account found. Redirecting to sign up...");
+        setTimeout(() => navigate("/register", { state: { prefillEmail: signupEmail } }), 1200);
+        return;
+      }
+
       const verifyRequired = err.response?.data?.verify_required;
       const verifyEmail = err.response?.data?.email;
       if (verifyRequired && verifyEmail) {
@@ -81,6 +89,14 @@ export default function Login() {
           setTimeout(() => navigate("/onboarding"), 1500);
         }
       } catch (err) {
+        const signupRequired = err.response?.data?.signup_required;
+        const signupEmail = err.response?.data?.email;
+        if (signupRequired && signupEmail) {
+          setMessage("success:No account found. Redirecting to sign up...");
+          setTimeout(() => navigate("/register", { state: { prefillEmail: signupEmail } }), 1200);
+          return;
+        }
+
         console.error('Google OAuth Error:', err.response?.data);
         const serverMsg = err.response?.data?.error || err.response?.data?.message;
         const details = err.response?.data?.details ? ` (${err.response.data.details})` : '';
