@@ -39,6 +39,7 @@ def _env_int(name: str, default: int) -> int:
     except (TypeError, ValueError):
         return default
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -250,8 +251,14 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Allow Google OAuth popups to communicate with the opener window.
+# Django's SecurityMiddleware defaults to "same-origin" which blocks window.closed
+# polling used by the Google Identity Services popup flow.
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "unsafe-none"
+
 # SMTP settings Configuration
-EMAIL_BACKEND = _env_str('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_BACKEND = _env_str(
+    'EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = _env_str('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = _env_int('EMAIL_PORT', 587)
 EMAIL_USE_TLS = _env_bool('EMAIL_USE_TLS', True)
