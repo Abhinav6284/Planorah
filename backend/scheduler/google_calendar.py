@@ -113,6 +113,9 @@ class GoogleCalendarService:
     def exchange_code(self, code, redirect_uri=None, code_verifier=None):
         """Exchange code for token and save credential"""
         flow = self.get_flow(redirect_uri=redirect_uri)
+        # Google can return a superset of requested scopes (for example openid + profile),
+        # which oauthlib treats as a strict mismatch unless this flag is enabled.
+        os.environ.setdefault("OAUTHLIB_RELAX_TOKEN_SCOPE", "1")
         if code_verifier:
             flow.fetch_token(code=code, code_verifier=code_verifier)
         else:
