@@ -3,11 +3,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.core import signing
-import requests # Added requests import
+import requests
 import logging
 from .models import Event, GoogleCredential
 from .google_calendar import GoogleCalendarService, PKCE_STATE_MAX_AGE, PKCE_STATE_SALT
-from .serializers import EventSerializer # Assuming you have one, or we'll make a simple one inline if needed
+from .serializers import EventSerializer  # Assuming you have one, or we'll make a simple one inline if needed
+
+logger = logging.getLogger(__name__)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -62,38 +64,64 @@ def google_auth_url(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def google_callback(request):
-    """Exchange code for token"""
+    """Exchange Google OAuth code for tokens and persist credentials."""
     code = request.data.get('code')
     state = request.data.get('state')
     redirect_uri = request.data.get('redirect_uri')
+
+    logger.debug(
+        "Google callback received: user=%s has_code=%s has_state=%s redirect_uri=%s",
+        request.user.id, bool(code), bool(state), redirect_uri,
+    )
+
     if not code:
+        logger.warning("Google callback missing code: user=%s", request.user.id)
         return Response({"error": "Code is required"}, status=status.HTTP_400_BAD_REQUEST)
     if not state:
+        logger.warning("Google callback missing state: user=%s", request.user.id)
         return Response({"error": "Missing OAuth state. Please reconnect Google Calendar."}, status=status.HTTP_400_BAD_REQUEST)
-    
+
+    # --- Verify PKCE state ---
+    code_verifier = None
     try:
-        code_verifier = None
-        try:
-            payload = signing.loads(state, salt=PKCE_STATE_SALT, max_age=PKCE_STATE_MAX_AGE)
-            if payload.get("u") != request.user.id:
-                return Response({"error": "Invalid OAuth state"}, status=status.HTTP_400_BAD_REQUEST)
-            code_verifier = payload.get("cv")
-        except signing.BadSignature:
-            return Response({"error": "Invalid or expired OAuth state"}, status=status.HTTP_400_BAD_REQUEST)
+        payload = signing.loads(state, salt=PKCE_STATE_SALT, max_age=PKCE_STATE_MAX_AGE)
+        if payload.get("u") != request.user.id:
+            logger.warning(
+                "Google callback state user mismatch: expected=%s got=%s",
+                request.user.id, payload.get("u"),
+            )
+            return Response({"error": "Invalid OAuth state"}, status=status.HTTP_400_BAD_REQUEST)
+        code_verifier = payload.get("cv")
+        logger.debug("Google callback state verified: user=%s has_code_verifier=%s", request.user.id, bool(code_verifier))
+    except signing.SignatureExpired:
+        logger.warning("Google callback state expired: user=%s", request.user.id)
+        return Response({"error": "OAuth state expired. Please reconnect Google Calendar."}, status=status.HTTP_400_BAD_REQUEST)
+    except signing.BadSignature:
+        logger.warning("Google callback invalid state signature: user=%s", request.user.id)
+        return Response({"error": "Invalid or expired OAuth state"}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as state_err:
+        logger.exception("Google callback state decode error: user=%s error=%s", request.user.id, state_err)
+        return Response({"error": "Invalid OAuth state. Please reconnect Google Calendar."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not code_verifier:
-            return Response({"error": "OAuth verification failed. Please reconnect Google Calendar."}, status=status.HTTP_400_BAD_REQUEST)
+    if not code_verifier:
+        logger.warning("Google callback missing code_verifier in state: user=%s", request.user.id)
+        return Response({"error": "OAuth verification failed. Please reconnect Google Calendar."}, status=status.HTTP_400_BAD_REQUEST)
 
+    # --- Exchange code for tokens ---
+    try:
+        logger.debug("Exchanging Google OAuth code: user=%s redirect_uri=%s", request.user.id, redirect_uri)
         service = GoogleCalendarService(request.user)
         service.exchange_code(code, redirect_uri=redirect_uri, code_verifier=code_verifier)
+        logger.info("Google Calendar connected successfully: user=%s", request.user.id)
         return Response({"message": "Google Calendar connected successfully"})
     except Exception as e:
-        logger.exception("Google callback error for user=%s", request.user.id)
+        logger.exception("Google callback token exchange error: user=%s error=%s", request.user.id, e)
         error_text = str(e)
         lowered = error_text.lower()
 
         # Duplicate callback/code redemption can happen on repeated callback execution.
         if "invalid_grant" in lowered and GoogleCredential.objects.filter(user=request.user).exists():
+            logger.info("Google Calendar already connected (invalid_grant on re-use): user=%s", request.user.id)
             return Response({"message": "Google Calendar already connected"})
 
         if "code_verifier" in lowered or "code verifier" in lowered:
@@ -117,6 +145,12 @@ def google_callback(request):
         if "oauth credentials are missing" in lowered:
             return Response(
                 {"error": "Google Calendar is not configured on the server. Contact support."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        if "redirect uri is missing" in lowered:
+            return Response(
+                {"error": "Google Calendar redirect URI is not configured. Contact support."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -153,13 +187,10 @@ from . import spotify
 from .models import SpotifyCredential
 from django.utils import timezone
 from datetime import timedelta
-from django.shortcuts import redirect # Added missing import
+from django.shortcuts import redirect  # Added missing import
 
-from django.core import signing
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import get_user_model
-
-logger = logging.getLogger(__name__)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
