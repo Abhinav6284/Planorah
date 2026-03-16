@@ -13,6 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='userprofile',
             name='gender',
-            field=models.CharField(blank=True, choices=[('male', 'Male'), ('female', 'Female')], max_length=10, null=True),
+            field=models.CharField(blank=True, choices=[(
+                'male', 'Male'), ('female', 'Female')], max_length=10, null=True),
         ),
     ]

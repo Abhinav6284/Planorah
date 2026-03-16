@@ -145,10 +145,10 @@ const ProfileCard = ({ user, streak }) => {
 
                                 <div
                                     className={`absolute flex items-center justify-center rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${day.active
-                                            ? 'w-full h-full bg-gradient-to-br from-orange-400 to-red-500 shadow-md shadow-orange-500/30 scale-105 z-20'
-                                            : day.isToday
-                                                ? 'w-6 h-6 sm:w-7 sm:h-7 bg-white dark:bg-[#1C1C1E] border-[2px] border-orange-400 dark:border-orange-500 shadow-sm z-10'
-                                                : 'w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gray-200 dark:bg-zinc-700'
+                                        ? 'w-full h-full bg-gradient-to-br from-orange-400 to-red-500 shadow-md shadow-orange-500/30 scale-105 z-20'
+                                        : day.isToday
+                                            ? 'w-6 h-6 sm:w-7 sm:h-7 bg-white dark:bg-[#1C1C1E] border-[2px] border-orange-400 dark:border-orange-500 shadow-sm z-10'
+                                            : 'w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gray-200 dark:bg-zinc-700'
                                         }`}
                                 >
                                     {day.active ? (
@@ -161,10 +161,10 @@ const ProfileCard = ({ user, streak }) => {
 
                             {/* Day Label below */}
                             <span className={`text-[10px] font-bold uppercase transition-colors duration-300 ${day.active
-                                    ? 'text-orange-600 dark:text-orange-500'
-                                    : day.isToday
-                                        ? 'text-gray-900 dark:text-white'
-                                        : 'text-gray-400 dark:text-gray-600'
+                                ? 'text-orange-600 dark:text-orange-500'
+                                : day.isToday
+                                    ? 'text-gray-900 dark:text-white'
+                                    : 'text-gray-400 dark:text-gray-600'
                                 }`}>
                                 {day.dayLabel}
                             </span>

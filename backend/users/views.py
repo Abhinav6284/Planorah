@@ -130,7 +130,8 @@ def register_user(request):
             existing_user.set_password(password)
             _set_user_pending(existing_user)
             existing_user.save(
-                update_fields=['username', 'password', 'status', 'is_active', 'is_verified', 'updated_at']
+                update_fields=['username', 'password', 'status',
+                               'is_active', 'is_verified', 'updated_at']
             )
 
             otp_sent = _send_fresh_otp(existing_user)
@@ -259,7 +260,8 @@ def verify_otp(request):
         )
 
     _set_user_active(user)
-    user.save(update_fields=['status', 'is_active', 'is_verified', 'updated_at'])
+    user.save(update_fields=['status', 'is_active',
+              'is_verified', 'updated_at'])
 
     # Send Welcome Email
     try:
@@ -346,7 +348,8 @@ def login_user(request):
             )
 
         _set_user_pending(user_obj)
-        user_obj.save(update_fields=['status', 'is_active', 'is_verified', 'updated_at'])
+        user_obj.save(
+            update_fields=['status', 'is_active', 'is_verified', 'updated_at'])
         otp_sent = _send_fresh_otp(user_obj)
         message = (
             "Please verify your email before login. A new OTP has been sent."
@@ -375,7 +378,8 @@ def login_user(request):
 
     if _resolve_user_status(user) != CustomUser.STATUS_ACTIVE or not user.is_active or getattr(user, "is_verified", False) is False:
         return Response(
-            {"error": "Please verify your email before login.", "verify_required": True, "email": user.email},
+            {"error": "Please verify your email before login.",
+                "verify_required": True, "email": user.email},
             status=status.HTTP_403_FORBIDDEN,
         )
 
@@ -454,7 +458,8 @@ def resend_otp(request):
         return Response({"message": "Account is already verified. Please login."}, status=status.HTTP_400_BAD_REQUEST)
 
     _set_user_pending(user)
-    user.save(update_fields=['status', 'is_active', 'is_verified', 'updated_at'])
+    user.save(update_fields=['status', 'is_active',
+              'is_verified', 'updated_at'])
 
     email_sent = _send_fresh_otp(user)
     if not email_sent:
@@ -768,7 +773,8 @@ def google_oauth_login(request):
             if not user.is_active or not user.is_verified:
                 _set_user_active(user)
                 user.set_unusable_password()  # Clear any old password from previous life
-                user.save(update_fields=['status', 'is_active', 'is_verified', 'password', 'updated_at'])
+                user.save(update_fields=[
+                          'status', 'is_active', 'is_verified', 'password', 'updated_at'])
 
         except CustomUser.DoesNotExist:
             # Check if this is a signup or login attempt
@@ -798,7 +804,8 @@ def google_oauth_login(request):
                     # Don't set name from Google - let user fill it during onboarding
                     user.save(update_fields=['password', 'updated_at'])
                 except Exception as create_err:
-                    logger.exception("Failed to create Google OAuth user for %s", email)
+                    logger.exception(
+                        "Failed to create Google OAuth user for %s", email)
                     return Response({
                         "error": "Failed to create account",
                         "details": str(create_err)
@@ -841,7 +848,8 @@ def google_oauth_login(request):
     except ValueError as exc:
         return Response({"error": "Invalid Google token", "details": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as exc:
-        logger.exception("[GOOGLE_OAUTH] EXCEPTION: %s: %s", type(exc).__name__, exc)
+        logger.exception("[GOOGLE_OAUTH] EXCEPTION: %s: %s",
+                         type(exc).__name__, exc)
         return Response({"error": "Google authentication failed", "details": f"{type(exc).__name__}: {str(exc)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -946,7 +954,8 @@ def github_oauth_login(request):
             if not user.is_active or not user.is_verified:
                 _set_user_active(user)
                 user.set_unusable_password()  # Clear any old password from previous life
-                user.save(update_fields=['status', 'is_active', 'is_verified', 'password', 'updated_at'])
+                user.save(update_fields=[
+                          'status', 'is_active', 'is_verified', 'password', 'updated_at'])
 
         except CustomUser.DoesNotExist:
             # Check if this is a signup or login attempt
@@ -977,7 +986,8 @@ def github_oauth_login(request):
                     # Don't set name from GitHub - let user fill it during onboarding
                     user.save(update_fields=['password', 'updated_at'])
                 except Exception as create_err:
-                    logger.exception("Failed to create GitHub OAuth user for %s", email)
+                    logger.exception(
+                        "Failed to create GitHub OAuth user for %s", email)
                     return Response({
                         "error": "Failed to create account",
                         "details": str(create_err)
@@ -1146,7 +1156,8 @@ def verify_social_otp(request):
 
     if _resolve_user_status(user) != CustomUser.STATUS_ACTIVE or not user.is_active or not user.is_verified:
         _set_user_active(user)
-        user.save(update_fields=['status', 'is_active', 'is_verified', 'updated_at'])
+        user.save(update_fields=['status', 'is_active',
+                  'is_verified', 'updated_at'])
 
     # Generate tokens
     try:
@@ -1193,4 +1204,3 @@ def check_auth_type(request):
         "has_password": has_password,
         "is_oauth": not has_password
     }, status=status.HTTP_200_OK)
-

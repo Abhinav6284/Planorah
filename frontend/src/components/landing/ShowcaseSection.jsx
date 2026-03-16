@@ -130,9 +130,8 @@ function ShowcaseItem({ item, index }) {
       ref={ref}
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
-      className={`flex flex-col ${
-        isReverse ? "lg:flex-row-reverse" : "lg:flex-row"
-      } items-center gap-12 lg:gap-24`}
+      className={`flex flex-col ${isReverse ? "lg:flex-row-reverse" : "lg:flex-row"
+        } items-center gap-12 lg:gap-24`}
     >
       {/* Text block */}
       <motion.div
