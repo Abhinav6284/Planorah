@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { schedulerService } from "../../api/schedulerService";
 import { userService } from "../../api/userService";
+import { FaPause, FaPlay, FaRedo, FaStepForward } from "react-icons/fa";
 
 // Components
 import AIVoicePanel from "../Mentoring/AIVoicePanel";
@@ -48,6 +49,23 @@ const ElevenLabsVoiceButton = ({ onClick }) => {
     );
 };
 
+const DEFAULT_FOCUS_SECONDS = 25 * 60;
+
+const getTaskFocusSeconds = (task) => {
+    const minutes = Number(task?.estimated_minutes);
+    if (Number.isFinite(minutes) && minutes > 0) {
+        return Math.round(minutes * 60);
+    }
+    return DEFAULT_FOCUS_SECONDS;
+};
+
+const formatFocusTime = (seconds) => {
+    const safeSeconds = Math.max(0, seconds);
+    const mins = Math.floor(safeSeconds / 60).toString().padStart(2, "0");
+    const secs = (safeSeconds % 60).toString().padStart(2, "0");
+    return `${mins}:${secs}`;
+};
+
 export default function OverviewSection() {
     const [loading, setLoading] = useState(true);
     const [userProfile, setUserProfile] = useState(null);
@@ -55,7 +73,59 @@ export default function OverviewSection() {
     const [streakData, setStreakData] = useState(null);
     const [voicePanelOpen, setVoicePanelOpen] = useState(false);
     const [showStreakModal, setShowStreakModal] = useState(false);
+    const [focusActive, setFocusActive] = useState(false);
+    const [focusSecondsLeft, setFocusSecondsLeft] = useState(DEFAULT_FOCUS_SECONDS);
+    const [focusTaskIndex, setFocusTaskIndex] = useState(0);
     const hasFetchedRef = useRef(false);
+
+    const pendingTasks = useMemo(
+        () => tasks.filter((task) => task.status !== "completed"),
+        [tasks]
+    );
+
+    const activeFocusTask =
+        pendingTasks.length > 0
+            ? pendingTasks[Math.min(focusTaskIndex, pendingTasks.length - 1)]
+            : null;
+
+    const focusDurationSeconds = getTaskFocusSeconds(activeFocusTask);
+
+    useEffect(() => {
+        if (pendingTasks.length === 0) {
+            setFocusTaskIndex(0);
+            return;
+        }
+        if (focusTaskIndex >= pendingTasks.length) {
+            setFocusTaskIndex(0);
+        }
+    }, [pendingTasks.length, focusTaskIndex]);
+
+    useEffect(() => {
+        setFocusActive(false);
+        setFocusSecondsLeft(focusDurationSeconds);
+    }, [focusDurationSeconds, activeFocusTask?.id]);
+
+    useEffect(() => {
+        let interval;
+        if (focusActive && focusSecondsLeft > 0) {
+            interval = setInterval(() => {
+                setFocusSecondsLeft((prev) => Math.max(prev - 1, 0));
+            }, 1000);
+        } else if (focusActive && focusSecondsLeft === 0) {
+            setFocusActive(false);
+        }
+        return () => clearInterval(interval);
+    }, [focusActive, focusSecondsLeft]);
+
+    const toggleFocus = () => setFocusActive((prev) => !prev);
+    const resetFocus = () => {
+        setFocusActive(false);
+        setFocusSecondsLeft(focusDurationSeconds);
+    };
+    const nextFocusTask = () => {
+        if (pendingTasks.length <= 1) return;
+        setFocusTaskIndex((prev) => (prev + 1) % pendingTasks.length);
+    };
 
     useEffect(() => {
         if (hasFetchedRef.current) return;
@@ -148,6 +218,37 @@ export default function OverviewSection() {
                 {/* Quick Stats - Right side */}
                 <div className="flex flex-wrap gap-2 items-center">
                     <QuickStatsWidget tasks={tasks} />
+
+                    {/* Focus Timer Pill */}
+                    <div className="h-10 sm:h-12 px-2 sm:px-3 rounded-xl sm:rounded-2xl bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 flex items-center gap-2 shadow-sm">
+                        <div className="leading-tight min-w-0">
+                            <div className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">Focus</div>
+                            <div className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">{formatFocusTime(focusSecondsLeft)}</div>
+                        </div>
+                        <button
+                            onClick={toggleFocus}
+                            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 flex items-center justify-center hover:opacity-90 transition-opacity"
+                            title={focusActive ? "Pause timer" : "Start timer"}
+                        >
+                            {focusActive ? <FaPause size={10} /> : <FaPlay size={10} className="ml-0.5" />}
+                        </button>
+                        <button
+                            onClick={resetFocus}
+                            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-[#2C2C2E] transition-colors"
+                            title="Reset timer"
+                        >
+                            <FaRedo size={10} />
+                        </button>
+                        {pendingTasks.length > 1 && (
+                            <button
+                                onClick={nextFocusTask}
+                                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-[#2C2C2E] transition-colors"
+                                title="Next task timer"
+                            >
+                                <FaStepForward size={9} />
+                            </button>
+                        )}
+                    </div>
 
                     {/* Voice Chat Button */}
                     <ElevenLabsVoiceButton onClick={() => setVoicePanelOpen(true)} />

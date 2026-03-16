@@ -7,11 +7,22 @@ import { useLocation, useNavigate } from "react-router-dom";
 import WeeklyCalendar from "../common/WeeklyCalendar";
 import { AnimatePresence, motion } from "framer-motion";
 
+const DEFAULT_FOCUS_MINUTES = 25;
+const DEFAULT_FOCUS_SECONDS = DEFAULT_FOCUS_MINUTES * 60;
+
+const getTaskTimerSeconds = (task) => {
+    const minutes = Number(task?.estimated_minutes);
+    if (Number.isFinite(minutes) && minutes > 0) {
+        return Math.round(minutes * 60);
+    }
+    return DEFAULT_FOCUS_SECONDS;
+};
+
 export default function Scheduler() {
     const [tasks, setTasks] = useState([]);
     const [roadmaps, setRoadmaps] = useState([]);
     const [timerActive, setTimerActive] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(25 * 60); // 25 minutes
+    const [timeLeft, setTimeLeft] = useState(DEFAULT_FOCUS_SECONDS);
     const [activeTask, setActiveTask] = useState(null);
     const [syncing, setSyncing] = useState(false);
     const [calendarKey, setCalendarKey] = useState(0); // Force calendar refresh
@@ -83,11 +94,11 @@ export default function Scheduler() {
             }, 1000);
         } else if (timeLeft === 0) {
             setTimerActive(false);
-            // Play sound or notify
-            alert("Focus session complete!");
+            const taskLabel = activeTask?.title ? ` for "${activeTask.title}"` : "";
+            alert(`Focus session complete${taskLabel}!`);
         }
         return () => clearInterval(interval);
-    }, [timerActive, timeLeft]);
+    }, [timerActive, timeLeft, activeTask]);
 
     const connectGoogleCalendar = async () => {
         try {
@@ -103,6 +114,12 @@ export default function Scheduler() {
             alert(message);
         }
     };
+
+    const selectTask = useCallback((task) => {
+        setActiveTask(task);
+        setTimerActive(false);
+        setTimeLeft(getTaskTimerSeconds(task));
+    }, []);
 
     const syncCalendar = async () => {
         setSyncing(true);
@@ -164,7 +181,7 @@ export default function Scheduler() {
     const toggleTimer = () => setTimerActive(!timerActive);
     const resetTimer = () => {
         setTimerActive(false);
-        setTimeLeft(25 * 60);
+        setTimeLeft(getTaskTimerSeconds(activeTask));
     };
 
     const handleEventClick = (event) => {
@@ -283,7 +300,7 @@ export default function Scheduler() {
                                                 key={task.id}
                                                 className="p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl shadow-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                                                 onClick={() => {
-                                                    setActiveTask(task);
+                                                    selectTask(task);
                                                     setSidebarOpen(false);
                                                 }}
                                             >
@@ -377,7 +394,7 @@ export default function Scheduler() {
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
                                                     className="p-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing group"
-                                                    onClick={() => setActiveTask(task)}
+                                                    onClick={() => selectTask(task)}
                                                 >
                                                     <div className="flex justify-between items-start mb-2">
                                                         <h3 className="font-bold text-gray-900 dark:text-white text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{task.title}</h3>
