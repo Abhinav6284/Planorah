@@ -1,5 +1,40 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
+
+function ResourceLogo({ itemName, itemUrl }) {
+    const [sourceIndex, setSourceIndex] = useState(0);
+
+    const logoSources = useMemo(() => {
+        try {
+            const domain = new URL(itemUrl).hostname.replace(/^www\./, '');
+            return [
+                `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64`,
+                `https://icons.duckduckgo.com/ip3/${domain}.ico`,
+                `https://${domain}/favicon.ico`
+            ];
+        } catch {
+            return [];
+        }
+    }, [itemUrl]);
+
+    const currentSource = logoSources[sourceIndex];
+
+    return (
+        <div className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center shrink-0 overflow-hidden">
+            {currentSource ? (
+                <img
+                    src={currentSource}
+                    alt={`${itemName} logo`}
+                    className="w-6 h-6 object-contain"
+                    loading="lazy"
+                    onError={() => setSourceIndex((prev) => prev + 1)}
+                />
+            ) : (
+                <span className="text-sm font-semibold text-gray-700">{itemName.charAt(0).toUpperCase()}</span>
+            )}
+        </div>
+    );
+}
 
 export default function ResourceHub() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -244,17 +279,20 @@ export default function ResourceHub() {
                                 </h2>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {category.items.map((item, index) => (
+                                    {category.items.map((item) => (
                                         <motion.a
-                                            key={index}
+                                            key={item.url}
                                             href={item.url}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             whileHover={{ y: -4 }}
                                             className={`p-5 rounded-2xl border-2 ${colorVariants[category.color]} hover:shadow-lg transition-all group`}
                                         >
-                                            <div className="flex justify-between items-start mb-2">
-                                                <h3 className="font-bold text-gray-900">{item.name}</h3>
+                                            <div className="flex justify-between items-start gap-3 mb-2">
+                                                <div className="flex items-center gap-3 min-w-0">
+                                                    <ResourceLogo itemName={item.name} itemUrl={item.url} />
+                                                    <h3 className="font-bold text-gray-900 leading-tight">{item.name}</h3>
+                                                </div>
                                                 <svg className="w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                                 </svg>
