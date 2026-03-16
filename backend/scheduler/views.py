@@ -68,17 +68,21 @@ def google_callback(request):
     redirect_uri = request.data.get('redirect_uri')
     if not code:
         return Response({"error": "Code is required"}, status=status.HTTP_400_BAD_REQUEST)
+    if not state:
+        return Response({"error": "Missing OAuth state. Please reconnect Google Calendar."}, status=status.HTTP_400_BAD_REQUEST)
     
     try:
         code_verifier = None
-        if state:
-            try:
-                payload = signing.loads(state, salt=PKCE_STATE_SALT, max_age=PKCE_STATE_MAX_AGE)
-                if payload.get("u") != request.user.id:
-                    return Response({"error": "Invalid OAuth state"}, status=status.HTTP_400_BAD_REQUEST)
-                code_verifier = payload.get("cv")
-            except signing.BadSignature:
-                return Response({"error": "Invalid or expired OAuth state"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            payload = signing.loads(state, salt=PKCE_STATE_SALT, max_age=PKCE_STATE_MAX_AGE)
+            if payload.get("u") != request.user.id:
+                return Response({"error": "Invalid OAuth state"}, status=status.HTTP_400_BAD_REQUEST)
+            code_verifier = payload.get("cv")
+        except signing.BadSignature:
+            return Response({"error": "Invalid or expired OAuth state"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not code_verifier:
+            return Response({"error": "OAuth verification failed. Please reconnect Google Calendar."}, status=status.HTTP_400_BAD_REQUEST)
 
         service = GoogleCalendarService(request.user)
         service.exchange_code(code, redirect_uri=redirect_uri, code_verifier=code_verifier)
@@ -91,6 +95,12 @@ def google_callback(request):
         # Duplicate callback/code redemption can happen on repeated callback execution.
         if "invalid_grant" in lowered and GoogleCredential.objects.filter(user=request.user).exists():
             return Response({"message": "Google Calendar already connected"})
+
+        if "code_verifier" in lowered or "code verifier" in lowered:
+            return Response(
+                {"error": "OAuth verification failed. Please reconnect Google Calendar."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         if "invalid_grant" in lowered or "redirect_uri_mismatch" in lowered:
             return Response(

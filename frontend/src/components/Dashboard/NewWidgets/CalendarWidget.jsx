@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { schedulerService } from '../../../api/schedulerService';
 
 const CalendarWidget = () => {
+    const GOOGLE_STATE_KEY = "google_calendar_oauth_state";
+    const GOOGLE_REDIRECT_URI_KEY = "google_calendar_redirect_uri";
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const hasFetchedRef = useRef(false);
@@ -26,7 +28,18 @@ const CalendarWidget = () => {
 
     const handleConnect = async () => {
         try {
-            const data = await schedulerService.getGoogleAuthUrl();
+            const redirectUri = `${window.location.origin}/scheduler`;
+            const data = await schedulerService.getGoogleAuthUrl(redirectUri);
+            try {
+                const authUrl = new URL(data.url);
+                const state = authUrl.searchParams.get('state');
+                if (state) {
+                    sessionStorage.setItem(GOOGLE_STATE_KEY, state);
+                }
+                sessionStorage.setItem(GOOGLE_REDIRECT_URI_KEY, redirectUri);
+            } catch (parseError) {
+                console.warn("Failed to parse Google auth URL", parseError);
+            }
             window.location.href = data.url;
         } catch (error) {
             console.error('Failed to get auth URL:', error);

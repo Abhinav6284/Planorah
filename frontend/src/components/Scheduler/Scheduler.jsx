@@ -9,6 +9,8 @@ import { AnimatePresence, motion } from "framer-motion";
 
 const DEFAULT_FOCUS_MINUTES = 25;
 const DEFAULT_FOCUS_SECONDS = DEFAULT_FOCUS_MINUTES * 60;
+const GOOGLE_STATE_KEY = "google_calendar_oauth_state";
+const GOOGLE_REDIRECT_URI_KEY = "google_calendar_redirect_uri";
 
 const getTaskTimerSeconds = (task) => {
     const minutes = Number(task?.estimated_minutes);
@@ -32,10 +34,10 @@ export default function Scheduler() {
     const navigate = useNavigate();
     const processedGoogleCodeRef = useRef(null);
 
-    const handleGoogleCallback = useCallback(async (code, state) => {
+    const handleGoogleCallback = useCallback(async (code, state, redirectUriOverride) => {
         setSyncing(true);
         try {
-            const redirectUri = `${window.location.origin}/scheduler`;
+            const redirectUri = redirectUriOverride || `${window.location.origin}/scheduler`;
             await schedulerService.handleGoogleCallback(code, redirectUri, state);
             alert("Google Calendar connected successfully!");
             navigate('/scheduler', { replace: true });
@@ -50,6 +52,8 @@ export default function Scheduler() {
         } finally {
             setSyncing(false);
         }
+        sessionStorage.removeItem(GOOGLE_STATE_KEY);
+        sessionStorage.removeItem(GOOGLE_REDIRECT_URI_KEY);
     }, [navigate]);
 
     const fetchData = async () => {
@@ -73,17 +77,20 @@ export default function Scheduler() {
         const oauthError = params.get('error');
         const oauthErrorDescription = params.get('error_description');
         const code = params.get('code');
-        const state = params.get('state');
+        const state = params.get('state') || sessionStorage.getItem(GOOGLE_STATE_KEY);
+        const storedRedirectUri = sessionStorage.getItem(GOOGLE_REDIRECT_URI_KEY);
 
         if (oauthError) {
             alert(`Google authorization failed: ${oauthErrorDescription || oauthError}`);
+            sessionStorage.removeItem(GOOGLE_STATE_KEY);
+            sessionStorage.removeItem(GOOGLE_REDIRECT_URI_KEY);
             navigate('/scheduler', { replace: true });
             return;
         }
 
         if (code && processedGoogleCodeRef.current !== code) {
             processedGoogleCodeRef.current = code;
-            handleGoogleCallback(code, state);
+            handleGoogleCallback(code, state, storedRedirectUri);
         }
     }, [location.search, handleGoogleCallback, navigate]);
 
@@ -105,6 +112,16 @@ export default function Scheduler() {
         try {
             const redirectUri = `${window.location.origin}/scheduler`;
             const data = await schedulerService.getGoogleAuthUrl(redirectUri);
+            try {
+                const authUrl = new URL(data.url);
+                const state = authUrl.searchParams.get('state');
+                if (state) {
+                    sessionStorage.setItem(GOOGLE_STATE_KEY, state);
+                }
+                sessionStorage.setItem(GOOGLE_REDIRECT_URI_KEY, redirectUri);
+            } catch (parseError) {
+                console.warn("Failed to parse Google auth URL", parseError);
+            }
             window.location.href = data.url;
         } catch (err) {
             console.error("Failed to get auth URL", err);
