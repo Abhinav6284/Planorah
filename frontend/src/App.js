@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "./context/ThemeContext";
 import { SubscriptionProvider } from "./context/SubscriptionContext";
 import { ToastProvider } from "./components/common/Toast";
@@ -110,6 +111,7 @@ export default function App() {
                     <Route path="*" element={<PublicPortfolio subdomain={subdomain} />} />
                   </Routes>
                 </Suspense>
+                <VercelAnalytics />
               </ErrorBoundary>
             </Router>
           </SubscriptionProvider>
@@ -187,6 +189,7 @@ export default function App() {
                   </Route>
                 </Routes>
               </Suspense>
+              <VercelAnalytics />
             </ErrorBoundary>
           </Router>
         </SubscriptionProvider>
