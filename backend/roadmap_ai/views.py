@@ -608,6 +608,17 @@ def schedule_roadmap(request, roadmap_id):
             return Response({
                 "error": "Invalid start_date format. Use YYYY-MM-DD."
             }, status=status.HTTP_400_BAD_REQUEST)
+
+        start_time_str = request.data.get('start_time', '09:00')
+        try:
+            time_parts = start_time_str.split(':')
+            base_hour = int(time_parts[0])
+            base_minute = int(time_parts[1]) if len(time_parts) > 1 else 0
+            if not (0 <= base_hour <= 23) or not (0 <= base_minute <= 59):
+                raise ValueError()
+        except (ValueError, IndexError):
+            base_hour = 9
+            base_minute = 0
         
         # Get all tasks for this roadmap
         tasks = Task.objects.filter(roadmap=roadmap).order_by('day', 'order_in_day')
@@ -632,8 +643,7 @@ def schedule_roadmap(request, roadmap_id):
             task.save()
             
             # Calculate time slots based on order_in_day
-            # Start at 9 AM, each task gets a slot based on its estimated minutes
-            base_hour = 9
+            # Start at user-specified time, each task gets a slot based on its estimated minutes
             safe_order = task.order_in_day if isinstance(task.order_in_day, int) and task.order_in_day >= 0 else 0
             slot_offset = safe_order * 2  # 2 hour slots
             start_hour = base_hour + slot_offset
@@ -643,7 +653,7 @@ def schedule_roadmap(request, roadmap_id):
                 start_hour = 9 + (safe_order % 6) * 2
             
             # Create timezone-aware datetimes
-            naive_start = datetime.combine(task_date, datetime.min.time().replace(hour=start_hour, minute=0))
+            naive_start = datetime.combine(task_date, datetime.min.time().replace(hour=start_hour, minute=base_minute))
             estimated_minutes = task.estimated_minutes if isinstance(task.estimated_minutes, int) and task.estimated_minutes > 0 else 60
             duration_hours = max(1, estimated_minutes // 60)
             naive_end = datetime.combine(task_date, datetime.min.time().replace(hour=min(start_hour + duration_hours, 23), minute=0))
@@ -673,6 +683,25 @@ def schedule_roadmap(request, roadmap_id):
                 "due_date": str(task_date),
                 "event_id": event.id
             })
+
+        # Auto-push to Google Calendar if the user has connected their account
+        google_calendar_synced = False
+        google_calendar_error = None
+        try:
+            from scheduler.google_calendar import GoogleCalendarService
+            gc_service = GoogleCalendarService(request.user)
+            if gc_service.get_service():
+                for ev in Event.objects.filter(id__in=created_events):
+                    gc_service.create_event(
+                        title=ev.title,
+                        start_time=ev.start_time,
+                        end_time=ev.end_time,
+                        description=ev.description or '',
+                    )
+                google_calendar_synced = True
+        except Exception as gc_err:
+            logger.warning("Google Calendar auto-sync failed: %s", gc_err)
+            google_calendar_error = str(gc_err)
 
         # Also update milestone dates for reference
         milestones = roadmap.milestones.all().order_by('order')
@@ -709,6 +738,8 @@ def schedule_roadmap(request, roadmap_id):
             "message": f"Roadmap scheduled successfully! {len(created_events)} tasks added to calendar.",
             "tasks_scheduled": len(scheduled_tasks),
             "events_created": len(created_events),
+            "google_calendar_synced": google_calendar_synced,
+            "google_calendar_error": google_calendar_error,
             "tasks": scheduled_tasks[:10]  # Return first 10 for confirmation
         }, status=status.HTTP_200_OK)
 

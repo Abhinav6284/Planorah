@@ -47,10 +47,10 @@ export const roadmapService = {
     },
 
     // Schedule a roadmap
-    scheduleRoadmap: async (id, startDate) => {
-        const response = await api.post(`roadmap/${id}/schedule/`, {
-            start_date: startDate,
-        });
+    scheduleRoadmap: async (id, startDate, startTime) => {
+        const payload = { start_date: startDate };
+        if (startTime) payload.start_time = startTime;
+        const response = await api.post(`roadmap/${id}/schedule/`, payload);
         return response.data;
     },
 
