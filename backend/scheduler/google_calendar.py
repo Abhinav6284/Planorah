@@ -1,5 +1,10 @@
 import os
 import datetime
+import base64
+import hashlib
+import secrets
+import time
+from django.core import signing
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
@@ -15,6 +20,8 @@ REDIRECT_URI = (
     os.environ.get("GOOGLE_CALENDAR_REDIRECT_URI")
     or f"{FRONTEND_URL}/scheduler"
 )
+PKCE_STATE_SALT = "scheduler.google.pkce"
+PKCE_STATE_MAX_AGE = 600
 
 
 class GoogleCalendarService:
@@ -68,20 +75,39 @@ class GoogleCalendarService:
         )
         return flow
 
+    def _build_pkce_state(self):
+        code_verifier = secrets.token_urlsafe(64)
+        digest = hashlib.sha256(code_verifier.encode("utf-8")).digest()
+        code_challenge = base64.urlsafe_b64encode(digest).rstrip(b"=").decode("utf-8")
+        state_payload = {
+            "u": self.user.id,
+            "cv": code_verifier,
+            "ts": int(time.time()),
+        }
+        state = signing.dumps(state_payload, salt=PKCE_STATE_SALT)
+        return state, code_verifier, code_challenge
+
     def get_authorization_url(self, redirect_uri=None):
         """Generate auth URL"""
         flow = self.get_flow(redirect_uri=redirect_uri)
+        state, _, code_challenge = self._build_pkce_state()
         authorization_url, state = flow.authorization_url(
             access_type='offline',
             include_granted_scopes='true',
-            prompt='consent'
+            prompt='consent',
+            code_challenge=code_challenge,
+            code_challenge_method='S256',
+            state=state,
         )
         return authorization_url
 
-    def exchange_code(self, code, redirect_uri=None):
+    def exchange_code(self, code, redirect_uri=None, code_verifier=None):
         """Exchange code for token and save credential"""
         flow = self.get_flow(redirect_uri=redirect_uri)
-        flow.fetch_token(code=code)
+        if code_verifier:
+            flow.fetch_token(code=code, code_verifier=code_verifier)
+        else:
+            flow.fetch_token(code=code)
         creds = flow.credentials
 
         existing_credential = GoogleCredential.objects.filter(user=self.user).first()

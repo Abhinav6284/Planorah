@@ -51,10 +51,13 @@ export const schedulerService = {
         return response.data;
     },
 
-    handleGoogleCallback: async (code, redirectUri = "") => {
+    handleGoogleCallback: async (code, redirectUri = "", state = "") => {
         const payload = { code };
         if (redirectUri) {
             payload.redirect_uri = redirectUri;
+        }
+        if (state) {
+            payload.state = state;
         }
         const response = await api.post("scheduler/google/callback/", payload);
         return response.data;

@@ -2,10 +2,11 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from django.core import signing
 import requests # Added requests import
 import logging
 from .models import Event, GoogleCredential
-from .google_calendar import GoogleCalendarService
+from .google_calendar import GoogleCalendarService, PKCE_STATE_MAX_AGE, PKCE_STATE_SALT
 from .serializers import EventSerializer # Assuming you have one, or we'll make a simple one inline if needed
 
 @api_view(['GET'])
@@ -63,13 +64,24 @@ def google_auth_url(request):
 def google_callback(request):
     """Exchange code for token"""
     code = request.data.get('code')
+    state = request.data.get('state')
     redirect_uri = request.data.get('redirect_uri')
     if not code:
         return Response({"error": "Code is required"}, status=status.HTTP_400_BAD_REQUEST)
     
     try:
+        code_verifier = None
+        if state:
+            try:
+                payload = signing.loads(state, salt=PKCE_STATE_SALT, max_age=PKCE_STATE_MAX_AGE)
+                if payload.get("u") != request.user.id:
+                    return Response({"error": "Invalid OAuth state"}, status=status.HTTP_400_BAD_REQUEST)
+                code_verifier = payload.get("cv")
+            except signing.BadSignature:
+                return Response({"error": "Invalid or expired OAuth state"}, status=status.HTTP_400_BAD_REQUEST)
+
         service = GoogleCalendarService(request.user)
-        service.exchange_code(code, redirect_uri=redirect_uri)
+        service.exchange_code(code, redirect_uri=redirect_uri, code_verifier=code_verifier)
         return Response({"message": "Google Calendar connected successfully"})
     except Exception as e:
         logger.exception("Google callback error for user=%s", request.user.id)

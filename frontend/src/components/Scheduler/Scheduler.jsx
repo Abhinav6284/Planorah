@@ -32,11 +32,11 @@ export default function Scheduler() {
     const navigate = useNavigate();
     const processedGoogleCodeRef = useRef(null);
 
-    const handleGoogleCallback = useCallback(async (code) => {
+    const handleGoogleCallback = useCallback(async (code, state) => {
         setSyncing(true);
         try {
             const redirectUri = `${window.location.origin}/scheduler`;
-            await schedulerService.handleGoogleCallback(code, redirectUri);
+            await schedulerService.handleGoogleCallback(code, redirectUri, state);
             alert("Google Calendar connected successfully!");
             navigate('/scheduler', { replace: true });
         } catch (err) {
@@ -73,6 +73,7 @@ export default function Scheduler() {
         const oauthError = params.get('error');
         const oauthErrorDescription = params.get('error_description');
         const code = params.get('code');
+        const state = params.get('state');
 
         if (oauthError) {
             alert(`Google authorization failed: ${oauthErrorDescription || oauthError}`);
@@ -82,7 +83,7 @@ export default function Scheduler() {
 
         if (code && processedGoogleCodeRef.current !== code) {
             processedGoogleCodeRef.current = code;
-            handleGoogleCallback(code);
+            handleGoogleCallback(code, state);
         }
     }, [location.search, handleGoogleCallback, navigate]);
 
