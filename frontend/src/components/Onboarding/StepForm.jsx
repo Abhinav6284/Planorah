@@ -158,9 +158,15 @@ export default function StepForm() {
                 };
 
                 const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
-                await axios.patch(`/users/update-profile/`, payload, {
+                const response = await axios.patch(`/users/update-profile/`, payload, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
+                if (response?.data?.onboarding_complete) {
+                    sessionStorage.setItem("show_realtime_onboarding_intro", "true");
+                    sessionStorage.removeItem("show_welcome_coach");
+                } else {
+                    sessionStorage.setItem("show_welcome_coach", formData.name?.split(" ")[0] || "true");
+                }
 
                 // Redirect to dashboard
                 navigate("/dashboard");

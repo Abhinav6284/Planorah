@@ -7,6 +7,8 @@ import WelcomeCoach from './Onboarding/WelcomeCoach';
 import { FaBrain, FaMicrophone } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const REALTIME_ONBOARDING_INTRO_KEY = 'show_realtime_onboarding_intro';
+
 // Map route prefixes to context sources
 const getContextSource = (pathname) => {
     if (pathname.startsWith('/roadmap')) return 'roadmap';
@@ -29,13 +31,32 @@ const Layout = () => {
     const [voiceOpen, setVoiceOpen] = useState(false);
     const [fabExpanded, setFabExpanded] = useState(false);
     const [welcomeUser, setWelcomeUser] = useState(null);
+    const [autoVoiceStart, setAutoVoiceStart] = useState(false);
     const location = useLocation();
     const contextSource = getContextSource(location.pathname);
 
     useEffect(() => {
+        const shouldAutoStartRealtimeIntro =
+            sessionStorage.getItem(REALTIME_ONBOARDING_INTRO_KEY) === 'true';
+
+        if (shouldAutoStartRealtimeIntro && location.pathname.startsWith('/dashboard')) {
+            sessionStorage.removeItem(REALTIME_ONBOARDING_INTRO_KEY);
+            sessionStorage.removeItem('show_welcome_coach');
+            setWelcomeUser(null);
+            setAutoVoiceStart(true);
+            setVoiceOpen(true);
+            return;
+        }
+
+        if (shouldAutoStartRealtimeIntro) {
+            return;
+        }
+
         const flag = sessionStorage.getItem('show_welcome_coach');
-        if (flag) setWelcomeUser(flag === 'true' ? '' : flag);
-    }, []);
+        if (flag) {
+            setWelcomeUser(flag === 'true' ? '' : flag);
+        }
+    }, [location.pathname]);
 
     return (
         <div className="min-h-screen bg-[#F5F5F7] dark:bg-gray-900 transition-colors duration-200 font-sans flex flex-col">
@@ -113,8 +134,13 @@ const Layout = () => {
             />
             <AIVoicePanel
                 isOpen={voiceOpen}
-                onClose={() => setVoiceOpen(false)}
+                onClose={() => {
+                    setVoiceOpen(false);
+                    setAutoVoiceStart(false);
+                }}
                 contextSource={contextSource}
+                autoStart={autoVoiceStart}
+                onAutoStartHandled={() => setAutoVoiceStart(false)}
             />
         </div>
     );

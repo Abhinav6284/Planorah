@@ -366,8 +366,24 @@ export function useVoiceSession() {
 
     // ── Connect & Start ──
     const connect = useCallback(async (config, isReconnect = false) => {
-        const { wsUrl, contextSource, studentGoal, sessionMemory, voiceName } = config || {};
-        lastConnectConfigRef.current = { wsUrl, contextSource, studentGoal, sessionMemory, voiceName };
+        const {
+            wsUrl,
+            contextSource,
+            studentGoal,
+            sessionMemory,
+            voiceName,
+            onboardingContext,
+            initialPrompt,
+        } = config || {};
+        lastConnectConfigRef.current = {
+            wsUrl,
+            contextSource,
+            studentGoal,
+            sessionMemory,
+            voiceName,
+            onboardingContext,
+            initialPrompt,
+        };
         if (!isReconnect) {
             reconnectAttemptsRef.current = 0;
             setIsReconnecting(false);
@@ -442,6 +458,8 @@ export function useVoiceSession() {
                     studentGoal: studentGoal || '',
                     sessionMemory: sessionMemory || [],
                     voiceName: voiceName || 'Aoede',
+                    onboardingContext: onboardingContext || {},
+                    initialPrompt: initialPrompt || '',
                 });
             };
 

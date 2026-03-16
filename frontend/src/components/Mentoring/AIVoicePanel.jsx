@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaTimes } from "react-icons/fa";
 // import { Canvas } from "@react-three/fiber"; // Removed 3D Canvas
@@ -23,6 +23,8 @@ export default function AIVoicePanel({
     onSwitchToText,
     contextSource = "general",
     studentGoal = "",
+    autoStart = false,
+    onAutoStartHandled,
 }) {
     // 'closed' | 'open' | 'minimized'
     const [panelState, setPanelState] = useState("closed");
@@ -30,6 +32,7 @@ export default function AIVoicePanel({
     const [selectedVoice, setSelectedVoice] = useState("Aoede");
     const [sessionDuration, setSessionDuration] = useState(0);
     const [switchingToText, setSwitchingToText] = useState(false);
+    const autoStartTriggeredRef = useRef(false);
 
     const {
         status,
@@ -78,7 +81,7 @@ export default function AIVoicePanel({
         return `${mins}:${secs}`;
     };
 
-    const handleStart = useCallback(() => {
+    const handleStart = useCallback((triggeredByAutoStart = false) => {
         if (!voiceConfig) return;
         connect({
             wsUrl: voiceConfig.ws_url,
@@ -86,8 +89,29 @@ export default function AIVoicePanel({
             studentGoal,
             sessionMemory: voiceConfig.session_memory,
             voiceName: selectedVoice,
+            onboardingContext: voiceConfig.onboarding_context || {},
+            initialPrompt: triggeredByAutoStart ? (voiceConfig.auto_intro_prompt || "") : "",
         });
     }, [voiceConfig, connect, contextSource, studentGoal, selectedVoice]);
+
+    useEffect(() => {
+        if (!isOpen) {
+            autoStartTriggeredRef.current = false;
+            return;
+        }
+
+        if (
+            autoStart &&
+            panelState === "open" &&
+            voiceConfig &&
+            status === "idle" &&
+            !autoStartTriggeredRef.current
+        ) {
+            autoStartTriggeredRef.current = true;
+            handleStart(true);
+            onAutoStartHandled?.();
+        }
+    }, [isOpen, autoStart, panelState, voiceConfig, status, handleStart, onAutoStartHandled]);
 
     const handleClose = useCallback(() => {
         disconnect();

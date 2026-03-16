@@ -147,6 +147,7 @@ MAX_SCREENSHOT_BASE64_CHARS = 2_000_000
 CLIENT_IDLE_TIMEOUT_SEC = 75
 CLIENT_SETUP_TIMEOUT_SEC = int(os.getenv('VOICE_PROXY_CLIENT_SETUP_TIMEOUT_SEC', '10'))
 GEMINI_SETUP_TIMEOUT_SEC = int(os.getenv('VOICE_PROXY_GEMINI_SETUP_TIMEOUT_SEC', '20'))
+MAX_INITIAL_PROMPT_CHARS = 3000
 
 
 def _safe_json_loads(raw):
@@ -156,6 +157,51 @@ def _safe_json_loads(raw):
         return json.loads(raw)
     except (json.JSONDecodeError, UnicodeDecodeError):
         return None
+
+
+def _sanitize_text(value):
+    if not isinstance(value, str):
+        return ''
+    return value.strip()
+
+
+def _append_onboarding_context(system_text, onboarding_context):
+    if not isinstance(onboarding_context, dict) or not onboarding_context:
+        return system_text
+
+    profile_lines = []
+    ordered_keys = (
+        ('full_name', 'Name'),
+        ('education_stage', 'Education stage'),
+        ('purpose', 'Purpose'),
+        ('domain', 'Domain'),
+        ('goal_statement', 'Goal statement'),
+        ('weekly_hours', 'Weekly hours'),
+        ('validation_mode', 'Validation mode'),
+    )
+
+    for key, label in ordered_keys:
+        value = onboarding_context.get(key)
+        if value in ('', None):
+            continue
+        profile_lines.append(f"- {label}: {value}")
+
+    highlights = onboarding_context.get('onboarding_highlights')
+    if isinstance(highlights, list):
+        for highlight in highlights[:6]:
+            clean_highlight = _sanitize_text(str(highlight))
+            if clean_highlight:
+                profile_lines.append(f"- Onboarding insight: {clean_highlight}")
+
+    if not profile_lines:
+        return system_text
+
+    profile_block = "\n".join(profile_lines)
+    return (
+        f"{system_text}\n\n[User onboarding profile]\n"
+        f"{profile_block}\n"
+        "Personalize your guidance using this profile. Keep advice practical and specific."
+    )
 
 
 async def proxy_handler(client_ws):
@@ -213,12 +259,15 @@ async def proxy_handler(client_ws):
         voice_name = setup_data.get('voiceName', DEFAULT_VOICE)
         context_source = setup_data.get('contextSource', 'general')
         student_goal = setup_data.get('studentGoal', '')
+        onboarding_context = setup_data.get('onboardingContext', {})
+        initial_prompt = _sanitize_text(setup_data.get('initialPrompt', ''))
 
         system_text = VOICE_SYSTEM_PROMPT
         if context_source:
             system_text += f"\n\nThe student is currently in the '{context_source}' section of the platform."
         if student_goal:
             system_text += f"\nTheir current goal: {student_goal}"
+        system_text = _append_onboarding_context(system_text, onboarding_context)
 
         # Include session memory if provided
         memory = setup_data.get('sessionMemory', [])
@@ -278,6 +327,18 @@ async def proxy_handler(client_ws):
         if 'setupComplete' in setup_resp_data:
             logger.info(f"Gemini session established for {client_addr}")
             await client_ws.send(json.dumps({'type': 'ready'}))
+            if initial_prompt:
+                kickoff_prompt = initial_prompt[:MAX_INITIAL_PROMPT_CHARS]
+                kickoff_msg = {
+                    'clientContent': {
+                        'turns': [{
+                            'role': 'user',
+                            'parts': [{'text': kickoff_prompt}],
+                        }],
+                        'turnComplete': True,
+                    }
+                }
+                await asyncio.wait_for(gemini_ws.send(json.dumps(kickoff_msg)), timeout=2.5)
         else:
             logger.warning(f"Unexpected setup response: {setup_resp_data}")
             await client_ws.send(json.dumps({
@@ -374,6 +435,21 @@ async def proxy_handler(client_ws):
                     elif msg_type == 'turnComplete':
                         gemini_msg = {
                             'realtimeInput': {
+                                'turnComplete': True,
+                            }
+                        }
+                        await asyncio.wait_for(gemini_ws.send(json.dumps(gemini_msg)), timeout=2.5)
+
+                    elif msg_type == 'text':
+                        text = _sanitize_text(data.get('text', ''))
+                        if not text:
+                            continue
+                        gemini_msg = {
+                            'clientContent': {
+                                'turns': [{
+                                    'role': 'user',
+                                    'parts': [{'text': text[:MAX_INITIAL_PROMPT_CHARS]}],
+                                }],
                                 'turnComplete': True,
                             }
                         }

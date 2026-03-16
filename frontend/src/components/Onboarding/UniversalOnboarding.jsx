@@ -487,8 +487,13 @@ export default function UniversalOnboarding() {
     const handleSubmit = async () => {
         setLoading(true);
         try {
-            await api.patch("users/update-profile/", mapToBackend(fd));
-            sessionStorage.setItem("show_welcome_coach", fd.name?.split(" ")[0] || "true");
+            const response = await api.patch("users/update-profile/", mapToBackend(fd));
+            if (response?.data?.onboarding_complete) {
+                sessionStorage.setItem("show_realtime_onboarding_intro", "true");
+                sessionStorage.removeItem("show_welcome_coach");
+            } else {
+                sessionStorage.setItem("show_welcome_coach", fd.name?.split(" ")[0] || "true");
+            }
             navigate("/dashboard");
         } catch (err) {
             console.error("Onboarding error:", err);

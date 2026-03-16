@@ -25,7 +25,9 @@ export const mentoringService = {
 
     /**
      * Get voice proxy WebSocket URL and session config.
-     * @returns {Promise<Object>} { ws_url, session_memory, available_voices }
+     * @returns {Promise<Object>} {
+     *   ws_url, session_memory, onboarding_context, auto_intro_prompt, available_voices
+     * }
      */
     getVoiceConfig: async () => {
         const response = await api.get('ai-mentoring/voice/config/');
