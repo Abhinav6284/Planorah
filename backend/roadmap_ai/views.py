@@ -602,7 +602,12 @@ def schedule_roadmap(request, roadmap_id):
         if not start_date_str:
             return Response({"error": "start_date is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+        try:
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+        except ValueError:
+            return Response({
+                "error": "Invalid start_date format. Use YYYY-MM-DD."
+            }, status=status.HTTP_400_BAD_REQUEST)
         
         # Get all tasks for this roadmap
         tasks = Task.objects.filter(roadmap=roadmap).order_by('day', 'order_in_day')
@@ -619,7 +624,8 @@ def schedule_roadmap(request, roadmap_id):
         # Schedule each task
         for task in tasks:
             # Calculate the actual date for this task based on its day number
-            task_date = start_date + timedelta(days=task.day - 1)
+            task_day = task.day if isinstance(task.day, int) and task.day > 0 else 1
+            task_date = start_date + timedelta(days=task_day - 1)
             
             # Update task's due_date
             task.due_date = task_date
@@ -628,20 +634,26 @@ def schedule_roadmap(request, roadmap_id):
             # Calculate time slots based on order_in_day
             # Start at 9 AM, each task gets a slot based on its estimated minutes
             base_hour = 9
-            slot_offset = task.order_in_day * 2  # 2 hour slots
+            safe_order = task.order_in_day if isinstance(task.order_in_day, int) and task.order_in_day >= 0 else 0
+            slot_offset = safe_order * 2  # 2 hour slots
             start_hour = base_hour + slot_offset
             
             # Cap at reasonable hours (9 AM to 8 PM)
             if start_hour > 20:
-                start_hour = 9 + (task.order_in_day % 6) * 2
+                start_hour = 9 + (safe_order % 6) * 2
             
             # Create timezone-aware datetimes
             naive_start = datetime.combine(task_date, datetime.min.time().replace(hour=start_hour, minute=0))
-            duration_hours = max(1, task.estimated_minutes // 60)
+            estimated_minutes = task.estimated_minutes if isinstance(task.estimated_minutes, int) and task.estimated_minutes > 0 else 60
+            duration_hours = max(1, estimated_minutes // 60)
             naive_end = datetime.combine(task_date, datetime.min.time().replace(hour=min(start_hour + duration_hours, 23), minute=0))
             
-            start_datetime = timezone.make_aware(naive_start)
-            end_datetime = timezone.make_aware(naive_end)
+            if timezone.is_aware(timezone.now()):
+                start_datetime = timezone.make_aware(naive_start, timezone.get_current_timezone())
+                end_datetime = timezone.make_aware(naive_end, timezone.get_current_timezone())
+            else:
+                start_datetime = naive_start
+                end_datetime = naive_end
             
             # Create calendar Event for this task
             event = Event.objects.create(
@@ -656,7 +668,7 @@ def schedule_roadmap(request, roadmap_id):
             created_events.append(event.id)
             
             scheduled_tasks.append({
-                "id": task.id,
+                "id": str(task.task_id),
                 "title": task.title,
                 "due_date": str(task_date),
                 "event_id": event.id

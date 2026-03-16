@@ -21,7 +21,7 @@ class GoogleCalendarService:
     def __init__(self, user):
         self.user = user
 
-    def get_flow(self):
+    def get_flow(self, redirect_uri=None):
         """Create OAuth flow"""
         # In production, use client_secrets.json or env vars
         # For now, we assume env vars or a config file
@@ -43,7 +43,11 @@ class GoogleCalendarService:
                 "Google Calendar OAuth credentials are missing. Set GOOGLE_CALENDAR_CLIENT_ID/SECRET or GOOGLE_OAUTH_CLIENT_ID/SECRET environment variables."
             )
 
-        if "/api/users/google/callback" in REDIRECT_URI:
+        effective_redirect_uri = (redirect_uri or REDIRECT_URI or "").strip()
+        if not effective_redirect_uri:
+            raise ValueError("Google Calendar redirect URI is missing.")
+
+        if "/api/users/google/callback" in effective_redirect_uri:
             raise ValueError(
                 "GOOGLE_CALENDAR_REDIRECT_URI is misconfigured for the scheduler flow. Use the frontend callback route, e.g. https://planorah.me/scheduler."
             )
@@ -60,35 +64,42 @@ class GoogleCalendarService:
         flow = Flow.from_client_config(
             client_config,
             scopes=SCOPES,
-            redirect_uri=REDIRECT_URI
+            redirect_uri=effective_redirect_uri
         )
         return flow
 
-    def get_authorization_url(self):
+    def get_authorization_url(self, redirect_uri=None):
         """Generate auth URL"""
-        flow = self.get_flow()
+        flow = self.get_flow(redirect_uri=redirect_uri)
         authorization_url, state = flow.authorization_url(
             access_type='offline',
-            include_granted_scopes='true'
+            include_granted_scopes='true',
+            prompt='consent'
         )
         return authorization_url
 
-    def exchange_code(self, code):
+    def exchange_code(self, code, redirect_uri=None):
         """Exchange code for token and save credential"""
-        flow = self.get_flow()
+        flow = self.get_flow(redirect_uri=redirect_uri)
         flow.fetch_token(code=code)
         creds = flow.credentials
+
+        existing_credential = GoogleCredential.objects.filter(user=self.user).first()
+        refresh_token = creds.refresh_token
+        if not refresh_token and existing_credential:
+            # Google may omit refresh_token on repeat consent; keep existing one.
+            refresh_token = existing_credential.refresh_token
 
         # Save to DB
         GoogleCredential.objects.update_or_create(
             user=self.user,
             defaults={
                 'access_token': creds.token,
-                'refresh_token': creds.refresh_token,
+                'refresh_token': refresh_token,
                 'token_uri': creds.token_uri,
                 'client_id': creds.client_id,
                 'client_secret': creds.client_secret,
-                'scopes': ' '.join(creds.scopes),
+                'scopes': ' '.join(creds.scopes or SCOPES),
                 'expiry': creds.expiry
             }
         )

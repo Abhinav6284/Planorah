@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { schedulerService } from "../../api/schedulerService";
 import { roadmapService } from "../../api/roadmapService";
@@ -19,16 +19,23 @@ export default function Scheduler() {
 
     const location = useLocation();
     const navigate = useNavigate();
+    const processedGoogleCodeRef = useRef(null);
 
     const handleGoogleCallback = useCallback(async (code) => {
         setSyncing(true);
         try {
-            await schedulerService.handleGoogleCallback(code);
+            const redirectUri = `${window.location.origin}/scheduler`;
+            await schedulerService.handleGoogleCallback(code, redirectUri);
             alert("Google Calendar connected successfully!");
             navigate('/scheduler', { replace: true });
         } catch (err) {
             console.error("Google Auth Error", err);
-            alert("Failed to connect Google Calendar");
+            const message =
+                err?.response?.data?.error ||
+                err?.response?.data?.message ||
+                "Failed to connect Google Calendar";
+            alert(message);
+            navigate('/scheduler', { replace: true });
         } finally {
             setSyncing(false);
         }
@@ -52,11 +59,21 @@ export default function Scheduler() {
 
         // Handle Google OAuth Callback
         const params = new URLSearchParams(location.search);
+        const oauthError = params.get('error');
+        const oauthErrorDescription = params.get('error_description');
         const code = params.get('code');
-        if (code) {
+
+        if (oauthError) {
+            alert(`Google authorization failed: ${oauthErrorDescription || oauthError}`);
+            navigate('/scheduler', { replace: true });
+            return;
+        }
+
+        if (code && processedGoogleCodeRef.current !== code) {
+            processedGoogleCodeRef.current = code;
             handleGoogleCallback(code);
         }
-    }, [location, handleGoogleCallback]);
+    }, [location.search, handleGoogleCallback, navigate]);
 
     useEffect(() => {
         let interval = null;
@@ -74,10 +91,16 @@ export default function Scheduler() {
 
     const connectGoogleCalendar = async () => {
         try {
-            const data = await schedulerService.getGoogleAuthUrl();
+            const redirectUri = `${window.location.origin}/scheduler`;
+            const data = await schedulerService.getGoogleAuthUrl(redirectUri);
             window.location.href = data.url;
         } catch (err) {
             console.error("Failed to get auth URL", err);
+            const message =
+                err?.response?.data?.error ||
+                err?.response?.data?.message ||
+                "Failed to initialize Google Calendar auth";
+            alert(message);
         }
     };
 
@@ -119,7 +142,11 @@ export default function Scheduler() {
                 alert("Roadmap scheduled! Check your calendar.");
             } catch (err) {
                 console.error("Schedule error:", err);
-                alert("Failed to schedule roadmap");
+                const message =
+                    err?.response?.data?.error ||
+                    err?.response?.data?.details ||
+                    "Failed to schedule roadmap";
+                alert(message);
             }
         }
     };

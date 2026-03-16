@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 import requests # Added requests import
 import logging
-from .models import Event
+from .models import Event, GoogleCredential
 from .google_calendar import GoogleCalendarService
 from .serializers import EventSerializer # Assuming you have one, or we'll make a simple one inline if needed
 
@@ -47,25 +47,58 @@ def google_auth_url(request):
     """Get the Google OAuth URL"""
     try:
         service = GoogleCalendarService(request.user)
-        url = service.get_authorization_url()
+        redirect_uri = request.query_params.get('redirect_uri')
+        url = service.get_authorization_url(redirect_uri=redirect_uri)
         return Response({"url": url})
     except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logger.exception("Google auth URL error for user=%s", request.user.id)
+        msg = str(e)
+        lowered = msg.lower()
+        if "credentials are missing" in lowered or "redirect uri is missing" in lowered:
+            return Response({"error": msg}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"error": "Failed to initialize Google Calendar auth."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def google_callback(request):
     """Exchange code for token"""
     code = request.data.get('code')
+    redirect_uri = request.data.get('redirect_uri')
     if not code:
         return Response({"error": "Code is required"}, status=status.HTTP_400_BAD_REQUEST)
     
     try:
         service = GoogleCalendarService(request.user)
-        service.exchange_code(code)
+        service.exchange_code(code, redirect_uri=redirect_uri)
         return Response({"message": "Google Calendar connected successfully"})
     except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logger.exception("Google callback error for user=%s", request.user.id)
+        error_text = str(e)
+        lowered = error_text.lower()
+
+        # Duplicate callback/code redemption can happen on repeated callback execution.
+        if "invalid_grant" in lowered and GoogleCredential.objects.filter(user=request.user).exists():
+            return Response({"message": "Google Calendar already connected"})
+
+        if "invalid_grant" in lowered or "redirect_uri_mismatch" in lowered:
+            return Response(
+                {"error": "Google authorization is invalid or expired. Please reconnect and try again."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if "invalid_client" in lowered or "unauthorized_client" in lowered or "invalid_request" in lowered:
+            return Response(
+                {"error": "Google OAuth client configuration is invalid. Please contact support."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        if "oauth credentials are missing" in lowered:
+            return Response(
+                {"error": "Google Calendar is not configured on the server. Contact support."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        return Response({"error": "Failed to connect Google Calendar."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

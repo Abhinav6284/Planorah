@@ -44,13 +44,19 @@ export const schedulerService = {
     },
 
     // Google Calendar
-    getGoogleAuthUrl: async () => {
-        const response = await api.get("scheduler/google/auth-url/");
+    getGoogleAuthUrl: async (redirectUri = "") => {
+        const response = await api.get("scheduler/google/auth-url/", {
+            params: redirectUri ? { redirect_uri: redirectUri } : undefined,
+        });
         return response.data;
     },
 
-    handleGoogleCallback: async (code) => {
-        const response = await api.post("scheduler/google/callback/", { code });
+    handleGoogleCallback: async (code, redirectUri = "") => {
+        const payload = { code };
+        if (redirectUri) {
+            payload.redirect_uri = redirectUri;
+        }
+        const response = await api.post("scheduler/google/callback/", payload);
         return response.data;
     },
 
