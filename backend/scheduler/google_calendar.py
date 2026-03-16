@@ -14,10 +14,18 @@ from .models import GoogleCredential
 # Scopes required for Google Calendar
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
+
+def _clean_env(name, default=""):
+    value = os.environ.get(name, default)
+    if value is None:
+        return default
+    return str(value).strip().strip('"').strip("'")
+
+
 # Redirect URI (must match Google Console)
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://planorah.me").rstrip("/")
+FRONTEND_URL = _clean_env("FRONTEND_URL", "https://planorah.me").rstrip("/")
 REDIRECT_URI = (
-    os.environ.get("GOOGLE_CALENDAR_REDIRECT_URI")
+    _clean_env("GOOGLE_CALENDAR_REDIRECT_URI")
     or f"{FRONTEND_URL}/scheduler"
 )
 PKCE_STATE_SALT = "scheduler.google.pkce"
@@ -35,14 +43,14 @@ class GoogleCalendarService:
         # We'll construct a client config dict for simplicity if env vars are present
 
         client_id = (
-            os.environ.get("GOOGLE_CALENDAR_CLIENT_ID")
-            or os.environ.get("GOOGLE_CLIENT_ID")
-            or os.environ.get("GOOGLE_OAUTH_CLIENT_ID")
+            _clean_env("GOOGLE_CALENDAR_CLIENT_ID")
+            or _clean_env("GOOGLE_CLIENT_ID")
+            or _clean_env("GOOGLE_OAUTH_CLIENT_ID")
         )
         client_secret = (
-            os.environ.get("GOOGLE_CALENDAR_CLIENT_SECRET")
-            or os.environ.get("GOOGLE_CLIENT_SECRET")
-            or os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET")
+            _clean_env("GOOGLE_CALENDAR_CLIENT_SECRET")
+            or _clean_env("GOOGLE_CLIENT_SECRET")
+            or _clean_env("GOOGLE_OAUTH_CLIENT_SECRET")
         )
 
         if not client_id or not client_secret:
@@ -78,7 +86,8 @@ class GoogleCalendarService:
     def _build_pkce_state(self):
         code_verifier = secrets.token_urlsafe(64)
         digest = hashlib.sha256(code_verifier.encode("utf-8")).digest()
-        code_challenge = base64.urlsafe_b64encode(digest).rstrip(b"=").decode("utf-8")
+        code_challenge = base64.urlsafe_b64encode(
+            digest).rstrip(b"=").decode("utf-8")
         state_payload = {
             "u": self.user.id,
             "cv": code_verifier,
@@ -110,7 +119,8 @@ class GoogleCalendarService:
             flow.fetch_token(code=code)
         creds = flow.credentials
 
-        existing_credential = GoogleCredential.objects.filter(user=self.user).first()
+        existing_credential = GoogleCredential.objects.filter(
+            user=self.user).first()
         refresh_token = creds.refresh_token
         if not refresh_token and existing_credential:
             # Google may omit refresh_token on repeat consent; keep existing one.
