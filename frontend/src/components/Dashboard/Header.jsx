@@ -4,6 +4,7 @@ import { useTheme } from "../../context/ThemeContext";
 import { userService } from "../../api/userService";
 import { AnimatePresence, motion } from 'framer-motion';
 import { User, Bell, Mail, Sun, Moon, LogOut } from 'lucide-react';
+import { getUserAvatar } from '../../utils/avatar';
 
 const Header = () => {
     const location = useLocation();
@@ -82,8 +83,7 @@ const Header = () => {
     // Helper to get display name
     const displayName = user ? (user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.username) : "Student";
     const userRole = user?.role || "Student";
-    // Backend now returns full avatar URL via serializer
-    const userAvatar = user?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?fit=crop&w=100&h=100";
+    const userAvatar = getUserAvatar(user);
 
     return (
         <header className={`flex items-center justify-between px-4 md:px-8 py-3 md:py-4 sticky top-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isScrolled ? 'bg-transparent pointer-events-none' : 'bg-transparent'}`}>

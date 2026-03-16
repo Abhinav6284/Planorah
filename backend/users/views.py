@@ -628,6 +628,7 @@ def update_user_profile(request):
                 )
                 education_onboarded = all([
                     profile.education_stage,
+                    profile.gender,
                     profile.weekly_hours and profile.weekly_hours > 0,
                     profile.validation_mode,
                     has_required_stage_data,

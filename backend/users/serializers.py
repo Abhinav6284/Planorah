@@ -44,6 +44,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = [
+            "gender",
             "field_of_study",
             "target_role",
             "experience_level",

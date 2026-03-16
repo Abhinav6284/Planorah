@@ -205,6 +205,19 @@ class UserProfile(models.Model):
     )
 
     # Profile Extensions
+    GENDER_MALE = 'male'
+    GENDER_FEMALE = 'female'
+    GENDER_CHOICES = (
+        (GENDER_MALE, 'Male'),
+        (GENDER_FEMALE, 'Female'),
+    )
+
+    gender = models.CharField(
+        max_length=10,
+        choices=GENDER_CHOICES,
+        blank=True,
+        null=True,
+    )
     bio = models.TextField(blank=True, null=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
 

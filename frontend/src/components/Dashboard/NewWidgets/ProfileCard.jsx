@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Flame } from 'lucide-react';
+import { getUserAvatar } from '../../../utils/avatar';
 
 const ProfileCard = ({ user, streak }) => {
     // Current streak count
@@ -67,7 +68,7 @@ const ProfileCard = ({ user, streak }) => {
                     <Link to="/settings" className="relative group/avatar flex-shrink-0">
                         <div className="w-16 h-16 rounded-full p-1 bg-gradient-to-tr from-orange-400 via-red-500 to-purple-600 shadow-lg shadow-orange-500/20 group-hover/avatar:shadow-orange-500/40 transition-all duration-300">
                             <img
-                                src={user?.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=" + (user?.username || "default")}
+                                src={getUserAvatar(user)}
                                 alt="User"
                                 className="w-full h-full rounded-full bg-white dark:bg-zinc-900 object-cover border-2 border-white dark:border-zinc-900"
                             />

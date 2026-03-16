@@ -149,6 +149,7 @@ export default function OverviewSection() {
                     first_name: profileData?.first_name,
                     last_name: profileData?.last_name,
                     username: profileData?.username,
+                    gender: profileData?.profile?.gender || statsData?.profile?.gender || '',
                     field_of_study: profileData?.profile?.field_of_study || profileData?.field_of_study || '',
                     xp: profileData?.xp_points || 0 // Map backend xp_points to xp prop
                 };
