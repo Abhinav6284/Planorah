@@ -8,19 +8,29 @@ export const subscriptionService = {
     // Get current active subscription (alias for widget compatibility)
     getMySubscription: async () => {
         const response = await api.get('subscriptions/current/');
-        return response.data;
+        const data = response.data;
+        return data?.status === 'none' ? null : data;
     },
 
     // Get current active subscription
     getCurrent: async () => {
         const response = await api.get('subscriptions/current/');
-        return response.data;
+        const data = response.data;
+        return data?.status === 'none' ? null : data;
     },
 
     // Get subscription usage details
     getUsage: async () => {
-        const response = await api.get('subscriptions/usage/');
-        return response.data;
+        try {
+            const response = await api.get('subscriptions/usage/');
+            return response.data;
+        } catch (error) {
+            // Backend returns 404 when no active subscription; treat as no-usage state.
+            if (error?.response?.status === 404) {
+                return null;
+            }
+            throw error;
+        }
     },
 
     // Activate a new subscription

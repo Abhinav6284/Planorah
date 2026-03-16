@@ -40,10 +40,8 @@ export default function SubscriptionStatus() {
 
     const fetchSubscription = async () => {
         try {
-            const [subData, usageData] = await Promise.all([
-                subscriptionService.getCurrent(),
-                subscriptionService.getUsage()
-            ]);
+            const subData = await subscriptionService.getCurrent();
+            const usageData = subData ? await subscriptionService.getUsage() : null;
             setSubscription(subData);
             setUsage(usageData);
         } catch (error) {

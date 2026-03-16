@@ -1,3 +1,28 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+
+# Private/authenticated app areas
+Disallow: /dashboard
+Disallow: /scheduler
+Disallow: /roadmap
+Disallow: /tasks
+Disallow: /resume
+Disallow: /ats
+Disallow: /jobs
+Disallow: /interview
+Disallow: /lab
+Disallow: /settings
+Disallow: /profile
+Disallow: /assistant
+Disallow: /billing
+Disallow: /subscription
+Disallow: /portfolio/edit
+Disallow: /projects
+
+# OAuth callback/internal flow routes
+Disallow: /auth/github/callback
+Disallow: /auth/spotify/callback
+Disallow: /auth/youtube/callback
+
+Sitemap: https://planorah.me/sitemap.xml

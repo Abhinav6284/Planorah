@@ -11,13 +11,15 @@ import html2canvas from 'html2canvas';
 
 const AUDIO_SAMPLE_RATE = 16000;  // What we send to Gemini
 const PLAYBACK_SAMPLE_RATE = 24000;  // What Gemini sends back
+const PLAYBACK_GAIN = 2.0;
 const MAX_AUDIO_QUEUE_CHUNKS = 20;
 const MAX_SCHEDULED_CHUNKS = 3;
 const SCREENSHOT_INTERVAL_MS = 12000;
 const RECONNECT_MAX_ATTEMPTS = 4;
 const RECONNECT_BASE_DELAY_MS = 1200;
 const VAD_START_THRESHOLD = 0.08;
-const VAD_BARGE_IN_THRESHOLD = 0.16;
+const VAD_BARGE_IN_THRESHOLD = 0.26;
+const VAD_BARGE_IN_MIN_FRAMES = 5;
 const VAD_SILENCE_MS = 700;
 // const CHUNK_SIZE removed - unused
 
@@ -65,6 +67,9 @@ export function useVoiceSession() {
     const audioQueueRef = useRef([]);
     const isPlayingRef = useRef(false);
     const playbackCtxRef = useRef(null);
+    const playbackInputNodeRef = useRef(null);
+    const playbackCompressorRef = useRef(null);
+    const playbackGainRef = useRef(null);
     const playbackCursorRef = useRef(0);
     const scheduledChunksRef = useRef(0);
     const activeSourcesRef = useRef(new Set());
@@ -80,6 +85,7 @@ export function useVoiceSession() {
     const reconnectAttemptsRef = useRef(0);
     const manualDisconnectRef = useRef(false);
     const lastConnectConfigRef = useRef(null);
+    const bargeInFramesRef = useRef(0);
 
     // ── Cleanup ──
     const cleanup = useCallback(() => {
@@ -94,6 +100,7 @@ export function useVoiceSession() {
             silenceTimerRef.current = null;
         }
         inUtteranceRef.current = false;
+        bargeInFramesRef.current = 0;
 
         // Stop screen capture interval
         if (screenIntervalRef.current) {
@@ -132,6 +139,9 @@ export function useVoiceSession() {
             playbackCtxRef.current?.close();
         }
         playbackCtxRef.current = null;
+        playbackInputNodeRef.current = null;
+        playbackCompressorRef.current = null;
+        playbackGainRef.current = null;
 
         // Close WebSocket
         if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -210,6 +220,19 @@ export function useVoiceSession() {
                     sampleRate: PLAYBACK_SAMPLE_RATE,
                     latencyHint: 'interactive',
                 });
+                playbackCompressorRef.current = playbackCtxRef.current.createDynamicsCompressor();
+                playbackCompressorRef.current.threshold.value = -18;
+                playbackCompressorRef.current.knee.value = 14;
+                playbackCompressorRef.current.ratio.value = 3;
+                playbackCompressorRef.current.attack.value = 0.003;
+                playbackCompressorRef.current.release.value = 0.2;
+
+                playbackGainRef.current = playbackCtxRef.current.createGain();
+                playbackGainRef.current.gain.value = PLAYBACK_GAIN;
+
+                playbackCompressorRef.current.connect(playbackGainRef.current);
+                playbackGainRef.current.connect(playbackCtxRef.current.destination);
+                playbackInputNodeRef.current = playbackCompressorRef.current;
                 playbackCursorRef.current = playbackCtxRef.current.currentTime + 0.04;
             }
 
@@ -249,7 +272,7 @@ export function useVoiceSession() {
 
                 const source = ctx.createBufferSource();
                 source.buffer = buffer;
-                source.connect(ctx.destination);
+                source.connect(playbackInputNodeRef.current || ctx.destination);
                 activeSourcesRef.current.add(source);
 
                 const startAt = Math.max(playbackCursorRef.current, ctx.currentTime + 0.02);
@@ -303,10 +326,23 @@ export function useVoiceSession() {
             setAudioLevel(level);
 
             if (statusRef.current === 'active' && wsRef.current?.readyState === WebSocket.OPEN) {
-                if (level > VAD_START_THRESHOLD) {
-                    if (isSpeakingRef.current && level > VAD_BARGE_IN_THRESHOLD) {
-                        interruptPlayback(); // support user barge-in during AI speech
+                if (isSpeakingRef.current) {
+                    // Require sustained, stronger input before interrupting AI speech.
+                    if (level > VAD_BARGE_IN_THRESHOLD) {
+                        bargeInFramesRef.current += 1;
+                        if (bargeInFramesRef.current >= VAD_BARGE_IN_MIN_FRAMES) {
+                            interruptPlayback();
+                            inUtteranceRef.current = true;
+                            bargeInFramesRef.current = 0;
+                            if (silenceTimerRef.current) {
+                                clearTimeout(silenceTimerRef.current);
+                                silenceTimerRef.current = null;
+                            }
+                        }
+                    } else {
+                        bargeInFramesRef.current = 0;
                     }
+                } else if (level > VAD_START_THRESHOLD) {
                     inUtteranceRef.current = true;
                     if (silenceTimerRef.current) {
                         clearTimeout(silenceTimerRef.current);
