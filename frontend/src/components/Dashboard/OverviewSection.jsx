@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { schedulerService } from "../../api/schedulerService";
 import { userService } from "../../api/userService";
-import { FaArrowRight, FaBolt, FaBrain, FaPause, FaPlay, FaRedo, FaStepForward, FaTrophy } from "react-icons/fa";
+import { FaArrowRight, FaBolt, FaBrain, FaPause, FaPlay, FaRedo, FaStepForward } from "react-icons/fa";
 
 import AIVoicePanel from "../Mentoring/AIVoicePanel";
 import StreakUpdateModal from "./Modals/StreakUpdateModal";
