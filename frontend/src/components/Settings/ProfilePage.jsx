@@ -49,6 +49,7 @@ export default function ProfilePage() {
                 bio: profile.bio || "Passionate about learning and building the future. 🚀",
                 email: profileData.email,
                 avatar: profile.avatar,
+                gender: profile.gender || '',
                 field: profile.field_of_study || 'Technology',
                 level: profile.experience_level || 'Intermediate',
             };
@@ -101,6 +102,7 @@ export default function ProfilePage() {
             formData.append('name', editForm.name);
             formData.append('target_role', editForm.role);
             formData.append('bio', editForm.bio);
+            formData.append('gender', editForm.gender || '');
             if (editForm.avatarFile) {
                 formData.append('avatar', editForm.avatarFile);
             }
@@ -258,6 +260,20 @@ export default function ProfilePage() {
                                                 className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white"
                                                 placeholder="e.g. CS Student"
                                             />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Gender</label>
+                                            <select
+                                                name="gender"
+                                                value={editForm.gender || ''}
+                                                onChange={handleEditChange}
+                                                className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white"
+                                            >
+                                                <option value="">Select gender</option>
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                            </select>
                                         </div>
 
                                         {/* Bio - Full Width */}

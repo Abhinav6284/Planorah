@@ -1,3 +1,7 @@
+from .serializers import StudentProjectSerializer, StudentProjectCreateSerializer
+from .models import StudentProject
+from rest_framework.decorators import action
+from rest_framework import viewsets
 import os
 import json
 import logging
@@ -383,8 +387,10 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
         )
 
         # Generate content and assign to response variable
-        logger.info("Generating roadmap for user_id=%s category=%s", user.id, category)
-        response = model.generate_content(prompt, generation_config=generation_config)
+        logger.info("Generating roadmap for user_id=%s category=%s",
+                    user.id, category)
+        response = model.generate_content(
+            prompt, generation_config=generation_config)
 
         # Safety check: Ensure valid response from AI
         if not response or not hasattr(response, "text") or not response.text:
@@ -425,9 +431,12 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
             category=roadmap_data.get('category', category),
             tech_stack=roadmap_data.get('tech_stack', tech_stack),
             output_format=roadmap_data.get('output_format', output_format),
-            learning_constraints=roadmap_data.get('learning_constraints', learning_constraints),
-            motivation_style=roadmap_data.get('motivation_style', motivation_style),
-            success_definition=roadmap_data.get('success_definition', success_definition),
+            learning_constraints=roadmap_data.get(
+                'learning_constraints', learning_constraints),
+            motivation_style=roadmap_data.get(
+                'motivation_style', motivation_style),
+            success_definition=roadmap_data.get(
+                'success_definition', success_definition),
             prerequisites=roadmap_data.get('prerequisites', []),
             career_outcomes=roadmap_data.get('career_outcomes', []),
             tips=roadmap_data.get('tips', []),
@@ -468,15 +477,18 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
                     tech_stack=project_data.get('tech_stack', []),
                     learning_outcomes=project_data.get('learning_outcomes', [])
                 )
-        
+
         # Auto-generate tasks from roadmap
         try:
             from tasks.task_generator import auto_create_tasks_from_roadmap
             created_tasks = auto_create_tasks_from_roadmap(roadmap)
-            logger.info("Auto-generated %s tasks for roadmap_id=%s", len(created_tasks), roadmap.id)
+            logger.info("Auto-generated %s tasks for roadmap_id=%s",
+                        len(created_tasks), roadmap.id)
         except Exception as task_error:
-            logger.warning("Task auto-generation failed for roadmap_id=%s: %s", roadmap.id, task_error)
-            logger.exception("Task generation failed for roadmap %s", roadmap.id)
+            logger.warning(
+                "Task auto-generation failed for roadmap_id=%s: %s", roadmap.id, task_error)
+            logger.exception(
+                "Task generation failed for roadmap %s", roadmap.id)
             # Don't fail the whole request if task generation fails
 
         serializer = RoadmapDetailSerializer(roadmap)
@@ -515,7 +527,8 @@ def get_user_roadmaps(request):
         serializer = RoadmapSerializer(roadmaps, many=True)
         return Response(serializer.data)
     except Exception as e:
-        logger.exception("Failed to fetch roadmaps for user_id=%s", request.user.id)
+        logger.exception(
+            "Failed to fetch roadmaps for user_id=%s", request.user.id)
         return Response({
             "error": "Failed to fetch roadmaps",
             "details": str(e)
@@ -533,7 +546,8 @@ def get_roadmap_detail(request, roadmap_id):
     except Roadmap.DoesNotExist:
         return Response({"error": "Roadmap not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        logger.exception("Failed to fetch roadmap detail roadmap_id=%s user_id=%s", roadmap_id, request.user.id)
+        logger.exception(
+            "Failed to fetch roadmap detail roadmap_id=%s user_id=%s", roadmap_id, request.user.id)
         return Response({
             "error": "Failed to fetch roadmap details",
             "details": str(e)
@@ -547,12 +561,14 @@ def delete_roadmap(request, roadmap_id):
     try:
         roadmap = Roadmap.objects.get(id=roadmap_id, user=request.user)
         roadmap.delete()
-        logger.info("Roadmap deleted roadmap_id=%s user_id=%s", roadmap_id, request.user.id)
+        logger.info("Roadmap deleted roadmap_id=%s user_id=%s",
+                    roadmap_id, request.user.id)
         return Response({"message": "Roadmap deleted successfully"}, status=status.HTTP_200_OK)
     except Roadmap.DoesNotExist:
         return Response({"error": "Roadmap not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        logger.exception("Failed to delete roadmap roadmap_id=%s user_id=%s", roadmap_id, request.user.id)
+        logger.exception(
+            "Failed to delete roadmap roadmap_id=%s user_id=%s", roadmap_id, request.user.id)
         return Response({
             "error": "Failed to delete roadmap",
             "details": str(e)
@@ -570,12 +586,14 @@ def update_milestone_progress(request, milestone_id):
 
         # Update completed_at timestamp
         milestone.save()
-        logger.info("Milestone updated milestone_id=%s completed=%s", milestone_id, milestone.is_completed)
+        logger.info("Milestone updated milestone_id=%s completed=%s",
+                    milestone_id, milestone.is_completed)
         return Response({"message": "Milestone updated"}, status=status.HTTP_200_OK)
     except Milestone.DoesNotExist:
         return Response({"error": "Milestone not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        logger.exception("Failed to update milestone milestone_id=%s user_id=%s", milestone_id, request.user.id)
+        logger.exception(
+            "Failed to update milestone milestone_id=%s user_id=%s", milestone_id, request.user.id)
         return Response({
             "error": "Failed to update milestone",
             "details": str(e)
@@ -594,7 +612,7 @@ def schedule_roadmap(request, roadmap_id):
     from django.utils import timezone
     from scheduler.models import Event
     from tasks.models import Task
-    
+
     try:
         roadmap = Roadmap.objects.get(id=roadmap_id, user=request.user)
         start_date_str = request.data.get('start_date')
@@ -608,53 +626,71 @@ def schedule_roadmap(request, roadmap_id):
             return Response({
                 "error": "Invalid start_date format. Use YYYY-MM-DD."
             }, status=status.HTTP_400_BAD_REQUEST)
-        
+
+        start_time_str = request.data.get('start_time', '09:00')
+        try:
+            time_parts = start_time_str.split(':')
+            base_hour = int(time_parts[0])
+            base_minute = int(time_parts[1]) if len(time_parts) > 1 else 0
+            if not (0 <= base_hour <= 23) or not (0 <= base_minute <= 59):
+                raise ValueError()
+        except (ValueError, IndexError):
+            base_hour = 9
+            base_minute = 0
+
         # Get all tasks for this roadmap
-        tasks = Task.objects.filter(roadmap=roadmap).order_by('day', 'order_in_day')
-        
+        tasks = Task.objects.filter(
+            roadmap=roadmap).order_by('day', 'order_in_day')
+
         if not tasks.exists():
             return Response({
                 "error": "No tasks found for this roadmap. Please generate tasks first.",
                 "tasks_found": 0
             }, status=status.HTTP_400_BAD_REQUEST)
-        
+
         created_events = []
         scheduled_tasks = []
-        
+
         # Schedule each task
         for task in tasks:
             # Calculate the actual date for this task based on its day number
-            task_day = task.day if isinstance(task.day, int) and task.day > 0 else 1
+            task_day = task.day if isinstance(
+                task.day, int) and task.day > 0 else 1
             task_date = start_date + timedelta(days=task_day - 1)
-            
+
             # Update task's due_date
             task.due_date = task_date
             task.save()
-            
+
             # Calculate time slots based on order_in_day
-            # Start at 9 AM, each task gets a slot based on its estimated minutes
-            base_hour = 9
-            safe_order = task.order_in_day if isinstance(task.order_in_day, int) and task.order_in_day >= 0 else 0
+            # Start at user-specified time, each task gets a slot based on its estimated minutes
+            safe_order = task.order_in_day if isinstance(
+                task.order_in_day, int) and task.order_in_day >= 0 else 0
             slot_offset = safe_order * 2  # 2 hour slots
             start_hour = base_hour + slot_offset
-            
+
             # Cap at reasonable hours (9 AM to 8 PM)
             if start_hour > 20:
                 start_hour = 9 + (safe_order % 6) * 2
-            
+
             # Create timezone-aware datetimes
-            naive_start = datetime.combine(task_date, datetime.min.time().replace(hour=start_hour, minute=0))
-            estimated_minutes = task.estimated_minutes if isinstance(task.estimated_minutes, int) and task.estimated_minutes > 0 else 60
+            naive_start = datetime.combine(
+                task_date, datetime.min.time().replace(hour=start_hour, minute=base_minute))
+            estimated_minutes = task.estimated_minutes if isinstance(
+                task.estimated_minutes, int) and task.estimated_minutes > 0 else 60
             duration_hours = max(1, estimated_minutes // 60)
-            naive_end = datetime.combine(task_date, datetime.min.time().replace(hour=min(start_hour + duration_hours, 23), minute=0))
-            
+            naive_end = datetime.combine(task_date, datetime.min.time().replace(
+                hour=min(start_hour + duration_hours, 23), minute=0))
+
             if timezone.is_aware(timezone.now()):
-                start_datetime = timezone.make_aware(naive_start, timezone.get_current_timezone())
-                end_datetime = timezone.make_aware(naive_end, timezone.get_current_timezone())
+                start_datetime = timezone.make_aware(
+                    naive_start, timezone.get_current_timezone())
+                end_datetime = timezone.make_aware(
+                    naive_end, timezone.get_current_timezone())
             else:
                 start_datetime = naive_start
                 end_datetime = naive_end
-            
+
             # Create calendar Event for this task
             event = Event.objects.create(
                 user=request.user,
@@ -666,7 +702,7 @@ def schedule_roadmap(request, roadmap_id):
             )
 
             created_events.append(event.id)
-            
+
             scheduled_tasks.append({
                 "id": str(task.task_id),
                 "title": task.title,
@@ -674,14 +710,33 @@ def schedule_roadmap(request, roadmap_id):
                 "event_id": event.id
             })
 
+        # Auto-push to Google Calendar if the user has connected their account
+        google_calendar_synced = False
+        google_calendar_error = None
+        try:
+            from scheduler.google_calendar import GoogleCalendarService
+            gc_service = GoogleCalendarService(request.user)
+            if gc_service.get_service():
+                for ev in Event.objects.filter(id__in=created_events):
+                    gc_service.create_event(
+                        title=ev.title,
+                        start_time=ev.start_time,
+                        end_time=ev.end_time,
+                        description=ev.description or '',
+                    )
+                google_calendar_synced = True
+        except Exception as gc_err:
+            logger.warning("Google Calendar auto-sync failed: %s", gc_err)
+            google_calendar_error = str(gc_err)
+
         # Also update milestone dates for reference
         milestones = roadmap.milestones.all().order_by('order')
         current_date = start_date
-        
+
         for milestone in milestones:
             duration_str = milestone.duration.lower() if milestone.duration else ""
             days_to_add = 7
-            
+
             if 'week' in duration_str:
                 try:
                     days_to_add = int(duration_str.split()[0]) * 7
@@ -703,12 +758,15 @@ def schedule_roadmap(request, roadmap_id):
             milestone.save()
             current_date = milestone.end_date + timedelta(days=1)
 
-        logger.info("Scheduled roadmap roadmap_id=%s user_id=%s events=%s", roadmap_id, request.user.id, len(created_events))
-        
+        logger.info("Scheduled roadmap roadmap_id=%s user_id=%s events=%s",
+                    roadmap_id, request.user.id, len(created_events))
+
         return Response({
             "message": f"Roadmap scheduled successfully! {len(created_events)} tasks added to calendar.",
             "tasks_scheduled": len(scheduled_tasks),
             "events_created": len(created_events),
+            "google_calendar_synced": google_calendar_synced,
+            "google_calendar_error": google_calendar_error,
             "tasks": scheduled_tasks[:10]  # Return first 10 for confirmation
         }, status=status.HTTP_200_OK)
 
@@ -731,13 +789,13 @@ def get_roadmap_projects(request):
     """
     try:
         from tasks.models import Task
-        
+
         user_roadmaps = Roadmap.objects.filter(user=request.user)
         all_projects = []
-        
+
         for roadmap in user_roadmaps:
             milestones = roadmap.milestones.all()
-            
+
             for milestone in milestones:
                 for project in milestone.projects.all():
                     # Calculate project progress based on related tasks
@@ -746,16 +804,18 @@ def get_roadmap_projects(request):
                         milestone=milestone,
                         tags__contains=['project']
                     )
-                    
+
                     total_tasks = project_tasks.count()
-                    completed_tasks = project_tasks.filter(status='completed').count()
-                    in_progress_tasks = project_tasks.filter(status='in_progress').count()
-                    
+                    completed_tasks = project_tasks.filter(
+                        status='completed').count()
+                    in_progress_tasks = project_tasks.filter(
+                        status='in_progress').count()
+
                     # Calculate progress percentage
                     progress = 0
                     if total_tasks > 0:
                         progress = int((completed_tasks / total_tasks) * 100)
-                    
+
                     # Determine status
                     if progress == 100:
                         status_val = 'completed'
@@ -763,7 +823,7 @@ def get_roadmap_projects(request):
                         status_val = 'in_progress'
                     else:
                         status_val = 'not_started'
-                    
+
                     all_projects.append({
                         'id': project.id,
                         'title': project.title,
@@ -782,11 +842,12 @@ def get_roadmap_projects(request):
                         'completed_tasks': completed_tasks,
                         'completed': project.completed,
                     })
-        
+
         return Response(all_projects)
-        
+
     except Exception as e:
-        logger.exception("Error fetching roadmap projects for user %s", request.user.id)
+        logger.exception(
+            "Error fetching roadmap projects for user %s", request.user.id)
         return Response({
             "error": "Failed to fetch projects",
             "details": str(e)
@@ -801,23 +862,23 @@ def get_roadmap_progress(request):
     """
     try:
         from tasks.models import Task
-        
+
         user_roadmaps = Roadmap.objects.filter(user=request.user)
         progress_data = []
-        
+
         for roadmap in user_roadmaps:
             tasks = Task.objects.filter(roadmap=roadmap)
             total_tasks = tasks.count()
             completed_tasks = tasks.filter(status='completed').count()
-            
+
             milestones = roadmap.milestones.all()
             total_milestones = milestones.count()
             completed_milestones = milestones.filter(is_completed=True).count()
-            
+
             progress = 0
             if total_tasks > 0:
                 progress = int((completed_tasks / total_tasks) * 100)
-            
+
             progress_data.append({
                 'id': roadmap.id,
                 'title': roadmap.title,
@@ -830,11 +891,12 @@ def get_roadmap_progress(request):
                 'difficulty_level': roadmap.difficulty_level,
                 'estimated_duration': roadmap.estimated_duration,
             })
-        
+
         return Response(progress_data)
-        
+
     except Exception as e:
-        logger.exception("Error fetching roadmap progress for user %s", request.user.id)
+        logger.exception(
+            "Error fetching roadmap progress for user %s", request.user.id)
         return Response({
             "error": "Failed to fetch progress",
             "details": str(e)
@@ -842,10 +904,6 @@ def get_roadmap_progress(request):
 
 
 # Student Projects ViewSet
-from rest_framework import viewsets
-from rest_framework.decorators import action
-from .models import StudentProject
-from .serializers import StudentProjectSerializer, StudentProjectCreateSerializer
 
 
 class StudentProjectViewSet(viewsets.ModelViewSet):
@@ -853,32 +911,31 @@ class StudentProjectViewSet(viewsets.ModelViewSet):
     ViewSet for managing student-uploaded projects.
     """
     permission_classes = [IsAuthenticated]
-    
+
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
             return StudentProjectCreateSerializer
         return StudentProjectSerializer
-    
+
     def get_queryset(self):
         return StudentProject.objects.filter(user=self.request.user)
-    
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-    
+
     @action(detail=False, methods=['get'])
     def stats(self, request):
         """Get statistics about student projects."""
         queryset = self.get_queryset()
-        
+
         total = queryset.count()
-        with_github = queryset.exclude(github_url__isnull=True).exclude(github_url='').count()
+        with_github = queryset.exclude(
+            github_url__isnull=True).exclude(github_url='').count()
         public = queryset.filter(visibility='public').count()
-        
+
         return Response({
             'total_projects': total,
             'projects_on_github': with_github,
             'public_projects': public,
             'private_projects': total - public,
         })
-
-

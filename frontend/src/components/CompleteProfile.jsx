@@ -9,6 +9,7 @@ export default function CompleteProfile() {
         name: "",
         date_of_birth: "",
         phone_number: "",
+        gender: "",
     });
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
@@ -133,6 +134,21 @@ export default function CompleteProfile() {
                                     className="w-full px-6 py-4 rounded-full bg-gray-50 border-2 border-transparent focus:bg-white focus:border-black outline-none transition-all placeholder-gray-400 text-lg"
                                     required
                                 />
+                            </div>
+
+                            <div className="col-span-1 md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2 ml-1">Gender</label>
+                                <select
+                                    name="gender"
+                                    value={formData.gender}
+                                    onChange={handleChange}
+                                    className="w-full px-6 py-4 rounded-full bg-gray-50 border-2 border-transparent focus:bg-white focus:border-black outline-none transition-all text-lg text-gray-700"
+                                    required
+                                >
+                                    <option value="">Select gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
                             </div>
                         </div>
 

@@ -200,7 +200,7 @@ function mapToBackend(fd) {
     const goal_statement = dirMap[dirKey] || "achieve their personal goal on Planora";
 
     // eslint-disable-next-line no-unused-vars
-    const { name, phone_number, date_of_birth, committed, ...rest } = fd;
+    const { name, phone_number, date_of_birth, gender, committed, ...rest } = fd;
 
     return {
         education_stage,
@@ -212,6 +212,7 @@ function mapToBackend(fd) {
         name,
         phone_number,
         date_of_birth,
+        gender,
     };
 }
 
@@ -434,6 +435,7 @@ export default function UniversalOnboarding() {
         daily_time: "", dream_vs_effort: "", pressure_response: "",
         // commitment lock
         committed: false,
+        gender: "",
         name: "", phone_number: "", date_of_birth: "",
     });
 
@@ -477,7 +479,7 @@ export default function UniversalOnboarding() {
 
     const canProceed = () => {
         if (currentStepId === "commitment_lock") return fd.committed;
-        if (currentStepId === "personal") return fd.name.trim() && fd.phone_number.trim() && fd.date_of_birth;
+        if (currentStepId === "personal") return fd.name.trim() && fd.phone_number.trim() && fd.date_of_birth && fd.gender;
         return !!fd[currentStepId];
     };
 
@@ -598,6 +600,18 @@ export default function UniversalOnboarding() {
                             />
                         </div>
                     ))}
+                    <div>
+                        <label className="block text-[15px] font-bold text-gray-800 mb-2">Gender</label>
+                        <select
+                            value={fd.gender}
+                            onChange={e => setFd(prev => ({ ...prev, gender: e.target.value }))}
+                            className="w-full px-4 py-4 rounded-2xl border-2 border-gray-200 bg-white text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none text-[16px] font-medium transition shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                        >
+                            <option value="">Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
                 </div>
             );
         }

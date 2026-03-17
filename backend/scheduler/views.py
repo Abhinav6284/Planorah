@@ -1,3 +1,10 @@
+from . import spotify
+from django.contrib.auth import get_user_model
+from rest_framework.permissions import AllowAny
+from django.shortcuts import redirect  # Added missing import
+from datetime import timedelta
+from django.utils import timezone
+from .models import SpotifyCredential
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -26,11 +33,13 @@ def get_events(request):
     } for e in events]
     return Response(data)
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_event(request):
     # Basic creation logic
     return Response({"message": "Not implemented yet"}, status=status.HTTP_501_NOT_IMPLEMENTED)
+
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
@@ -43,6 +52,7 @@ def delete_all_events(request):
     })
 
 # --- Google Calendar Endpoints ---
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -60,6 +70,7 @@ def google_auth_url(request):
         if "credentials are missing" in lowered or "redirect uri is missing" in lowered:
             return Response({"error": msg}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response({"error": "Failed to initialize Google Calendar auth."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -142,6 +153,12 @@ def google_callback(request):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+        if "access blocked" in lowered or "access_denied" in lowered or "org_internal" in lowered:
+            return Response(
+                {"error": "Google OAuth app access is blocked for this account. Check app publishing status and test users."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         if "oauth credentials are missing" in lowered:
             return Response(
                 {"error": "Google Calendar is not configured on the server. Contact support."},
@@ -156,6 +173,7 @@ def google_callback(request):
 
         return Response({"error": "Failed to connect Google Calendar."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def sync_calendar(request):
@@ -163,7 +181,7 @@ def sync_calendar(request):
     try:
         service = GoogleCalendarService(request.user)
         events = service.list_events()
-        
+
         # Transform for frontend
         formatted_events = []
         for e in events:
@@ -176,7 +194,7 @@ def sync_calendar(request):
                 "end": end,
                 "type": "google"
             })
-            
+
         return Response(formatted_events)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -200,23 +218,24 @@ def spotify_auth_url(request):
     url = spotify.get_auth_url(state=state)
     return Response({"url": url})
 
+
 @api_view(['GET'])
-@permission_classes([AllowAny]) # Allow callback without JWT header
+@permission_classes([AllowAny])  # Allow callback without JWT header
 def spotify_callback(request):
     code = request.GET.get('code')
     state = request.GET.get('state')
-    
+
     if not code or not state:
         return Response({"error": "Code and state are required"}, status=status.HTTP_400_BAD_REQUEST)
-    
+
     try:
         # Verify state to get user ID
-        user_id = signing.loads(state, max_age=600) # 10 minutes expiry
+        user_id = signing.loads(state, max_age=600)  # 10 minutes expiry
         User = get_user_model()
         user = User.objects.get(id=user_id)
-        
+
         token_data = spotify.get_token(code)
-        
+
         # Save credential
         SpotifyCredential.objects.update_or_create(
             user=user,
@@ -235,18 +254,20 @@ def spotify_callback(request):
         logger.exception("Spotify Callback Error: %s", e)
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_current_song(request):
     try:
         cred = SpotifyCredential.objects.get(user=request.user)
-        
+
         # Simple refresh check (should be more robust in prod)
         if cred.expires_in and timezone.now() > cred.expires_in:
-             token_data = spotify.refresh_token(cred.refresh_token)
-             cred.access_token = token_data['access_token']
-             cred.expires_in = timezone.now() + timedelta(seconds=token_data['expires_in'])
-             cred.save()
+            token_data = spotify.refresh_token(cred.refresh_token)
+            cred.access_token = token_data['access_token']
+            cred.expires_in = timezone.now(
+            ) + timedelta(seconds=token_data['expires_in'])
+            cred.save()
 
         data = spotify.get_current_song(cred.access_token)
         return Response(data)
@@ -263,6 +284,7 @@ def get_current_song(request):
         logger.exception("Spotify Internal Error (Current Song): %s", e)
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_queue(request):
@@ -270,10 +292,11 @@ def get_queue(request):
         cred = SpotifyCredential.objects.get(user=request.user)
         # Refresh token check (simplified)
         if cred.expires_in and timezone.now() > cred.expires_in:
-             token_data = spotify.refresh_token(cred.refresh_token)
-             cred.access_token = token_data['access_token']
-             cred.expires_in = timezone.now() + timedelta(seconds=token_data['expires_in'])
-             cred.save()
+            token_data = spotify.refresh_token(cred.refresh_token)
+            cred.access_token = token_data['access_token']
+            cred.expires_in = timezone.now(
+            ) + timedelta(seconds=token_data['expires_in'])
+            cred.save()
 
         data = spotify.get_queue(cred.access_token)
         return Response(data)
@@ -289,6 +312,7 @@ def get_queue(request):
     except Exception as e:
         logger.exception("Spotify Internal Error (Queue): %s", e)
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
