@@ -10,11 +10,11 @@ import StreakUpdateModal from "./Modals/StreakUpdateModal";
 import TaskSchedulerWidget from "./NewWidgets/TaskSchedulerWidget";
 import ProgressChartWidget from "./NewWidgets/ProgressChartWidget";
 
-const SURFACE_CARD = "rounded-[20px] border border-slate-200/80 bg-white/90 shadow-[0_14px_34px_-24px_rgba(15,23,42,0.42)] backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/90";
-const INNER_CARD = "rounded-2xl border border-slate-200/75 bg-white/80 p-4 dark:border-slate-700/80 dark:bg-slate-900/75";
+const SURFACE_CARD = "group relative overflow-hidden rounded-[20px] border border-white/45 bg-white/58 shadow-[0_24px_60px_-36px_rgba(67,56,202,0.55)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/64 hover:shadow-[0_30px_72px_-38px_rgba(79,70,229,0.65)] dark:border-white/15 dark:bg-white/[0.06] dark:hover:bg-white/[0.1]";
+const INNER_CARD = "relative overflow-hidden rounded-2xl border border-white/50 bg-white/55 p-4 backdrop-blur-xl dark:border-white/12 dark:bg-white/[0.05]";
 
-const PRIMARY_BUTTON = "inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_20px_-12px_rgba(37,99,235,0.85)] transition-all hover:from-blue-500 hover:to-blue-400";
-const SECONDARY_BUTTON = "inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-all hover:border-blue-300 hover:text-blue-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:text-blue-300";
+const PRIMARY_BUTTON = "inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-500 to-violet-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_12px_26px_-14px_rgba(79,70,229,0.8)] transition-all duration-200 hover:brightness-110";
+const SECONDARY_BUTTON = "inline-flex items-center justify-center gap-2 rounded-xl border border-white/50 bg-white/60 px-4 py-2.5 text-sm font-semibold text-slate-700 backdrop-blur-xl transition-all duration-200 hover:border-indigo-300 hover:text-indigo-700 dark:border-white/15 dark:bg-white/[0.05] dark:text-slate-200 dark:hover:border-indigo-400/50 dark:hover:text-indigo-200";
 
 const DEFAULT_FOCUS_SECONDS = 25 * 60;
 
@@ -61,9 +61,9 @@ const VoiceCoachButton = ({ onClick }) => {
             type="button"
             whileTap={{ scale: 0.96 }}
             onClick={onClick}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700 transition-all hover:bg-blue-100 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300 dark:hover:bg-blue-500/20"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/55 bg-white/60 px-3 py-2 text-sm font-semibold text-indigo-700 backdrop-blur-xl transition-all duration-200 hover:border-indigo-300 hover:bg-white/70 dark:border-white/15 dark:bg-white/[0.05] dark:text-indigo-200"
         >
-            <span className="inline-flex h-2 w-2 rounded-full bg-blue-500" />
+            <span className="inline-flex h-2 w-2 rounded-full bg-indigo-400" />
             Voice Coach
         </motion.button>
     );
@@ -228,14 +228,14 @@ export default function OverviewSection() {
 
     const itemVariants = {
         hidden: { opacity: 0, y: 18 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+        visible: { opacity: 1, y: 0, transition: { duration: 0.42, ease: [0.22, 1, 0.36, 1] } }
     };
 
     if (loading) {
         return (
             <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-[#0b1220]">
                 <div className="text-center">
-                    <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+                    <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
                     <div className="text-base text-slate-500 dark:text-slate-400">Loading dashboard...</div>
                 </div>
             </div>
@@ -243,9 +243,22 @@ export default function OverviewSection() {
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-slate-50 dark:bg-[#0b1220]">
-            <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full bg-blue-300/30 blur-3xl dark:bg-blue-500/12" />
-            <div className="pointer-events-none absolute -right-20 top-16 h-72 w-72 rounded-full bg-orange-200/30 blur-3xl dark:bg-orange-500/10" />
+        <div className="relative min-h-screen overflow-hidden bg-[#eef2ff] dark:bg-[#090f1f]">
+            <motion.div
+                className="pointer-events-none absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full bg-blue-400/35 blur-3xl dark:bg-blue-500/18"
+                animate={{ x: [0, 26, 0], y: [0, 18, 0] }}
+                transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.div
+                className="pointer-events-none absolute -right-20 top-14 h-[360px] w-[360px] rounded-full bg-violet-400/30 blur-3xl dark:bg-violet-500/18"
+                animate={{ x: [0, -24, 0], y: [0, 16, 0] }}
+                transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.div
+                className="pointer-events-none absolute bottom-0 left-1/3 h-[300px] w-[300px] rounded-full bg-indigo-300/30 blur-3xl dark:bg-indigo-500/12"
+                animate={{ y: [0, -20, 0] }}
+                transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+            />
 
             <div className="relative z-10 mx-auto max-w-[1480px] px-4 py-5 lg:py-6">
                 <motion.div
@@ -254,177 +267,197 @@ export default function OverviewSection() {
                     animate="visible"
                     className="grid grid-cols-1 gap-5 lg:grid-cols-12"
                 >
-                    <motion.section variants={itemVariants} whileHover={{ y: -3 }} className={`${SURFACE_CARD} overflow-hidden p-6 lg:col-span-8`}>
-                        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                            <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300">
-                                Focus Primary
-                            </span>
-                            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                                {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
-                            </span>
-                        </div>
+                    <motion.section variants={itemVariants} whileHover={{ y: -4 }} className={`${SURFACE_CARD} p-6 lg:col-span-8`}>
+                        <motion.div
+                            className="pointer-events-none absolute inset-0 opacity-70"
+                            style={{
+                                backgroundImage: "linear-gradient(125deg, rgba(59,130,246,0.18), rgba(139,92,246,0.16), rgba(99,102,241,0.16))",
+                                backgroundSize: "200% 200%"
+                            }}
+                            animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+                            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+                        />
 
-                        <h1 className="text-2xl leading-tight text-slate-900 sm:text-3xl dark:text-white [font-family:'Space_Grotesk',sans-serif]">
-                            {getGreeting()}, {getDisplayName(userProfile)}
-                        </h1>
-                        <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
-                            Start with one clear deep-work block, then move into scheduling and progress review.
-                        </p>
-
-                        <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
-                            <div className={`${INNER_CARD} min-w-0`}> 
-                                <div className="mb-4 flex items-center justify-between">
-                                    <p className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">Focus timer</p>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400">{Math.round(focusDurationSeconds / 60)} min block</p>
-                                </div>
-
-                                <div className="relative mx-auto mb-4 grid h-44 w-44 place-items-center">
-                                    <motion.div
-                                        className="absolute inset-4 rounded-full bg-blue-500/20 blur-2xl"
-                                        animate={focusActive ? { opacity: [0.24, 0.46, 0.24] } : { opacity: 0.18 }}
-                                        transition={focusActive ? { duration: 1.8, repeat: Infinity } : { duration: 0.3 }}
-                                    />
-
-                                    <div
-                                        className="relative grid h-full w-full place-items-center rounded-full p-2"
-                                        style={{
-                                            background: `conic-gradient(#2563eb ${focusProgressAngle}deg, rgba(148,163,184,0.24) 0deg)`
-                                        }}
-                                    >
-                                        <div className="grid h-full w-full place-items-center rounded-full border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
-                                            <p className="text-[10px] uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">{focusProgressPct}% complete</p>
-                                            <p className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">{formatFocusTime(focusSecondsLeft)}</p>
-                                            <p className={`text-[11px] font-semibold ${focusActive ? "text-blue-600 dark:text-blue-300" : "text-slate-500 dark:text-slate-400"}`}>
-                                                {focusActive ? "In session" : "Ready"}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="mb-4 flex items-center justify-center gap-2">
-                                    <motion.button type="button" whileTap={{ scale: 0.94 }} onClick={toggleFocus} className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-[0_8px_18px_-10px_rgba(37,99,235,0.9)]">
-                                        {focusActive ? <FaPause size={12} /> : <FaPlay size={12} className="ml-0.5" />}
-                                    </motion.button>
-                                    <motion.button type="button" whileTap={{ scale: 0.94 }} onClick={resetFocus} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
-                                        <FaRedo size={12} />
-                                    </motion.button>
-                                    {pendingTasks.length > 1 && (
-                                        <motion.button type="button" whileTap={{ scale: 0.94 }} onClick={nextFocusTask} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
-                                            <FaStepForward size={11} />
-                                        </motion.button>
-                                    )}
-                                </div>
-
-                                <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900">
-                                    <p className="text-[11px] uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">Selected task</p>
-                                    <p className="mt-1 truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
-                                        {activeFocusTask?.title || "Pick a task from Schedule below"}
-                                    </p>
-                                </div>
+                        <div className="relative z-10">
+                            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                                <span className="inline-flex items-center rounded-full border border-white/60 bg-white/55 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-indigo-700 backdrop-blur-lg dark:border-white/20 dark:bg-white/[0.06] dark:text-indigo-200">
+                                    Focus Primary
+                                </span>
+                                <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
+                                    {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+                                </span>
                             </div>
 
-                            <div className={`${INNER_CARD} flex min-h-full flex-col`}>
-                                <div className="mb-3 flex items-center justify-between">
-                                    <p className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">AI coach</p>
-                                    <motion.span
-                                        className="inline-flex h-2.5 w-2.5 rounded-full bg-blue-500"
-                                        animate={{ opacity: [0.45, 1, 0.45] }}
-                                        transition={{ duration: 1.8, repeat: Infinity }}
-                                    />
+                            <h1 className="text-2xl leading-tight text-slate-900 sm:text-3xl dark:text-white [font-family:'Space_Grotesk',sans-serif]">
+                                {getGreeting()}, {getDisplayName(userProfile)}
+                            </h1>
+                            <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
+                                Start with one clear deep-work block, then move into scheduling and progress review.
+                            </p>
+
+                            <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div className={`${INNER_CARD} min-w-0`}>
+                                    <div className="mb-4 flex items-center justify-between">
+                                        <p className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">Focus timer</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400">{Math.round(focusDurationSeconds / 60)} min block</p>
+                                    </div>
+
+                                    <div className="relative mx-auto mb-4 grid h-44 w-44 place-items-center">
+                                        <motion.div
+                                            className="absolute inset-4 rounded-full bg-indigo-500/35 blur-2xl"
+                                            animate={focusActive ? { opacity: [0.26, 0.5, 0.26], scale: [0.98, 1.04, 0.98] } : { opacity: 0.22, scale: 1 }}
+                                            transition={focusActive ? { duration: 1.8, repeat: Infinity } : { duration: 0.3 }}
+                                        />
+
+                                        <div
+                                            className="relative grid h-full w-full place-items-center rounded-full p-2"
+                                            style={{
+                                                background: `conic-gradient(#4f46e5 ${focusProgressAngle}deg, rgba(148,163,184,0.24) 0deg)`
+                                            }}
+                                        >
+                                            <div className="grid h-full w-full place-items-center rounded-full border border-white/60 bg-white/70 backdrop-blur-xl dark:border-white/20 dark:bg-white/[0.06]">
+                                                <p className="text-[10px] uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">{focusProgressPct}% complete</p>
+                                                <p className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">{formatFocusTime(focusSecondsLeft)}</p>
+                                                <p className={`text-[11px] font-semibold ${focusActive ? "text-indigo-600 dark:text-indigo-300" : "text-slate-500 dark:text-slate-400"}`}>
+                                                    {focusActive ? "In session" : "Ready"}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-4 flex items-center justify-center gap-2">
+                                        <motion.button type="button" whileTap={{ scale: 0.95 }} onClick={toggleFocus} className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 via-indigo-500 to-violet-500 text-white shadow-[0_10px_22px_-12px_rgba(79,70,229,0.9)]">
+                                            {focusActive ? <FaPause size={12} /> : <FaPlay size={12} className="ml-0.5" />}
+                                        </motion.button>
+                                        <motion.button type="button" whileTap={{ scale: 0.95 }} onClick={resetFocus} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/60 bg-white/60 text-slate-600 backdrop-blur-xl dark:border-white/20 dark:bg-white/[0.06] dark:text-slate-300">
+                                            <FaRedo size={12} />
+                                        </motion.button>
+                                        {pendingTasks.length > 1 && (
+                                            <motion.button type="button" whileTap={{ scale: 0.95 }} onClick={nextFocusTask} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/60 bg-white/60 text-slate-600 backdrop-blur-xl dark:border-white/20 dark:bg-white/[0.06] dark:text-slate-300">
+                                                <FaStepForward size={11} />
+                                            </motion.button>
+                                        )}
+                                    </div>
+
+                                    <div className="rounded-xl border border-white/60 bg-white/50 px-3 py-2 backdrop-blur-xl dark:border-white/20 dark:bg-white/[0.04]">
+                                        <p className="text-[11px] uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">Selected task</p>
+                                        <p className="mt-1 truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
+                                            {activeFocusTask?.title || "Pick a task from Schedule below"}
+                                        </p>
+                                    </div>
                                 </div>
 
-                                <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                                    {insight?.today_action || "Ask AI to break down your next focus session into clear steps."}
-                                </p>
-                                <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                                    {insight?.summary || "Keep actions short, measurable, and tied to one immediate outcome."}
-                                </p>
-
-                                <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-                                    <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900">
-                                        <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-                                            <FaBolt size={11} className="text-blue-500" />
-                                            Focus Load
-                                        </div>
-                                        <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">{formatMinutes(totalPendingMinutes)}</p>
+                                <div className={`${INNER_CARD} flex min-h-full flex-col`}>
+                                    <div className="mb-3 flex items-center justify-between">
+                                        <p className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">AI coach</p>
+                                        <motion.span
+                                            className="inline-flex h-2.5 w-2.5 rounded-full bg-indigo-400"
+                                            animate={{ opacity: [0.5, 1, 0.5] }}
+                                            transition={{ duration: 1.8, repeat: Infinity }}
+                                        />
                                     </div>
-                                    <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900">
-                                        <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-                                            <FaBrain size={11} className="text-blue-500" />
-                                            Completion
-                                        </div>
-                                        <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">{completionRate}%</p>
-                                    </div>
-                                </div>
 
-                                <div className="mt-4 flex flex-wrap items-center gap-2">
-                                    <motion.button
-                                        type="button"
-                                        whileTap={{ scale: 0.96 }}
-                                        onClick={() => navigate("/assistant", { state: { initialMessage: focusPrompt } })}
-                                        className={PRIMARY_BUTTON}
-                                    >
-                                        Ask AI Coach
-                                        <FaArrowRight size={12} />
-                                    </motion.button>
-                                    <VoiceCoachButton onClick={() => setVoicePanelOpen(true)} />
+                                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                                        {insight?.today_action || "Ask AI to break down your next focus session into clear steps."}
+                                    </p>
+                                    <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                        {insight?.summary || "Keep actions short, measurable, and tied to one immediate outcome."}
+                                    </p>
+
+                                    <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+                                        <div className="rounded-xl border border-white/60 bg-white/50 px-3 py-2 backdrop-blur-xl dark:border-white/20 dark:bg-white/[0.04]">
+                                            <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                                                <FaBolt size={11} className="text-indigo-500" />
+                                                Focus Load
+                                            </div>
+                                            <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">{formatMinutes(totalPendingMinutes)}</p>
+                                        </div>
+                                        <div className="rounded-xl border border-white/60 bg-white/50 px-3 py-2 backdrop-blur-xl dark:border-white/20 dark:bg-white/[0.04]">
+                                            <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                                                <FaBrain size={11} className="text-indigo-500" />
+                                                Completion
+                                            </div>
+                                            <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">{completionRate}%</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-4 flex flex-wrap items-center gap-2">
+                                        <motion.button
+                                            type="button"
+                                            whileTap={{ scale: 0.96 }}
+                                            onClick={() => navigate("/assistant", { state: { initialMessage: focusPrompt } })}
+                                            className={PRIMARY_BUTTON}
+                                        >
+                                            Ask AI Coach
+                                            <FaArrowRight size={12} />
+                                        </motion.button>
+                                        <VoiceCoachButton onClick={() => setVoicePanelOpen(true)} />
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </motion.section>
 
                     <div className="flex flex-col gap-5 lg:col-span-4">
-                        <motion.div variants={itemVariants} whileHover={{ y: -3 }} className={`${SURFACE_CARD} p-5`}>
-                            <div className="mb-3 flex items-center justify-between">
-                                <p className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">Momentum</p>
-                                <motion.div
-                                    className="text-2xl"
-                                    animate={streakCurrent > 0 ? { scale: [1, 1.08, 1] } : { scale: 1 }}
-                                    transition={streakCurrent > 0 ? { duration: 2, repeat: Infinity } : { duration: 0.2 }}
-                                >
-                                    🔥
-                                </motion.div>
-                            </div>
+                        <motion.div variants={itemVariants} whileHover={{ y: -4 }} className={`${SURFACE_CARD} p-5`}>
+                            <motion.div
+                                className="pointer-events-none absolute -right-14 -top-14 h-36 w-36 rounded-full bg-orange-400/30 blur-3xl"
+                                animate={{ opacity: [0.2, 0.38, 0.2], scale: [0.96, 1.06, 0.96] }}
+                                transition={{ duration: 2.6, repeat: Infinity }}
+                            />
 
-                            <p className="text-2xl font-semibold text-slate-900 dark:text-white">{streakCurrent} day streak</p>
-                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Best: {streakLongest} days</p>
+                            <div className="relative z-10">
+                                <div className="mb-3 flex items-center justify-between">
+                                    <p className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">Momentum</p>
+                                    <motion.div
+                                        className="text-2xl"
+                                        animate={streakCurrent > 0 ? { scale: [1, 1.08, 1] } : { scale: 1 }}
+                                        transition={streakCurrent > 0 ? { duration: 2, repeat: Infinity } : { duration: 0.2 }}
+                                    >
+                                        🔥
+                                    </motion.div>
+                                </div>
 
-                            <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
-                                <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${streakProgress}%` }}
-                                    transition={{ duration: 0.7, ease: "easeOut" }}
-                                    className="h-full rounded-full bg-gradient-to-r from-orange-500 to-orange-400"
-                                />
+                                <p className="text-2xl font-semibold text-slate-900 dark:text-white">{streakCurrent} day streak</p>
+                                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Best: {streakLongest} days</p>
+
+                                <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/60 dark:bg-white/10">
+                                    <motion.div
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${streakProgress}%` }}
+                                        transition={{ duration: 0.8, ease: "easeOut" }}
+                                        className="h-full rounded-full bg-gradient-to-r from-orange-500 to-amber-400"
+                                    />
+                                </div>
+                                <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                    {Math.max(nextStreakMilestone - streakCurrent, 0)} days to {nextStreakMilestone}-day milestone
+                                </p>
                             </div>
-                            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                                {Math.max(nextStreakMilestone - streakCurrent, 0)} days to {nextStreakMilestone}-day milestone
-                            </p>
                         </motion.div>
 
-                        <motion.div variants={itemVariants} whileHover={{ y: -3 }} className={`${SURFACE_CARD} p-5`}>
+                        <motion.div variants={itemVariants} whileHover={{ y: -4 }} className={`${SURFACE_CARD} p-5`}>
                             <p className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">Today snapshot</p>
                             <div className="mt-3 grid grid-cols-3 gap-2">
-                                <div className="rounded-xl border border-slate-200 bg-white px-3 py-3 text-center dark:border-slate-700 dark:bg-slate-900">
+                                <div className="rounded-xl border border-white/60 bg-white/50 px-3 py-3 text-center backdrop-blur-xl dark:border-white/20 dark:bg-white/[0.04]">
                                     <p className="text-[11px] text-slate-500 dark:text-slate-400">Total</p>
                                     <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-white">{totalTasks}</p>
                                 </div>
-                                <div className="rounded-xl border border-slate-200 bg-white px-3 py-3 text-center dark:border-slate-700 dark:bg-slate-900">
+                                <div className="rounded-xl border border-white/60 bg-white/50 px-3 py-3 text-center backdrop-blur-xl dark:border-white/20 dark:bg-white/[0.04]">
                                     <p className="text-[11px] text-slate-500 dark:text-slate-400">Done</p>
-                                    <p className="mt-1 text-lg font-semibold text-blue-600 dark:text-blue-300">{completedTasks}</p>
+                                    <p className="mt-1 text-lg font-semibold text-indigo-600 dark:text-indigo-300">{completedTasks}</p>
                                 </div>
-                                <div className="rounded-xl border border-slate-200 bg-white px-3 py-3 text-center dark:border-slate-700 dark:bg-slate-900">
+                                <div className="rounded-xl border border-white/60 bg-white/50 px-3 py-3 text-center backdrop-blur-xl dark:border-white/20 dark:bg-white/[0.04]">
                                     <p className="text-[11px] text-slate-500 dark:text-slate-400">Pending</p>
                                     <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-white">{pendingCount}</p>
                                 </div>
                             </div>
 
-                            <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                            <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/60 dark:bg-white/10">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${completionRate}%` }}
-                                    transition={{ duration: 0.7, ease: "easeOut" }}
-                                    className="h-full rounded-full bg-gradient-to-r from-blue-600 to-blue-500"
+                                    transition={{ duration: 0.8, ease: "easeOut" }}
+                                    className="h-full rounded-full bg-gradient-to-r from-blue-600 via-indigo-500 to-violet-500"
                                 />
                             </div>
 
@@ -439,20 +472,20 @@ export default function OverviewSection() {
                         </motion.div>
                     </div>
 
-                    <motion.div variants={itemVariants} whileHover={{ y: -3 }} className={`${SURFACE_CARD} p-[1px] lg:col-span-8`}>
+                    <motion.div variants={itemVariants} whileHover={{ y: -4 }} className={`${SURFACE_CARD} p-[1px] lg:col-span-8`}>
                         <div className="overflow-hidden rounded-[19px]">
                             <TaskSchedulerWidget tasks={tasks} />
                         </div>
                     </motion.div>
 
                     <div className="flex flex-col gap-5 lg:col-span-4">
-                        <motion.div variants={itemVariants} whileHover={{ y: -3 }} className={`${SURFACE_CARD} p-[1px]} overflow-hidden`}>
+                        <motion.div variants={itemVariants} whileHover={{ y: -4 }} className={`${SURFACE_CARD} overflow-hidden p-[1px]`}>
                             <div className="overflow-hidden rounded-[19px]">
                                 <ProgressChartWidget data={tasks} />
                             </div>
                         </motion.div>
 
-                        <motion.div variants={itemVariants} whileHover={{ y: -3 }} className={`${SURFACE_CARD} p-5`}>
+                        <motion.div variants={itemVariants} whileHover={{ y: -4 }} className={`${SURFACE_CARD} p-5`}>
                             <p className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">Execution shortcuts</p>
                             <div className="mt-3 flex flex-col gap-2">
                                 <motion.div whileTap={{ scale: 0.96 }}>
