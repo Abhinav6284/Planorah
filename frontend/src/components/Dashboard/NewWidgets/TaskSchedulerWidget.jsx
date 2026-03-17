@@ -1,28 +1,33 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { schedulerService } from '../../../api/schedulerService';
 import { FaTimes, FaClock, FaCheckCircle, FaLightbulb, FaExclamationTriangle, FaFlag, FaSpinner } from 'react-icons/fa';
 
+const SHELL_CLASS = 'rounded-[20px] border border-slate-200/80 bg-white/90 p-5 shadow-[0_14px_34px_-24px_rgba(15,23,42,0.42)] backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/90';
+const SECTION_CARD = 'rounded-2xl border border-slate-200/75 bg-white/80 p-3 dark:border-slate-700/80 dark:bg-slate-900/75';
+
 const TaskSchedulerWidget = ({ tasks = [] }) => {
-    // Generate dates
-    const days = Array.from({ length: 14 }, (_, i) => {
-        const d = new Date();
-        d.setDate(d.getDate() + i);
-        return {
-            date: d,
-            dayName: d.toLocaleDateString('en-US', { weekday: 'short' }),
-            dayNum: d.getDate(),
-            isoDate: d.toLocaleDateString('en-CA')
-        };
-    });
+    const days = useMemo(() => {
+        return Array.from({ length: 14 }, (_, i) => {
+            const d = new Date();
+            d.setDate(d.getDate() + i);
+            return {
+                date: d,
+                dayName: d.toLocaleDateString('en-US', { weekday: 'short' }),
+                dayNum: d.getDate(),
+                isoDate: d.toLocaleDateString('en-CA')
+            };
+        });
+    }, []);
 
     const [selectedDate, setSelectedDate] = useState(days[0].isoDate);
     const [selectedTask, setSelectedTask] = useState(null);
     const [guidance, setGuidance] = useState(null);
     const [loadingGuidance, setLoadingGuidance] = useState(false);
 
-    const currentTasks = tasks.filter(task => task.due_date === selectedDate);
-    const completedCount = currentTasks.filter(t => t.status === 'completed').length;
+    const currentTasks = tasks.filter((task) => task.due_date === selectedDate);
+    const completedCount = currentTasks.filter((task) => task.status === 'completed').length;
+    const completionPct = currentTasks.length > 0 ? Math.round((completedCount / currentTasks.length) * 100) : 0;
 
     const handleTaskClick = async (task) => {
         setSelectedTask(task);
@@ -38,19 +43,19 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                 generated: false,
                 objective: `Complete the task: ${task.title}`,
                 time_breakdown: [
-                    { duration: '10 min', activity: 'Review and understand the task' },
-                    { duration: '40 min', activity: 'Work on the main activity' },
-                    { duration: '10 min', activity: 'Review your work' }
+                    { duration: '10 min', activity: 'Review and frame the goal' },
+                    { duration: '40 min', activity: 'Execute the core work' },
+                    { duration: '10 min', activity: 'Review and summarize outcomes' }
                 ],
                 steps: [
-                    { step: 1, title: 'Understand the Task', description: task.description || 'Read through the task carefully.' },
-                    { step: 2, title: 'Gather Resources', description: 'Find any materials or tools you need.' },
-                    { step: 3, title: 'Start Working', description: 'Begin the main activity.' },
-                    { step: 4, title: 'Review & Document', description: 'Check what you accomplished and take notes.' }
+                    { step: 1, title: 'Clarify success', description: task.description || 'Define exactly what done looks like.' },
+                    { step: 2, title: 'Prepare resources', description: 'Gather references, tools, and blockers upfront.' },
+                    { step: 3, title: 'Execute deeply', description: 'Run uninterrupted focus blocks.' },
+                    { step: 4, title: 'Close loop', description: 'Document progress and next step.' }
                 ],
-                best_practices: ['Focus on understanding over rushing', 'Take short breaks if needed'],
-                common_mistakes: ['Skipping the planning phase', 'Not taking notes'],
-                expected_outcome: `By completing this task, you'll make meaningful progress on your learning goals.`
+                best_practices: ['Use time-boxed focus blocks', 'End with one measurable output'],
+                common_mistakes: ['Starting without success criteria', 'Switching context too often'],
+                expected_outcome: 'You move one meaningful step forward with clear evidence of progress.'
             });
         } finally {
             setLoadingGuidance(false);
@@ -63,232 +68,193 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
     };
 
     return (
-        <div className="bg-white dark:bg-black text-gray-900 dark:text-white rounded-[24px] p-4 sm:p-5 relative overflow-hidden shadow-sm border border-gray-100 dark:border-white/5 transition-all duration-200">
-
-            {/* Header: Date Strip */}
-            <div className="mb-3">
-                <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-base sm:text-lg font-semibold tracking-tight">Schedule</h3>
-                    <span className="text-xs font-medium text-gray-400">Days</span>
+        <div className={`${SHELL_CLASS} h-full overflow-hidden`}>
+            <div className="mb-4 flex items-center justify-between gap-2">
+                <div>
+                    <h3 className="text-base font-semibold text-slate-900 dark:text-white">Schedule</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">One place for daily execution tasks</p>
                 </div>
+                <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
+                    {currentTasks.length} tasks
+                </span>
+            </div>
 
-                {/* Date Scroll Area */}
-                <div className="flex gap-1.5 sm:gap-2 overflow-x-auto py-1 px-0.5 -mx-0.5 no-scrollbar" style={{ scrollbarWidth: 'none' }}>
+            <div className="mb-4 overflow-x-auto pb-1 no-scrollbar">
+                <div className="flex min-w-max gap-2">
                     {days.map((day) => {
                         const isSelected = selectedDate === day.isoDate;
                         return (
-                            <button
+                            <motion.button
+                                whileTap={{ scale: 0.96 }}
                                 key={day.isoDate}
                                 onClick={() => setSelectedDate(day.isoDate)}
-                                className={`flex flex-col items-center justify-center min-w-[42px] sm:min-w-[50px] h-[58px] sm:h-[66px] rounded-2xl transition-all duration-200 flex-shrink-0 ${isSelected
-                                    ? 'bg-gradient-to-br from-cyan-100 to-sky-200 text-slate-900 scale-105 z-10'
-                                    : 'bg-gray-100 dark:bg-[#1C1C1E] text-gray-500 hover:bg-gray-200 dark:hover:bg-[#2C2C2E] hover:text-gray-900 dark:hover:text-white'
+                                className={`flex h-14 w-12 flex-col items-center justify-center rounded-xl border text-xs transition-all ${isSelected
+                                    ? 'border-blue-300 bg-gradient-to-b from-blue-600 to-blue-500 text-white shadow-[0_10px_18px_-12px_rgba(37,99,235,0.9)]'
+                                    : 'border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-blue-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-blue-500/40 dark:hover:text-blue-300'
                                     }`}
                             >
-                                <span className={`text-sm sm:text-base font-bold leading-none mb-0.5 ${isSelected ? 'text-black' : 'text-gray-700 dark:text-gray-200'}`}>
-                                    {String(day.dayNum).padStart(2, '0')}
-                                </span>
-                                <span className={`text-[9px] sm:text-[10px] font-medium tracking-wide ${isSelected ? 'text-gray-900' : 'text-gray-500 dark:text-gray-600'}`}>
-                                    {day.dayName}
-                                </span>
-                            </button>
+                                <span className="text-base font-semibold leading-none">{String(day.dayNum).padStart(2, '0')}</span>
+                                <span className="mt-1 text-[10px] uppercase tracking-[0.08em]">{day.dayName}</span>
+                            </motion.button>
                         );
                     })}
                 </div>
             </div>
 
-
-            {/* Tasks List */}
-            <div className="mt-2">
-                <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-semibold opacity-70 tracking-wide">Tasks ({currentTasks.length})</span>
-                    {currentTasks.length > 0 && (
-                        <div className="flex items-center gap-3">
-                            <div className="w-24 h-2 bg-gray-200 dark:bg-white/5 rounded-full overflow-hidden backdrop-blur-sm">
-                                <div
-                                    className="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(74,222,128,0.4)]"
-                                    style={{ width: `${(completedCount / currentTasks.length) * 100}%` }}
-                                />
-                            </div>
-                            <span className="text-sm font-mono opacity-60 text-gray-400 dark:text-gray-300">{Math.round((completedCount / currentTasks.length) * 100)}%</span>
-                        </div>
-                    )}
+            <div className={`${SECTION_CARD} mb-4`}>
+                <div className="mb-2 flex items-center justify-between gap-2">
+                    <span className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">Day progress</span>
+                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">{completionPct}%</span>
                 </div>
-
-                <div className="space-y-3">
-                    <AnimatePresence mode='popLayout'>
-                        {currentTasks.length > 0 ? (
-                            currentTasks.map((task, i) => (
-                                <motion.div
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: 20 }}
-                                    transition={{ delay: i * 0.05 }}
-                                    key={task.id || i}
-                                    onClick={() => handleTaskClick(task)}
-                                    className="group flex items-center gap-3 p-3 rounded-xl bg-white/60 dark:bg-[#1C1C1E]/60 hover:bg-white/80 dark:hover:bg-[#2C2C2E]/80 backdrop-blur-md border border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10 transition-all hover:shadow-md cursor-pointer"
-                                >
-                                    {/* Task Number/Icon */}
-                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${task.status === 'completed' ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
-                                        task.status === 'in_progress' ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400' :
-                                            'bg-sky-100 dark:bg-sky-500/20 text-cyan-700 dark:text-cyan-300'
-                                        }`}>
-                                        {task.status === 'completed' ? '✓' : i + 1}
-                                    </div>
-
-                                    {/* Task Content */}
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className={`text-sm font-semibold text-gray-900 dark:text-white truncate ${task.status === 'completed' ? 'opacity-50 line-through' : ''}`}>
-                                            {task.title}
-                                        </h4>
-                                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                            {task.roadmap_title && (
-                                                <>
-                                                    <span className="truncate max-w-[150px]">📚 {task.roadmap_title}</span>
-                                                    <span>•</span>
-                                                </>
-                                            )}
-                                            <span>⏱️ {task.estimated_minutes || 60} min</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Status Badge */}
-                                    <div className="flex items-center gap-3 flex-shrink-0">
-                                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${task.status === 'completed' ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
-                                            task.status === 'in_progress' ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400' :
-                                                'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400'
-                                            }`}>
-                                            {task.status?.replace('_', ' ')}
-                                        </span>
-
-                                        {/* Arrow indicator */}
-                                        <span className="text-gray-300 dark:text-gray-600 group-hover:text-cyan-500 dark:group-hover:text-cyan-300 transition-colors">
-                                            →
-                                        </span>
-                                    </div>
-                                </motion.div>
-                            ))
-                        ) : (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="flex flex-col items-center justify-center py-6 text-center opacity-40"
-                            >
-                                <span className="text-3xl mb-2 grayscale opacity-50">☕</span>
-                                <p className="text-sm font-medium text-gray-900 dark:text-white">No tasks scheduled</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Time to relax or plan ahead!</p>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                    <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${completionPct}%` }}
+                        transition={{ duration: 0.6, ease: 'easeOut' }}
+                        className="h-full rounded-full bg-gradient-to-r from-blue-600 to-blue-500"
+                    />
                 </div>
             </div>
 
-            {/* Task Guidance Modal */}
+            <div className="space-y-2.5">
+                <AnimatePresence mode="popLayout">
+                    {currentTasks.length > 0 ? (
+                        currentTasks.map((task, i) => {
+                            const taskTone = task.status === 'completed'
+                                ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/12 dark:text-blue-300'
+                                : task.status === 'in_progress'
+                                    ? 'border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-500/30 dark:bg-orange-500/12 dark:text-orange-300'
+                                    : 'border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-300';
+
+                            return (
+                                <motion.button
+                                    type="button"
+                                    key={task.id || i}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -8 }}
+                                    transition={{ duration: 0.22, delay: i * 0.03 }}
+                                    onClick={() => handleTaskClick(task)}
+                                    className="group flex w-full items-center gap-3 rounded-xl border border-slate-200/80 bg-white/85 p-3 text-left transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_10px_18px_-14px_rgba(37,99,235,0.55)] dark:border-slate-700 dark:bg-slate-900/80 dark:hover:border-blue-500/40"
+                                >
+                                    <div className={`inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border text-xs font-semibold ${taskTone}`}>
+                                        {task.status === 'completed' ? '✓' : i + 1}
+                                    </div>
+
+                                    <div className="min-w-0 flex-1">
+                                        <p className={`truncate text-sm font-semibold ${task.status === 'completed' ? 'text-slate-500 line-through dark:text-slate-400' : 'text-slate-900 dark:text-slate-100'}`}>
+                                            {task.title}
+                                        </p>
+                                        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                                            {task.roadmap_title && <span className="truncate">{task.roadmap_title}</span>}
+                                            <span>•</span>
+                                            <span>{task.estimated_minutes || 60} min</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="inline-flex items-center gap-2">
+                                        <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${taskTone}`}>
+                                            {task.status?.replace('_', ' ') || 'pending'}
+                                        </span>
+                                        <span className="text-slate-300 transition-colors group-hover:text-blue-500 dark:text-slate-600 dark:group-hover:text-blue-300">→</span>
+                                    </div>
+                                </motion.button>
+                            );
+                        })
+                    ) : (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-400"
+                        >
+                            No tasks scheduled for this day.
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+
             <AnimatePresence>
                 {selectedTask && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm"
                         onClick={closeModal}
                     >
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className="bg-white dark:bg-[#1C1C1E] rounded-3xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden"
-                            onClick={(e) => e.stopPropagation()}
+                            initial={{ opacity: 0, y: 16, scale: 0.96 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 16, scale: 0.96 }}
+                            transition={{ type: 'spring', damping: 24, stiffness: 280 }}
+                            className="max-h-[85vh] w-full max-w-2xl overflow-hidden rounded-[20px] border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900"
+                            onClick={(event) => event.stopPropagation()}
                         >
-                            {/* Modal Header */}
-                            <div className="p-6 border-b border-gray-100 dark:border-white/10 bg-gradient-to-r from-cyan-500/10 to-blue-500/10">
-                                <div className="flex justify-between items-start">
-                                    <div className="flex-1 pr-4">
-                                        <div className="flex items-center gap-2 mb-2">
+                            <div className="border-b border-slate-200 bg-gradient-to-r from-blue-600/10 to-blue-500/5 p-5 dark:border-slate-700">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="min-w-0 flex-1">
+                                        <div className="mb-2 flex items-center gap-2">
                                             <span className="text-2xl">{selectedTask.icon || '📝'}</span>
-                                            <span className={`text-xs px-2 py-1 rounded-full font-medium ${selectedTask.status === 'completed' ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
-                                                selectedTask.status === 'in_progress' ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400' :
-                                                    'bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-400'
-                                                }`}>
-                                                {selectedTask.status?.replace('_', ' ')}
+                                            <span className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                                                {selectedTask.status?.replace('_', ' ') || 'pending'}
                                             </span>
                                         </div>
-                                        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{selectedTask.title}</h2>
+                                        <h2 className="truncate text-lg font-semibold text-slate-900 dark:text-white">{selectedTask.title}</h2>
                                         {selectedTask.roadmap_title && (
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">📚 {selectedTask.roadmap_title}</p>
+                                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{selectedTask.roadmap_title}</p>
                                         )}
                                     </div>
-                                    <button
-                                        onClick={closeModal}
-                                        className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
-                                    >
-                                        <FaTimes className="text-gray-400" />
-                                    </button>
+
+                                    <motion.button whileTap={{ scale: 0.94 }} onClick={closeModal} className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:text-white">
+                                        <FaTimes size={12} />
+                                    </motion.button>
                                 </div>
 
-                                {/* Time & Day Info */}
-                                <div className="flex gap-4 mt-4 text-sm">
-                                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                                        <FaClock className="text-cyan-500" />
-                                        <span>{selectedTask.estimated_minutes || 60} min</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                                        <FaFlag className="text-blue-500" />
-                                        <span>Day {selectedTask.day}</span>
-                                    </div>
+                                <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-slate-600 dark:text-slate-300">
+                                    <div className="inline-flex items-center gap-1.5"><FaClock className="text-blue-500" /> {selectedTask.estimated_minutes || 60} min</div>
+                                    <div className="inline-flex items-center gap-1.5"><FaFlag className="text-orange-500" /> Day {selectedTask.day}</div>
                                 </div>
                             </div>
 
-                            {/* Modal Content */}
-                            <div className="p-6 overflow-y-auto max-h-[60vh]">
+                            <div className="max-h-[60vh] overflow-y-auto p-5">
                                 {loadingGuidance ? (
-                                    <div className="flex flex-col items-center justify-center py-12">
-                                        <FaSpinner className="text-4xl text-cyan-500 animate-spin mb-4" />
-                                        <p className="text-gray-500 dark:text-gray-400">Generating your personalized guide...</p>
+                                    <div className="py-10 text-center">
+                                        <FaSpinner className="mx-auto mb-3 animate-spin text-3xl text-blue-500" />
+                                        <p className="text-sm text-slate-500 dark:text-slate-400">Generating task guidance...</p>
                                     </div>
                                 ) : guidance ? (
-                                    <div className="space-y-6">
-                                        {/* Objective */}
-                                        <div className="p-4 rounded-2xl bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-200 dark:border-cyan-500/20">
-                                            <h3 className="font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                                                🎯 Objective
-                                            </h3>
-                                            <p className="text-gray-700 dark:text-gray-300">{guidance.objective}</p>
+                                    <div className="space-y-5">
+                                        <div className="rounded-xl border border-blue-200 bg-blue-50/70 p-4 dark:border-blue-500/30 dark:bg-blue-500/10">
+                                            <h3 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">Objective</h3>
+                                            <p className="text-sm text-slate-700 dark:text-slate-200">{guidance.objective}</p>
                                         </div>
 
-                                        {/* Time Breakdown */}
                                         {guidance.time_breakdown && (
                                             <div>
-                                                <h3 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                                                    <FaClock className="text-cyan-500" /> Time Breakdown
-                                                </h3>
+                                                <h3 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">Time Breakdown</h3>
                                                 <div className="flex flex-wrap gap-2">
-                                                    {guidance.time_breakdown.map((item, i) => (
-                                                        <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-white/5 text-sm">
-                                                            <span className="font-bold text-cyan-700 dark:text-cyan-300">{item.duration}</span>
-                                                            <span className="text-gray-600 dark:text-gray-400">{item.activity}</span>
+                                                    {guidance.time_breakdown.map((item, index) => (
+                                                        <div key={index} className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs dark:border-slate-700 dark:bg-slate-800/70">
+                                                            <span className="font-semibold text-blue-700 dark:text-blue-300">{item.duration}</span>
+                                                            <span className="ml-1 text-slate-600 dark:text-slate-300">{item.activity}</span>
                                                         </div>
                                                     ))}
                                                 </div>
                                             </div>
                                         )}
 
-                                        {/* Step-by-Step Guide */}
                                         {guidance.steps && (
                                             <div>
-                                                <h3 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                                                    📝 Step-by-Step Guide
-                                                </h3>
-                                                <div className="space-y-3">
-                                                    {guidance.steps.map((step, i) => (
-                                                        <div key={i} className="flex gap-3 p-3 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
-                                                            <div className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-500/20 text-cyan-700 dark:text-cyan-300 flex items-center justify-center font-bold text-sm flex-shrink-0">
-                                                                {step.step || i + 1}
+                                                <h3 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">Step-by-Step</h3>
+                                                <div className="space-y-2">
+                                                    {guidance.steps.map((step, index) => (
+                                                        <div key={index} className="flex gap-3 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800/70">
+                                                            <div className="inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">
+                                                                {step.step || index + 1}
                                                             </div>
                                                             <div>
-                                                                <h4 className="font-semibold text-gray-900 dark:text-white">{step.title}</h4>
-                                                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{step.description}</p>
+                                                                <p className="text-sm font-semibold text-slate-900 dark:text-white">{step.title}</p>
+                                                                <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-300">{step.description}</p>
                                                             </div>
                                                         </div>
                                                     ))}
@@ -296,60 +262,48 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                             </div>
                                         )}
 
-                                        {/* Best Practices */}
                                         {guidance.best_practices && (
                                             <div>
-                                                <h3 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                                                    <FaCheckCircle className="text-green-500" /> Best Practices
+                                                <h3 className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
+                                                    <FaCheckCircle className="text-blue-500" /> Best Practices
                                                 </h3>
-                                                <ul className="space-y-2">
-                                                    {guidance.best_practices.map((tip, i) => (
-                                                        <li key={i} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
-                                                            <span className="text-green-500 mt-0.5">✓</span>
-                                                            {tip}
-                                                        </li>
+                                                <ul className="space-y-1.5">
+                                                    {guidance.best_practices.map((tip, index) => (
+                                                        <li key={index} className="text-sm text-slate-700 dark:text-slate-200">• {tip}</li>
                                                     ))}
                                                 </ul>
                                             </div>
                                         )}
 
-                                        {/* Common Mistakes */}
                                         {guidance.common_mistakes && (
                                             <div>
-                                                <h3 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                                                    <FaExclamationTriangle className="text-orange-500" /> Common Mistakes to Avoid
+                                                <h3 className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
+                                                    <FaExclamationTriangle className="text-orange-500" /> Mistakes to Avoid
                                                 </h3>
-                                                <ul className="space-y-2">
-                                                    {guidance.common_mistakes.map((mistake, i) => (
-                                                        <li key={i} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
-                                                            <span className="text-orange-500 mt-0.5">⚠</span>
-                                                            {mistake}
-                                                        </li>
+                                                <ul className="space-y-1.5">
+                                                    {guidance.common_mistakes.map((mistake, index) => (
+                                                        <li key={index} className="text-sm text-slate-700 dark:text-slate-200">• {mistake}</li>
                                                     ))}
                                                 </ul>
                                             </div>
                                         )}
 
-                                        {/* Expected Outcome */}
                                         {guidance.expected_outcome && (
-                                            <div className="p-4 rounded-2xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20">
-                                                <h3 className="font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                                                    🏁 Expected Outcome
-                                                </h3>
-                                                <p className="text-gray-700 dark:text-gray-300">{guidance.expected_outcome}</p>
+                                            <div className="rounded-xl border border-orange-200 bg-orange-50/70 p-4 dark:border-orange-500/30 dark:bg-orange-500/10">
+                                                <h3 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">Expected Outcome</h3>
+                                                <p className="text-sm text-slate-700 dark:text-slate-200">{guidance.expected_outcome}</p>
                                             </div>
                                         )}
 
-                                        {/* Quick Tips */}
                                         {guidance.quick_tips && guidance.quick_tips.length > 0 && (
                                             <div>
-                                                <h3 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                                                    <FaLightbulb className="text-yellow-500" /> Quick Tips
+                                                <h3 className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
+                                                    <FaLightbulb className="text-orange-500" /> Quick Tips
                                                 </h3>
                                                 <div className="flex flex-wrap gap-2">
-                                                    {guidance.quick_tips.map((tip, i) => (
-                                                        <span key={i} className="px-3 py-1 rounded-full text-sm bg-yellow-100 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-500/20">
-                                                            💡 {tip}
+                                                    {guidance.quick_tips.map((tip, index) => (
+                                                        <span key={index} className="rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-medium text-orange-700 dark:border-orange-500/30 dark:bg-orange-500/10 dark:text-orange-300">
+                                                            {tip}
                                                         </span>
                                                     ))}
                                                 </div>
@@ -362,10 +316,8 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                     </motion.div>
                 )}
             </AnimatePresence>
-
         </div>
     );
 };
 
 export default TaskSchedulerWidget;
-

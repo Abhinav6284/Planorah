@@ -1,137 +1,112 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 const ProgressChartWidget = ({ data = [] }) => {
-    // Calculate last 7 days data
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const last7Days = [...Array(7)].map((_, i) => {
-        const d = new Date(today);
-        d.setDate(d.getDate() - (6 - i));
+    const last7Days = [...Array(7)].map((_, index) => {
+        const date = new Date(today);
+        date.setDate(date.getDate() - (6 - index));
         return {
-            date: d.toISOString().split('T')[0],
-            day: d.toLocaleDateString('en-US', { weekday: 'short' }),
-            fullDate: d,
-            isToday: i === 6  // Last item in array is today
+            date: date.toISOString().split('T')[0],
+            day: date.toLocaleDateString('en-US', { weekday: 'short' }),
+            isToday: index === 6,
         };
     });
 
-    const chartData = last7Days.map(dayInfo => {
-        const dayTasks = data.filter(t => {
-            if (!t.completed_at) return false;
-            return t.completed_at.startsWith(dayInfo.date);
+    const chartData = last7Days.map((dayInfo) => {
+        const dayTasks = data.filter((task) => {
+            if (!task.completed_at) return false;
+            return task.completed_at.startsWith(dayInfo.date);
         });
 
         const completedCount = dayTasks.length;
-        // Normalize to 100% for the chart height (assuming 5 tasks/day is 100% for visual)
         const value = Math.min((completedCount / 5) * 100, 100);
 
         return {
             day: dayInfo.day,
-            value: value,
+            value,
             count: completedCount,
-            isToday: dayInfo.isToday
+            isToday: dayInfo.isToday,
         };
     });
 
-    // Calculate total completed this week
-    const totalCompleted = chartData.reduce((a, b) => a + b.count, 0);
-
-    // Calculate average percentage, handle zero case
+    const totalCompleted = chartData.reduce((sum, item) => sum + item.count, 0);
     const avgValue = chartData.length > 0
-        ? Math.round(chartData.reduce((a, b) => a + b.value, 0) / chartData.length)
+        ? Math.round(chartData.reduce((sum, item) => sum + item.value, 0) / chartData.length)
         : 0;
 
     return (
-        <div className="bg-white dark:bg-[#1C1C1E] rounded-[28px] p-5 h-full flex flex-col relative overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-5">
+        <div className="h-full rounded-[20px] border border-slate-200/80 bg-white/90 p-5 shadow-[0_14px_34px_-24px_rgba(15,23,42,0.42)] backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/90">
+            <div className="mb-5 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/20">
-                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-[0_10px_18px_-12px_rgba(37,99,235,0.85)]">
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v8m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V7a2 2 0 012-2h2a2 2 0 012 2v10a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
                     </div>
                     <div>
-                        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Weekly Progress</h3>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {totalCompleted} task{totalCompleted !== 1 ? 's' : ''} completed
-                        </p>
+                        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Weekly Progress</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">{totalCompleted} completed this week</p>
                     </div>
                 </div>
+
                 <div className="text-right">
-                    <span className="text-2xl font-bold text-yellow-500">{avgValue}%</span>
-                    <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider">avg rate</p>
+                    <p className="text-2xl font-semibold text-blue-600 dark:text-blue-300">{avgValue}%</p>
+                    <p className="text-[10px] uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">avg completion</p>
                 </div>
             </div>
 
-            {/* Chart Area */}
-            <div className="flex-1 flex items-end gap-3 min-h-[100px] px-1">
-                {chartData.map((item, i) => {
-                    // Show actual progress, but ensure minimum visible height
-                    const displayHeight = item.value > 0 ? Math.max(item.value, 20) : 12;
+            <div className="flex min-h-[120px] items-end gap-2.5">
+                {chartData.map((item, index) => {
+                    const displayHeight = item.value > 0 ? Math.max(item.value, 16) : 10;
 
                     return (
-                        <div
-                            key={i}
-                            className="flex-1 flex flex-col items-center gap-2 group"
+                        <motion.div
+                            key={index}
+                            whileHover={{ y: -2 }}
+                            className="group flex flex-1 flex-col items-center gap-2"
                         >
-                            {/* Bar container */}
-                            <div className="relative w-full h-full flex items-end justify-center">
-                                {/* Hover tooltip */}
-                                <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10">
-                                    <div className="bg-gray-900 dark:bg-gray-700 text-white text-[10px] px-2 py-1 rounded-lg whitespace-nowrap shadow-lg">
-                                        {item.count} task{item.count !== 1 ? 's' : ''}
-                                    </div>
+                            <div className="relative flex h-full w-full items-end justify-center">
+                                <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 rounded-lg bg-slate-900 px-2 py-1 text-[10px] text-white opacity-0 transition-opacity group-hover:opacity-100 dark:bg-slate-700">
+                                    {item.count} task{item.count !== 1 ? 's' : ''}
                                 </div>
 
-                                {/* The bar */}
-                                <div
-                                    className={`w-full max-w-[40px] rounded-lg transition-all duration-300 cursor-pointer
-                                        ${item.isToday
-                                            ? 'bg-gradient-to-t from-yellow-500 to-yellow-400 shadow-md shadow-yellow-500/30'
-                                            : item.count > 0
-                                                ? 'bg-gradient-to-t from-emerald-500 to-emerald-400 shadow-sm'
-                                                : 'bg-gray-100 dark:bg-gray-800'
-                                        }
-                                        group-hover:scale-105 group-hover:shadow-lg
-                                    `}
-                                    style={{ height: `${displayHeight}%`, minHeight: '10px' }}
+                                <motion.div
+                                    initial={{ height: 0 }}
+                                    animate={{ height: `${displayHeight}%` }}
+                                    transition={{ duration: 0.55, delay: index * 0.04, ease: 'easeOut' }}
+                                    className={`w-full max-w-[34px] rounded-lg border transition-all duration-300 ${item.isToday
+                                        ? 'border-orange-300 bg-gradient-to-t from-orange-500 to-orange-400 shadow-[0_10px_18px_-12px_rgba(249,115,22,0.7)]'
+                                        : item.count > 0
+                                            ? 'border-blue-300 bg-gradient-to-t from-blue-600 to-blue-500 shadow-[0_10px_18px_-12px_rgba(37,99,235,0.7)]'
+                                            : 'border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800'
+                                        } group-hover:scale-[1.03]`}
                                 />
                             </div>
 
-                            {/* Day label */}
-                            <span className={`text-[10px] font-medium transition-colors
-                                ${item.isToday
-                                    ? 'text-yellow-500 font-bold'
-                                    : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300'
-                                }`}
-                            >
+                            <span className={`text-[10px] font-semibold uppercase tracking-[0.08em] ${item.isToday
+                                ? 'text-orange-600 dark:text-orange-300'
+                                : 'text-slate-500 dark:text-slate-400'
+                                }`}>
                                 {item.day}
                             </span>
-                        </div>
+                        </motion.div>
                     );
                 })}
             </div>
 
-            {/* Legend */}
-            <div className="flex items-center justify-center gap-5 text-xs mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
+            <div className="mt-4 flex items-center justify-center gap-5 border-t border-slate-200 pt-3 text-xs dark:border-slate-700">
                 <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-yellow-500 to-yellow-400" />
-                    <span className="text-gray-500 dark:text-gray-400">Today</span>
+                    <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
+                    <span className="text-slate-500 dark:text-slate-400">Completed days</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400" />
-                    <span className="text-gray-500 dark:text-gray-400">Completed</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700" />
-                    <span className="text-gray-500 dark:text-gray-400">No tasks</span>
+                    <span className="h-2.5 w-2.5 rounded-full bg-orange-500" />
+                    <span className="text-slate-500 dark:text-slate-400">Today</span>
                 </div>
             </div>
-
-            {/* Decorative glow */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
         </div>
     );
 };
