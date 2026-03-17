@@ -81,7 +81,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                 key={day.isoDate}
                                 onClick={() => setSelectedDate(day.isoDate)}
                                 className={`flex flex-col items-center justify-center min-w-[42px] sm:min-w-[50px] h-[58px] sm:h-[66px] rounded-2xl transition-all duration-200 flex-shrink-0 ${isSelected
-                                    ? 'bg-[#E0C8FF] text-black scale-105 z-10'
+                                    ? 'bg-gradient-to-br from-cyan-100 to-sky-200 text-slate-900 scale-105 z-10'
                                     : 'bg-gray-100 dark:bg-[#1C1C1E] text-gray-500 hover:bg-gray-200 dark:hover:bg-[#2C2C2E] hover:text-gray-900 dark:hover:text-white'
                                     }`}
                             >
@@ -131,7 +131,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                     {/* Task Number/Icon */}
                                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${task.status === 'completed' ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
                                         task.status === 'in_progress' ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400' :
-                                            'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400'
+                                            'bg-sky-100 dark:bg-sky-500/20 text-cyan-700 dark:text-cyan-300'
                                         }`}>
                                         {task.status === 'completed' ? '✓' : i + 1}
                                     </div>
@@ -162,7 +162,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                         </span>
 
                                         {/* Arrow indicator */}
-                                        <span className="text-gray-300 dark:text-gray-600 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors">
+                                        <span className="text-gray-300 dark:text-gray-600 group-hover:text-cyan-500 dark:group-hover:text-cyan-300 transition-colors">
                                             →
                                         </span>
                                     </div>
@@ -202,7 +202,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                             onClick={(e) => e.stopPropagation()}
                         >
                             {/* Modal Header */}
-                            <div className="p-6 border-b border-gray-100 dark:border-white/10 bg-gradient-to-r from-purple-500/10 to-blue-500/10">
+                            <div className="p-6 border-b border-gray-100 dark:border-white/10 bg-gradient-to-r from-cyan-500/10 to-blue-500/10">
                                 <div className="flex justify-between items-start">
                                     <div className="flex-1 pr-4">
                                         <div className="flex items-center gap-2 mb-2">
@@ -230,7 +230,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                 {/* Time & Day Info */}
                                 <div className="flex gap-4 mt-4 text-sm">
                                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                                        <FaClock className="text-purple-500" />
+                                        <FaClock className="text-cyan-500" />
                                         <span>{selectedTask.estimated_minutes || 60} min</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
@@ -244,13 +244,13 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                             <div className="p-6 overflow-y-auto max-h-[60vh]">
                                 {loadingGuidance ? (
                                     <div className="flex flex-col items-center justify-center py-12">
-                                        <FaSpinner className="text-4xl text-purple-500 animate-spin mb-4" />
+                                        <FaSpinner className="text-4xl text-cyan-500 animate-spin mb-4" />
                                         <p className="text-gray-500 dark:text-gray-400">Generating your personalized guide...</p>
                                     </div>
                                 ) : guidance ? (
                                     <div className="space-y-6">
                                         {/* Objective */}
-                                        <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-200 dark:border-purple-500/20">
+                                        <div className="p-4 rounded-2xl bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-200 dark:border-cyan-500/20">
                                             <h3 className="font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
                                                 🎯 Objective
                                             </h3>
@@ -261,12 +261,12 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                         {guidance.time_breakdown && (
                                             <div>
                                                 <h3 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                                                    <FaClock className="text-purple-500" /> Time Breakdown
+                                                    <FaClock className="text-cyan-500" /> Time Breakdown
                                                 </h3>
                                                 <div className="flex flex-wrap gap-2">
                                                     {guidance.time_breakdown.map((item, i) => (
                                                         <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-white/5 text-sm">
-                                                            <span className="font-bold text-purple-600 dark:text-purple-400">{item.duration}</span>
+                                                            <span className="font-bold text-cyan-700 dark:text-cyan-300">{item.duration}</span>
                                                             <span className="text-gray-600 dark:text-gray-400">{item.activity}</span>
                                                         </div>
                                                     ))}
@@ -283,7 +283,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                                 <div className="space-y-3">
                                                     {guidance.steps.map((step, i) => (
                                                         <div key={i} className="flex gap-3 p-3 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
-                                                            <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                                                            <div className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-500/20 text-cyan-700 dark:text-cyan-300 flex items-center justify-center font-bold text-sm flex-shrink-0">
                                                                 {step.step || i + 1}
                                                             </div>
                                                             <div>
@@ -368,3 +368,4 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
 };
 
 export default TaskSchedulerWidget;
+

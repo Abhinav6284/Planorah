@@ -1,39 +1,47 @@
 import React from 'react';
 
 const QuickStatsWidget = ({ tasks = [] }) => {
-    // Calculate overall stats
-    const totalCompleted = tasks.filter(t => t.status === 'completed').length;
-    const totalPending = tasks.filter(t => t.status !== 'completed').length;
-    const uniqueRoadmaps = new Set(tasks.map(t => t.roadmap_title).filter(Boolean)).size;
+    const totalCompleted = tasks.filter((task) => task.status === 'completed').length;
+    const totalPending = tasks.filter((task) => task.status !== 'completed').length;
+    const uniqueRoadmaps = new Set(tasks.map((task) => task.roadmap_title).filter(Boolean)).size;
+
+    const statItems = [
+        {
+            label: 'Done',
+            value: totalCompleted,
+            chip: '✓',
+            chipClass: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
+        },
+        {
+            label: 'Pending',
+            value: totalPending,
+            chip: '•',
+            chipClass: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300'
+        },
+        {
+            label: 'Paths',
+            value: uniqueRoadmaps,
+            chip: '◈',
+            chipClass: 'bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-300'
+        }
+    ];
 
     return (
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            {/* Completed Pill */}
-            <div className="h-10 sm:h-12 px-3 sm:px-5 rounded-xl sm:rounded-2xl bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 flex items-center gap-2 sm:gap-3 hover:bg-gray-50 dark:hover:bg-[#2C2C2E] transition-all group shadow-sm">
-                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-[9px] sm:text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">✓</div>
-                <div className="flex items-baseline gap-1 sm:gap-1.5">
-                    <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white tracking-tight">{totalCompleted}</span>
-                    <span className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300">Done</span>
+        <div className="grid grid-cols-3 gap-2">
+            {statItems.map((item) => (
+                <div
+                    key={item.label}
+                    className="rounded-2xl border border-slate-200/80 bg-white/80 p-3 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-300 dark:border-white/10 dark:bg-slate-950/45 dark:hover:border-cyan-400/25"
+                >
+                    <div className="mb-2 flex items-center justify-between">
+                        <span className={`inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-bold ${item.chipClass}`}>
+                            {item.chip}
+                        </span>
+                        <span className="text-[10px] uppercase tracking-wide text-slate-500 dark:text-slate-400">{item.label}</span>
+                    </div>
+                    <p className="text-xl font-semibold leading-none text-slate-900 dark:text-white">{item.value}</p>
                 </div>
-            </div>
-
-            {/* Pending Pill */}
-            <div className="h-10 sm:h-12 px-3 sm:px-5 rounded-xl sm:rounded-2xl bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 flex items-center gap-2 sm:gap-3 hover:bg-gray-50 dark:hover:bg-[#2C2C2E] transition-all group shadow-sm">
-                <div className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></div>
-                <div className="flex items-baseline gap-1 sm:gap-1.5">
-                    <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white tracking-tight">{totalPending}</span>
-                    <span className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300">Pending</span>
-                </div>
-            </div>
-
-            {/* Roadmaps Pill */}
-            <div className="h-10 sm:h-12 px-3 sm:px-5 rounded-xl sm:rounded-2xl bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 flex items-center gap-2 sm:gap-3 hover:bg-gray-50 dark:hover:bg-[#2C2C2E] transition-all group shadow-sm">
-                <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
-                <div className="flex items-baseline gap-1 sm:gap-1.5">
-                    <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white tracking-tight">{uniqueRoadmaps}</span>
-                    <span className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300">Paths</span>
-                </div>
-            </div>
+            ))}
         </div>
     );
 };
