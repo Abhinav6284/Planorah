@@ -4,12 +4,15 @@ import base64
 import hashlib
 import secrets
 import time
+import logging
 from django.core import signing
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
 from django.conf import settings
 from .models import GoogleCredential
+
+logger = logging.getLogger(__name__)
 
 # Scopes required for Google Calendar
 SCOPES = ['https://www.googleapis.com/auth/calendar']
@@ -38,10 +41,6 @@ class GoogleCalendarService:
 
     def get_flow(self, redirect_uri=None):
         """Create OAuth flow"""
-        # In production, use client_secrets.json or env vars
-        # For now, we assume env vars or a config file
-        # We'll construct a client config dict for simplicity if env vars are present
-
         client_id = (
             _clean_env("GOOGLE_CALENDAR_CLIENT_ID")
             or _clean_env("GOOGLE_CLIENT_ID")
@@ -54,18 +53,29 @@ class GoogleCalendarService:
         )
 
         if not client_id or not client_secret:
+            logger.error(
+                "Google Calendar OAuth credentials are missing. "
+                "Checked: GOOGLE_CALENDAR_CLIENT_ID/SECRET, GOOGLE_CLIENT_ID/SECRET, GOOGLE_OAUTH_CLIENT_ID/SECRET."
+            )
             raise ValueError(
                 "Google Calendar OAuth credentials are missing. Set GOOGLE_CALENDAR_CLIENT_ID/SECRET or GOOGLE_OAUTH_CLIENT_ID/SECRET environment variables."
             )
 
         effective_redirect_uri = (redirect_uri or REDIRECT_URI or "").strip()
         if not effective_redirect_uri:
+            logger.error("Google Calendar redirect URI is missing. Set GOOGLE_CALENDAR_REDIRECT_URI or FRONTEND_URL.")
             raise ValueError("Google Calendar redirect URI is missing.")
 
         if "/api/users/google/callback" in effective_redirect_uri:
+            logger.error(
+                "GOOGLE_CALENDAR_REDIRECT_URI is misconfigured: %s — must be the frontend /scheduler route.",
+                effective_redirect_uri,
+            )
             raise ValueError(
                 "GOOGLE_CALENDAR_REDIRECT_URI is misconfigured for the scheduler flow. Use the frontend callback route, e.g. https://planorah.me/scheduler."
             )
+
+        logger.debug("Building Google OAuth flow with redirect_uri=%s", effective_redirect_uri)
 
         client_config = {
             "web": {
@@ -112,6 +122,10 @@ class GoogleCalendarService:
 
     def exchange_code(self, code, redirect_uri=None, code_verifier=None):
         """Exchange code for token and save credential"""
+        logger.debug(
+            "Exchanging OAuth code for user=%s redirect_uri=%s has_code_verifier=%s",
+            self.user.id, redirect_uri, bool(code_verifier),
+        )
         flow = self.get_flow(redirect_uri=redirect_uri)
         # Google can return a superset of requested scopes (for example openid + profile),
         # which oauthlib treats as a strict mismatch unless this flag is enabled.
@@ -127,7 +141,10 @@ class GoogleCalendarService:
         refresh_token = creds.refresh_token
         if not refresh_token and existing_credential:
             # Google may omit refresh_token on repeat consent; keep existing one.
+            logger.debug("No new refresh_token from Google; retaining existing token for user=%s", self.user.id)
             refresh_token = existing_credential.refresh_token
+        elif not refresh_token:
+            logger.warning("No refresh_token received from Google and no existing credential to fall back on: user=%s", self.user.id)
 
         # Save to DB
         GoogleCredential.objects.update_or_create(
@@ -142,6 +159,7 @@ class GoogleCalendarService:
                 'expiry': creds.expiry
             }
         )
+        logger.info("Google OAuth credentials saved for user=%s", self.user.id)
         return True
 
     def get_service(self):
