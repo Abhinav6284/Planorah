@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { schedulerService } from "../../api/schedulerService";
 import { userService } from "../../api/userService";
-import { FaArrowRight, FaBolt, FaBrain, FaPause, FaPlay, FaRedo, FaStepForward } from "react-icons/fa";
+import { FaArrowRight, FaBolt, FaBrain, FaPause, FaPlay, FaRedo, FaStepForward, FaTrophy } from "react-icons/fa";
 
 import AIVoicePanel from "../Mentoring/AIVoicePanel";
 import StreakUpdateModal from "./Modals/StreakUpdateModal";
@@ -446,7 +446,7 @@ export default function OverviewSection() {
                     </motion.div>
 
                     <div className="flex flex-col gap-5 lg:col-span-4">
-                        <motion.div variants={itemVariants} whileHover={{ y: -3 }} className={`${SURFACE_CARD} overflow-hidden p-[1px]`}>
+                        <motion.div variants={itemVariants} whileHover={{ y: -3 }} className={`${SURFACE_CARD} p-[1px]} overflow-hidden`}>
                             <div className="overflow-hidden rounded-[19px]">
                                 <ProgressChartWidget data={tasks} />
                             </div>
