@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { schedulerService } from '../../../api/schedulerService';
 import { FaTimes, FaClock, FaCheckCircle, FaLightbulb, FaExclamationTriangle, FaFlag, FaSpinner } from 'react-icons/fa';
 
-const SHELL_CLASS = 'relative overflow-hidden rounded-[20px] border border-white/45 bg-white/58 p-5 shadow-[0_24px_60px_-36px_rgba(67,56,202,0.55)] backdrop-blur-xl dark:border-white/15 dark:bg-white/[0.06]';
+const SHELL_CLASS = 'relative overflow-hidden rounded-[20px] border border-white/45 bg-white/58 p-5 shadow-[0_18px_44px_-30px_rgba(37,99,235,0.42)] backdrop-blur-xl dark:border-white/15 dark:bg-white/[0.06]';
 const SECTION_CARD = 'rounded-2xl border border-white/50 bg-white/55 p-3 backdrop-blur-xl dark:border-white/12 dark:bg-white/[0.05]';
 
 const TaskSchedulerWidget = ({ tasks = [] }) => {
@@ -69,7 +69,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
 
     return (
         <div className={`${SHELL_CLASS} h-full`}>
-            <div className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-indigo-400/25 blur-3xl dark:bg-indigo-500/15" />
+            <div className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-blue-300/26 blur-3xl dark:bg-blue-500/14" />
 
             <div className="relative z-10">
                 <div className="mb-4 flex items-center justify-between gap-2">
@@ -92,8 +92,8 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                     key={day.isoDate}
                                     onClick={() => setSelectedDate(day.isoDate)}
                                     className={`flex h-14 w-12 flex-col items-center justify-center rounded-xl border text-xs transition-all ${isSelected
-                                        ? 'border-indigo-300 bg-gradient-to-b from-blue-600 via-indigo-500 to-violet-500 text-white shadow-[0_12px_26px_-14px_rgba(79,70,229,0.82)]'
-                                        : 'border-white/60 bg-white/55 text-slate-600 backdrop-blur-xl hover:border-indigo-300 hover:text-indigo-700 dark:border-white/15 dark:bg-white/[0.05] dark:text-slate-300 dark:hover:border-indigo-400/45 dark:hover:text-indigo-200'
+                                        ? 'border-blue-300 bg-gradient-to-b from-blue-600 to-sky-500 text-white shadow-[0_10px_20px_-12px_rgba(37,99,235,0.72)]'
+                                        : 'border-white/60 bg-white/55 text-slate-600 backdrop-blur-xl hover:border-blue-300 hover:text-blue-700 dark:border-white/15 dark:bg-white/[0.05] dark:text-slate-300 dark:hover:border-blue-400/45 dark:hover:text-blue-200'
                                         }`}
                                 >
                                     <span className="text-base font-semibold leading-none">{String(day.dayNum).padStart(2, '0')}</span>
@@ -114,7 +114,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                             initial={{ width: 0 }}
                             animate={{ width: `${completionPct}%` }}
                             transition={{ duration: 0.65, ease: 'easeOut' }}
-                            className="h-full rounded-full bg-gradient-to-r from-blue-600 via-indigo-500 to-violet-500"
+                            className="h-full rounded-full bg-gradient-to-r from-blue-600 to-sky-500"
                         />
                     </div>
                 </div>
@@ -124,7 +124,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                         {currentTasks.length > 0 ? (
                             currentTasks.map((task, index) => {
                                 const taskTone = task.status === 'completed'
-                                    ? 'border-indigo-200 bg-indigo-50/90 text-indigo-700 dark:border-indigo-500/30 dark:bg-indigo-500/12 dark:text-indigo-300'
+                                    ? 'border-blue-200 bg-blue-50/90 text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/12 dark:text-blue-300'
                                     : task.status === 'in_progress'
                                         ? 'border-orange-200 bg-orange-50/90 text-orange-700 dark:border-orange-500/30 dark:bg-orange-500/12 dark:text-orange-300'
                                         : 'border-white/60 bg-white/55 text-slate-600 dark:border-white/15 dark:bg-white/[0.05] dark:text-slate-300';
@@ -136,10 +136,10 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -8 }}
-                                        whileHover={{ y: -2 }}
+                                        whileHover={{ y: -1.5 }}
                                         transition={{ duration: 0.22, delay: index * 0.03 }}
                                         onClick={() => handleTaskClick(task)}
-                                        className="group flex w-full items-center gap-3 rounded-xl border border-white/65 bg-white/55 p-3 text-left backdrop-blur-xl transition-all duration-220 hover:border-indigo-300 hover:bg-white/65 hover:shadow-[0_14px_24px_-16px_rgba(79,70,229,0.65)] dark:border-white/15 dark:bg-white/[0.05] dark:hover:border-indigo-400/45 dark:hover:bg-white/[0.08]"
+                                        className="group flex w-full items-center gap-3 rounded-xl border border-white/65 bg-white/55 p-3 text-left backdrop-blur-xl transition-all duration-220 hover:border-blue-300 hover:bg-white/65 hover:shadow-[0_12px_22px_-16px_rgba(37,99,235,0.58)] dark:border-white/15 dark:bg-white/[0.05] dark:hover:border-blue-400/45 dark:hover:bg-white/[0.08]"
                                     >
                                         <div className={`inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border text-xs font-semibold ${taskTone}`}>
                                             {task.status === 'completed' ? '✓' : index + 1}
@@ -160,7 +160,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                             <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${taskTone}`}>
                                                 {task.status?.replace('_', ' ') || 'pending'}
                                             </span>
-                                            <span className="text-slate-300 transition-colors group-hover:text-indigo-500 dark:text-slate-600 dark:group-hover:text-indigo-300">→</span>
+                                            <span className="text-slate-300 transition-colors group-hover:text-blue-500 dark:text-slate-600 dark:group-hover:text-blue-300">→</span>
                                         </div>
                                     </motion.button>
                                 );
@@ -195,7 +195,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                             className="max-h-[85vh] w-full max-w-2xl overflow-hidden rounded-[20px] border border-white/45 bg-white/70 shadow-2xl backdrop-blur-2xl dark:border-white/15 dark:bg-slate-900/80"
                             onClick={(event) => event.stopPropagation()}
                         >
-                            <div className="border-b border-white/55 bg-gradient-to-r from-blue-600/18 via-indigo-500/14 to-violet-500/14 p-5 dark:border-white/12">
+                            <div className="border-b border-white/55 bg-gradient-to-r from-sky-400/16 via-blue-500/12 to-sky-300/12 p-5 dark:border-white/12">
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="min-w-0 flex-1">
                                         <div className="mb-2 flex items-center gap-2">
@@ -216,7 +216,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                 </div>
 
                                 <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-slate-600 dark:text-slate-300">
-                                    <div className="inline-flex items-center gap-1.5"><FaClock className="text-indigo-500" /> {selectedTask.estimated_minutes || 60} min</div>
+                                    <div className="inline-flex items-center gap-1.5"><FaClock className="text-blue-500" /> {selectedTask.estimated_minutes || 60} min</div>
                                     <div className="inline-flex items-center gap-1.5"><FaFlag className="text-orange-500" /> Day {selectedTask.day}</div>
                                 </div>
                             </div>
@@ -224,7 +224,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                             <div className="max-h-[60vh] overflow-y-auto p-5">
                                 {loadingGuidance ? (
                                     <div className="py-10 text-center">
-                                        <FaSpinner className="mx-auto mb-3 animate-spin text-3xl text-indigo-500" />
+                                        <FaSpinner className="mx-auto mb-3 animate-spin text-3xl text-blue-500" />
                                         <p className="text-sm text-slate-500 dark:text-slate-400">Generating task guidance...</p>
                                     </div>
                                 ) : guidance ? (
@@ -240,7 +240,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                                 <div className="flex flex-wrap gap-2">
                                                     {guidance.time_breakdown.map((item, i) => (
                                                         <div key={i} className="rounded-lg border border-white/60 bg-white/50 px-3 py-2 text-xs backdrop-blur-xl dark:border-white/15 dark:bg-white/[0.05]">
-                                                            <span className="font-semibold text-indigo-700 dark:text-indigo-300">{item.duration}</span>
+                                                            <span className="font-semibold text-blue-700 dark:text-blue-300">{item.duration}</span>
                                                             <span className="ml-1 text-slate-600 dark:text-slate-300">{item.activity}</span>
                                                         </div>
                                                     ))}
@@ -254,7 +254,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                                 <div className="space-y-2">
                                                     {guidance.steps.map((step, i) => (
                                                         <div key={i} className="flex gap-3 rounded-xl border border-white/60 bg-white/50 p-3 backdrop-blur-xl dark:border-white/15 dark:bg-white/[0.05]">
-                                                            <div className="inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
+                                                            <div className="inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">
                                                                 {step.step || i + 1}
                                                             </div>
                                                             <div>
@@ -270,7 +270,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                         {guidance.best_practices && (
                                             <div>
                                                 <h3 className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
-                                                    <FaCheckCircle className="text-indigo-500" /> Best Practices
+                                                    <FaCheckCircle className="text-blue-500" /> Best Practices
                                                 </h3>
                                                 <ul className="space-y-1.5">
                                                     {guidance.best_practices.map((tip, i) => (

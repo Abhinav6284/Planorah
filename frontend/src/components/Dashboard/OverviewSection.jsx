@@ -10,11 +10,11 @@ import StreakUpdateModal from "./Modals/StreakUpdateModal";
 import TaskSchedulerWidget from "./NewWidgets/TaskSchedulerWidget";
 import ProgressChartWidget from "./NewWidgets/ProgressChartWidget";
 
-const SURFACE_CARD = "group relative overflow-hidden rounded-[20px] border border-white/45 bg-white/58 shadow-[0_24px_60px_-36px_rgba(67,56,202,0.55)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/64 hover:shadow-[0_30px_72px_-38px_rgba(79,70,229,0.65)] dark:border-white/15 dark:bg-white/[0.06] dark:hover:bg-white/[0.1]";
+const SURFACE_CARD = "group relative overflow-hidden rounded-[20px] border border-white/45 bg-white/58 shadow-[0_18px_44px_-30px_rgba(37,99,235,0.42)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/62 hover:shadow-[0_24px_52px_-32px_rgba(59,130,246,0.5)] dark:border-white/15 dark:bg-white/[0.06] dark:hover:bg-white/[0.09]";
 const INNER_CARD = "relative overflow-hidden rounded-2xl border border-white/50 bg-white/55 p-4 backdrop-blur-xl dark:border-white/12 dark:bg-white/[0.05]";
 
-const PRIMARY_BUTTON = "inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-500 to-violet-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_12px_26px_-14px_rgba(79,70,229,0.8)] transition-all duration-200 hover:brightness-110";
-const SECONDARY_BUTTON = "inline-flex items-center justify-center gap-2 rounded-xl border border-white/50 bg-white/60 px-4 py-2.5 text-sm font-semibold text-slate-700 backdrop-blur-xl transition-all duration-200 hover:border-indigo-300 hover:text-indigo-700 dark:border-white/15 dark:bg-white/[0.05] dark:text-slate-200 dark:hover:border-indigo-400/50 dark:hover:text-indigo-200";
+const PRIMARY_BUTTON = "inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_22px_-12px_rgba(37,99,235,0.72)] transition-all duration-200 hover:brightness-105";
+const SECONDARY_BUTTON = "inline-flex items-center justify-center gap-2 rounded-xl border border-white/50 bg-white/60 px-4 py-2.5 text-sm font-semibold text-slate-700 backdrop-blur-xl transition-all duration-200 hover:border-blue-300 hover:text-blue-700 dark:border-white/15 dark:bg-white/[0.05] dark:text-slate-200 dark:hover:border-blue-400/50 dark:hover:text-blue-200";
 
 const DEFAULT_FOCUS_SECONDS = 25 * 60;
 
@@ -61,9 +61,9 @@ const VoiceCoachButton = ({ onClick }) => {
             type="button"
             whileTap={{ scale: 0.96 }}
             onClick={onClick}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/55 bg-white/60 px-3 py-2 text-sm font-semibold text-indigo-700 backdrop-blur-xl transition-all duration-200 hover:border-indigo-300 hover:bg-white/70 dark:border-white/15 dark:bg-white/[0.05] dark:text-indigo-200"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/55 bg-white/60 px-3 py-2 text-sm font-semibold text-blue-700 backdrop-blur-xl transition-all duration-200 hover:border-blue-300 hover:bg-white/70 dark:border-white/15 dark:bg-white/[0.05] dark:text-blue-200"
         >
-            <span className="inline-flex h-2 w-2 rounded-full bg-indigo-400" />
+            <span className="inline-flex h-2 w-2 rounded-full bg-blue-400" />
             Voice Coach
         </motion.button>
     );
@@ -235,7 +235,7 @@ export default function OverviewSection() {
         return (
             <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-[#0b1220]">
                 <div className="text-center">
-                    <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
+                    <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
                     <div className="text-base text-slate-500 dark:text-slate-400">Loading dashboard...</div>
                 </div>
             </div>
@@ -245,19 +245,19 @@ export default function OverviewSection() {
     return (
         <div className="relative min-h-screen overflow-hidden bg-[#eef2ff] dark:bg-[#090f1f]">
             <motion.div
-                className="pointer-events-none absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full bg-blue-400/35 blur-3xl dark:bg-blue-500/18"
-                animate={{ x: [0, 26, 0], y: [0, 18, 0] }}
-                transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+                className="pointer-events-none absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full bg-sky-300/32 blur-3xl dark:bg-sky-500/18"
+                animate={{ x: [0, 10, 0], y: [0, 8, 0] }}
+                transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
             />
             <motion.div
-                className="pointer-events-none absolute -right-20 top-14 h-[360px] w-[360px] rounded-full bg-violet-400/30 blur-3xl dark:bg-violet-500/18"
-                animate={{ x: [0, -24, 0], y: [0, 16, 0] }}
-                transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.div
-                className="pointer-events-none absolute bottom-0 left-1/3 h-[300px] w-[300px] rounded-full bg-indigo-300/30 blur-3xl dark:bg-indigo-500/12"
-                animate={{ y: [0, -20, 0] }}
+                className="pointer-events-none absolute -right-20 top-14 h-[360px] w-[360px] rounded-full bg-blue-300/28 blur-3xl dark:bg-blue-500/16"
+                animate={{ x: [0, -10, 0], y: [0, 8, 0] }}
                 transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.div
+                className="pointer-events-none absolute bottom-0 left-1/3 h-[300px] w-[300px] rounded-full bg-sky-200/30 blur-3xl dark:bg-sky-500/10"
+                animate={{ y: [0, -8, 0] }}
+                transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
             />
 
             <div className="relative z-10 mx-auto max-w-[1480px] px-4 py-5 lg:py-6">
@@ -267,20 +267,20 @@ export default function OverviewSection() {
                     animate="visible"
                     className="grid grid-cols-1 gap-5 lg:grid-cols-12"
                 >
-                    <motion.section variants={itemVariants} whileHover={{ y: -4 }} className={`${SURFACE_CARD} p-6 lg:col-span-8`}>
+                    <motion.section variants={itemVariants} whileHover={{ y: -2 }} className={`${SURFACE_CARD} p-6 lg:col-span-8`}>
                         <motion.div
-                            className="pointer-events-none absolute inset-0 opacity-70"
+                            className="pointer-events-none absolute inset-0 opacity-45"
                             style={{
-                                backgroundImage: "linear-gradient(125deg, rgba(59,130,246,0.18), rgba(139,92,246,0.16), rgba(99,102,241,0.16))",
+                                backgroundImage: "linear-gradient(125deg, rgba(56,189,248,0.16), rgba(59,130,246,0.12), rgba(125,211,252,0.12))",
                                 backgroundSize: "200% 200%"
                             }}
-                            animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-                            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+                            animate={{ backgroundPosition: ["45% 50%", "55% 50%", "45% 50%"] }}
+                            transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
                         />
 
                         <div className="relative z-10">
                             <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                                <span className="inline-flex items-center rounded-full border border-white/60 bg-white/55 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-indigo-700 backdrop-blur-lg dark:border-white/20 dark:bg-white/[0.06] dark:text-indigo-200">
+                                <span className="inline-flex items-center rounded-full border border-white/60 bg-white/55 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-blue-700 backdrop-blur-lg dark:border-white/20 dark:bg-white/[0.06] dark:text-blue-200">
                                     Focus Primary
                                 </span>
                                 <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
@@ -304,21 +304,21 @@ export default function OverviewSection() {
 
                                     <div className="relative mx-auto mb-4 grid h-44 w-44 place-items-center">
                                         <motion.div
-                                            className="absolute inset-4 rounded-full bg-indigo-500/35 blur-2xl"
-                                            animate={focusActive ? { opacity: [0.26, 0.5, 0.26], scale: [0.98, 1.04, 0.98] } : { opacity: 0.22, scale: 1 }}
-                                            transition={focusActive ? { duration: 1.8, repeat: Infinity } : { duration: 0.3 }}
+                                            className="absolute inset-4 rounded-full bg-blue-500/26 blur-2xl"
+                                            animate={focusActive ? { opacity: [0.2, 0.34, 0.2], scale: [0.99, 1.02, 0.99] } : { opacity: 0.16, scale: 1 }}
+                                            transition={focusActive ? { duration: 2.2, repeat: Infinity } : { duration: 0.3 }}
                                         />
 
                                         <div
                                             className="relative grid h-full w-full place-items-center rounded-full p-2"
                                             style={{
-                                                background: `conic-gradient(#4f46e5 ${focusProgressAngle}deg, rgba(148,163,184,0.24) 0deg)`
+                                                background: `conic-gradient(#2563eb ${focusProgressAngle}deg, rgba(148,163,184,0.24) 0deg)`
                                             }}
                                         >
                                             <div className="grid h-full w-full place-items-center rounded-full border border-white/60 bg-white/70 backdrop-blur-xl dark:border-white/20 dark:bg-white/[0.06]">
                                                 <p className="text-[10px] uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">{focusProgressPct}% complete</p>
                                                 <p className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">{formatFocusTime(focusSecondsLeft)}</p>
-                                                <p className={`text-[11px] font-semibold ${focusActive ? "text-indigo-600 dark:text-indigo-300" : "text-slate-500 dark:text-slate-400"}`}>
+                                                <p className={`text-[11px] font-semibold ${focusActive ? "text-blue-600 dark:text-blue-300" : "text-slate-500 dark:text-slate-400"}`}>
                                                     {focusActive ? "In session" : "Ready"}
                                                 </p>
                                             </div>
@@ -326,7 +326,7 @@ export default function OverviewSection() {
                                     </div>
 
                                     <div className="mb-4 flex items-center justify-center gap-2">
-                                        <motion.button type="button" whileTap={{ scale: 0.95 }} onClick={toggleFocus} className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 via-indigo-500 to-violet-500 text-white shadow-[0_10px_22px_-12px_rgba(79,70,229,0.9)]">
+                                        <motion.button type="button" whileTap={{ scale: 0.95 }} onClick={toggleFocus} className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 text-white shadow-[0_10px_20px_-12px_rgba(37,99,235,0.72)]">
                                             {focusActive ? <FaPause size={12} /> : <FaPlay size={12} className="ml-0.5" />}
                                         </motion.button>
                                         <motion.button type="button" whileTap={{ scale: 0.95 }} onClick={resetFocus} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/60 bg-white/60 text-slate-600 backdrop-blur-xl dark:border-white/20 dark:bg-white/[0.06] dark:text-slate-300">
@@ -351,9 +351,9 @@ export default function OverviewSection() {
                                     <div className="mb-3 flex items-center justify-between">
                                         <p className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">AI coach</p>
                                         <motion.span
-                                            className="inline-flex h-2.5 w-2.5 rounded-full bg-indigo-400"
-                                            animate={{ opacity: [0.5, 1, 0.5] }}
-                                            transition={{ duration: 1.8, repeat: Infinity }}
+                                            className="inline-flex h-2.5 w-2.5 rounded-full bg-blue-400"
+                                            animate={{ opacity: [0.52, 0.82, 0.52] }}
+                                            transition={{ duration: 2.2, repeat: Infinity }}
                                         />
                                     </div>
 
@@ -367,17 +367,17 @@ export default function OverviewSection() {
                                     <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
                                         <div className="rounded-xl border border-white/60 bg-white/50 px-3 py-2 backdrop-blur-xl dark:border-white/20 dark:bg-white/[0.04]">
                                             <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-                                                <FaBolt size={11} className="text-indigo-500" />
+                                                <FaBolt size={11} className="text-blue-500" />
                                                 Focus Load
                                             </div>
                                             <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">{formatMinutes(totalPendingMinutes)}</p>
                                         </div>
                                         <div className="rounded-xl border border-white/60 bg-white/50 px-3 py-2 backdrop-blur-xl dark:border-white/20 dark:bg-white/[0.04]">
                                             <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-                                                <FaBrain size={11} className="text-indigo-500" />
-                                                Completion
+                                                <FaBrain size={11} className="text-blue-500" />
+                                                Next Milestone
                                             </div>
-                                            <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">{completionRate}%</p>
+                                            <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">{Math.max(nextStreakMilestone - streakCurrent, 0)} days</p>
                                         </div>
                                     </div>
 
@@ -399,11 +399,11 @@ export default function OverviewSection() {
                     </motion.section>
 
                     <div className="flex flex-col gap-5 lg:col-span-4">
-                        <motion.div variants={itemVariants} whileHover={{ y: -4 }} className={`${SURFACE_CARD} p-5`}>
+                        <motion.div variants={itemVariants} whileHover={{ y: -2 }} className={`${SURFACE_CARD} p-5`}>
                             <motion.div
                                 className="pointer-events-none absolute -right-14 -top-14 h-36 w-36 rounded-full bg-orange-400/30 blur-3xl"
-                                animate={{ opacity: [0.2, 0.38, 0.2], scale: [0.96, 1.06, 0.96] }}
-                                transition={{ duration: 2.6, repeat: Infinity }}
+                                animate={{ opacity: [0.2, 0.3, 0.2], scale: [0.98, 1.03, 0.98] }}
+                                transition={{ duration: 3.2, repeat: Infinity }}
                             />
 
                             <div className="relative z-10">
@@ -411,8 +411,8 @@ export default function OverviewSection() {
                                     <p className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">Momentum</p>
                                     <motion.div
                                         className="text-2xl"
-                                        animate={streakCurrent > 0 ? { scale: [1, 1.08, 1] } : { scale: 1 }}
-                                        transition={streakCurrent > 0 ? { duration: 2, repeat: Infinity } : { duration: 0.2 }}
+                                        animate={streakCurrent > 0 ? { scale: [1, 1.04, 1] } : { scale: 1 }}
+                                        transition={streakCurrent > 0 ? { duration: 2.6, repeat: Infinity } : { duration: 0.2 }}
                                     >
                                         🔥
                                     </motion.div>
@@ -435,7 +435,7 @@ export default function OverviewSection() {
                             </div>
                         </motion.div>
 
-                        <motion.div variants={itemVariants} whileHover={{ y: -4 }} className={`${SURFACE_CARD} p-5`}>
+                        <motion.div variants={itemVariants} whileHover={{ y: -2 }} className={`${SURFACE_CARD} p-5`}>
                             <p className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">Today snapshot</p>
                             <div className="mt-3 grid grid-cols-3 gap-2">
                                 <div className="rounded-xl border border-white/60 bg-white/50 px-3 py-3 text-center backdrop-blur-xl dark:border-white/20 dark:bg-white/[0.04]">
@@ -444,7 +444,7 @@ export default function OverviewSection() {
                                 </div>
                                 <div className="rounded-xl border border-white/60 bg-white/50 px-3 py-3 text-center backdrop-blur-xl dark:border-white/20 dark:bg-white/[0.04]">
                                     <p className="text-[11px] text-slate-500 dark:text-slate-400">Done</p>
-                                    <p className="mt-1 text-lg font-semibold text-indigo-600 dark:text-indigo-300">{completedTasks}</p>
+                                    <p className="mt-1 text-lg font-semibold text-blue-600 dark:text-blue-300">{completedTasks}</p>
                                 </div>
                                 <div className="rounded-xl border border-white/60 bg-white/50 px-3 py-3 text-center backdrop-blur-xl dark:border-white/20 dark:bg-white/[0.04]">
                                     <p className="text-[11px] text-slate-500 dark:text-slate-400">Pending</p>
@@ -457,7 +457,7 @@ export default function OverviewSection() {
                                     initial={{ width: 0 }}
                                     animate={{ width: `${completionRate}%` }}
                                     transition={{ duration: 0.8, ease: "easeOut" }}
-                                    className="h-full rounded-full bg-gradient-to-r from-blue-600 via-indigo-500 to-violet-500"
+                                    className="h-full rounded-full bg-gradient-to-r from-blue-600 to-sky-500"
                                 />
                             </div>
 
@@ -472,20 +472,20 @@ export default function OverviewSection() {
                         </motion.div>
                     </div>
 
-                    <motion.div variants={itemVariants} whileHover={{ y: -4 }} className={`${SURFACE_CARD} p-[1px] lg:col-span-8`}>
+                    <motion.div variants={itemVariants} whileHover={{ y: -2 }} className={`${SURFACE_CARD} p-[1px] lg:col-span-8`}>
                         <div className="overflow-hidden rounded-[19px]">
                             <TaskSchedulerWidget tasks={tasks} />
                         </div>
                     </motion.div>
 
                     <div className="flex flex-col gap-5 lg:col-span-4">
-                        <motion.div variants={itemVariants} whileHover={{ y: -4 }} className={`${SURFACE_CARD} overflow-hidden p-[1px]`}>
+                        <motion.div variants={itemVariants} whileHover={{ y: -2 }} className={`${SURFACE_CARD} overflow-hidden p-[1px]`}>
                             <div className="overflow-hidden rounded-[19px]">
                                 <ProgressChartWidget data={tasks} />
                             </div>
                         </motion.div>
 
-                        <motion.div variants={itemVariants} whileHover={{ y: -4 }} className={`${SURFACE_CARD} p-5`}>
+                        <motion.div variants={itemVariants} whileHover={{ y: -2 }} className={`${SURFACE_CARD} p-5`}>
                             <p className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">Execution shortcuts</p>
                             <div className="mt-3 flex flex-col gap-2">
                                 <motion.div whileTap={{ scale: 0.96 }}>
