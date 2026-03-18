@@ -96,6 +96,7 @@ INSTALLED_APPS = [
     'github_integration',
     'billing',
     'analytics',
+    'planora',  # AI-powered study platform
     'projects',  # User projects from CodeSpace
     'codespace',  # Real terminal / IDE backend
     'ai_calls',   # AI outbound call system (onboarding guide)

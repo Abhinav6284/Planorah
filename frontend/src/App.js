@@ -59,6 +59,11 @@ const PaymentHistory = lazy(() => import('./components/Billing/PaymentHistory'))
 const PortfolioEditor = lazy(() => import('./components/Portfolio').then(m => ({ default: m.PortfolioEditor })));
 const ProjectManager = lazy(() => import('./components/Portfolio').then(m => ({ default: m.ProjectManager })));
 const PublicPortfolio = lazy(() => import('./components/Portfolio').then(m => ({ default: m.PublicPortfolio })));
+// Planora – AI-powered study platform
+const PlanoraDashboard = lazy(() => import('./components/Planora/PlanoraDashboard'));
+const SubjectDetail = lazy(() => import('./components/Planora/SubjectDetail'));
+const TopicDetail = lazy(() => import('./components/Planora/TopicDetail'));
+const StudyPlanner = lazy(() => import('./components/Planora/StudyPlanner'));
 
 function GlobalDevelopmentBanner() {
   return (
@@ -186,6 +191,12 @@ export default function App() {
                     <Route path="/billing/history" element={<PaymentHistory />} />
                     <Route path="/portfolio/edit" element={<PortfolioEditor />} />
                     <Route path="/projects" element={<ProjectManager />} />
+                    {/* Planora – AI Study Platform */}
+                    <Route path="/planora" element={<PlanoraDashboard />} />
+                    <Route path="/planora/subject/:subjectId" element={<SubjectDetail />} />
+                    <Route path="/planora/subject/:subjectId/plan" element={<StudyPlanner />} />
+                    <Route path="/planora/topic/:topicId/notes" element={<TopicDetail />} />
+                    <Route path="/planora/topic/:topicId/guide" element={<TopicDetail />} />
                   </Route>
                 </Routes>
               </Suspense>
