@@ -173,20 +173,35 @@ const NewSubjectModal = ({ onClose, onCreate }) => {
 export default function PlanoraDashboard() {
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
 
   const fetchSubjects = useCallback(async () => {
     try {
       const data = await planoraService.getSubjects();
       setSubjects(Array.isArray(data) ? data : []);
-    } catch {
-      // silent fail — show empty state
+      setError('');
+    } catch (err) {
+      const status = err?.response?.status;
+      if (status === 404) {
+        setError('The study platform service is temporarily unavailable. Please try again later.');
+      } else if (status === 401) {
+        setError('Your session has expired. Please log in again.');
+      } else {
+        setError('Failed to load subjects. Please refresh the page.');
+      }
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => { fetchSubjects(); }, [fetchSubjects]);
+
+  const handleRetry = useCallback(() => {
+    setLoading(true);
+    setError('');
+    fetchSubjects();
+  }, [fetchSubjects]);
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this subject and all its topics?')) return;
@@ -218,6 +233,22 @@ export default function PlanoraDashboard() {
               <div key={i} className="h-44 rounded-2xl bg-gray-200 dark:bg-gray-800 animate-pulse" />
             ))}
           </div>
+        ) : error ? (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center py-24 text-center"
+          >
+            <div className="text-5xl mb-4">⚠️</div>
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">Something went wrong</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-xs">{error}</p>
+            <button
+              onClick={handleRetry}
+              className="px-5 py-2.5 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-semibold hover:opacity-80 transition-opacity"
+            >
+              Retry
+            </button>
+          </motion.div>
         ) : subjects.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
