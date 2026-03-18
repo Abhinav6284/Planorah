@@ -22,6 +22,7 @@ const getContextSource = (pathname) => {
     if (pathname.startsWith('/interview')) return 'interview';
     if (pathname.startsWith('/portfolio')) return 'portfolio';
     if (pathname.startsWith('/projects')) return 'projects';
+    if (pathname.startsWith('/planora')) return 'planora';
     if (pathname.startsWith('/assistant')) return 'assistant';
     return 'general';
 };
