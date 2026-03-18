@@ -365,16 +365,10 @@ def login_user(request):
             status=status.HTTP_403_FORBIDDEN,
         )
 
-    # Authenticate using username (Django default)
+    # Authenticate using email as USERNAME_FIELD is "email" in CustomUser
     user = authenticate(request, username=user_obj.email, password=password)
-    if not isinstance(user, CustomUser):
-        return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
-
     if user is None:
-        return Response(
-            {"error": "Invalid credentials"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
 
     if _resolve_user_status(user) != CustomUser.STATUS_ACTIVE or not user.is_active or getattr(user, "is_verified", False) is False:
         return Response(
