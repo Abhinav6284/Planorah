@@ -144,27 +144,69 @@ def generate_topics(request, subject_id):
         raw_topics = services.generate_topics_from_syllabus(subject.syllabus_text, exam_pattern_data)
     except EnvironmentError as exc:
         return Response({'error': str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    except ValueError as exc:
+        logger.warning('Topic generation returned invalid JSON: %s', exc)
+        return Response(
+            {'error': 'AI returned an invalid topic format. Please retry.'},
+            status=status.HTTP_502_BAD_GATEWAY,
+        )
     except Exception as exc:
         logger.exception('Topic generation failed: %s', exc)
         return Response({'error': 'AI topic generation failed. Please try again.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    if not isinstance(raw_topics, list):
+        logger.warning('Topic generation returned non-list payload: %s', type(raw_topics).__name__)
+        return Response(
+            {'error': 'AI returned an invalid topic list. Please retry.'},
+            status=status.HTTP_502_BAD_GATEWAY,
+        )
 
     append = str(request.data.get('append', 'false')).lower() == 'true'
     if not append:
         subject.topics.all().delete()
 
+    allowed_importance = {choice[0] for choice in Topic.IMPORTANCE_CHOICES}
+    allowed_depth = {choice[0] for choice in Topic.DEPTH_CHOICES}
     created_topics = []
     for idx, raw in enumerate(raw_topics):
+        if isinstance(raw, str):
+            raw = {'name': raw}
+        if not isinstance(raw, dict):
+            logger.warning('Skipping invalid topic item at index %s: %s', idx, type(raw).__name__)
+            continue
+
+        name = str(raw.get('name') or f'Topic {idx + 1}').strip() or f'Topic {idx + 1}'
+        importance = raw.get('importance', 'medium')
+        depth = raw.get('depth', 'medium')
+        if importance not in allowed_importance:
+            importance = 'medium'
+        if depth not in allowed_depth:
+            depth = 'medium'
+
+        subtopics = raw.get('subtopics', [])
+        expected_questions = raw.get('expected_questions', [])
+        if not isinstance(subtopics, list):
+            subtopics = []
+        if not isinstance(expected_questions, list):
+            expected_questions = []
+
         topic = Topic.objects.create(
             subject=subject,
-            name=raw.get('name', f'Topic {idx + 1}'),
-            description=raw.get('description', ''),
-            importance=raw.get('importance', 'medium'),
-            depth=raw.get('depth', 'medium'),
+            name=name,
+            description=str(raw.get('description', '')),
+            importance=importance,
+            depth=depth,
             order=idx,
-            subtopics=raw.get('subtopics', []),
-            expected_questions=raw.get('expected_questions', []),
+            subtopics=subtopics,
+            expected_questions=expected_questions,
         )
         created_topics.append(topic)
+
+    if not created_topics:
+        return Response(
+            {'error': 'No valid topics were generated. Please retry with clearer syllabus text.'},
+            status=status.HTTP_502_BAD_GATEWAY,
+        )
 
     serializer = TopicSerializer(created_topics, many=True)
     return Response({'topics': serializer.data}, status=status.HTTP_201_CREATED)
@@ -369,7 +411,9 @@ def study_plan(request, subject_id):
     if request.method == 'GET':
         latest_plan = subject.study_plans.first()
         if not latest_plan:
-            return Response({'error': 'No study plan generated yet.'}, status=status.HTTP_404_NOT_FOUND)
+            # Return an empty plan payload instead of 404 so fresh subjects
+            # do not surface as failed network requests in the client.
+            return Response({'plan_data': []}, status=status.HTTP_200_OK)
         serializer = StudyPlanSerializer(latest_plan)
         return Response(serializer.data)
 

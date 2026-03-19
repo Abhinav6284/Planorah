@@ -265,18 +265,35 @@ export default function OverviewSection() {
                 animate="visible"
                 className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4"
             >
-                {/* --- Left Column (Main Content) - Full width on mobile, 8 cols on lg --- */}
+                {/* Hero: Today Task Scheduler */}
+                <motion.div variants={itemVariants} className="lg:col-span-12">
+                    <TaskSchedulerWidget tasks={tasks} />
+                </motion.div>
+
+                {/* Priority Panel: AI Suggestion + Progress */}
                 <div className="lg:col-span-8 flex flex-col gap-3 sm:gap-4">
-
-                    {/* Task Scheduler - Main Widget */}
                     <motion.div variants={itemVariants}>
-                        <TaskSchedulerWidget tasks={tasks} />
+                        <OnboardingWidget />
                     </motion.div>
+                    <motion.div variants={itemVariants}>
+                        <ProgressChartWidget data={tasks} />
+                    </motion.div>
+                </div>
 
-                    {/* Bottom Row: GitHub/Research & Portfolio - Stack on mobile */}
+                {/* Supporting Panel */}
+                <div className="lg:col-span-4 flex flex-col gap-3 sm:gap-4">
+                    <motion.div variants={itemVariants}>
+                        <ProfileCard user={userProfile} streak={streakData} />
+                    </motion.div>
+                </div>
+
+                {/* Secondary Tools */}
+                <div className="lg:col-span-12">
+                    <motion.div variants={itemVariants} className="mb-2 px-1">
+                        <p className="text-[11px] uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Secondary</p>
+                    </motion.div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <motion.div variants={itemVariants} className="min-h-[240px]">
-                            {/* Show GitHub for CS/IT, Research for Medical/Science only */}
                             {(userProfile?.field_of_study?.toLowerCase().includes('computer') ||
                                 userProfile?.field_of_study?.toLowerCase().includes('it')) ? (
                                 <CodeSpaceWidget />
@@ -293,26 +310,6 @@ export default function OverviewSection() {
                             <CalendarWidget />
                         </motion.div>
                     </div>
-
-                    {/* Weekly Progress Chart */}
-                    <motion.div variants={itemVariants}>
-                        <ProgressChartWidget data={tasks} />
-                    </motion.div>
-                </div>
-
-                {/* --- Right Column (Side Panel) - Full width on mobile, 4 cols on lg --- */}
-                <div className="lg:col-span-4 flex flex-col gap-3 sm:gap-4">
-
-                    {/* Profile Card - Full Width */}
-                    <motion.div variants={itemVariants}>
-                        <ProfileCard user={userProfile} streak={streakData} />
-                    </motion.div>
-
-                    {/* Onboarding AI Guidance */}
-                    <motion.div variants={itemVariants}>
-                        <OnboardingWidget />
-                    </motion.div>
-
                 </div>
             </motion.div>
 

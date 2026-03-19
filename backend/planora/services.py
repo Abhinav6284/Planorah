@@ -27,10 +27,79 @@ def _parse_json_response(text: str) -> dict | list:
     Extract JSON from Gemini response text.
     Handles markdown code-fenced blocks gracefully.
     """
-    # Strip markdown fences if present
-    cleaned = re.sub(r'^```(?:json)?\s*', '', text.strip(), flags=re.MULTILINE)
-    cleaned = re.sub(r'\s*```$', '', cleaned.strip(), flags=re.MULTILINE)
-    return json.loads(cleaned.strip())
+    raw_text = (text or "").strip()
+    if not raw_text:
+        raise ValueError("AI response was empty.")
+
+    candidates: list[str] = [raw_text]
+
+    # Add fenced JSON blocks when present.
+    fenced_blocks = re.findall(
+        r"```(?:json)?\s*([\s\S]*?)\s*```",
+        raw_text,
+        flags=re.IGNORECASE,
+    )
+    candidates.extend(block.strip() for block in fenced_blocks if block.strip())
+
+    # Try extracting a balanced top-level JSON object/array from mixed text.
+    extracted = _extract_balanced_json(raw_text)
+    if extracted:
+        candidates.append(extracted.strip())
+
+    seen: set[str] = set()
+    for candidate in candidates:
+        if not candidate or candidate in seen:
+            continue
+        seen.add(candidate)
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError:
+            continue
+
+    preview = raw_text.replace("\n", " ")[:200]
+    raise ValueError(f"Unable to parse AI JSON response. Preview: {preview}")
+
+
+def _extract_balanced_json(text: str) -> str | None:
+    """Return the first balanced JSON object/array found in text."""
+    starts = [idx for idx in (text.find("["), text.find("{")) if idx != -1]
+    if not starts:
+        return None
+
+    start = min(starts)
+    opener = text[start]
+    closer = "]" if opener == "[" else "}"
+
+    depth = 0
+    in_string = False
+    escaped = False
+
+    for idx in range(start, len(text)):
+        char = text[idx]
+
+        if in_string:
+            if escaped:
+                escaped = False
+                continue
+            if char == "\\":
+                escaped = True
+                continue
+            if char == '"':
+                in_string = False
+            continue
+
+        if char == '"':
+            in_string = True
+            continue
+
+        if char == opener:
+            depth += 1
+        elif char == closer:
+            depth -= 1
+            if depth == 0:
+                return text[start:idx + 1]
+
+    return None
 
 
 # ---------------------------------------------------------------------------

@@ -23,6 +23,9 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
 
     const currentTasks = tasks.filter(task => task.due_date === selectedDate);
     const completedCount = currentTasks.filter(t => t.status === 'completed').length;
+    const completionPct = currentTasks.length > 0 ? Math.round((completedCount / currentTasks.length) * 100) : 0;
+    const isGettingStarted = currentTasks.length > 0 && completionPct === 0;
+    const isTodaySelected = selectedDate === days[0].isoDate;
 
     const handleTaskClick = async (task) => {
         setSelectedTask(task);
@@ -68,8 +71,10 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
             {/* Header: Date Strip */}
             <div className="mb-3">
                 <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-base sm:text-lg font-semibold tracking-tight">Schedule</h3>
-                    <span className="text-xs font-medium text-gray-400">Days</span>
+                    <h3 className="text-base sm:text-lg font-semibold tracking-tight">
+                        {isTodaySelected ? "Today's Tasks" : 'Task Schedule'}
+                    </h3>
+                    <span className="text-xs font-medium text-gray-400">14-day view</span>
                 </div>
 
                 {/* Date Scroll Area */}
@@ -107,10 +112,16 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                             <div className="w-24 h-2 bg-gray-200 dark:bg-white/5 rounded-full overflow-hidden backdrop-blur-sm">
                                 <div
                                     className="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(74,222,128,0.4)]"
-                                    style={{ width: `${(completedCount / currentTasks.length) * 100}%` }}
+                                    style={{ width: `${completionPct}%` }}
                                 />
                             </div>
-                            <span className="text-sm font-mono opacity-60 text-gray-400 dark:text-gray-300">{Math.round((completedCount / currentTasks.length) * 100)}%</span>
+                            {isGettingStarted ? (
+                                <span className="text-xs sm:text-sm font-medium text-indigo-600 dark:text-indigo-300">
+                                    Start your first task
+                                </span>
+                            ) : (
+                                <span className="text-sm font-mono opacity-60 text-gray-400 dark:text-gray-300">{completionPct}%</span>
+                            )}
                         </div>
                     )}
                 </div>
