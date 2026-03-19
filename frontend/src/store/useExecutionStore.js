@@ -33,7 +33,7 @@ export const useExecutionStore = create((set, get) => ({
     bootstrap: async () => {
         set((state) => ({ loading: { ...state.loading, bootstrap: true } }));
         try {
-            const [todayTask, coach, tasks, examTasks, progress] = await Promise.all([
+            const [todayTaskResult, coachResult, tasksResult, examTasksResult, progressResult] = await Promise.allSettled([
                 executionService.getTodayTask(),
                 executionService.getAICoach(),
                 executionService.getExecutionTasks('learning'),
@@ -41,9 +41,21 @@ export const useExecutionStore = create((set, get) => ({
                 executionService.getProgress(),
             ]);
 
+            const todayTask = todayTaskResult.status === 'fulfilled' ? todayTaskResult.value : null;
+            const coach = coachResult.status === 'fulfilled' ? coachResult.value : null;
+            const tasks = tasksResult.status === 'fulfilled' ? tasksResult.value : [];
+            const examTasks = examTasksResult.status === 'fulfilled' ? examTasksResult.value : [];
+            const progress = progressResult.status === 'fulfilled' ? progressResult.value : null;
+
             set({
                 todayTask,
-                coach,
+                coach: coach || {
+                    task: 'Start one focused 25-minute study sprint',
+                    reason: 'Small wins rebuild momentum and improve consistency.',
+                    difficulty: 'medium',
+                    estimated_time: '25 min',
+                    alternatives: [],
+                },
                 tasks,
                 examTasks,
                 progress,

@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 import requests
 from django.conf import settings
@@ -559,7 +559,7 @@ def _update_streak(stats, completed_day):
         stats.current_streak = 1
     elif completed_day == stats.last_completed_date:
         pass
-    elif completed_day == stats.last_completed_date + dj_timezone.timedelta(days=1):
+    elif completed_day == stats.last_completed_date + timedelta(days=1):
         stats.current_streak += 1
     else:
         stats.current_streak = 1
@@ -810,7 +810,7 @@ def execution_progress(request):
     weekly_completed = ExecutionTask.objects.filter(
         user=request.user,
         status='completed',
-        completed_at__date__gte=dj_timezone.localdate() - dj_timezone.timedelta(days=6),
+        completed_at__date__gte=dj_timezone.localdate() - timedelta(days=6),
     ).count()
 
     payload = {
