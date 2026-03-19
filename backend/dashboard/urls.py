@@ -11,6 +11,7 @@ urlpatterns = [
     path('ai/coach/', views.ai_coach, name='dashboard_ai_coach'),
     path('focus-session/', views.focus_session, name='dashboard_focus_session'),
     path('exam/plan/', views.exam_plan, name='dashboard_exam_plan'),
+    path('rewards/apply/', views.rewards_apply, name='dashboard_rewards_apply'),
     path('execution/tasks/', views.execution_tasks,
          name='dashboard_execution_tasks'),
     path('execution/progress/', views.execution_progress,

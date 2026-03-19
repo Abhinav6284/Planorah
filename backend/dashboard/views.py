@@ -575,6 +575,51 @@ def _update_streak(stats, completed_day):
     )
 
 
+def _apply_completion_rewards(user, task):
+    """Apply XP/streak reward once per completed task."""
+    if not task or task.status != 'completed':
+        stats = _get_or_create_user_stats(user)
+        return {
+            'applied': False,
+            'xp_gain': 0,
+            'stats': UserStatsSerializer(stats).data,
+        }
+
+    existing_log = XPLog.objects.filter(
+        user=user,
+        task=task,
+        reason='TASK_COMPLETION_REWARD',
+    ).exists()
+
+    stats = _get_or_create_user_stats(user)
+    if existing_log:
+        return {
+            'applied': False,
+            'xp_gain': 0,
+            'stats': UserStatsSerializer(stats).data,
+        }
+
+    xp_gain = 40 if task.task_type == 'exam' else 25
+    stats.xp_points += xp_gain
+    stats.tasks_completed += 1
+    _update_streak(stats, dj_timezone.localdate())
+    stats.level = _level_from_xp(stats.xp_points)
+    stats.save()
+
+    XPLog.objects.create(
+        user=user,
+        task=task,
+        points=xp_gain,
+        reason='TASK_COMPLETION_REWARD',
+    )
+
+    return {
+        'applied': True,
+        'xp_gain': xp_gain,
+        'stats': UserStatsSerializer(stats).data,
+    }
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_today_task(request):
@@ -695,21 +740,7 @@ def execution_tasks(request):
             if updated_task.status == 'completed' and not was_completed:
                 updated_task.completed_at = dj_timezone.now()
                 updated_task.save(update_fields=['completed_at'])
-
-                stats = _get_or_create_user_stats(request.user)
-                xp_gain = 40 if updated_task.task_type == 'exam' else 25
-                stats.xp_points += xp_gain
-                stats.tasks_completed += 1
-                _update_streak(stats, dj_timezone.localdate())
-                stats.level = _level_from_xp(stats.xp_points)
-                stats.save()
-
-                XPLog.objects.create(
-                    user=request.user,
-                    task=updated_task,
-                    points=xp_gain,
-                    reason=f"Completed {updated_task.task_type} task",
-                )
+                _apply_completion_rewards(request.user, updated_task)
 
         return Response(ExecutionTaskSerializer(updated_task).data, status=status.HTTP_200_OK)
 
@@ -820,3 +851,19 @@ def execution_progress(request):
         'active_exam_plan': ExamPlanSerializer(latest_plan).data if latest_plan else None,
     }
     return Response(payload, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def rewards_apply(request):
+    task_id = request.data.get('task_id')
+    if not task_id:
+        return Response({'detail': 'task_id is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        task = ExecutionTask.objects.get(id=task_id, user=request.user)
+    except ExecutionTask.DoesNotExist:
+        return Response({'detail': 'Task not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    reward_result = _apply_completion_rewards(request.user, task)
+    return Response(reward_result, status=status.HTTP_200_OK)

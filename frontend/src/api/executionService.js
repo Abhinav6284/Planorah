@@ -2,12 +2,12 @@ import api from './axios';
 
 export const executionService = {
     getTodayTask: async () => {
-        const response = await api.get('dashboard/today-task/');
+        const response = await api.get('today-task/');
         return response.data;
     },
 
     getAICoach: async (payload = {}) => {
-        const response = await api.post('dashboard/ai/coach/', payload);
+        const response = await api.post('ai/coach/', payload);
         return response.data;
     },
 
@@ -39,6 +39,11 @@ export const executionService = {
 
     generateExamPlan: async (payload) => {
         const response = await api.post('dashboard/exam/plan/', payload);
+        return response.data;
+    },
+
+    applyRewards: async (payload) => {
+        const response = await api.post('rewards/apply/', payload);
         return response.data;
     },
 

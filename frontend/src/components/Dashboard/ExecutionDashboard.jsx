@@ -7,9 +7,9 @@ import ProfileCard from './NewWidgets/ProfileCard';
 import CalendarWidget from './NewWidgets/CalendarWidget';
 import OnboardingWidget from './NewWidgets/OnboardingWidget';
 
-import TodayFocusCard from './Execution/TodayFocusCard';
+import TodayMissionCard from './Execution/TodayMissionCard';
 import AICoachCard from './Execution/AICoachCard';
-import FocusModeModal from './Execution/FocusModeModal';
+import FocusMode from './Execution/FocusMode';
 import ModeSwitch from './Execution/ModeSwitch';
 import ProgressReframeCard from './Execution/ProgressReframeCard';
 import GamificationBar from './Execution/GamificationBar';
@@ -17,6 +17,7 @@ import ExamModePanel from './Execution/ExamModePanel';
 
 import { useExecutionStore } from '../../store/useExecutionStore';
 import { userService } from '../../api/userService';
+import { useMissionFlow } from '../../hooks/useMissionFlow';
 
 const ExecutionDashboard = () => {
     const {
@@ -32,6 +33,7 @@ const ExecutionDashboard = () => {
         updateTaskStatus,
         createFocusSession,
         updateFocusSession,
+        applyRewards,
         createExamPlan,
         refreshTodayTask,
         setTodayTask,
@@ -39,8 +41,6 @@ const ExecutionDashboard = () => {
 
     const [profile, setProfile] = useState(null);
     const [voicePanelOpen, setVoicePanelOpen] = useState(false);
-    const [focusOpen, setFocusOpen] = useState(false);
-    const [focusSession, setFocusSession] = useState(null);
 
     useEffect(() => {
         bootstrap();
@@ -53,39 +53,20 @@ const ExecutionDashboard = () => {
         return profile?.username || 'there';
     }, [profile]);
 
-    const handleStartFocus = useCallback(async () => {
-        if (!todayTask?.id) return;
-        try {
-            const session = await createFocusSession({ task: todayTask.id, planned_minutes: 25 });
-            setFocusSession(session);
-            setFocusOpen(true);
-        } catch (error) {
-            console.error('Failed to start focus session', error);
-        }
-    }, [createFocusSession, todayTask]);
-
-    const handleFocusComplete = useCallback(async (minutes) => {
-        try {
-            if (focusSession?.id) {
-                await updateFocusSession({ id: focusSession.id, status: 'completed', actual_minutes: minutes });
-            }
-            if (todayTask?.id) {
-                await updateTaskStatus(todayTask.id, 'completed');
-            }
-            await refreshTodayTask();
-        } catch (error) {
-            console.error('Failed to complete focus session', error);
-        } finally {
-            setFocusOpen(false);
-            setFocusSession(null);
-        }
-    }, [focusSession, todayTask, updateFocusSession, updateTaskStatus, refreshTodayTask]);
-
-    const handleSkip = useCallback(async () => {
-        if (!todayTask?.id) return;
-        await updateTaskStatus(todayTask.id, 'skipped');
-        await refreshTodayTask();
-    }, [todayTask, updateTaskStatus, refreshTodayTask]);
+    const {
+        focusOpen,
+        setFocusOpen,
+        rewardPulse,
+        handleStartFocus,
+        handleFocusComplete,
+    } = useMissionFlow({
+        todayTask,
+        createFocusSession,
+        updateFocusSession,
+        updateTaskStatus,
+        applyRewards,
+        refreshTodayTask,
+    });
 
     const handleChangeTask = useCallback(async () => {
         const next = await regenerateCoach();
@@ -133,12 +114,24 @@ const ExecutionDashboard = () => {
 
                 <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
                     <div className="xl:col-span-8 space-y-4">
-                        <TodayFocusCard
+                        <TodayMissionCard
                             task={todayTask}
+                            loading={loading.bootstrap && !todayTask}
                             onStart={handleStartFocus}
-                            onSkip={handleSkip}
                             onChangeTask={handleChangeTask}
                         />
+
+                        {rewardPulse && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4"
+                            >
+                                <p className="text-sm font-semibold text-emerald-100">Mission Complete</p>
+                                <p className="text-xs text-emerald-200/90 mt-1">+{rewardPulse.xp} XP • {rewardPulse.streak} day streak • Level {rewardPulse.level}</p>
+                            </motion.div>
+                        )}
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             <AICoachCard coach={coach} onRegenerate={regenerateCoach} loading={loading.coach} />
@@ -165,7 +158,7 @@ const ExecutionDashboard = () => {
                 </div>
             </div>
 
-            <FocusModeModal
+            <FocusMode
                 open={focusOpen}
                 task={todayTask}
                 onClose={() => setFocusOpen(false)}

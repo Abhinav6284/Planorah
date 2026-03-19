@@ -13,6 +13,7 @@ export const useExecutionStore = create((set, get) => ({
         bootstrap: false,
         coach: false,
         examPlan: false,
+        rewards: false,
     },
 
     setMode: (mode) => set({ mode }),
@@ -101,6 +102,18 @@ export const useExecutionStore = create((set, get) => ({
 
     createFocusSession: async (payload) => executionService.createFocusSession(payload),
     updateFocusSession: async (payload) => executionService.updateFocusSession(payload),
+
+    applyRewards: async (taskId) => {
+        set((state) => ({ loading: { ...state.loading, rewards: true } }));
+        try {
+            const reward = await executionService.applyRewards({ task_id: taskId });
+            const progress = await executionService.getProgress();
+            set({ progress, activeExamPlan: progress?.active_exam_plan || null });
+            return reward;
+        } finally {
+            set((state) => ({ loading: { ...state.loading, rewards: false } }));
+        }
+    },
 
     createExamPlan: async (payload) => {
         set((state) => ({ loading: { ...state.loading, examPlan: true } }));

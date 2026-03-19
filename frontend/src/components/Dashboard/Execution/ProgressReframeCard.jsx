@@ -3,16 +3,16 @@ import React from 'react';
 const ProgressReframeCard = ({ stats, weeklyCompleted }) => {
     const completed = stats?.tasks_completed || 0;
 
-    let message = 'Start your first task';
+    let message = 'Start your first mission 🚀';
     let tone = 'text-cyan-200';
 
     if (completed > 0 && completed < 10) {
-        message = "You're getting started";
+        message = "You're getting momentum 💪";
         tone = 'text-amber-200';
     }
 
     if (completed >= 10) {
-        message = "You're on fire";
+        message = "You're on fire 🔥";
         tone = 'text-rose-200';
     }
 

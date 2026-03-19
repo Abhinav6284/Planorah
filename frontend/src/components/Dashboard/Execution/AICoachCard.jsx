@@ -3,6 +3,17 @@ import React, { useState } from 'react';
 const AICoachCard = ({ coach, onRegenerate, loading }) => {
     const [showReason, setShowReason] = useState(false);
 
+    if (loading && !coach) {
+        return (
+            <div className="rounded-3xl border border-white/10 bg-[#121822] p-5 text-white animate-pulse">
+                <div className="h-3 w-24 rounded bg-slate-700/60 mb-4" />
+                <div className="h-7 w-3/4 rounded bg-slate-700/60 mb-3" />
+                <div className="h-5 w-1/3 rounded bg-slate-700/60 mb-4" />
+                <div className="h-10 w-28 rounded bg-slate-700/60" />
+            </div>
+        );
+    }
+
     return (
         <div className="rounded-3xl border border-white/10 bg-[#121822] p-5 text-white shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
             <div className="flex items-center justify-between gap-2">
@@ -10,7 +21,7 @@ const AICoachCard = ({ coach, onRegenerate, loading }) => {
                 <button
                     onClick={onRegenerate}
                     disabled={loading}
-                    className="text-xs px-3 py-1 rounded-lg border border-cyan-300/30 text-cyan-100 hover:bg-cyan-500/10 disabled:opacity-50"
+                    className="text-xs px-3 py-1 rounded-lg border border-cyan-300/30 text-cyan-100 hover:bg-cyan-500/10 active:scale-[0.98] transition-transform disabled:opacity-50"
                 >
                     {loading ? 'Generating...' : 'Regenerate सुझाव'}
                 </button>

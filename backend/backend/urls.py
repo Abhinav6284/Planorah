@@ -6,6 +6,7 @@ from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
+from dashboard import views as dashboard_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -15,6 +16,11 @@ urlpatterns = [
     path('api/ats/', include('ats.urls')),
     path('api/interview/', include('interview.urls')),
     path('api/dashboard/', include('dashboard.urls')),
+    path('api/today-task/', dashboard_views.get_today_task,
+         name='api_today_task_alias'),
+    path('api/ai/coach/', dashboard_views.ai_coach, name='api_ai_coach_alias'),
+    path('api/rewards/apply/', dashboard_views.rewards_apply,
+         name='api_rewards_apply_alias'),
     path('api/roadmap/', include('roadmap_ai.urls')),
     path('api/scheduler/', include('scheduler.urls')),
     path('api/', include('tasks.urls')),  # Tasks and Notes API
