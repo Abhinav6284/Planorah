@@ -83,7 +83,7 @@ const ExecutionDashboard = () => {
     }, [regenerateCoach, setTodayTask]);
 
     return (
-        <div className="min-h-screen p-3 sm:p-5 lg:p-6 bg-[radial-gradient(circle_at_20%_0%,#0d3142_0%,#05080f_42%,#03040a_100%)] text-white">
+        <div className="min-h-screen p-3 sm:p-5 lg:p-6 text-white">
             <div className="max-w-[1580px] mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
