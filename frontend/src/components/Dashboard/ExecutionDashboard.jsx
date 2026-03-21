@@ -84,7 +84,7 @@ const ExecutionDashboard = () => {
 
     return (
         <div className="min-h-screen p-3 sm:p-5 lg:p-6 text-white">
-            <div className="max-w-[1580px] mx-auto">
+            <div className="max-w-[1580px] mx-auto dark">
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
