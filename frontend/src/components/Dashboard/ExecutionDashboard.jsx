@@ -90,7 +90,7 @@ const ExecutionDashboard = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="flex flex-col lg:flex-row lg:items-center gap-3 mb-4"
                 >
-                    <DateTasksWidget tasks={[]} />
+                    <DateTasksWidget tasks={[]} variant="execution" />
 
                     <div className="flex-1">
                         <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
@@ -148,12 +148,12 @@ const ExecutionDashboard = () => {
                             />
                         )}
 
-                        {mode === 'learning' && <OnboardingWidget />}
+                        {mode === 'learning' && <OnboardingWidget variant="execution" />}
                     </div>
 
                     <div className="xl:col-span-4 space-y-4">
-                        <ProfileCard user={profile} streak={null} />
-                        <CalendarWidget />
+                        <ProfileCard user={profile} streak={null} variant="execution" />
+                        <CalendarWidget variant="execution" />
                     </div>
                 </div>
             </div>

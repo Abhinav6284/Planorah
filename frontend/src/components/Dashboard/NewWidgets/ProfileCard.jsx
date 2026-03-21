@@ -4,7 +4,9 @@ import { motion } from 'framer-motion';
 import { Flame } from 'lucide-react';
 import { getUserAvatar } from '../../../utils/avatar';
 
-const ProfileCard = ({ user, streak }) => {
+const ProfileCard = ({ user, streak, variant = 'default' }) => {
+    const isExecution = variant === 'execution';
+
     // Current streak count
     const currentStreak = streak?.streak?.current || 0;
 
@@ -60,29 +62,52 @@ const ProfileCard = ({ user, streak }) => {
     }, [streak, currentStreak, daysIntoCurrentMilestone]);
 
     return (
-        <div className="bg-white dark:bg-[#1C1C1E] rounded-[32px] p-6 flex flex-col gap-6 border border-gray-100 dark:border-gray-800/60 shadow-xl shadow-gray-100/50 dark:shadow-none relative overflow-hidden group">
+        <div
+            className={`rounded-[32px] p-6 flex flex-col gap-6 border relative overflow-hidden group ${isExecution
+                ? 'bg-[linear-gradient(145deg,#10151f,#1a1c27_45%,#111723)] border-cyan-300/20 shadow-[0_22px_55px_rgba(0,0,0,0.45)]'
+                : 'bg-white dark:bg-[#1C1C1E] border-gray-100 dark:border-gray-800/60 shadow-xl shadow-gray-100/50 dark:shadow-none'
+                }`}
+        >
 
             {/* Header Section */}
             <div className="flex items-center justify-between z-10 w-full">
                 <div className="flex items-center gap-4">
                     <Link to="/settings" className="relative group/avatar flex-shrink-0">
-                        <div className="w-16 h-16 rounded-full p-1 bg-gradient-to-tr from-orange-400 via-red-500 to-purple-600 shadow-lg shadow-orange-500/20 group-hover/avatar:shadow-orange-500/40 transition-all duration-300">
+                        <div className={`w-16 h-16 rounded-full p-1 shadow-lg transition-all duration-300 ${isExecution
+                            ? 'bg-gradient-to-tr from-cyan-300 via-sky-400 to-indigo-500 shadow-cyan-500/20 group-hover/avatar:shadow-cyan-500/40'
+                            : 'bg-gradient-to-tr from-orange-400 via-red-500 to-purple-600 shadow-orange-500/20 group-hover/avatar:shadow-orange-500/40'
+                            }`}>
                             <img
                                 src={getUserAvatar(user)}
                                 alt="User"
-                                className="w-full h-full rounded-full bg-white dark:bg-zinc-900 object-cover border-2 border-white dark:border-zinc-900"
+                                className={`w-full h-full rounded-full object-cover border-2 ${isExecution
+                                    ? 'bg-[#0d141f] border-[#0d141f]'
+                                    : 'bg-white dark:bg-zinc-900 border-white dark:border-zinc-900'
+                                    }`}
                             />
                         </div>
-                        <div className="absolute -bottom-1 -right-1 bg-white dark:bg-zinc-800 p-1.5 rounded-full border border-gray-100 dark:border-zinc-700 shadow-sm">
+                        <div className={`absolute -bottom-1 -right-1 p-1.5 rounded-full border shadow-sm ${isExecution
+                            ? 'bg-[#0d141f] border-cyan-300/20'
+                            : 'bg-white dark:bg-zinc-800 border-gray-100 dark:border-zinc-700'
+                            }`}>
                             <div className="text-[10px]">✏️</div>
                         </div>
                     </Link>
                     <div>
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
+                        <h3 className={`text-xl font-bold tracking-tight flex items-center gap-2 ${isExecution ? 'text-cyan-50' : 'text-gray-900 dark:text-white'}`}>
                             {user?.username || "Student"}
-                            {user?.level && <span className="px-2 py-0.5 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-500 text-[10px] font-bold uppercase tracking-wider">Level {user.level}</span>}
+                            {user?.level && (
+                                <span
+                                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${isExecution
+                                        ? 'bg-cyan-400/15 text-cyan-100 border border-cyan-300/30'
+                                        : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-500'
+                                        }`}
+                                >
+                                    Level {user.level}
+                                </span>
+                            )}
                         </h3>
-                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        <p className={`text-sm font-medium ${isExecution ? 'text-cyan-100/70' : 'text-gray-500 dark:text-gray-400'}`}>
                             {user?.role || "Planora Learner"}
                         </p>
                     </div>
@@ -101,7 +126,12 @@ const ProfileCard = ({ user, streak }) => {
                         >
                             🔥
                         </motion.div>
-                        <div className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full border-2 border-white dark:border-[#1C1C1E] shadow-sm">
+                        <div
+                            className={`absolute -top-2 -right-2 text-xs font-bold px-2 py-0.5 rounded-full border-2 shadow-sm ${isExecution
+                                ? 'bg-cyan-500 text-[#042332] border-[#111723]'
+                                : 'bg-red-600 text-white border-white dark:border-[#1C1C1E]'
+                                }`}
+                        >
                             {currentStreak}
                         </div>
                     </div>
@@ -109,19 +139,19 @@ const ProfileCard = ({ user, streak }) => {
             </div>
 
             {/* Streak Visualization - "Duolingo Style" */}
-            <div className="z-10 bg-gray-50 dark:bg-zinc-900/50 rounded-2xl p-5 border border-gray-100 dark:border-white/5 w-full">
+            <div className={`z-10 rounded-2xl p-5 border w-full ${isExecution ? 'bg-black/20 border-cyan-300/15' : 'bg-gray-50 dark:bg-zinc-900/50 border-gray-100 dark:border-white/5'}`}>
                 <div className="flex justify-between items-center mb-4">
-                    <span className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+                    <span className={`text-xs font-bold uppercase tracking-widest ${isExecution ? 'text-cyan-100/55' : 'text-gray-400 dark:text-gray-500'}`}>
                         Week {weekNumber}
                     </span>
-                    <span className="text-xs font-bold text-orange-600 dark:text-orange-400">
+                    <span className={`text-xs font-bold ${isExecution ? 'text-cyan-100' : 'text-orange-600 dark:text-orange-400'}`}>
                         {currentStreak} / {nextMilestone} Days
                     </span>
                 </div>
 
                 <div className="flex justify-between items-center relative w-full px-1 py-1">
                     {/* Connecting Line (Background) */}
-                    <div className="absolute top-[18px] sm:top-[22px] left-4 right-4 h-1 bg-gray-100 dark:bg-zinc-800/80 rounded-full z-0" />
+                    <div className={`absolute top-[18px] sm:top-[22px] left-4 right-4 h-1 rounded-full z-0 ${isExecution ? 'bg-cyan-200/10' : 'bg-gray-100 dark:bg-zinc-800/80'}`} />
 
                     {/* Active Line Fill (Dynamic) */}
                     {weekDays.filter(d => d.active).length > 1 && (
@@ -129,7 +159,7 @@ const ProfileCard = ({ user, streak }) => {
                             initial={{ width: 0 }}
                             animate={{ width: `${((weekDays.filter(d => d.active).length - 1) / 6) * 100}%` }}
                             transition={{ duration: 1, ease: "easeOut" }}
-                            className="absolute top-[18px] sm:top-[22px] left-4 h-1 bg-gradient-to-r from-orange-400 to-red-500 rounded-full z-0"
+                            className={`absolute top-[18px] sm:top-[22px] left-4 h-1 rounded-full z-0 ${isExecution ? 'bg-gradient-to-r from-cyan-300 to-blue-400' : 'bg-gradient-to-r from-orange-400 to-red-500'}`}
                             style={{ maxWidth: 'calc(100% - 2rem)' }}
                         />
                     )}
@@ -140,31 +170,43 @@ const ProfileCard = ({ user, streak }) => {
                             <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
                                 {/* Glow Effect for Active Days */}
                                 {day.active && (
-                                    <div className="absolute inset-0 bg-orange-500/30 rounded-full blur-md" />
+                                    <div className={`absolute inset-0 rounded-full blur-md ${isExecution ? 'bg-cyan-400/25' : 'bg-orange-500/30'}`} />
                                 )}
 
                                 <div
                                     className={`absolute flex items-center justify-center rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${day.active
-                                        ? 'w-full h-full bg-gradient-to-br from-orange-400 to-red-500 shadow-md shadow-orange-500/30 scale-105 z-20'
+                                        ? isExecution
+                                            ? 'w-full h-full bg-gradient-to-br from-cyan-300 to-blue-500 shadow-md shadow-cyan-500/30 scale-105 z-20'
+                                            : 'w-full h-full bg-gradient-to-br from-orange-400 to-red-500 shadow-md shadow-orange-500/30 scale-105 z-20'
                                         : day.isToday
-                                            ? 'w-6 h-6 sm:w-7 sm:h-7 bg-white dark:bg-[#1C1C1E] border-[2px] border-orange-400 dark:border-orange-500 shadow-sm z-10'
-                                            : 'w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gray-200 dark:bg-zinc-700'
+                                            ? isExecution
+                                                ? 'w-6 h-6 sm:w-7 sm:h-7 bg-[#121a27] border-[2px] border-cyan-300 shadow-sm z-10'
+                                                : 'w-6 h-6 sm:w-7 sm:h-7 bg-white dark:bg-[#1C1C1E] border-[2px] border-orange-400 dark:border-orange-500 shadow-sm z-10'
+                                            : isExecution
+                                                ? 'w-2 h-2 sm:w-2.5 sm:h-2.5 bg-cyan-100/30'
+                                                : 'w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gray-200 dark:bg-zinc-700'
                                         }`}
                                 >
                                     {day.active ? (
                                         <Flame size={18} className="text-white fill-white" strokeWidth={0} />
                                     ) : day.isToday ? (
-                                        <div className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
+                                        <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${isExecution ? 'bg-cyan-200' : 'bg-orange-400'}`} />
                                     ) : null}
                                 </div>
                             </div>
 
                             {/* Day Label below */}
                             <span className={`text-[10px] font-bold uppercase transition-colors duration-300 ${day.active
-                                ? 'text-orange-600 dark:text-orange-500'
+                                ? isExecution
+                                    ? 'text-cyan-100'
+                                    : 'text-orange-600 dark:text-orange-500'
                                 : day.isToday
-                                    ? 'text-gray-900 dark:text-white'
-                                    : 'text-gray-400 dark:text-gray-600'
+                                    ? isExecution
+                                        ? 'text-cyan-50'
+                                        : 'text-gray-900 dark:text-white'
+                                    : isExecution
+                                        ? 'text-cyan-100/45'
+                                        : 'text-gray-400 dark:text-gray-600'
                                 }`}>
                                 {day.dayLabel}
                             </span>
@@ -174,8 +216,8 @@ const ProfileCard = ({ user, streak }) => {
             </div>
 
             {/* Subtle Texture/Decorations */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl -ml-32 -mb-32 pointer-events-none" />
+            <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none ${isExecution ? 'bg-cyan-500/10' : 'bg-orange-500/5'}`} />
+            <div className={`absolute bottom-0 left-0 w-64 h-64 rounded-full blur-3xl -ml-32 -mb-32 pointer-events-none ${isExecution ? 'bg-sky-500/10' : 'bg-purple-500/5'}`} />
         </div>
     );
 };

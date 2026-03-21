@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { schedulerService } from '../../../api/schedulerService';
 
-const CalendarWidget = () => {
+const CalendarWidget = ({ variant = 'default' }) => {
     const GOOGLE_STATE_KEY = "google_calendar_oauth_state";
     const GOOGLE_REDIRECT_URI_KEY = "google_calendar_redirect_uri";
+    const isExecution = variant === 'execution';
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const hasFetchedRef = useRef(false);
@@ -78,32 +79,32 @@ const CalendarWidget = () => {
 
     if (loading) {
         return (
-            <div className="bg-white dark:bg-[#1C1C1E] rounded-[24px] sm:rounded-[28px] p-4 sm:p-5 h-full flex items-center justify-center border border-gray-100 dark:border-gray-800">
-                <div className="text-gray-400 dark:text-gray-500 animate-pulse text-sm">Loading...</div>
+            <div className={`rounded-[24px] sm:rounded-[28px] p-4 sm:p-5 h-full flex items-center justify-center border ${isExecution ? 'bg-[linear-gradient(145deg,#0f1520,#161d29)] border-cyan-300/20' : 'bg-white dark:bg-[#1C1C1E] border-gray-100 dark:border-gray-800'}`}>
+                <div className={`animate-pulse text-sm ${isExecution ? 'text-cyan-100/65' : 'text-gray-400 dark:text-gray-500'}`}>Loading...</div>
             </div>
         );
     }
 
     return (
-        <div className="bg-white dark:bg-[#1C1C1E] rounded-[24px] sm:rounded-[28px] p-4 sm:p-5 h-full flex flex-col relative overflow-hidden border border-gray-100 dark:border-gray-800">
+        <div className={`rounded-[24px] sm:rounded-[28px] p-4 sm:p-5 h-full flex flex-col relative overflow-hidden border ${isExecution ? 'bg-[linear-gradient(145deg,#0f1520,#161d29)] border-cyan-300/20 shadow-[0_20px_45px_rgba(0,0,0,0.4)]' : 'bg-white dark:bg-[#1C1C1E] border-gray-100 dark:border-gray-800'}`}>
             {/* Header */}
             <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-lg sm:rounded-xl flex items-center justify-center">
+                    <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center ${isExecution ? 'bg-gradient-to-br from-cyan-400 to-blue-500' : 'bg-gradient-to-br from-red-500 to-red-600'}`}>
                         <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </div>
                     <div>
-                        <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">Calendar</h3>
-                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                        <h3 className={`text-xs sm:text-sm font-semibold ${isExecution ? 'text-cyan-50' : 'text-gray-900 dark:text-white'}`}>Calendar</h3>
+                        <p className={`text-[10px] sm:text-xs ${isExecution ? 'text-cyan-100/60' : 'text-gray-500 dark:text-gray-400'}`}>
                             {events.length > 0 ? `${events.length} events` : 'No events'}
                         </p>
                     </div>
                 </div>
                 <Link
                     to="/scheduler"
-                    className="text-[10px] sm:text-xs px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    className={`text-[10px] sm:text-xs px-2 py-1 rounded-full transition-colors ${isExecution ? 'bg-cyan-400/10 text-cyan-100/80 hover:bg-cyan-400/20' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
                 >
                     View All
                 </Link>
@@ -115,14 +116,14 @@ const CalendarWidget = () => {
                     {events.map((event, index) => (
                         <div
                             key={event.id || index}
-                            className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                            className={`flex items-start gap-3 p-3 rounded-xl transition-colors cursor-pointer ${isExecution ? 'bg-black/20 border border-cyan-300/10 hover:bg-black/30' : 'bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
                         >
                             <div className={`w-1 h-full min-h-[40px] ${getEventColor(index)} rounded-full`} />
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                <p className={`text-sm font-medium truncate ${isExecution ? 'text-cyan-50' : 'text-gray-900 dark:text-white'}`}>
                                     {event.title}
                                 </p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                <p className={`text-xs mt-0.5 ${isExecution ? 'text-cyan-100/60' : 'text-gray-500 dark:text-gray-400'}`}>
                                     {formatEventTime(event.start_time)}
                                 </p>
                             </div>
@@ -138,20 +139,20 @@ const CalendarWidget = () => {
                 </div>
             ) : (
                 <div className="flex-1 flex flex-col items-center justify-center text-center">
-                    <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center mb-4">
-                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 ${isExecution ? 'bg-black/30 border border-cyan-300/15' : 'bg-gray-100 dark:bg-gray-800'}`}>
+                        <svg className={`w-8 h-8 ${isExecution ? 'text-cyan-100/55' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    <p className={`text-sm mb-2 ${isExecution ? 'text-cyan-100/80' : 'text-gray-600 dark:text-gray-400'}`}>
                         No upcoming events
                     </p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
+                    <p className={`text-xs mb-4 ${isExecution ? 'text-cyan-100/55' : 'text-gray-400 dark:text-gray-500'}`}>
                         Schedule a roadmap or connect Google Calendar
                     </p>
                     <button
                         onClick={handleConnect}
-                        className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        className={`flex items-center gap-2 px-4 py-2 border rounded-xl text-sm font-medium transition-colors ${isExecution ? 'bg-cyan-400/10 border-cyan-300/25 text-cyan-50 hover:bg-cyan-400/20' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
                     >
                         <svg className="w-4 h-4 text-red-500" viewBox="0 0 24 24">
                             <path fill="currentColor" d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z" />
@@ -163,10 +164,10 @@ const CalendarWidget = () => {
 
             {/* Quick Action */}
             {events.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                <div className={`mt-4 pt-4 border-t ${isExecution ? 'border-cyan-300/15' : 'border-gray-100 dark:border-gray-800'}`}>
                     <Link
                         to="/scheduler"
-                        className="flex items-center justify-center gap-2 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium transition-colors"
+                        className={`flex items-center justify-center gap-2 text-sm font-medium transition-colors ${isExecution ? 'text-cyan-200 hover:text-cyan-100' : 'text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300'}`}
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -177,7 +178,7 @@ const CalendarWidget = () => {
             )}
 
             {/* Decorative */}
-            <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
+            <div className={`absolute top-0 right-0 w-24 h-24 rounded-full blur-2xl -mr-10 -mt-10 ${isExecution ? 'bg-cyan-500/10' : 'bg-red-500/5'}`}></div>
         </div>
     );
 };

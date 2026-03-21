@@ -25,8 +25,9 @@ function SkeletonLine({ w = "full" }) {
     return <div className={`h-3.5 w-${w} bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse`} />;
 }
 
-export default function OnboardingWidget() {
+export default function OnboardingWidget({ variant = "default" }) {
     const navigate = useNavigate();
+    const isExecution = variant === "execution";
     const [loading, setLoading] = useState(true);
     const [insight, setInsight] = useState(fallbackInsight);
     const [activeTab, setActiveTab] = useState(0);
@@ -52,29 +53,32 @@ export default function OnboardingWidget() {
     const pros = Array.isArray(insight.pros) ? insight.pros : [];
     const cons = Array.isArray(insight.cons) ? insight.cons : [];
 
-    const readinessColor =
-        readiness >= 70 ? "from-emerald-400 to-teal-500"
+    const readinessColor = isExecution
+        ? readiness >= 70 ? "from-cyan-300 to-blue-500"
+            : readiness >= 40 ? "from-teal-300 to-cyan-500"
+                : "from-sky-300 to-indigo-500"
+        : readiness >= 70 ? "from-emerald-400 to-teal-500"
             : readiness >= 40 ? "from-amber-400 to-orange-500"
                 : "from-rose-400 to-pink-500";
 
     return (
-        <div className="h-full rounded-3xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1C1C1E] shadow-sm flex flex-col overflow-hidden">
+        <div className={`h-full rounded-3xl border shadow-sm flex flex-col overflow-hidden ${isExecution ? "border-cyan-300/20 bg-[linear-gradient(145deg,#0f1520,#161d29)] shadow-[0_20px_45px_rgba(0,0,0,0.4)]" : "border-gray-200 dark:border-white/10 bg-white dark:bg-[#1C1C1E]"}`}>
             {/* ── Header ── */}
             <div className="px-5 pt-5 pb-3">
                 <div className="flex items-start justify-between gap-2 mb-3">
                     <div className="min-w-0">
-                        <p className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-0.5">AI Learning Intelligence</p>
+                        <p className={`text-[10px] uppercase tracking-widest mb-0.5 ${isExecution ? "text-cyan-100/55" : "text-gray-400 dark:text-gray-500"}`}>AI Learning Intelligence</p>
                         {loading ? (
-                            <div className="h-5 w-40 bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse mt-1" />
+                            <div className={`h-5 w-40 rounded-lg animate-pulse mt-1 ${isExecution ? "bg-cyan-200/10" : "bg-gray-100 dark:bg-gray-800"}`} />
                         ) : (
-                            <h3 className="text-base font-bold text-gray-900 dark:text-white leading-snug truncate">
+                            <h3 className={`text-base font-bold leading-snug truncate ${isExecution ? "text-cyan-50" : "text-gray-900 dark:text-white"}`}>
                                 {insight.identity_tag || "Your Strategy"}
                             </h3>
                         )}
-                        <p className="text-[11px] text-gray-500 dark:text-gray-400 capitalize mt-0.5">{stageLabel} · {insight.weekly_hours || 0} hrs/week</p>
+                        <p className={`text-[11px] capitalize mt-0.5 ${isExecution ? "text-cyan-100/65" : "text-gray-500 dark:text-gray-400"}`}>{stageLabel} · {insight.weekly_hours || 0} hrs/week</p>
                     </div>
                     <div className="text-right flex-shrink-0">
-                        <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wide">Readiness</p>
+                        <p className={`text-[10px] uppercase tracking-wide ${isExecution ? "text-cyan-100/55" : "text-gray-400 dark:text-gray-500"}`}>Readiness</p>
                         <p className={`text-2xl font-black bg-gradient-to-br ${readinessColor} bg-clip-text text-transparent`}>
                             {readiness}%
                         </p>
@@ -82,7 +86,7 @@ export default function OnboardingWidget() {
                 </div>
 
                 {/* Readiness bar */}
-                <div className="h-1.5 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden mb-3">
+                <div className={`h-1.5 w-full rounded-full overflow-hidden mb-3 ${isExecution ? "bg-cyan-200/10" : "bg-gray-100 dark:bg-gray-800"}`}>
                     <div
                         className={`h-full bg-gradient-to-r ${readinessColor} transition-all duration-700`}
                         style={{ width: `${readiness}%` }}
@@ -93,7 +97,7 @@ export default function OnboardingWidget() {
                 {!loading && highlights.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mb-2">
                         {highlights.slice(0, 4).map((item, i) => (
-                            <span key={i} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                            <span key={i} className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${isExecution ? "bg-cyan-300/10 text-cyan-100/80 border border-cyan-300/20" : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"}`}>
                                 {item}
                             </span>
                         ))}
@@ -102,21 +106,25 @@ export default function OnboardingWidget() {
 
                 {/* Incomplete warning */}
                 {!loading && !onboardingComplete && (
-                    <div className="mb-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-1.5 text-[11px] text-amber-800 dark:border-amber-700/30 dark:bg-amber-900/20 dark:text-amber-300">
+                    <div className={`mb-2 rounded-xl border px-3 py-1.5 text-[11px] ${isExecution ? "border-cyan-300/20 bg-cyan-400/10 text-cyan-100/90" : "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-700/30 dark:bg-amber-900/20 dark:text-amber-300"}`}>
                         ⚠ Onboarding incomplete — insights are partially estimated.
                     </div>
                 )}
             </div>
 
             {/* ── Tabs ── */}
-            <div className="flex border-b border-gray-100 dark:border-white/10 px-5">
+            <div className={`flex border-b px-5 ${isExecution ? "border-cyan-300/15" : "border-gray-100 dark:border-white/10"}`}>
                 {TABS.map((tab, i) => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(i)}
                         className={`text-xs font-semibold pb-2 mr-5 border-b-2 transition-colors ${activeTab === i
-                                ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
-                                : "border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                                ? isExecution
+                                    ? "border-cyan-300 text-cyan-100"
+                                    : "border-indigo-500 text-indigo-600 dark:text-indigo-400"
+                                : isExecution
+                                    ? "border-transparent text-cyan-100/55 hover:text-cyan-100/90"
+                                    : "border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                             }`}
                     >
                         {tab}
@@ -138,28 +146,28 @@ export default function OnboardingWidget() {
                         {/* ── OVERVIEW TAB ── */}
                         {activeTab === 0 && (
                             <div className="space-y-3">
-                                <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-[13px]">
+                                <p className={`leading-relaxed text-[13px] ${isExecution ? "text-cyan-100/80" : "text-gray-700 dark:text-gray-300"}`}>
                                     {insight.summary}
                                 </p>
 
                                 {insight.today_action && (
-                                    <div className="rounded-2xl bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-900/20 dark:to-violet-900/10 border border-indigo-100 dark:border-indigo-800/30 p-3">
-                                        <p className="text-[10px] uppercase tracking-widest text-indigo-500 dark:text-indigo-400 font-bold mb-1">Do this today</p>
-                                        <p className="text-[13px] text-indigo-900 dark:text-indigo-100 font-medium leading-snug">
+                                    <div className={`rounded-2xl p-3 border ${isExecution ? "bg-cyan-400/10 border-cyan-300/20" : "bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-900/20 dark:to-violet-900/10 border-indigo-100 dark:border-indigo-800/30"}`}>
+                                        <p className={`text-[10px] uppercase tracking-widest font-bold mb-1 ${isExecution ? "text-cyan-100/80" : "text-indigo-500 dark:text-indigo-400"}`}>Do this today</p>
+                                        <p className={`text-[13px] font-medium leading-snug ${isExecution ? "text-cyan-50" : "text-indigo-900 dark:text-indigo-100"}`}>
                                             {insight.today_action}
                                         </p>
                                     </div>
                                 )}
 
-                                <div className="rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 p-3">
-                                    <p className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500 font-bold mb-1">Reflection</p>
-                                    <p className="text-[13px] text-gray-700 dark:text-gray-300 italic leading-snug">
+                                <div className={`rounded-2xl border p-3 ${isExecution ? "bg-black/20 border-cyan-300/15" : "bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10"}`}>
+                                    <p className={`text-[10px] uppercase tracking-widest font-bold mb-1 ${isExecution ? "text-cyan-100/55" : "text-gray-400 dark:text-gray-500"}`}>Reflection</p>
+                                    <p className={`text-[13px] italic leading-snug ${isExecution ? "text-cyan-100/80" : "text-gray-700 dark:text-gray-300"}`}>
                                         "{insight.reflection_prompt}"
                                     </p>
                                 </div>
 
-                                <div className="flex items-center gap-2 text-[11px] text-gray-400 dark:text-gray-500">
-                                    <span className={`w-1.5 h-1.5 rounded-full ${insight.source === "ai" ? "bg-emerald-400" : "bg-gray-400"}`} />
+                                <div className={`flex items-center gap-2 text-[11px] ${isExecution ? "text-cyan-100/55" : "text-gray-400 dark:text-gray-500"}`}>
+                                    <span className={`w-1.5 h-1.5 rounded-full ${insight.source === "ai" ? "bg-emerald-400" : isExecution ? "bg-cyan-300/60" : "bg-gray-400"}`} />
                                     {insight.source === "ai" ? "Powered by Gemini AI" : "Smart fallback · Complete onboarding for AI insights"}
                                 </div>
                             </div>
@@ -170,8 +178,8 @@ export default function OnboardingWidget() {
                             <div className="space-y-3">
                                 {insight.priority_focus && (
                                     <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500 font-bold">Week focus</span>
-                                        <span className="px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-[11px] font-semibold">
+                                        <span className={`text-[10px] uppercase tracking-widest font-bold ${isExecution ? "text-cyan-100/55" : "text-gray-400 dark:text-gray-500"}`}>Week focus</span>
+                                        <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${isExecution ? "bg-cyan-300/15 border border-cyan-300/25 text-cyan-100" : "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300"}`}>
                                             {insight.priority_focus}
                                         </span>
                                     </div>
@@ -181,12 +189,12 @@ export default function OnboardingWidget() {
                                 {weekPlan.length > 0 && (
                                     <div className="space-y-2">
                                         {weekPlan.map((slot, i) => (
-                                            <div key={i} className="flex items-start gap-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 p-2.5">
+                                            <div key={i} className={`flex items-start gap-3 rounded-xl border p-2.5 ${isExecution ? "bg-black/20 border-cyan-300/15" : "bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10"}`}>
                                                 <div className="flex-shrink-0 w-14 text-center">
-                                                    <span className="text-[10px] font-bold text-indigo-500 dark:text-indigo-400 uppercase">{slot.slot}</span>
-                                                    <p className="text-[10px] text-gray-400 dark:text-gray-500">{slot.hours}h</p>
+                                                    <span className={`text-[10px] font-bold uppercase ${isExecution ? "text-cyan-100/80" : "text-indigo-500 dark:text-indigo-400"}`}>{slot.slot}</span>
+                                                    <p className={`text-[10px] ${isExecution ? "text-cyan-100/50" : "text-gray-400 dark:text-gray-500"}`}>{slot.hours}h</p>
                                                 </div>
-                                                <p className="text-[12px] text-gray-700 dark:text-gray-300 leading-snug pt-0.5">{slot.focus}</p>
+                                                <p className={`text-[12px] leading-snug pt-0.5 ${isExecution ? "text-cyan-100/85" : "text-gray-700 dark:text-gray-300"}`}>{slot.focus}</p>
                                             </div>
                                         ))}
                                     </div>
@@ -195,11 +203,11 @@ export default function OnboardingWidget() {
                                 {/* Action points */}
                                 {actionPoints.length > 0 && (
                                     <>
-                                        <p className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500 font-bold mt-1">Action Points</p>
+                                        <p className={`text-[10px] uppercase tracking-widest font-bold mt-1 ${isExecution ? "text-cyan-100/55" : "text-gray-400 dark:text-gray-500"}`}>Action Points</p>
                                         <ul className="space-y-2">
                                             {actionPoints.map((point, i) => (
-                                                <li key={i} className="flex items-start gap-2 text-[12px] text-gray-700 dark:text-gray-300">
-                                                    <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-indigo-400 flex-shrink-0" />
+                                                <li key={i} className={`flex items-start gap-2 text-[12px] ${isExecution ? "text-cyan-100/80" : "text-gray-700 dark:text-gray-300"}`}>
+                                                    <span className={`mt-1.5 h-1.5 w-1.5 rounded-full flex-shrink-0 ${isExecution ? "bg-cyan-300" : "bg-indigo-400"}`} />
                                                     {point}
                                                 </li>
                                             ))}
@@ -280,18 +288,18 @@ export default function OnboardingWidget() {
             </div>
 
             {/* ── Footer ── */}
-            <div className="px-5 pb-4 pt-2 flex items-center justify-between gap-2 border-t border-gray-100 dark:border-white/10">
+            <div className={`px-5 pb-4 pt-2 flex items-center justify-between gap-2 border-t ${isExecution ? "border-cyan-300/15" : "border-gray-100 dark:border-white/10"}`}>
                 {!onboardingComplete && (
                     <button
                         onClick={() => navigate("/onboarding")}
-                        className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                        className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${isExecution ? "border-cyan-300/25 text-cyan-100/90 hover:bg-cyan-400/10" : "border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5"}`}
                     >
                         Finish Onboarding
                     </button>
                 )}
                 <button
                     onClick={() => navigate("/assistant", { state: { initialMessage: `Give me a full execution strategy based on this: ${insight.summary}. Today I should: ${insight.today_action}` } })}
-                    className="ml-auto text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors"
+                    className={`ml-auto text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${isExecution ? "bg-cyan-300 text-[#032533] hover:bg-cyan-200" : "bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-100"}`}
                 >
                     Ask AI Coach →
                 </button>
