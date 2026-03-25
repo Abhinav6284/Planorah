@@ -6,8 +6,20 @@ import { getTemplateById } from "./templates";
 import TemplateModal from "./TemplateModal";
 
 // Collapsible Section Component
-const AccordionSection = ({ id, title, icon, isOpen, onToggle, children }) => (
-    <div className="border-b border-gray-200 dark:border-gray-700">
+const AccordionSection = ({
+    id,
+    title,
+    icon,
+    isOpen,
+    onToggle,
+    canMoveUp,
+    canMoveDown,
+    onMoveUp,
+    onMoveDown,
+    order,
+    children
+}) => (
+    <div className="border-b border-gray-200 dark:border-gray-700" style={{ order }}>
         <button
             onClick={() => onToggle(id)}
             className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
@@ -16,14 +28,44 @@ const AccordionSection = ({ id, title, icon, isOpen, onToggle, children }) => (
                 <span className="text-lg">{icon}</span>
                 <span className="font-medium text-gray-900 dark:text-white">{title}</span>
             </div>
-            <svg
-                className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-            >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+            <div className="flex items-center gap-1.5">
+                <button
+                    type="button"
+                    disabled={!canMoveUp}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        if (canMoveUp) {
+                            onMoveUp(id);
+                        }
+                    }}
+                    className="h-6 w-6 rounded border border-gray-200 bg-white text-gray-500 transition-colors hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-30 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                    aria-label={`Move ${title} up`}
+                >
+                    ↑
+                </button>
+                <button
+                    type="button"
+                    disabled={!canMoveDown}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        if (canMoveDown) {
+                            onMoveDown(id);
+                        }
+                    }}
+                    className="h-6 w-6 rounded border border-gray-200 bg-white text-gray-500 transition-colors hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-30 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                    aria-label={`Move ${title} down`}
+                >
+                    ↓
+                </button>
+                <svg
+                    className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
         </button>
         <AnimatePresence>
             {isOpen && (
@@ -68,6 +110,15 @@ const createEmptyEducation = () => ({
     cgpa: ""
 });
 
+const DEFAULT_SECTION_ORDER = [
+    "personal",
+    "education",
+    "experience",
+    "skills",
+    "projects",
+    "links"
+];
+
 export default function ResumeBuilder() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -75,6 +126,7 @@ export default function ResumeBuilder() {
 
     const [activeTab, setActiveTab] = useState("details");
     const [openSections, setOpenSections] = useState(["personal"]);
+    const [sectionOrder, setSectionOrder] = useState(DEFAULT_SECTION_ORDER);
     const [saving, setSaving] = useState(false);
     const [zoom, setZoom] = useState(75);
     const [resumeTitle, setResumeTitle] = useState("Untitled Resume");
@@ -145,6 +197,29 @@ export default function ResumeBuilder() {
         setOpenSections(prev =>
             prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
         );
+    };
+
+    const moveSection = (id, direction) => {
+        setSectionOrder(prev => {
+            const currentIndex = prev.indexOf(id);
+            if (currentIndex === -1) {
+                return prev;
+            }
+
+            const nextIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+            if (nextIndex < 0 || nextIndex >= prev.length) {
+                return prev;
+            }
+
+            const reordered = [...prev];
+            [reordered[currentIndex], reordered[nextIndex]] = [reordered[nextIndex], reordered[currentIndex]];
+            return reordered;
+        });
+    };
+
+    const getSectionPosition = (id) => {
+        const index = sectionOrder.indexOf(id);
+        return index === -1 ? DEFAULT_SECTION_ORDER.length : index;
     };
 
     const handlePersonalChange = (field, value) => {
@@ -356,7 +431,7 @@ export default function ResumeBuilder() {
                 {/* Scrollable Content */}
                 <div className="flex-1 overflow-y-auto overscroll-y-contain">
                     {activeTab === 'details' && (
-                        <>
+                        <div className="flex flex-col">
                             {/* Personal Info */}
                             <AccordionSection
                                 id="personal"
@@ -364,6 +439,11 @@ export default function ResumeBuilder() {
                                 icon="👤"
                                 isOpen={openSections.includes("personal")}
                                 onToggle={toggleSection}
+                                order={getSectionPosition("personal")}
+                                canMoveUp={getSectionPosition("personal") > 0}
+                                canMoveDown={getSectionPosition("personal") < sectionOrder.length - 1}
+                                onMoveUp={(sectionId) => moveSection(sectionId, "up")}
+                                onMoveDown={(sectionId) => moveSection(sectionId, "down")}
                             >
                                 <div className="grid grid-cols-2 gap-3">
                                     <InputField label="First Name" value={formData.personal.first_name} onChange={(e) => handlePersonalChange("first_name", e.target.value)} />
@@ -384,6 +464,11 @@ export default function ResumeBuilder() {
                                 icon="🎓"
                                 isOpen={openSections.includes("education")}
                                 onToggle={toggleSection}
+                                order={getSectionPosition("education")}
+                                canMoveUp={getSectionPosition("education") > 0}
+                                canMoveDown={getSectionPosition("education") < sectionOrder.length - 1}
+                                onMoveUp={(sectionId) => moveSection(sectionId, "up")}
+                                onMoveDown={(sectionId) => moveSection(sectionId, "down")}
                             >
                                 {formData.education.map((edu, idx) => (
                                     <div key={idx} className="bg-gray-50 dark:bg-gray-700/30 p-3 rounded-lg space-y-2 relative">
@@ -447,6 +532,11 @@ export default function ResumeBuilder() {
                                 icon="💼"
                                 isOpen={openSections.includes("experience")}
                                 onToggle={toggleSection}
+                                order={getSectionPosition("experience")}
+                                canMoveUp={getSectionPosition("experience") > 0}
+                                canMoveDown={getSectionPosition("experience") < sectionOrder.length - 1}
+                                onMoveUp={(sectionId) => moveSection(sectionId, "up")}
+                                onMoveDown={(sectionId) => moveSection(sectionId, "down")}
                             >
                                 {formData.experience.map((exp, idx) => (
                                     <div key={idx} className="bg-gray-50 dark:bg-gray-700/30 p-3 rounded-lg space-y-2 relative">
@@ -486,6 +576,11 @@ export default function ResumeBuilder() {
                                 icon="🛠️"
                                 isOpen={openSections.includes("skills")}
                                 onToggle={toggleSection}
+                                order={getSectionPosition("skills")}
+                                canMoveUp={getSectionPosition("skills") > 0}
+                                canMoveDown={getSectionPosition("skills") < sectionOrder.length - 1}
+                                onMoveUp={(sectionId) => moveSection(sectionId, "up")}
+                                onMoveDown={(sectionId) => moveSection(sectionId, "down")}
                             >
                                 {formData.skills.map((skill, idx) => (
                                     <div key={idx} className="bg-gray-50 dark:bg-gray-700/30 p-3 rounded-lg space-y-2 relative">
@@ -508,6 +603,11 @@ export default function ResumeBuilder() {
                                 icon="🚀"
                                 isOpen={openSections.includes("projects")}
                                 onToggle={toggleSection}
+                                order={getSectionPosition("projects")}
+                                canMoveUp={getSectionPosition("projects") > 0}
+                                canMoveDown={getSectionPosition("projects") < sectionOrder.length - 1}
+                                onMoveUp={(sectionId) => moveSection(sectionId, "up")}
+                                onMoveDown={(sectionId) => moveSection(sectionId, "down")}
                             >
                                 {formData.projects.map((proj, idx) => (
                                     <div key={idx} className="bg-gray-50 dark:bg-gray-700/30 p-3 rounded-lg space-y-2 relative">
@@ -539,6 +639,11 @@ export default function ResumeBuilder() {
                                 icon="🔗"
                                 isOpen={openSections.includes("links")}
                                 onToggle={toggleSection}
+                                order={getSectionPosition("links")}
+                                canMoveUp={getSectionPosition("links") > 0}
+                                canMoveDown={getSectionPosition("links") < sectionOrder.length - 1}
+                                onMoveUp={(sectionId) => moveSection(sectionId, "up")}
+                                onMoveDown={(sectionId) => moveSection(sectionId, "down")}
                             >
                                 {formData.links.map((link, idx) => (
                                     <div key={idx} className="flex gap-2 items-end">
@@ -565,7 +670,7 @@ export default function ResumeBuilder() {
                                     + Add Link
                                 </button>
                             </AccordionSection>
-                        </>
+                        </div>
                     )}
 
                     {activeTab === 'matcher' && (
