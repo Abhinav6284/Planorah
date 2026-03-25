@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import { useTheme } from '../context/ThemeContext';
 import Header from './Dashboard/Header';
 import AITalkPanel from './Mentoring/AITalkPanel';
 import AIVoicePanel from './Mentoring/AIVoicePanel';
@@ -35,21 +34,7 @@ const Layout = () => {
     const [welcomeUser, setWelcomeUser] = useState(null);
     const [autoVoiceStart, setAutoVoiceStart] = useState(false);
     const location = useLocation();
-    const { theme } = useTheme();
-    const isDashboardRoute = location.pathname.startsWith('/dashboard');
     const contextSource = getContextSource(location.pathname);
-    const shellBackgroundClass = isDashboardRoute ? '' : 'bg-[#F5F5F7] dark:bg-gray-900';
-    const shellStyle = isDashboardRoute
-        ? (theme === 'dark'
-            ? {
-                backgroundImage: 'radial-gradient(circle at 20% 0%, #0d3142 0%, #05080f 42%, #03040a 100%)',
-                backgroundColor: '#03040a',
-            }
-            : {
-                backgroundImage: 'radial-gradient(circle at 22% -10%, #eef8ff 0%, #8bb4cd 18%, #1b3d56 36%, #05080f 100%)',
-                backgroundColor: '#05080f',
-            })
-        : undefined;
 
     useEffect(() => {
         const shouldAutoStartRealtimeIntro =
@@ -75,10 +60,7 @@ const Layout = () => {
     }, [location.pathname]);
 
     return (
-        <div
-            className={`min-h-screen transition-colors duration-200 font-sans flex flex-col ${shellBackgroundClass}`}
-            style={shellStyle}
-        >
+        <div className="min-h-screen bg-[#F5F5F7] dark:bg-gray-900 transition-colors duration-200 font-sans flex flex-col">
             <Header />
             <main className="flex-1 overflow-auto">
                 <Outlet />

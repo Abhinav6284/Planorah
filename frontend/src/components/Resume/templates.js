@@ -1,5 +1,18 @@
 // Resume Templates - Professional, ATS-friendly designs
 
+const getEducationScoreText = (educationItem = {}) => {
+    const percentage = educationItem?.percentage ? String(educationItem.percentage).trim() : '';
+    const cgpa = educationItem?.cgpa ? String(educationItem.cgpa).trim() : '';
+
+    if (percentage && cgpa) {
+        return `${percentage} • CGPA: ${cgpa}`;
+    }
+    if (cgpa) {
+        return `CGPA: ${cgpa}`;
+    }
+    return percentage;
+};
+
 export const TEMPLATES = {
     professional: {
         id: 'professional',
@@ -42,7 +55,7 @@ export const TEMPLATES = {
                                     </div>
                                     <p style="font-size: 12px; color: #444; margin: 3px 0;">
                                         ${edu.degree || ''}${edu.field ? ` in ${edu.field}` : ''}
-                                        ${edu.percentage ? ` • ${edu.percentage}` : ''}
+                                        ${getEducationScoreText(edu) ? ` • ${getEducationScoreText(edu)}` : ''}
                                     </p>
                                 </div>
                             `).join('')}
@@ -94,7 +107,7 @@ export const TEMPLATES = {
                     ${skills?.some(s => s.items) ? `
                         <div style="margin-bottom: 20px;">
                             <h2 style="font-size: 13px; font-weight: bold; text-transform: uppercase; color: #2c3e50; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px; margin-bottom: 12px; letter-spacing: 2px;">
-                                Technical Skills
+                                Skills
                             </h2>
                             ${skills.filter(s => s.items).map(skill => `
                                 <p style="font-size: 11px; margin: 5px 0; color: #444;">
@@ -178,7 +191,7 @@ export const TEMPLATES = {
                                     </div>
                                     <p style="font-size: 12px; color: #555; margin: 3px 0;">
                                         ${edu.degree || ''}${edu.field ? ` in ${edu.field}` : ''}
-                                        ${edu.percentage ? ` • ${edu.percentage}` : ''}
+                                        ${getEducationScoreText(edu) ? ` • ${getEducationScoreText(edu)}` : ''}
                                     </p>
                                 </div>
                             `).join('')}
@@ -304,7 +317,7 @@ export const TEMPLATES = {
                                             </p>
                                             <p style="font-size: 11px; color: #764ba2; margin: 4px 0 0 0;">
                                                 ${edu.start_date || ''} - ${edu.end_date || ''}
-                                                ${edu.percentage ? ` • ${edu.percentage}` : ''}
+                                                ${getEducationScoreText(edu) ? ` • ${getEducationScoreText(edu)}` : ''}
                                             </p>
                                         </div>
                                     `).join('')}
