@@ -97,11 +97,22 @@ const ExecutionDashboard = () => {
         key: r.id, tag: 'Path', title: r.title, subtitle: r.overview, ctaTo: `/roadmap/${r.id}`
     })), [roadmaps]);
 
-    const examSubjectCards = useMemo(() => (subjects || []).slice(0, 3).map(s => ({
-        key: s.id, tag: 'Exam', title: s.name, subtitle: s.description, ctaTo: `/planora/subject/${s.id}`
-    })), [subjects]);
+    // Replace Exam Subjects with Pending Tasks (Day-wise carry over logic)
+    const pendingTaskCards = useMemo(() => {
+        const pending = (activeTasks || [])
+            .filter(t => t.status !== 'completed')
+            .sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
 
-    const displayCards = activeTab === 'paths' ? learningPathCards : examSubjectCards;
+        return pending.slice(0, 5).map(t => ({
+            key: t.id,
+            tag: 'Pending',
+            title: t.title,
+            subtitle: t.description || `Carried over from ${new Date(t.created_at || Date.now()).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}`,
+            ctaTo: '#' // potentially open task details
+        }));
+    }, [activeTasks]);
+
+    const displayCards = activeTab === 'paths' ? learningPathCards : pendingTaskCards;
 
     return (
         <div className={`min-h-screen text-slate-800 transition-colors duration-500 dark:text-slate-100 ${currentState === 'IN_PROGRESS' ? 'bg-[#050505]' : 'bg-[#F5F5F7] dark:bg-[#0b0b0b]'}`}>
@@ -169,7 +180,7 @@ const ExecutionDashboard = () => {
                         <div className={shellCardClass}>
                             <div className="mb-4 flex items-center gap-4 border-b border-slate-100 pb-2 dark:border-white/5">
                                 <button onClick={() => setActiveTab('activities')} className={`pb-2 text-sm font-semibold ${activeTab === 'activities' ? 'border-b-2 border-blue-500 text-blue-600 dark:text-white' : 'text-slate-500'}`}>
-                                    {mode === 'exam' ? 'Exam Subjects' : 'Recent Tasks'}
+                                    Pending Tasks
                                 </button>
                                 <button onClick={() => setActiveTab('paths')} className={`pb-2 text-sm font-semibold ${activeTab === 'paths' ? 'border-b-2 border-blue-500 text-blue-600 dark:text-white' : 'text-slate-500'}`}>
                                     Learning Paths
@@ -177,14 +188,16 @@ const ExecutionDashboard = () => {
                             </div>
 
                             {activeTab === 'activities' && displayCards.length === 0 && (
-                                <p className="text-sm text-slate-500">No recent activities found.</p>
+                                <p className="text-sm text-slate-500">No pending tasks. You're all caught up!</p>
                             )}
 
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 {displayCards.map(card => (
                                     <div key={card.key} className="relative rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all hover:bg-white hover:shadow-md dark:border-white/5 dark:bg-[#181818] dark:hover:bg-[#202020]">
                                         <div className="mb-2 flex items-center justify-between">
-                                            <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold uppercase text-blue-600 dark:bg-blue-500/20 dark:text-blue-300">{card.tag}</span>
+                                            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${card.tag === 'Pending' ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300' : 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-300'}`}>
+                                                {card.tag}
+                                            </span>
                                         </div>
                                         <h4 className="font-semibold text-slate-800 dark:text-slate-200">{card.title}</h4>
                                         <p className="mt-1 line-clamp-2 text-xs text-slate-500 dark:text-slate-400">{card.subtitle}</p>
