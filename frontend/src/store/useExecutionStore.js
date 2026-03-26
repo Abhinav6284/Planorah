@@ -15,7 +15,9 @@ export const useExecutionStore = create((set, get) => ({
         examPlan: false,
         rewards: false,
     },
+    currentState: 'NOT_STARTED', // 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED'
 
+    setExecutionState: (state) => set({ currentState: state }),
     setMode: (mode) => set({ mode }),
     setTodayTask: (todayTaskOrUpdater) =>
         set((state) => ({

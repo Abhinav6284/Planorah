@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
 const MESSAGES = [
-    { delay: 0,    text: "Hey! I'm your AI Coach — built just for you. 👋" },
+    { delay: 0, text: "Hey! I'm your AI Coach — built just for you. 👋" },
     { delay: 2600, text: "I've already looked at your goals and mapped your path forward." },
     { delay: 5400, text: "I'm always here — just tap the mic button anytime you need me." },
     { delay: 8200, text: "Let me show you around. Ready?" },

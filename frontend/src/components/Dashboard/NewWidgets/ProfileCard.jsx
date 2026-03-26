@@ -4,11 +4,12 @@ import { motion } from 'framer-motion';
 import { Flame } from 'lucide-react';
 import { getUserAvatar } from '../../../utils/avatar';
 
-const ProfileCard = ({ user, streak, variant = 'default' }) => {
+const ProfileCard = ({ user, streak, variant = 'default', summaryItems = [], currentStreakValue = null }) => {
     const isExecution = variant === 'execution';
 
     // Current streak count
-    const currentStreak = streak?.streak?.current || 0;
+    const currentStreak =
+        currentStreakValue ?? streak?.streak?.current ?? streak?.current ?? 0;
 
     // Milestone calculation: 7, 14, 21, 28...
     const weekNumber = Math.ceil(currentStreak / 7) || 1;
@@ -19,6 +20,7 @@ const ProfileCard = ({ user, streak, variant = 'default' }) => {
     const daysIntoCurrentMilestone = currentStreak === 0 ? 0 : (currentStreak - 1) % 7;
 
     // 7 dots representing the current milestone window (infinitely repeating)
+    const fallbackActiveCount = Math.min(7, Math.max(0, currentStreak));
     const weekDays = useMemo(() => {
         const days = [];
         const today = new Date();
@@ -48,6 +50,10 @@ const ProfileCard = ({ user, streak, variant = 'default' }) => {
                 if (!isActive && currentStreak > 0 && daysAgo <= currentStreak - 1) {
                     isActive = true;
                 }
+                // Execution payload may not include heatmap; keep day-wise streak visible.
+                if (!isActive && !streak?.activity_heatmap && i <= fallbackActiveCount - 1) {
+                    isActive = true;
+                }
             }
 
             days.push({
@@ -59,7 +65,7 @@ const ProfileCard = ({ user, streak, variant = 'default' }) => {
             });
         }
         return days;
-    }, [streak, currentStreak, daysIntoCurrentMilestone]);
+    }, [streak, currentStreak, daysIntoCurrentMilestone, fallbackActiveCount]);
 
     return (
         <div
@@ -151,7 +157,7 @@ const ProfileCard = ({ user, streak, variant = 'default' }) => {
 
                 <div className="flex justify-between items-center relative w-full px-1 py-1">
                     {/* Connecting Line (Background) */}
-                    <div className={`absolute top-[18px] sm:top-[22px] left-4 right-4 h-1 rounded-full z-0 ${isExecution ? 'bg-cyan-200/10' : 'bg-gray-100 dark:bg-zinc-800/80'}`} />
+                    <div className={`absolute top-[18px] sm:top-[22px] left-4 right-4 h-1 rounded-full z-0 ${isExecution ? 'bg-cyan-200/10' : 'bg-gray-100 dark:bg-zinc-700/90'}`} />
 
                     {/* Active Line Fill (Dynamic) */}
                     {weekDays.filter(d => d.active).length > 1 && (
@@ -190,7 +196,7 @@ const ProfileCard = ({ user, streak, variant = 'default' }) => {
                                     {day.active ? (
                                         <Flame size={18} className="text-white fill-white" strokeWidth={0} />
                                     ) : day.isToday ? (
-                                        <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${isExecution ? 'bg-cyan-200' : 'bg-orange-400'}`} />
+                                        <Flame size={14} className={`fill-current ${isExecution ? 'text-cyan-200' : 'text-orange-400 dark:text-orange-300'}`} strokeWidth={0} />
                                     ) : null}
                                 </div>
                             </div>
@@ -218,6 +224,19 @@ const ProfileCard = ({ user, streak, variant = 'default' }) => {
             {/* Subtle Texture/Decorations */}
             <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none ${isExecution ? 'bg-cyan-500/10' : 'bg-orange-500/5'}`} />
             <div className={`absolute bottom-0 left-0 w-64 h-64 rounded-full blur-3xl -ml-32 -mb-32 pointer-events-none ${isExecution ? 'bg-sky-500/10' : 'bg-purple-500/5'}`} />
+
+            {summaryItems.length > 0 && (
+                <div className={`z-10 rounded-2xl p-4 border w-full ${isExecution ? 'bg-[#171717] border-white/10' : 'bg-gray-50 border-gray-200 dark:bg-[#171717] dark:border-white/10'}`}>
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-2">
+                        {summaryItems.map((item) => (
+                            <div key={item.label} className={`flex items-center justify-between rounded-full px-3 py-1.5 text-sm ${isExecution ? 'bg-white/10 text-slate-100' : 'bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-slate-100'}`}>
+                                <span className="font-medium">{item.label}</span>
+                                <span className="font-semibold">{item.value}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
