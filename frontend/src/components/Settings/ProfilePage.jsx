@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 import { userService } from '../../api/userService';
 import ProgressGauge from './ProgressGauge';
+import { resolveAvatarUrl } from '../../utils/avatar';
 
 const MAX_AVATAR_UPLOAD_BYTES = 900 * 1024; // Keep below common 1 MB proxy limits
 const AVATAR_MAX_DIMENSION = 1024;
@@ -133,7 +134,7 @@ export default function ProfilePage() {
             setUser(userData);
 
             if (profile.avatar) {
-                setPreview(profile.avatar.startsWith('http') ? profile.avatar : `/api${profile.avatar}`);
+                setPreview(resolveAvatarUrl(profile.avatar));
             }
 
             setStats(statisticsData);
