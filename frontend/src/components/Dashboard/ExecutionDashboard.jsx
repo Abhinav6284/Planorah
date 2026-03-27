@@ -14,7 +14,6 @@ import ProgressPanel from './Execution/ProgressPanel';
 
 import { useExecutionStore } from '../../store/useExecutionStore';
 import { userService } from '../../api/userService';
-import { roadmapService } from '../../api/roadmapService';
 import { useMissionFlow } from '../../hooks/useMissionFlow';
 
 const shellCardClass = 'rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_16px_35px_-28px_rgba(15,23,42,0.55)] dark:border-white/10 dark:bg-[#121212] dark:shadow-none';
@@ -96,14 +95,9 @@ const ExecutionDashboard = () => {
     const [voicePanelOpen, setVoicePanelOpen] = useState(false);
     const [selectedDateKey, setSelectedDateKey] = useState(null);
 
-    // Legacy support for roadmaps/subjects to maintain routing
-    const [roadmaps, setRoadmaps] = useState([]);
-    const [activeTab, setActiveTab] = useState('activities');
-
     useEffect(() => {
         bootstrap();
         userService.getProfile().then(setProfile).catch(() => null);
-        roadmapService.getUserRoadmaps().then(d => setRoadmaps(Array.isArray(d) ? d : []));
     }, [bootstrap]);
 
     // Use Mission Flow Hook for logic
@@ -140,11 +134,6 @@ const ExecutionDashboard = () => {
 
     const activeTasks = useMemo(() => mode === 'exam' ? examTasks : tasks, [mode, examTasks, tasks]);
     const streak = progress?.stats?.streak || progress?.stats?.current_streak || 0;
-
-    // Additional Cards Logic (Paths/Subjects)
-    const learningPathCards = useMemo(() => (roadmaps || []).slice(0, 3).map(r => ({
-        key: r.id, tag: 'Path', title: r.title, subtitle: r.overview, ctaTo: `/roadmap/${r.id}`
-    })), [roadmaps]);
 
     // Replace Exam Subjects with Pending Tasks (Day-wise carry over logic)
     const pendingTaskData = useMemo(() => {
