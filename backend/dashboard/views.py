@@ -763,7 +763,8 @@ def get_today_task(request):
                 estimated_minutes=25,
                 reason=recommendation['reason'],
                 ai_generated=True,
-                metadata={'alternatives': recommendation.get('alternatives', [])},
+                metadata={'alternatives': recommendation.get(
+                    'alternatives', [])},
                 scheduled_for=today,
             )
 
@@ -844,7 +845,8 @@ def execution_tasks(request):
             return Response({'detail': 'Task not found.'}, status=status.HTTP_404_NOT_FOUND)
 
         was_completed = task.status == 'completed'
-        serializer = ExecutionTaskSerializer(task, data=request.data, partial=True)
+        serializer = ExecutionTaskSerializer(
+            task, data=request.data, partial=True)
         if serializer.is_valid():
             with transaction.atomic():
                 updated_task = serializer.save()

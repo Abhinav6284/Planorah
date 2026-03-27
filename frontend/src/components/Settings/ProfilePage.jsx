@@ -5,6 +5,83 @@ import { useTheme } from '../../context/ThemeContext';
 import { userService } from '../../api/userService';
 import ProgressGauge from './ProgressGauge';
 
+const MAX_AVATAR_UPLOAD_BYTES = 900 * 1024; // Keep below common 1 MB proxy limits
+const AVATAR_MAX_DIMENSION = 1024;
+
+const readFileAsDataUrl = (file) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('Failed to read selected image.'));
+    reader.readAsDataURL(file);
+});
+
+const loadImage = (src) => new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error('Failed to process selected image.'));
+    image.src = src;
+});
+
+const canvasToBlob = (canvas, type, quality) => new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+        if (!blob) {
+            reject(new Error('Failed to compress selected image.'));
+            return;
+        }
+        resolve(blob);
+    }, type, quality);
+});
+
+const optimizeAvatarFile = async (file) => {
+    if (!file?.type?.startsWith('image/')) {
+        throw new Error('Please select a valid image file.');
+    }
+
+    if (file.size <= MAX_AVATAR_UPLOAD_BYTES) {
+        return file;
+    }
+
+    const dataUrl = await readFileAsDataUrl(file);
+    const image = await loadImage(dataUrl);
+
+    const longestEdge = Math.max(image.width, image.height);
+    const scale = longestEdge > AVATAR_MAX_DIMENSION ? AVATAR_MAX_DIMENSION / longestEdge : 1;
+    const width = Math.max(1, Math.round(image.width * scale));
+    const height = Math.max(1, Math.round(image.height * scale));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+
+    const context = canvas.getContext('2d');
+    if (!context) {
+        throw new Error('Could not initialize image processing.');
+    }
+    context.drawImage(image, 0, 0, width, height);
+
+    let mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+    let quality = 0.9;
+    let blob = await canvasToBlob(canvas, mimeType, quality);
+
+    if (blob.size > MAX_AVATAR_UPLOAD_BYTES && mimeType === 'image/png') {
+        mimeType = 'image/jpeg';
+        quality = 0.85;
+        blob = await canvasToBlob(canvas, mimeType, quality);
+    }
+
+    while (blob.size > MAX_AVATAR_UPLOAD_BYTES && quality > 0.3) {
+        quality -= 0.1;
+        blob = await canvasToBlob(canvas, mimeType, quality);
+    }
+
+    if (blob.size > MAX_AVATAR_UPLOAD_BYTES) {
+        throw new Error('Image is too large. Please choose a smaller image (under 900 KB).');
+    }
+
+    const outputName = file.name.replace(/\.[^.]+$/, mimeType === 'image/png' ? '.png' : '.jpg');
+    return new File([blob], outputName, { type: mimeType, lastModified: Date.now() });
+};
+
 export default function ProfilePage() {
     const navigate = useNavigate();
     const { theme, toggleTheme } = useTheme();
@@ -86,11 +163,23 @@ export default function ProfilePage() {
         setEditForm({ ...editForm, [e.target.name]: e.target.value });
     };
 
-    const handleImageChange = (e) => {
+    const handleImageChange = async (e) => {
         const file = e.target.files[0];
-        if (file) {
-            setEditForm({ ...editForm, avatarFile: file });
-            setEditPreview(URL.createObjectURL(file));
+        if (!file) {
+            return;
+        }
+
+        try {
+            const optimizedFile = await optimizeAvatarFile(file);
+            setEditForm({ ...editForm, avatarFile: optimizedFile });
+            setEditPreview(URL.createObjectURL(optimizedFile));
+
+            if (optimizedFile.size < file.size) {
+                setMessage({ type: 'success', text: 'Image optimized for upload.' });
+            }
+        } catch (error) {
+            setMessage({ type: 'error', text: error.message || 'Failed to process image.' });
+            e.target.value = '';
         }
     };
 
@@ -120,7 +209,13 @@ export default function ProfilePage() {
             }, 1500);
         } catch (error) {
             console.error("Failed to save profile", error);
-            setMessage({ type: 'error', text: 'Failed to update profile.' });
+            const statusCode = error?.status || error?.response?.status;
+            const serverMessage = error?.response?.data?.details || error?.response?.data?.error;
+            const fallbackMessage = statusCode === 413
+                ? 'Profile image is too large. Please upload a smaller image.'
+                : 'Failed to update profile.';
+
+            setMessage({ type: 'error', text: serverMessage || error?.message || fallbackMessage });
         } finally {
             setSaving(false);
         }
