@@ -14,6 +14,8 @@ import ProgressPanel from './Execution/ProgressPanel';
 
 import { useExecutionStore } from '../../store/useExecutionStore';
 import { userService } from '../../api/userService';
+import { roadmapService } from '../../api/roadmapService';
+import { planoraService } from '../../api/planoraService';
 import { useMissionFlow } from '../../hooks/useMissionFlow';
 
 const shellCardClass = 'rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_16px_35px_-28px_rgba(15,23,42,0.55)] dark:border-white/10 dark:bg-[#121212] dark:shadow-none';
@@ -94,10 +96,14 @@ const ExecutionDashboard = () => {
     const [profile, setProfile] = useState(null);
     const [voicePanelOpen, setVoicePanelOpen] = useState(false);
     const [selectedDateKey, setSelectedDateKey] = useState(null);
+    const [roadmaps, setRoadmaps] = useState([]);
+    const [subjects, setSubjects] = useState([]);
 
     useEffect(() => {
         bootstrap();
         userService.getProfile().then(setProfile).catch(() => null);
+        roadmapService.getUserRoadmaps().then((data) => setRoadmaps(Array.isArray(data) ? data : [])).catch(() => null);
+        planoraService.getSubjects().then((data) => setSubjects(Array.isArray(data) ? data : [])).catch(() => null);
     }, [bootstrap]);
 
     // Use Mission Flow Hook for logic
@@ -200,6 +206,31 @@ const ExecutionDashboard = () => {
         }));
     }, [pendingTaskData.orderedDates, selectedDateKey]);
 
+    const roadmapCards = useMemo(() => {
+        return (roadmaps || []).slice(0, 3).map((roadmap) => ({
+            key: roadmap.id,
+            title: roadmap.title,
+            subtitle: roadmap.overview || 'Open roadmap milestones and linked tasks.',
+            ctaTo: `/roadmap/${roadmap.id}`,
+        }));
+    }, [roadmaps]);
+
+    const subjectCards = useMemo(() => {
+        return (subjects || []).slice(0, 4).map((subject) => {
+            const progressSummary = subject.progress_summary || {};
+            const topicCount = progressSummary.total || ((progressSummary.not_started || 0) + (progressSummary.weak || 0) + (progressSummary.strong || 0));
+            return {
+                key: subject.id,
+                title: subject.name,
+                topicCount,
+                strong: progressSummary.strong || 0,
+                weak: progressSummary.weak || 0,
+                notStarted: progressSummary.not_started || 0,
+                ctaTo: `/planora/subject/${subject.id}`,
+            };
+        });
+    }, [subjects]);
+
     return (
         <div className={`min-h-screen text-slate-800 transition-colors duration-500 dark:text-slate-100 ${currentState === 'IN_PROGRESS' ? 'bg-[#050505]' : 'bg-[#F5F5F7] dark:bg-[#0b0b0b]'}`}>
 
@@ -262,12 +293,10 @@ const ExecutionDashboard = () => {
                             streak={streak}
                         />
 
-                        {/* Additional Activities */}
+                        {/* Schedule Section */}
                         <div className={shellCardClass}>
                             <div className="mb-4 flex items-center justify-between pb-2">
-                                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">
-                                    Schedule
-                                </h3>
+                                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">Schedule</h3>
                                 <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">Days</span>
                             </div>
 
@@ -299,7 +328,7 @@ const ExecutionDashboard = () => {
                                     <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Tasks ({selectedTasks.length})</p>
                                     <div className="flex items-center gap-3">
                                         <div className="h-1.5 w-32 overflow-hidden rounded-full bg-slate-200 dark:bg-[#25242e]">
-                                            <div className="h-full rounded-full bg-slate-500/60 dark:bg-white/20 transition-all" style={{ width: `${selectedTaskProgress}%` }} />
+                                            <div className="h-full rounded-full bg-slate-500/60 transition-all dark:bg-white/20" style={{ width: `${selectedTaskProgress}%` }} />
                                         </div>
                                         <span className="text-xs font-semibold text-slate-500 dark:text-slate-500">{selectedTaskProgress}%</span>
                                     </div>
@@ -316,13 +345,13 @@ const ExecutionDashboard = () => {
                                                 </div>
                                                 <div className="min-w-0 flex-1">
                                                     <h4 className="truncate text-[14px] font-bold text-slate-800 dark:text-slate-100">
-                                                        <span className="mr-1.5 inline-flex items-center justify-center rounded bg-[#e8e8e8] dark:bg-[#2a2a2a] p-[3px]">
+                                                        <span className="mr-1.5 inline-flex items-center justify-center rounded bg-[#e8e8e8] p-[3px] dark:bg-[#2a2a2a]">
                                                             <span className="text-[10px]">📚</span>
                                                         </span>
                                                         {card.title}
                                                     </h4>
                                                     <p className="mt-1 flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                                                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-slate-200 dark:bg-[#25242e] text-[9px]">⏱</span>
+                                                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-slate-200 text-[9px] dark:bg-[#25242e]">⏱</span>
                                                         {card.estimatedMinutes} min
                                                     </p>
                                                 </div>
@@ -341,6 +370,65 @@ const ExecutionDashboard = () => {
                                 )}
                             </div>
                         </div>
+
+                        {/* Mode-specific Linked Section */}
+                        {mode === 'learning' ? (
+                            <div className={shellCardClass}>
+                                <div className="mb-4 flex items-center justify-between pb-2">
+                                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">Learning Path Roadmaps</h3>
+                                    <Link to="/roadmap/list" className="text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-200">
+                                        View all
+                                    </Link>
+                                </div>
+
+                                {roadmapCards.length === 0 ? (
+                                    <p className="text-sm text-slate-500">No roadmaps found. Create one to link tasks with your learning path.</p>
+                                ) : (
+                                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                                        {roadmapCards.map((roadmap) => (
+                                            <Link
+                                                key={roadmap.key}
+                                                to={roadmap.ctaTo}
+                                                className="rounded-2xl border border-slate-200 bg-slate-50 p-3 transition hover:bg-white hover:shadow-sm dark:border-white/10 dark:bg-[#1a1921] dark:hover:bg-[#25242e]"
+                                            >
+                                                <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{roadmap.title}</p>
+                                                <p className="mt-1 line-clamp-2 text-xs text-slate-500 dark:text-slate-400">{roadmap.subtitle}</p>
+                                                <p className="mt-2 text-[11px] font-semibold text-slate-500 dark:text-slate-400">Open roadmap →</p>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className={shellCardClass}>
+                                <div className="mb-4 flex items-center justify-between pb-2">
+                                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">Exam Subjects & Topics</h3>
+                                    <Link to="/planora" className="text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-200">
+                                        Open study platform
+                                    </Link>
+                                </div>
+
+                                {subjectCards.length === 0 ? (
+                                    <p className="text-sm text-slate-500">No exam subjects found. Create subjects and generate topics in the study platform.</p>
+                                ) : (
+                                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                                        {subjectCards.map((subject) => (
+                                            <Link
+                                                key={subject.key}
+                                                to={subject.ctaTo}
+                                                className="rounded-2xl border border-slate-200 bg-slate-50 p-3 transition hover:bg-white hover:shadow-sm dark:border-white/10 dark:bg-[#1a1921] dark:hover:bg-[#25242e]"
+                                            >
+                                                <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{subject.title}</p>
+                                                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{subject.topicCount} topics</p>
+                                                <p className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
+                                                    {subject.strong} strong • {subject.weak} weak • {subject.notStarted} not started
+                                                </p>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* RIGHT COLUMN: Progress & AI */}
