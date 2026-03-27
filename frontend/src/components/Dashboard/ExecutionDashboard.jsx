@@ -19,6 +19,57 @@ import { useMissionFlow } from '../../hooks/useMissionFlow';
 
 const shellCardClass = 'rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_16px_35px_-28px_rgba(15,23,42,0.55)] dark:border-white/10 dark:bg-[#121212] dark:shadow-none';
 
+const buildDateKey = (dateValue) => {
+    if (!dateValue) {
+        return null;
+    }
+    const date = new Date(dateValue);
+    if (Number.isNaN(date.getTime())) {
+        return null;
+    }
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+const formatDateLabel = (dateKey) => {
+    if (!dateKey) {
+        return 'Unscheduled';
+    }
+    const todayKey = buildDateKey(new Date());
+    if (dateKey === todayKey) {
+        return 'Today';
+    }
+    const date = new Date(`${dateKey}T00:00:00`);
+    return date.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+};
+
+const buildDateRange = (startDate, days) => {
+    const range = [];
+    for (let i = 0; i < days; i += 1) {
+        const day = new Date(startDate);
+        day.setDate(startDate.getDate() + i);
+        range.push({
+            date: day,
+            key: buildDateKey(day),
+            dayName: day.toLocaleDateString([], { weekday: 'short' }),
+            dayNumber: day.getDate(),
+        });
+    }
+    return range;
+};
+
+const getTaskStatusLabel = (status) => {
+    if (status === 'completed') {
+        return 'completed';
+    }
+    if (status === 'in_progress') {
+        return 'in progress';
+    }
+    return 'not started';
+};
+
 const ExecutionDashboard = () => {
     const {
         mode,
@@ -43,6 +94,7 @@ const ExecutionDashboard = () => {
 
     const [profile, setProfile] = useState(null);
     const [voicePanelOpen, setVoicePanelOpen] = useState(false);
+    const [selectedDateKey, setSelectedDateKey] = useState(null);
 
     // Legacy support for roadmaps/subjects to maintain routing
     const [roadmaps, setRoadmaps] = useState([]);
@@ -95,21 +147,69 @@ const ExecutionDashboard = () => {
     })), [roadmaps]);
 
     // Replace Exam Subjects with Pending Tasks (Day-wise carry over logic)
-    const pendingTaskCards = useMemo(() => {
+    const pendingTaskData = useMemo(() => {
         const pending = (activeTasks || [])
             .filter(t => t.status !== 'completed')
-            .sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
+            .sort((a, b) => new Date(a.scheduled_for || a.created_at || 0) - new Date(b.scheduled_for || b.created_at || 0));
 
-        return pending.slice(0, 5).map(t => ({
-            key: t.id,
-            tag: 'Pending',
-            title: t.title,
-            subtitle: t.description || `Carried over from ${new Date(t.created_at || Date.now()).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}`,
-            ctaTo: '#' // potentially open task details
-        }));
+        const map = new Map();
+        pending.forEach((task) => {
+            const dateKey = task?.scheduled_for || buildDateKey(task?.created_at) || buildDateKey(new Date());
+            const card = {
+                key: task.id,
+                tag: 'Pending',
+                title: task.title,
+                subtitle: task.description || (task?.scheduled_for ? `Scheduled for ${formatDateLabel(dateKey)}` : 'Pending task'),
+                ctaTo: '#',
+                dateKey,
+                status: task.status,
+                estimatedMinutes: task.estimated_minutes || 25,
+            };
+            if (!map.has(dateKey)) {
+                map.set(dateKey, []);
+            }
+            map.get(dateKey).push(card);
+        });
+
+        const orderedDates = Array.from(map.keys()).sort();
+        return { map, orderedDates };
     }, [activeTasks]);
 
-    const displayCards = activeTab === 'paths' ? learningPathCards : pendingTaskCards;
+    useEffect(() => {
+        if (selectedDateKey) {
+            return;
+        }
+
+        if (pendingTaskData.orderedDates.length) {
+            setSelectedDateKey(pendingTaskData.orderedDates[0]);
+            return;
+        }
+
+        setSelectedDateKey(buildDateKey(new Date()));
+    }, [pendingTaskData.orderedDates, selectedDateKey]);
+
+    const selectedTasks = useMemo(() => {
+        const tasksForDate = pendingTaskData.map.get(selectedDateKey) || [];
+        return tasksForDate.slice(0, 5);
+    }, [pendingTaskData.map, selectedDateKey]);
+
+    const selectedTaskProgress = useMemo(() => {
+        if (!selectedTasks.length) {
+            return 0;
+        }
+        const completed = selectedTasks.filter((task) => task.status === 'completed').length;
+        return Math.round((completed / selectedTasks.length) * 100);
+    }, [selectedTasks]);
+
+    const scheduleDays = useMemo(() => {
+        const firstTaskDateKey = pendingTaskData.orderedDates[0] || null;
+        const baseDate = firstTaskDateKey ? new Date(`${firstTaskDateKey}T00:00:00`) : new Date();
+        baseDate.setHours(0, 0, 0, 0);
+        return buildDateRange(baseDate, 14).map((day) => ({
+            ...day,
+            isSelected: day.key === selectedDateKey,
+        }));
+    }, [pendingTaskData.orderedDates, selectedDateKey]);
 
     return (
         <div className={`min-h-screen text-slate-800 transition-colors duration-500 dark:text-slate-100 ${currentState === 'IN_PROGRESS' ? 'bg-[#050505]' : 'bg-[#F5F5F7] dark:bg-[#0b0b0b]'}`}>
@@ -173,38 +273,83 @@ const ExecutionDashboard = () => {
                             streak={streak}
                         />
 
-                        {/* Additional Activities (Paths/Subjects) */}
+                        {/* Additional Activities */}
                         <div className={shellCardClass}>
-                            <div className="mb-4 flex items-center gap-4 border-b border-slate-100 pb-2 dark:border-white/5">
-                                <button onClick={() => setActiveTab('activities')} className={`pb-2 text-sm font-semibold ${activeTab === 'activities' ? 'border-b-2 border-blue-500 text-blue-600 dark:text-white' : 'text-slate-500'}`}>
-                                    Pending Tasks
-                                </button>
-                                <button onClick={() => setActiveTab('paths')} className={`pb-2 text-sm font-semibold ${activeTab === 'paths' ? 'border-b-2 border-blue-500 text-blue-600 dark:text-white' : 'text-slate-500'}`}>
-                                    Learning Paths
-                                </button>
+                            <div className="mb-4 flex items-center justify-between pb-2">
+                                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">
+                                    Schedule
+                                </h3>
+                                <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">Days</span>
                             </div>
 
-                            {activeTab === 'activities' && displayCards.length === 0 && (
-                                <p className="text-sm text-slate-500">No pending tasks. You're all caught up!</p>
+                            {pendingTaskData.orderedDates.length === 0 && (
+                                <p className="mb-4 text-sm text-slate-500">No pending tasks. You're all caught up!</p>
                             )}
 
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                {displayCards.map(card => (
-                                    <div key={card.key} className="relative rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all hover:bg-white hover:shadow-md dark:border-white/5 dark:bg-[#181818] dark:hover:bg-[#202020]">
-                                        <div className="mb-2 flex items-center justify-between">
-                                            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${card.tag === 'Pending' ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300' : 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-300'}`}>
-                                                {card.tag}
+                            <div className="space-y-5">
+                                <div className="flex gap-2 overflow-x-auto pb-2">
+                                    {scheduleDays.map((day) => (
+                                        <button
+                                            key={day.key}
+                                            type="button"
+                                            onClick={() => setSelectedDateKey(day.key)}
+                                            className={`flex h-[60px] w-[50px] flex-shrink-0 flex-col items-center justify-center gap-[2px] rounded-2xl text-xs font-semibold transition-all ${day.isSelected
+                                                ? 'bg-[#e2cfff] text-[#1e1e1e] shadow-sm'
+                                                : 'bg-slate-100 hover:bg-slate-200 dark:bg-[#1a1921] dark:hover:bg-[#25242e]'
+                                                }`}
+                                        >
+                                            <span className={`text-[15px] font-bold leading-none ${day.isSelected ? 'text-[#1e1e1e]' : 'text-slate-700 dark:text-white/80'}`}>{day.dayNumber}</span>
+                                            <span className={`text-[10px] capitalize tracking-wide ${day.isSelected ? 'text-[#1e1e1e]' : 'text-slate-400 dark:text-[#6a6a72]'}`}>
+                                                {day.dayName}
                                             </span>
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Tasks ({selectedTasks.length})</p>
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-1.5 w-32 overflow-hidden rounded-full bg-slate-200 dark:bg-[#25242e]">
+                                            <div className="h-full rounded-full bg-slate-500/60 dark:bg-white/20 transition-all" style={{ width: `${selectedTaskProgress}%` }} />
                                         </div>
-                                        <h4 className="font-semibold text-slate-800 dark:text-slate-200">{card.title}</h4>
-                                        <p className="mt-1 line-clamp-2 text-xs text-slate-500 dark:text-slate-400">{card.subtitle}</p>
-                                        <Link to={card.ctaTo} className="absolute inset-0 flex items-end justify-end p-4 opacity-0 transition-opacity hover:opacity-100">
-                                            <div className="rounded-full bg-white p-2 shadow-sm dark:bg-[#303030]">
-                                                <ArrowRight className="h-4 w-4" />
-                                            </div>
-                                        </Link>
+                                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-500">{selectedTaskProgress}%</span>
                                     </div>
-                                ))}
+                                </div>
+
+                                {selectedTasks.length === 0 ? (
+                                    <p className="text-sm text-slate-500">No tasks scheduled for {formatDateLabel(selectedDateKey)}.</p>
+                                ) : (
+                                    <div className="grid grid-cols-1 gap-4">
+                                        {selectedTasks.map((card, index) => (
+                                            <div key={card.key} className="relative flex items-center gap-4 rounded-[20px] bg-slate-50 p-[14px] transition-all hover:bg-white hover:shadow-md dark:bg-[#1a1921] dark:hover:bg-[#25242e]">
+                                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-[13px] font-bold text-violet-800 dark:bg-[#311f4d] dark:text-violet-200">
+                                                    {index + 1}
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <h4 className="truncate text-[14px] font-bold text-slate-800 dark:text-slate-100">
+                                                        <span className="mr-1.5 inline-flex items-center justify-center rounded bg-[#e8e8e8] dark:bg-[#2a2a2a] p-[3px]">
+                                                            <span className="text-[10px]">📚</span>
+                                                        </span>
+                                                        {card.title}
+                                                    </h4>
+                                                    <p className="mt-1 flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                                                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-slate-200 dark:bg-[#25242e] text-[9px]">⏱</span>
+                                                        {card.estimatedMinutes} min
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="rounded-full border border-slate-200 px-3 py-1 text-[11px] font-semibold lowercase tracking-wide text-slate-600 dark:border-white/10 dark:text-slate-400">
+                                                        {getTaskStatusLabel(card.status)}
+                                                    </span>
+                                                    <ArrowRight className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                                                </div>
+                                                <Link to={card.ctaTo} className="absolute inset-0">
+                                                    <span className="sr-only">Open task</span>
+                                                </Link>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
