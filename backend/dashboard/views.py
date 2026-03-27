@@ -551,6 +551,94 @@ def _level_from_xp(xp_points):
     return 'Beginner'
 
 
+LEAGUE_TIERS = [
+    {'name': 'Bronze League', 'min': 0, 'max': 499},
+    {'name': 'Silver League', 'min': 500, 'max': 999},
+    {'name': 'Gold League', 'min': 1000, 'max': 1699},
+    {'name': 'Platinum League', 'min': 1700, 'max': 2599},
+    {'name': 'Diamond League', 'min': 2600, 'max': 999999},
+]
+
+
+def _display_name_for_user(user):
+    first = (getattr(user, 'first_name', '') or '').strip()
+    last = (getattr(user, 'last_name', '') or '').strip()
+    if first and last:
+        return f"{first} {last}"
+    if first:
+        return first
+    return (getattr(user, 'username', '') or 'User').strip() or 'User'
+
+
+def _league_points_from_stats(stats_obj):
+    # League score is grounded in backend-tracked progress only.
+    xp_points = int(getattr(stats_obj, 'xp_points', 0) or 0)
+    streak_bonus = int(getattr(stats_obj, 'current_streak', 0) or 0) * 5
+    completion_bonus = int(getattr(stats_obj, 'tasks_completed', 0) or 0) * 2
+    return xp_points + streak_bonus + completion_bonus
+
+
+def _build_league_payload(user, stats):
+    league_points = _league_points_from_stats(stats)
+    tier = next(
+        (item for item in LEAGUE_TIERS if item['min']
+         <= league_points <= item['max']),
+        LEAGUE_TIERS[0],
+    )
+
+    tier_span = max(1, tier['max'] - tier['min'] + 1)
+    tier_progress = max(0, league_points - tier['min'])
+    progress_percent = min(100, int((tier_progress / tier_span) * 100))
+
+    next_tier = next(
+        (item for item in LEAGUE_TIERS if item['min'] > tier['min']), None)
+    points_to_next_tier = max(
+        0, (next_tier['min'] - league_points)) if next_tier else 0
+
+    ranked_stats = list(
+        UserStats.objects.select_related('user')
+        .filter(user__is_active=True)
+        .order_by('-xp_points', '-tasks_completed', '-current_streak', 'updated_at')
+    )
+
+    total_participants = len(ranked_stats)
+    leaderboard = []
+    current_user_rank = None
+
+    for idx, stat_row in enumerate(ranked_stats, start=1):
+        row_points = _league_points_from_stats(stat_row)
+        is_me = stat_row.user_id == user.id
+        if is_me:
+            current_user_rank = idx
+
+        if idx <= 10 or is_me:
+            leaderboard.append({
+                'rank': idx,
+                'user_id': stat_row.user_id,
+                'name': _display_name_for_user(stat_row.user),
+                'username': stat_row.user.username,
+                'league_points': row_points,
+                'xp_points': stat_row.xp_points,
+                'tasks_completed': stat_row.tasks_completed,
+                'current_streak': stat_row.current_streak,
+                'is_me': is_me,
+            })
+
+    if current_user_rank is None:
+        current_user_rank = 1
+
+    return {
+        'league_points': league_points,
+        'tier': tier['name'],
+        'progress_percent': progress_percent,
+        'points_to_next_tier': points_to_next_tier,
+        'next_tier': next_tier['name'] if next_tier else None,
+        'rank': current_user_rank,
+        'total_participants': total_participants,
+        'leaderboard': leaderboard,
+    }
+
+
 def _update_streak(stats, completed_day):
     if not completed_day:
         return
@@ -849,6 +937,7 @@ def execution_progress(request):
         'weekly_completed': weekly_completed,
         'mode': 'exam' if latest_plan else 'learning',
         'active_exam_plan': ExamPlanSerializer(latest_plan).data if latest_plan else None,
+        'league': _build_league_payload(request.user, stats),
     }
     return Response(payload, status=status.HTTP_200_OK)
 
