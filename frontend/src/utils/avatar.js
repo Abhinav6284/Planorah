@@ -6,13 +6,41 @@ export function resolveAvatarUrl(avatarValue) {
         return '';
     }
 
-    // Already an absolute or browser-generated URL.
-    if (/^(https?:)?\/\//i.test(raw) || raw.startsWith('data:') || raw.startsWith('blob:')) {
+    // Browser-generated URLs should pass through untouched.
+    if (raw.startsWith('data:') || raw.startsWith('blob:')) {
         return raw;
     }
 
     const apiOrigin = String(env.API_ORIGIN || '').replace(/\/+$/, '');
-    const normalizedPath = raw.startsWith('/') ? raw : `/${raw}`;
+    const normalizeMediaPath = (path) => {
+        const withLeadingSlash = path.startsWith('/') ? path : `/${path}`;
+        if (withLeadingSlash.startsWith('/api/media/')) {
+            return withLeadingSlash.slice(4);
+        }
+        return withLeadingSlash;
+    };
+
+    // Normalize absolute URLs that incorrectly point to the frontend host.
+    if (/^https?:\/\//i.test(raw)) {
+        try {
+            const parsed = new URL(raw);
+            const host = parsed.hostname.toLowerCase();
+            const isFrontendHost = host === 'planorah.me' || host === 'www.planorah.me';
+
+            if (isFrontendHost && apiOrigin) {
+                const normalizedPath = normalizeMediaPath(parsed.pathname);
+                if (normalizedPath.startsWith('/media/')) {
+                    return `${apiOrigin}${normalizedPath}`;
+                }
+            }
+        } catch {
+            return raw;
+        }
+
+        return raw;
+    }
+
+    const normalizedPath = normalizeMediaPath(raw);
 
     if (!apiOrigin) {
         return normalizedPath;
