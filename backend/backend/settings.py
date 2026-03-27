@@ -319,6 +319,10 @@ SIMPLE_JWT = {
     'USER_ID_CLAIM': 'user_id',
 }
 
+# Upload limits: raise defaults to support profile image updates in production.
+DATA_UPLOAD_MAX_MEMORY_SIZE = _env_int('DATA_UPLOAD_MAX_MEMORY_SIZE', 25 * 1024 * 1024)
+FILE_UPLOAD_MAX_MEMORY_SIZE = _env_int('FILE_UPLOAD_MAX_MEMORY_SIZE', 25 * 1024 * 1024)
+
 # Google OAuth Settings
 GOOGLE_OAUTH_CLIENT_ID = os.getenv('GOOGLE_OAUTH_CLIENT_ID', '')
 GOOGLE_OAUTH_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH_CLIENT_SECRET', '')

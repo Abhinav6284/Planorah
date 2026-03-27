@@ -8,20 +8,6 @@ const isPrimaryWebHost = () => {
     return host === 'planorah.me' || host === 'www.planorah.me';
 };
 
-const shouldRetryProfileUpdateSameOrigin = (error) => {
-    if (!isPrimaryWebHost()) {
-        return false;
-    }
-
-    // CORS/network failures typically surface as Axios "Network Error" without response.
-    if (!error?.response) {
-        return true;
-    }
-
-    // Retry specific upstream/proxy failures that can occur on API edge.
-    return [404, 502, 503, 504].includes(error.response.status);
-};
-
 export const userService = {
     getProfile: async () => {
         const response = await api.get('users/profile/');
@@ -37,16 +23,15 @@ export const userService = {
             });
             return response.data;
         } catch (error) {
-            if (!shouldRetryProfileUpdateSameOrigin(error)) {
-                throw error;
+            // Avoid retrying against frontend same-origin route in production.
+            // It can return 405 and hide the real API failure.
+            if (isPrimaryWebHost() && error?.response?.status === 413) {
+                const enhancedError = new Error('Profile image is too large. Please upload a smaller file.');
+                enhancedError.cause = error;
+                enhancedError.status = 413;
+                throw enhancedError;
             }
-
-            const fallbackResponse = await api.patch(`${window.location.origin}/api/users/update-profile/`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            return fallbackResponse.data;
+            throw error;
         }
     },
 

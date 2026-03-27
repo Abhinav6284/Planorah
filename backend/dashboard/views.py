@@ -711,128 +711,153 @@ def _apply_completion_rewards(user, task):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_today_task(request):
-    today = dj_timezone.localdate()
+    try:
+        today = dj_timezone.localdate()
 
-    today_task = ExecutionTask.objects.filter(
-        user=request.user,
-        scheduled_for=today,
-        status__in=['pending', 'in_progress'],
-    ).order_by('created_at').first()
-
-    if not today_task:
-        stats = _get_or_create_user_stats(request.user)
-        pending = ExecutionTask.objects.filter(
+        today_task = ExecutionTask.objects.filter(
             user=request.user,
-            status__in=['pending', 'in_progress'],
-        ).order_by('-priority', 'created_at')[:5]
-
-        profile = UserProfile.objects.filter(user=request.user).first()
-        payload = {
-            'goals': {
-                'goal_statement': getattr(profile, 'goal_statement', ''),
-                'target_role': getattr(profile, 'target_role', ''),
-                'weekly_hours': getattr(profile, 'weekly_hours', 0),
-            },
-            'consistency': {
-                'current_streak': stats.current_streak,
-                'tasks_completed': stats.tasks_completed,
-            },
-            'pending_tasks': [item.title for item in pending],
-        }
-        recommendation = generate_coach_recommendation(payload)
-
-        today_task = ExecutionTask.objects.create(
-            user=request.user,
-            title=recommendation['task'],
-            task_type='learning',
-            status='pending',
-            priority='high',
-            difficulty=recommendation['difficulty'],
-            estimated_time=recommendation['estimated_time'],
-            estimated_minutes=25,
-            reason=recommendation['reason'],
-            ai_generated=True,
-            metadata={'alternatives': recommendation.get('alternatives', [])},
             scheduled_for=today,
-        )
+            status__in=['pending', 'in_progress'],
+        ).order_by('created_at').first()
 
-    data = ExecutionTaskSerializer(today_task).data
-    return Response(data, status=status.HTTP_200_OK)
+        if not today_task:
+            stats = _get_or_create_user_stats(request.user)
+            pending = ExecutionTask.objects.filter(
+                user=request.user,
+                status__in=['pending', 'in_progress'],
+            ).order_by('-priority', 'created_at')[:5]
+
+            profile = UserProfile.objects.filter(user=request.user).first()
+            payload = {
+                'goals': {
+                    'goal_statement': getattr(profile, 'goal_statement', ''),
+                    'target_role': getattr(profile, 'target_role', ''),
+                    'weekly_hours': getattr(profile, 'weekly_hours', 0),
+                },
+                'consistency': {
+                    'current_streak': stats.current_streak,
+                    'tasks_completed': stats.tasks_completed,
+                },
+                'pending_tasks': [item.title for item in pending],
+            }
+
+            try:
+                recommendation = generate_coach_recommendation(payload)
+            except Exception:
+                recommendation = {
+                    'task': 'Start one focused 25-minute study sprint',
+                    'reason': 'Small wins rebuild momentum and improve consistency.',
+                    'difficulty': 'medium',
+                    'estimated_time': '25 min',
+                    'alternatives': [],
+                }
+
+            today_task = ExecutionTask.objects.create(
+                user=request.user,
+                title=recommendation['task'],
+                task_type='learning',
+                status='pending',
+                priority='high',
+                difficulty=recommendation['difficulty'],
+                estimated_time=recommendation['estimated_time'],
+                estimated_minutes=25,
+                reason=recommendation['reason'],
+                ai_generated=True,
+                metadata={'alternatives': recommendation.get('alternatives', [])},
+                scheduled_for=today,
+            )
+
+        data = ExecutionTaskSerializer(today_task).data
+        return Response(data, status=status.HTTP_200_OK)
+    except Exception as exc:
+        return Response({'detail': 'Unable to load today task.', 'error': str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def ai_coach(request):
-    stats = _get_or_create_user_stats(request.user)
+    try:
+        stats = _get_or_create_user_stats(request.user)
 
-    pending_tasks = ExecutionTask.objects.filter(
-        user=request.user,
-        status__in=['pending', 'in_progress'],
-    ).order_by('-priority', 'created_at')[:6]
+        pending_tasks = ExecutionTask.objects.filter(
+            user=request.user,
+            status__in=['pending', 'in_progress'],
+        ).order_by('-priority', 'created_at')[:6]
 
-    profile = UserProfile.objects.filter(user=request.user).first()
-    payload = {
-        'progress': request.data.get('progress') or {
-            'tasks_completed': stats.tasks_completed,
-            'xp_points': stats.xp_points,
-            'focus_minutes': stats.focus_minutes,
-        },
-        'pending_tasks': request.data.get('pending_tasks') or [item.title for item in pending_tasks],
-        'consistency': request.data.get('past_consistency') or {
-            'current_streak': stats.current_streak,
-            'longest_streak': stats.longest_streak,
-        },
-        'learning_goals': request.data.get('learning_goals') or {
-            'goal_statement': getattr(profile, 'goal_statement', ''),
-            'target_role': getattr(profile, 'target_role', ''),
-        },
-    }
+        profile = UserProfile.objects.filter(user=request.user).first()
+        payload = {
+            'progress': request.data.get('progress') or {
+                'tasks_completed': stats.tasks_completed,
+                'xp_points': stats.xp_points,
+                'focus_minutes': stats.focus_minutes,
+            },
+            'pending_tasks': request.data.get('pending_tasks') or [item.title for item in pending_tasks],
+            'consistency': request.data.get('past_consistency') or {
+                'current_streak': stats.current_streak,
+                'longest_streak': stats.longest_streak,
+            },
+            'learning_goals': request.data.get('learning_goals') or {
+                'goal_statement': getattr(profile, 'goal_statement', ''),
+                'target_role': getattr(profile, 'target_role', ''),
+            },
+        }
 
-    recommendation = generate_coach_recommendation(payload)
-    return Response(recommendation, status=status.HTTP_200_OK)
+        recommendation = generate_coach_recommendation(payload)
+        return Response(recommendation, status=status.HTTP_200_OK)
+    except Exception:
+        return Response({
+            'task': 'Start one focused 25-minute study sprint',
+            'reason': 'Small wins rebuild momentum and improve consistency.',
+            'difficulty': 'medium',
+            'estimated_time': '25 min',
+            'alternatives': [],
+        }, status=status.HTTP_200_OK)
 
 
 @api_view(['GET', 'POST', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def execution_tasks(request):
-    if request.method == 'GET':
-        task_type = request.query_params.get('type')
-        queryset = ExecutionTask.objects.filter(user=request.user)
-        if task_type in {'learning', 'exam'}:
-            queryset = queryset.filter(task_type=task_type)
-        serializer = ExecutionTaskSerializer(
-            queryset.order_by('-created_at'), many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    if request.method == 'POST':
-        serializer = ExecutionTaskSerializer(data=request.data)
-        if serializer.is_valid():
-            task = serializer.save(user=request.user)
-            return Response(ExecutionTaskSerializer(task).data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    task_id = request.data.get('id')
-    if not task_id:
-        return Response({'detail': 'Task id is required for PATCH.'}, status=status.HTTP_400_BAD_REQUEST)
-
     try:
-        task = ExecutionTask.objects.get(id=task_id, user=request.user)
-    except ExecutionTask.DoesNotExist:
-        return Response({'detail': 'Task not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if request.method == 'GET':
+            task_type = request.query_params.get('type')
+            queryset = ExecutionTask.objects.filter(user=request.user)
+            if task_type in {'learning', 'exam'}:
+                queryset = queryset.filter(task_type=task_type)
+            serializer = ExecutionTaskSerializer(
+                queryset.order_by('-created_at'), many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
-    was_completed = task.status == 'completed'
-    serializer = ExecutionTaskSerializer(task, data=request.data, partial=True)
-    if serializer.is_valid():
-        with transaction.atomic():
-            updated_task = serializer.save()
-            if updated_task.status == 'completed' and not was_completed:
-                updated_task.completed_at = dj_timezone.now()
-                updated_task.save(update_fields=['completed_at'])
-                _apply_completion_rewards(request.user, updated_task)
+        if request.method == 'POST':
+            serializer = ExecutionTaskSerializer(data=request.data)
+            if serializer.is_valid():
+                task = serializer.save(user=request.user)
+                return Response(ExecutionTaskSerializer(task).data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(ExecutionTaskSerializer(updated_task).data, status=status.HTTP_200_OK)
+        task_id = request.data.get('id')
+        if not task_id:
+            return Response({'detail': 'Task id is required for PATCH.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            task = ExecutionTask.objects.get(id=task_id, user=request.user)
+        except ExecutionTask.DoesNotExist:
+            return Response({'detail': 'Task not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        was_completed = task.status == 'completed'
+        serializer = ExecutionTaskSerializer(task, data=request.data, partial=True)
+        if serializer.is_valid():
+            with transaction.atomic():
+                updated_task = serializer.save()
+                if updated_task.status == 'completed' and not was_completed:
+                    updated_task.completed_at = dj_timezone.now()
+                    updated_task.save(update_fields=['completed_at'])
+                    _apply_completion_rewards(request.user, updated_task)
+
+            return Response(ExecutionTaskSerializer(updated_task).data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as exc:
+        return Response({'detail': 'Unable to load execution tasks.', 'error': str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
 
 @api_view(['POST', 'PATCH'])
@@ -923,23 +948,42 @@ def exam_plan(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def execution_progress(request):
-    stats = _get_or_create_user_stats(request.user)
-    latest_plan = ExamPlan.objects.filter(
-        user=request.user, is_active=True).first()
-    weekly_completed = ExecutionTask.objects.filter(
-        user=request.user,
-        status='completed',
-        completed_at__date__gte=dj_timezone.localdate() - timedelta(days=6),
-    ).count()
+    try:
+        stats = _get_or_create_user_stats(request.user)
+        latest_plan = ExamPlan.objects.filter(
+            user=request.user, is_active=True).first()
+        weekly_completed = ExecutionTask.objects.filter(
+            user=request.user,
+            status='completed',
+            completed_at__date__gte=dj_timezone.localdate() - timedelta(days=6),
+        ).count()
 
-    payload = {
-        'stats': UserStatsSerializer(stats).data,
-        'weekly_completed': weekly_completed,
-        'mode': 'exam' if latest_plan else 'learning',
-        'active_exam_plan': ExamPlanSerializer(latest_plan).data if latest_plan else None,
-        'league': _build_league_payload(request.user, stats),
-    }
-    return Response(payload, status=status.HTTP_200_OK)
+        payload = {
+            'stats': UserStatsSerializer(stats).data,
+            'weekly_completed': weekly_completed,
+            'mode': 'exam' if latest_plan else 'learning',
+            'active_exam_plan': ExamPlanSerializer(latest_plan).data if latest_plan else None,
+            'league': _build_league_payload(request.user, stats),
+        }
+        return Response(payload, status=status.HTTP_200_OK)
+    except Exception as exc:
+        return Response({
+            'stats': {
+                'xp_points': 0,
+                'current_streak': 0,
+                'longest_streak': 0,
+                'tasks_completed': 0,
+                'focus_minutes': 0,
+                'level': 'Beginner',
+                'progress_label': 'Start your first task',
+            },
+            'weekly_completed': 0,
+            'mode': 'learning',
+            'active_exam_plan': None,
+            'league': None,
+            'detail': 'Unable to load execution progress.',
+            'error': str(exc),
+        }, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
