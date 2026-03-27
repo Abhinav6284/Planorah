@@ -11,6 +11,60 @@ const requestWith404Fallback = async (primaryRequest, fallbackRequest) => {
     }
 };
 
+const shouldUseFallback = (error) => {
+    const status = error?.response?.status;
+    return status === 404 || (typeof status === 'number' && status >= 500);
+};
+
+const requestWithResilientFallback = async (primaryRequest, fallbackRequest) => {
+    try {
+        return await primaryRequest();
+    } catch (error) {
+        if (fallbackRequest && shouldUseFallback(error)) {
+            return fallbackRequest();
+        }
+        throw error;
+    }
+};
+
+const normalizeExecutionStatus = (task) => {
+    const raw = String(task?.status || task?.user_status || '').toLowerCase();
+    if (raw === 'completed') {
+        return 'completed';
+    }
+    if (raw === 'in_progress' || raw === 'in progress') {
+        return 'in_progress';
+    }
+    return 'pending';
+};
+
+const mapRoadmapTaskToExecutionTask = (task, type = 'learning') => {
+    const minutes = Number(task?.estimated_minutes) || 25;
+    const dueDate = task?.due_date || null;
+    return {
+        id: task?.id || task?.task_id,
+        title: task?.title || 'Task',
+        type,
+        status: normalizeExecutionStatus(task),
+        priority: 'medium',
+        difficulty: 'medium',
+        estimated_time: `${minutes} min`,
+        estimated_minutes: minutes,
+        reason: task?.description || task?.objective || '',
+        ai_generated: false,
+        metadata: {
+            source: 'roadmap_tasks',
+            roadmap_id: task?.roadmap || null,
+            milestone_id: task?.milestone || null,
+            day: task?.day || null,
+        },
+        scheduled_for: dueDate,
+        completed_at: task?.completed_at || null,
+        created_at: task?.created_at || null,
+        updated_at: task?.updated_at || null,
+    };
+};
+
 export const executionService = {
     getTodayTask: async () => {
         const response = await requestWith404Fallback(
@@ -30,9 +84,31 @@ export const executionService = {
 
     getExecutionTasks: async (type = '') => {
         const params = type ? { type } : undefined;
-        const response = await requestWith404Fallback(
+        const response = await requestWithResilientFallback(
             () => api.get('dashboard/execution/tasks/', { params }),
-            () => api.get('execution/tasks/', { params })
+            async () => {
+                if (type === 'exam') {
+                    return { data: [] };
+                }
+
+                try {
+                    const fallbackResponse = await api.get('execution/tasks/', { params });
+                    return fallbackResponse;
+                } catch (error) {
+                    if (!shouldUseFallback(error)) {
+                        throw error;
+                    }
+
+                    const roadmapTasksResponse = await api.get('tasks/');
+                    const payload = Array.isArray(roadmapTasksResponse?.data)
+                        ? roadmapTasksResponse.data
+                        : (Array.isArray(roadmapTasksResponse?.data?.tasks) ? roadmapTasksResponse.data.tasks : []);
+
+                    return {
+                        data: payload.map((task) => mapRoadmapTaskToExecutionTask(task, 'learning')),
+                    };
+                }
+            }
         );
         return response.data;
     },

@@ -71,6 +71,11 @@ const getTaskStatusLabel = (status) => {
     return 'not started';
 };
 
+const normalizeDisplayTitle = (title) => {
+    const text = String(title || '').trim();
+    return text.replace(/^[^A-Za-z0-9]+\s*/, '') || text;
+};
+
 const ExecutionDashboard = () => {
     const {
         mode,
@@ -153,7 +158,7 @@ const ExecutionDashboard = () => {
             const card = {
                 key: task.id,
                 tag: 'Pending',
-                title: task.title,
+                title: normalizeDisplayTitle(task.title),
                 subtitle: task.description || (task?.scheduled_for ? `Scheduled for ${formatDateLabel(dateKey)}` : 'Pending task'),
                 ctaTo: '#',
                 dateKey,
