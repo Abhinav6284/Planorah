@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { useToast } from '../components/common/Toast';
 
@@ -14,11 +14,22 @@ export const useMissionFlow = ({
     const [focusOpen, setFocusOpen] = useState(false);
     const [focusSession, setFocusSession] = useState(null);
     const [rewardPulse, setRewardPulse] = useState(null);
+    const [activeTask, setActiveTask] = useState(todayTask || null);
 
-    const handleStartFocus = useCallback(async () => {
-        if (!todayTask?.id) return;
+    useEffect(() => {
+        if (todayTask?.id) {
+            setActiveTask(todayTask);
+        }
+    }, [todayTask]);
+
+    const handleStartFocus = useCallback(async (taskOverride = null) => {
+        const taskToFocus = taskOverride || todayTask;
+        if (!taskToFocus?.id) return;
+
         try {
-            const session = await createFocusSession({ task: todayTask.id, planned_minutes: 25 });
+            setActiveTask(taskToFocus);
+            const plannedMinutes = Number(taskToFocus?.estimated_minutes) || 25;
+            const session = await createFocusSession({ task: taskToFocus.id, planned_minutes: plannedMinutes });
             setFocusSession(session);
             setFocusOpen(true);
         } catch (error) {
@@ -27,14 +38,16 @@ export const useMissionFlow = ({
     }, [todayTask, createFocusSession, toast]);
 
     const handleFocusComplete = useCallback(async (minutes) => {
+        const taskToComplete = activeTask || todayTask;
+
         try {
             if (focusSession?.id) {
                 await updateFocusSession({ id: focusSession.id, status: 'completed', actual_minutes: minutes });
             }
 
-            if (todayTask?.id) {
-                await updateTaskStatus(todayTask.id, 'completed');
-                const reward = await applyRewards(todayTask.id);
+            if (taskToComplete?.id) {
+                await updateTaskStatus(taskToComplete.id, 'completed');
+                const reward = await applyRewards(taskToComplete.id);
                 const xp = reward?.xp_gain || 0;
                 const streak = reward?.stats?.current_streak || 0;
                 const level = reward?.stats?.level || 'Beginner';
@@ -56,8 +69,9 @@ export const useMissionFlow = ({
         } finally {
             setFocusOpen(false);
             setFocusSession(null);
+            setActiveTask(null);
         }
-    }, [focusSession, todayTask, updateFocusSession, updateTaskStatus, applyRewards, refreshTodayTask, toast]);
+    }, [focusSession, activeTask, todayTask, updateFocusSession, updateTaskStatus, applyRewards, refreshTodayTask, toast]);
 
     return {
         focusOpen,

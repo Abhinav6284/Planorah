@@ -11,6 +11,7 @@ import TodayExecution from './Execution/TodayExecution';
 import FocusMode from './Execution/FocusMode';
 import ExecutionFeed from './Execution/ExecutionFeed';
 import ProgressPanel from './Execution/ProgressPanel';
+import TaskDetailModal from './Execution/TaskDetailModal';
 
 import { useExecutionStore } from '../../store/useExecutionStore';
 import { userService } from '../../api/userService';
@@ -104,6 +105,8 @@ const ExecutionDashboard = () => {
     const [roadmaps, setRoadmaps] = useState([]);
     const [subjects, setSubjects] = useState([]);
     const [userStats, setUserStats] = useState(null);
+    const [isTaskGuideOpen, setIsTaskGuideOpen] = useState(false);
+    const [selectedGuideTask, setSelectedGuideTask] = useState(null);
 
     useEffect(() => {
         bootstrap();
@@ -123,9 +126,21 @@ const ExecutionDashboard = () => {
         refreshTodayTask
     });
 
-    const onStartFocus = async () => {
+    const onStartFocus = async (taskOverride = null) => {
+        const focusTask = taskOverride
+            ? {
+                ...taskOverride,
+                reason: taskOverride.reason || taskOverride.description || taskOverride.subtitle || '',
+                estimated_time: taskOverride.estimated_time || `${taskOverride.estimated_minutes || taskOverride.estimatedMinutes || 25} min`,
+            }
+            : todayTask;
+
+        if (taskOverride) {
+            setTodayTask(focusTask);
+        }
+
         setExecutionState('IN_PROGRESS');
-        await handleStartFocus();
+        await handleStartFocus(focusTask);
     };
 
     const onComplete = async (minutes) => {
@@ -150,6 +165,18 @@ const ExecutionDashboard = () => {
         }
     }, [regenerateCoach, setTodayTask]);
 
+    const handleOpenTaskGuide = useCallback((taskCard) => {
+        if (!taskCard) {
+            return;
+        }
+        setSelectedGuideTask(taskCard);
+        setIsTaskGuideOpen(true);
+    }, []);
+
+    const handleCloseTaskGuide = useCallback(() => {
+        setIsTaskGuideOpen(false);
+    }, []);
+
     const activeTasks = useMemo(() => mode === 'exam' ? examTasks : tasks, [mode, examTasks, tasks]);
     const streak = userStats?.streak?.current || profile?.profile?.streak_count || progress?.stats?.current_streak || 0;
     
@@ -173,13 +200,19 @@ const ExecutionDashboard = () => {
             const dateKey = task?.scheduled_for || buildDateKey(task?.created_at) || buildDateKey(new Date());
             const card = {
                 key: task.id,
+                id: task.id,
                 tag: 'Pending',
                 title: normalizeDisplayTitle(task.title),
                 subtitle: task.description || (task?.scheduled_for ? `Scheduled for ${formatDateLabel(dateKey)}` : 'Pending task'),
-                ctaTo: '#',
+                description: task.description || '',
                 dateKey,
                 status: task.status,
                 estimatedMinutes: task.estimated_minutes || 25,
+                estimated_minutes: task.estimated_minutes || 25,
+                estimated_time: task.estimated_time || `${task.estimated_minutes || 25} min`,
+                reason: task.reason || task.description || '',
+                task_type: task.type || mode,
+                related_links: Array.isArray(task.related_links) ? task.related_links : [],
             };
             if (!map.has(dateKey)) {
                 map.set(dateKey, []);
@@ -189,7 +222,7 @@ const ExecutionDashboard = () => {
 
         const orderedDates = Array.from(map.keys()).sort();
         return { map, orderedDates };
-    }, [activeTasks]);
+    }, [activeTasks, mode]);
 
     useEffect(() => {
         if (selectedDateKey) {
@@ -352,7 +385,19 @@ const ExecutionDashboard = () => {
                                 ) : (
                                     <div className="grid grid-cols-1 gap-4">
                                         {selectedTasks.map((card, index) => (
-                                            <div key={card.key} className="relative flex items-center gap-4 rounded-[20px] bg-slate-50 p-[14px] transition-all hover:bg-white hover:shadow-md dark:bg-[#1a1921] dark:hover:bg-[#25242e]">
+                                            <div
+                                                key={card.key}
+                                                role="button"
+                                                tabIndex={0}
+                                                onClick={() => handleOpenTaskGuide(card)}
+                                                onKeyDown={(event) => {
+                                                    if (event.key === 'Enter' || event.key === ' ') {
+                                                        event.preventDefault();
+                                                        handleOpenTaskGuide(card);
+                                                    }
+                                                }}
+                                                className="relative flex cursor-pointer items-center gap-4 rounded-[20px] bg-slate-50 p-[14px] transition-all hover:bg-white hover:shadow-md dark:bg-[#1a1921] dark:hover:bg-[#25242e]"
+                                            >
                                                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-[13px] font-bold text-violet-800 dark:bg-[#311f4d] dark:text-violet-200">
                                                     {index + 1}
                                                 </div>
@@ -374,9 +419,6 @@ const ExecutionDashboard = () => {
                                                     </span>
                                                     <ArrowRight className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
                                                 </div>
-                                                <Link to={card.ctaTo} className="absolute inset-0">
-                                                    <span className="sr-only">Open task</span>
-                                                </Link>
                                             </div>
                                         ))}
                                     </div>
@@ -481,6 +523,13 @@ const ExecutionDashboard = () => {
                 isOpen={voicePanelOpen}
                 onClose={() => setVoicePanelOpen(false)}
                 contextSource="dashboard"
+            />
+
+            <TaskDetailModal
+                task={selectedGuideTask}
+                isOpen={isTaskGuideOpen}
+                onClose={handleCloseTaskGuide}
+                onStartFocus={onStartFocus}
             />
         </div>
     );
