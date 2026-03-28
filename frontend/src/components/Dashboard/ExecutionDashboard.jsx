@@ -151,16 +151,16 @@ const ExecutionDashboard = () => {
     }, [regenerateCoach, setTodayTask]);
 
     const activeTasks = useMemo(() => mode === 'exam' ? examTasks : tasks, [mode, examTasks, tasks]);
-    const streak = userStats?.streak?.current || progress?.stats?.streak || progress?.stats?.current_streak || 0;
+    const streak = userStats?.streak?.current || profile?.profile?.streak_count || progress?.stats?.current_streak || 0;
     
-    // Merge stats from userStats (correct data) and progress (execution-specific)
+    // Merge stats from multiple sources (profile has XP, userStats has task counts, progress has focus data)
     const mergedStats = useMemo(() => ({
-        xp_points: userStats?.xp_points || progress?.stats?.xp_points || 0,
+        xp_points: profile?.profile?.xp_points || progress?.stats?.xp_points || 0,
         current_streak: streak,
-        tasks_completed: userStats?.tasks_completed || progress?.stats?.tasks_completed || 0,
+        tasks_completed: userStats?.overview?.completed_tasks || progress?.stats?.tasks_completed || 0,
         focus_minutes: progress?.stats?.focus_minutes || 0,
-        level: userStats?.level || progress?.stats?.level || 'Beginner',
-    }), [userStats, progress, streak]);
+        level: progress?.stats?.level || 'Beginner',
+    }), [profile, userStats, progress, streak]);
 
     // Replace Exam Subjects with Pending Tasks (Day-wise carry over logic)
     const pendingTaskData = useMemo(() => {

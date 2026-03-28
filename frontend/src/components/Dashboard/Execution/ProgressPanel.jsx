@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const XP_LEVELS = [
@@ -29,12 +28,11 @@ const ProgressPanel = ({ tasks, stats }) => {
         };
     }, [xpPoints]);
 
-    // Today Circular Logic
+    // Today Circular Logic — count all completed tasks vs total missions
     const todayData = useMemo(() => {
-        const todayISO = new Date().toISOString().slice(0, 10);
-        const todayTasks = (tasks || []).filter(t => String(t.scheduled_for || '').slice(0, 10) === todayISO);
-        const completed = todayTasks.filter(t => t.status === 'completed').length;
-        const total = Math.max(todayTasks.length, 1);
+        const allTasks = tasks || [];
+        const completed = allTasks.filter(t => t.status === 'completed').length;
+        const total = Math.max(allTasks.length, completed, 1);
         const percent = Math.round((completed / total) * 100);
 
         return { completed, total, percent };
@@ -163,31 +161,6 @@ const ProgressPanel = ({ tasks, stats }) => {
                 </div>
             </div>
 
-            {/* XP Level */}
-            <div className="rounded-3xl border border-slate-200 bg-white p-5 dark:border-white/10 dark:bg-[#121212]">
-                <div className="mb-2 flex items-center justify-between">
-                    <span className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 dark:text-white">
-                        <Zap className="h-4 w-4 fill-amber-400 text-amber-500" />
-                        {xpData.current.level}
-                    </span>
-                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                        {xpPoints} XP
-                    </span>
-                </div>
-
-                <div className="relative h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
-                    <div
-                        className="absolute left-0 top-0 h-full bg-amber-500 transition-all duration-1000"
-                        style={{ width: `${xpData.percent}%` }}
-                    />
-                </div>
-
-                {xpData.next && (
-                    <p className="mt-2 text-right text-[10px] text-slate-400">
-                        {xpData.remaining} XP to {xpData.next.level}
-                    </p>
-                )}
-            </div>
         </div>
     );
 };
