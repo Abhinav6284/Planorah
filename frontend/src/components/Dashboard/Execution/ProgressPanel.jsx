@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Zap } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const XP_LEVELS = [
     { level: 'Beginner', min: 0, max: 499 },
@@ -18,7 +19,14 @@ const ProgressPanel = ({ tasks, stats }) => {
         const inLevel = Math.max(0, xpPoints - current.min);
         const percent = Math.min(100, Math.round((inLevel / currentSpan) * 100));
 
-        return { current, next, percent, remaining: next ? next.min - xpPoints : 0 };
+        return { 
+            current, 
+            next, 
+            percent, 
+            remaining: next ? next.min - xpPoints : 0,
+            xpInCurrentLevel: inLevel,
+            xpTotal: xpPoints
+        };
     }, [xpPoints]);
 
     // Today Circular Logic
@@ -60,6 +68,54 @@ const ProgressPanel = ({ tasks, stats }) => {
 
     return (
         <div className="space-y-4">
+            {/* XP Progress Card */}
+            <div className="rounded-3xl border border-slate-200 bg-white p-5 dark:border-white/10 dark:bg-[#121212]">
+                <div className="mb-4 flex items-center justify-between">
+                    <div>
+                        <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">Your Level</h3>
+                        <p className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">
+                            ⚡ {xpData.current.level}
+                        </p>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Total XP</p>
+                        <p className="text-lg font-bold text-slate-900 dark:text-white">{xpData.xpTotal}</p>
+                    </div>
+                </div>
+
+                {xpData.next && (
+                    <>
+                        <div className="mb-2 flex items-center justify-between text-xs">
+                            <span className="text-slate-600 dark:text-slate-400">
+                                Progress to {xpData.next.level}
+                            </span>
+                            <span className="font-semibold text-slate-700 dark:text-slate-300">
+                                {xpData.remaining} XP left
+                            </span>
+                        </div>
+                        <div className="h-2.5 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
+                            <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${xpData.percent}%` }}
+                                transition={{ duration: 1, ease: "easeOut" }}
+                                className="h-full rounded-full bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400"
+                            />
+                        </div>
+                        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                            {xpData.xpInCurrentLevel} / {xpData.next.min - xpData.current.min} XP in current level
+                        </p>
+                    </>
+                )}
+
+                {!xpData.next && (
+                    <div className="rounded-xl bg-gradient-to-r from-yellow-100 to-amber-100 p-3 text-center dark:from-yellow-500/20 dark:to-amber-500/20">
+                        <p className="text-sm font-bold text-amber-900 dark:text-amber-200">
+                            🎖️ Max Level Reached!
+                        </p>
+                    </div>
+                )}
+            </div>
+
             {/* Today Progress */}
             <div className="rounded-3xl border border-slate-200 bg-white p-5 dark:border-white/10 dark:bg-[#121212]">
                 <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Today's Focus</h3>

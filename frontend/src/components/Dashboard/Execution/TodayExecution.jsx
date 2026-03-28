@@ -25,6 +25,23 @@ const TodayExecution = ({
         return Math.max((tasks || []).length, completedCount + (todayTask ? 1 : 0));
     }, [tasks, todayTask, completedCount]);
 
+    // Milestone calculation: 7, 14, 21, 28...
+    const milestoneData = useMemo(() => {
+        const currentStreak = streak || 0;
+        const weekNumber = Math.ceil(currentStreak / 7) || 1;
+        const nextMilestone = weekNumber * 7;
+        const daysIntoCurrentWeek = currentStreak % 7;
+        const progressPercent = currentStreak > 0 ? Math.round((daysIntoCurrentWeek / 7) * 100) : 0;
+        
+        return {
+            current: currentStreak,
+            nextMilestone,
+            daysRemaining: nextMilestone - currentStreak,
+            progressPercent,
+            weekNumber
+        };
+    }, [streak]);
+
     return (
         <section className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_16px_35px_-28px_rgba(15,23,42,0.55)] dark:border-white/10 dark:bg-[#121212] dark:shadow-none">
             {/* Background decoration */}
@@ -43,13 +60,48 @@ const TodayExecution = ({
                             <div className="mt-1 flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400">
                                 <span className="flex items-center gap-1 text-orange-500">
                                     <Flame className="h-4 w-4" fill="currentColor" />
-                                    {streak} day streak
+                                    {streak || 0} day streak
                                 </span>
                                 <span>•</span>
                                 <span>{completedCount}/{totalCount} missions done</span>
+                                {milestoneData.current > 0 && (
+                                    <>
+                                        <span>•</span>
+                                        <span className="text-blue-600 dark:text-blue-400">
+                                            {milestoneData.daysRemaining} days to {milestoneData.nextMilestone}-day milestone
+                                        </span>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
+
+                    {/* Milestone Progress Bar */}
+                    {milestoneData.current > 0 && (
+                        <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-500/20 dark:bg-blue-500/10">
+                            <div className="mb-2 flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-blue-700 dark:text-blue-300">
+                                    Week {milestoneData.weekNumber} Progress
+                                </span>
+                                <span className="text-xs font-bold text-blue-700 dark:text-blue-300">
+                                    {milestoneData.current % 7 || 7}/7 days
+                                </span>
+                            </div>
+                            <div className="h-2 overflow-hidden rounded-full bg-blue-200 dark:bg-blue-900/30">
+                                <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${milestoneData.progressPercent}%` }}
+                                    transition={{ duration: 1, ease: "easeOut" }}
+                                    className="h-full rounded-full bg-blue-600 dark:bg-blue-400"
+                                />
+                            </div>
+                            <p className="mt-2 text-xs text-blue-700 dark:text-blue-300">
+                                {milestoneData.daysRemaining === 0 
+                                    ? '🎉 Milestone reached!' 
+                                    : `${milestoneData.daysRemaining} more days to complete this week!`}
+                            </p>
+                        </div>
+                    )}
 
                     <div className="max-w-xl">
                         <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">

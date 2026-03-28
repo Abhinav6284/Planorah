@@ -11,6 +11,7 @@ import TodayExecution from './Execution/TodayExecution';
 import FocusMode from './Execution/FocusMode';
 import ExecutionFeed from './Execution/ExecutionFeed';
 import ProgressPanel from './Execution/ProgressPanel';
+import TaskDetailModal from './Execution/TaskDetailModal';
 
 import { useExecutionStore } from '../../store/useExecutionStore';
 import { userService } from '../../api/userService';
@@ -103,6 +104,8 @@ const ExecutionDashboard = () => {
     const [selectedDateKey, setSelectedDateKey] = useState(null);
     const [roadmaps, setRoadmaps] = useState([]);
     const [subjects, setSubjects] = useState([]);
+    const [selectedTask, setSelectedTask] = useState(null);
+    const [taskModalOpen, setTaskModalOpen] = useState(false);
 
     useEffect(() => {
         bootstrap();
@@ -122,7 +125,28 @@ const ExecutionDashboard = () => {
     });
 
     const onStartFocus = async () => {
+      
+
+    const onStartFocusForTask = async (task) => {
+        // Update today task to the selected task
+        if (task) {
+            setTodayTask({
+                id: task.id,
+                title: task.title,
+                description: task.description,
+                estimated_minutes: task.estimated_minutes,
+                difficulty: task.difficulty,
+                reason: task.reason || task.description
+            });
+        }
         setExecutionState('IN_PROGRESS');
+        await handleStartFocus();
+    };
+
+    const handleTaskClick = (task) => {
+        setSelectedTask(task);
+        setTaskModalOpen(true);
+    };  setExecutionState('IN_PROGRESS');
         await handleStartFocus();
     };
 
@@ -130,6 +154,8 @@ const ExecutionDashboard = () => {
         await originalComplete(minutes);
         setExecutionState('COMPLETED');
         setTimeout(() => setExecutionState('NOT_STARTED'), 5000);
+        // Refresh all data to update stats
+        setTimeout(() => bootstrap(), 1000);
     };
 
     const onCloseFocus = () => {
@@ -143,7 +169,8 @@ const ExecutionDashboard = () => {
         }
     }, [regenerateCoach, setTodayTask]);
 
-    const activeTasks = useMemo(() => mode === 'exam' ? examTasks : tasks, [mode, examTasks, tasks]);
+    const ac    taskData: task, // Store full task data
+            tiveTasks = useMemo(() => mode === 'exam' ? examTasks : tasks, [mode, examTasks, tasks]);
     const streak = progress?.stats?.streak || progress?.stats?.current_streak || 0;
 
     // Replace Exam Subjects with Pending Tasks (Day-wise carry over logic)
@@ -290,14 +317,6 @@ const ExecutionDashboard = () => {
                             </button>
                         </div>
 
-                        {/* 4. EXECUTION FEED */}
-                        <ExecutionFeed
-                            tasks={activeTasks}
-                            focusOpen={currentState === 'IN_PROGRESS'}
-                            todayTask={todayTask}
-                            streak={streak}
-                        />
-
                         {/* Schedule Section */}
                         <div className={shellCardClass}>
                             <div className="mb-4 flex items-center justify-between pb-2">
@@ -322,32 +341,33 @@ const ExecutionDashboard = () => {
                                                 }`}
                                         >
                                             <span className={`text-[15px] font-bold leading-none ${day.isSelected ? 'text-[#1e1e1e]' : 'text-slate-700 dark:text-white/80'}`}>{day.dayNumber}</span>
-                                            <span className={`text-[10px] capitalize tracking-wide ${day.isSelected ? 'text-[#1e1e1e]' : 'text-slate-400 dark:text-[#6a6a72]'}`}>
-                                                {day.dayName}
-                                            </span>
-                                        </button>
-                                    ))}
-                                </div>
-
-                                <div className="flex items-center justify-between">
-                                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Tasks ({selectedTasks.length})</p>
-                                    <div className="flex items-center gap-3">
-                                        <div className="h-1.5 w-32 overflow-hidden rounded-full bg-slate-200 dark:bg-[#25242e]">
-                                            <div className="h-full rounded-full bg-slate-500/60 transition-all dark:bg-white/20" style={{ width: `${selectedTaskProgress}%` }} />
-                                        </div>
-                                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-500">{selectedTaskProgress}%</span>
-                                    </div>
-                                </div>
-
-                                {selectedTasks.length === 0 ? (
-                                    <p className="text-sm text-slate-500">No tasks scheduled for {formatDateLabel(selectedDateKey)}.</p>
-                                ) : (
-                                    <div className="grid grid-cols-1 gap-4">
-                                        {selectedTasks.map((card, index) => (
-                                            <div key={card.key} className="relative flex items-center gap-4 rounded-[20px] bg-slate-50 p-[14px] transition-all hover:bg-white hover:shadow-md dark:bg-[#1a1921] dark:hover:bg-[#25242e]">
+                                            <button
+                                                key={card.key}
+                                                onClick={() => handleTaskClick(card.taskData)}
+                                                className="relative flex w-full items-center gap-4 rounded-[20px] bg-slate-50 p-[14px] text-left transition-all hover:bg-white hover:shadow-md dark:bg-[#1a1921] dark:hover:bg-[#25242e]"
+                                            >
                                                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-[13px] font-bold text-violet-800 dark:bg-[#311f4d] dark:text-violet-200">
                                                     {index + 1}
                                                 </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <h4 className="truncate text-[14px] font-bold text-slate-800 dark:text-slate-100">
+                                                        <span className="mr-1.5 inline-flex items-center justify-center rounded bg-[#e8e8e8] p-[3px] dark:bg-[#2a2a2a]">
+                                                            <span className="text-[10px]">📚</span>
+                                                        </span>
+                                                        {card.title}
+                                                    </h4>
+                                                    <p className="mt-1 flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                                                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-slate-200 text-[9px] dark:bg-[#25242e]">⏱</span>
+                                                        {card.estimatedMinutes} min
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="rounded-full border border-slate-200 px-3 py-1 text-[11px] font-semibold lowercase tracking-wide text-slate-600 dark:border-white/10 dark:text-slate-400">
+                                                        {getTaskStatusLabel(card.status)}
+                                                    </span>
+                                                    <ArrowRight className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                                                </div>
+                                            </button/div>
                                                 <div className="min-w-0 flex-1">
                                                     <h4 className="truncate text-[14px] font-bold text-slate-800 dark:text-slate-100">
                                                         <span className="mr-1.5 inline-flex items-center justify-center rounded bg-[#e8e8e8] p-[3px] dark:bg-[#2a2a2a]">
@@ -438,6 +458,14 @@ const ExecutionDashboard = () => {
 
                     {/* RIGHT COLUMN: Progress & AI */}
                     <aside className="space-y-6 lg:col-span-4">
+                        {/* EXECUTION FEED */}
+                        <ExecutionFeed
+                            tasks={activeTasks}
+                            focusOpen={currentState === 'IN_PROGRESS'}
+                            todayTask={todayTask}
+                            streak={streak}
+                        />
+
                         {/* 5. PROGRESS PANEL */}
                         <ProgressPanel tasks={activeTasks} stats={progress?.stats} />
 
@@ -464,6 +492,13 @@ const ExecutionDashboard = () => {
             <AIVoicePanel
                 isOpen={voicePanelOpen}
                 onClose={() => setVoicePanelOpen(false)}
+
+            <TaskDetailModal
+                task={selectedTask}
+                isOpen={taskModalOpen}
+                onClose={() => setTaskModalOpen(false)}
+                onStartFocus={onStartFocusForTask}
+            />
                 contextSource="dashboard"
             />
         </div>

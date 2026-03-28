@@ -153,4 +153,9 @@ export const executionService = {
         );
         return response.data;
     },
+
+    getTaskGuidance: async (taskId) => {
+        const response = await api.get(`tasks/${taskId}/guidance/`);
+        return response.data;
+    },
 };
