@@ -288,7 +288,7 @@ const ExecutionDashboard = () => {
 
                 <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-12">
 
-                    {/* LEFT COLUMN: Main Feed & Activities */}
+                    {/* LEFT COLUMN: Main Activities */}
                     <div className="space-y-6 lg:col-span-8">
                         {/* Mode Switcher Block */}
                         <div className="flex items-center justify-between rounded-3xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-[#121212]">
@@ -305,14 +305,6 @@ const ExecutionDashboard = () => {
                                 <Sparkles className="h-3.5 w-3.5" /> AI Coach
                             </button>
                         </div>
-
-                        {/* 4. EXECUTION FEED */}
-                        <ExecutionFeed
-                            tasks={activeTasks}
-                            focusOpen={currentState === 'IN_PROGRESS'}
-                            todayTask={todayTask}
-                            streak={streak}
-                        />
 
                         {/* Schedule Section */}
                         <div className={shellCardClass}>
@@ -452,8 +444,16 @@ const ExecutionDashboard = () => {
                         )}
                     </div>
 
-                    {/* RIGHT COLUMN: Progress & AI */}
+                    {/* RIGHT COLUMN: Feed, Progress & AI */}
                     <aside className="space-y-6 lg:col-span-4">
+                        {/* 4. EXECUTION FEED */}
+                        <ExecutionFeed
+                            tasks={activeTasks}
+                            focusOpen={currentState === 'IN_PROGRESS'}
+                            todayTask={todayTask}
+                            streak={streak}
+                        />
+
                         {/* 5. PROGRESS PANEL */}
                         <ProgressPanel tasks={activeTasks} stats={mergedStats} />
 
