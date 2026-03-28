@@ -103,10 +103,12 @@ const ExecutionDashboard = () => {
     const [selectedDateKey, setSelectedDateKey] = useState(null);
     const [roadmaps, setRoadmaps] = useState([]);
     const [subjects, setSubjects] = useState([]);
+    const [userStats, setUserStats] = useState(null);
 
     useEffect(() => {
         bootstrap();
         userService.getProfile().then(setProfile).catch(() => null);
+        userService.getStatistics().then(setUserStats).catch(() => null);
         roadmapService.getUserRoadmaps().then((data) => setRoadmaps(Array.isArray(data) ? data : [])).catch(() => null);
         planoraService.getSubjects().then((data) => setSubjects(Array.isArray(data) ? data : [])).catch(() => null);
     }, [bootstrap]);
@@ -130,6 +132,11 @@ const ExecutionDashboard = () => {
         await originalComplete(minutes);
         setExecutionState('COMPLETED');
         setTimeout(() => setExecutionState('NOT_STARTED'), 5000);
+        // Refresh stats after completion
+        setTimeout(() => {
+            userService.getStatistics().then(setUserStats).catch(() => null);
+            bootstrap();
+        }, 1000);
     };
 
     const onCloseFocus = () => {
@@ -144,7 +151,16 @@ const ExecutionDashboard = () => {
     }, [regenerateCoach, setTodayTask]);
 
     const activeTasks = useMemo(() => mode === 'exam' ? examTasks : tasks, [mode, examTasks, tasks]);
-    const streak = progress?.stats?.streak || progress?.stats?.current_streak || 0;
+    const streak = userStats?.streak?.current || progress?.stats?.streak || progress?.stats?.current_streak || 0;
+    
+    // Merge stats from userStats (correct data) and progress (execution-specific)
+    const mergedStats = useMemo(() => ({
+        xp_points: userStats?.xp_points || progress?.stats?.xp_points || 0,
+        current_streak: streak,
+        tasks_completed: userStats?.tasks_completed || progress?.stats?.tasks_completed || 0,
+        focus_minutes: progress?.stats?.focus_minutes || 0,
+        level: userStats?.level || progress?.stats?.level || 'Beginner',
+    }), [userStats, progress, streak]);
 
     // Replace Exam Subjects with Pending Tasks (Day-wise carry over logic)
     const pendingTaskData = useMemo(() => {
@@ -439,7 +455,7 @@ const ExecutionDashboard = () => {
                     {/* RIGHT COLUMN: Progress & AI */}
                     <aside className="space-y-6 lg:col-span-4">
                         {/* 5. PROGRESS PANEL */}
-                        <ProgressPanel tasks={activeTasks} stats={progress?.stats} />
+                        <ProgressPanel tasks={activeTasks} stats={mergedStats} />
 
                         {/* AI Insight Card */}
                         <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-indigo-50 to-white p-5 dark:from-[#1a1a2e] dark:to-[#121212] dark:border-white/10">
