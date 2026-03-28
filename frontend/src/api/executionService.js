@@ -68,16 +68,16 @@ const mapRoadmapTaskToExecutionTask = (task, type = 'learning') => {
 export const executionService = {
     getTodayTask: async () => {
         const response = await requestWith404Fallback(
-            () => api.get('dashboard/today-task/'),
-            () => api.get('today-task/')
+            () => api.get('dashboard/today-task/', { timeout: 7000 }),
+            () => api.get('today-task/', { timeout: 7000 })
         );
         return response.data;
     },
 
     getAICoach: async (payload = {}) => {
         const response = await requestWith404Fallback(
-            () => api.post('dashboard/ai/coach/', payload),
-            () => api.post('ai/coach/', payload)
+            () => api.post('dashboard/ai/coach/', payload, { timeout: 9000 }),
+            () => api.post('ai/coach/', payload, { timeout: 9000 })
         );
         return response.data;
     },
@@ -85,21 +85,21 @@ export const executionService = {
     getExecutionTasks: async (type = '') => {
         const params = type ? { type } : undefined;
         const response = await requestWithResilientFallback(
-            () => api.get('dashboard/execution/tasks/', { params }),
+            () => api.get('dashboard/execution/tasks/', { params, timeout: 7000 }),
             async () => {
                 if (type === 'exam') {
                     return { data: [] };
                 }
 
                 try {
-                    const fallbackResponse = await api.get('execution/tasks/', { params });
+                    const fallbackResponse = await api.get('execution/tasks/', { params, timeout: 7000 });
                     return fallbackResponse;
                 } catch (error) {
                     if (!shouldUseFallback(error)) {
                         throw error;
                     }
 
-                    const roadmapTasksResponse = await api.get('tasks/');
+                    const roadmapTasksResponse = await api.get('tasks/', { timeout: 7000 });
                     const payload = Array.isArray(roadmapTasksResponse?.data)
                         ? roadmapTasksResponse.data
                         : (Array.isArray(roadmapTasksResponse?.data?.tasks) ? roadmapTasksResponse.data.tasks : []);
@@ -148,8 +148,8 @@ export const executionService = {
 
     getProgress: async () => {
         const response = await requestWith404Fallback(
-            () => api.get('dashboard/execution/progress/'),
-            () => api.get('execution/progress/')
+            () => api.get('dashboard/execution/progress/', { timeout: 7000 }),
+            () => api.get('execution/progress/', { timeout: 7000 })
         );
         return response.data;
     },
