@@ -9,20 +9,28 @@ const normalizeArrayPayload = (payload, keys = []) => {
     return [];
 };
 
-const withNormalizedArrayData = (requestPromise, keys = []) => requestPromise.then((response) => {
-    const rawData = response?.data;
-    return {
+const withNormalizedArrayData = (requestPromise, keys = [], options = {}) => requestPromise.then((response) => {
+    const payload = response?.data;
+    const normalized = {
         ...response,
-        data: normalizeArrayPayload(rawData, keys),
-        meta: rawData?.meta || null,
+        data: normalizeArrayPayload(payload, keys),
     };
+
+    if (options.includeMeta) {
+        normalized.meta = payload && typeof payload === 'object' && !Array.isArray(payload)
+            ? payload.meta || null
+            : null;
+    }
+
+    return normalized;
 });
 
 export const tasksService = {
     // Tasks
     getTasks: (filters = {}) => withNormalizedArrayData(
         axios.get('tasks/', { params: filters }),
-        ['tasks', 'items']
+        ['tasks', 'items'],
+        { includeMeta: true }
     ),
     getTask: (id) => axios.get(`tasks/${id}/`),
     createTask: (data) => axios.post('tasks/', data),

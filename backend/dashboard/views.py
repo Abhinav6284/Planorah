@@ -708,6 +708,71 @@ def _apply_completion_rewards(user, task):
     }
 
 
+def _build_execution_task_guidance(task):
+    planned_minutes = max(5, int(task.estimated_minutes or 25))
+    setup_minutes = max(5, int(planned_minutes * 0.2))
+    wrap_minutes = max(5, int(planned_minutes * 0.2))
+    execute_minutes = max(10, planned_minutes - setup_minutes - wrap_minutes)
+
+    objective = task.reason or f"Complete: {task.title}"
+    metadata = task.metadata if isinstance(task.metadata, dict) else {}
+
+    base_steps = [
+        {
+            'step': 1,
+            'title': 'Define Expected Output',
+            'description': objective,
+        },
+        {
+            'step': 2,
+            'title': 'Prepare Work Context',
+            'description': 'Open only the required tools/resources and remove distractions before execution.',
+        },
+        {
+            'step': 3,
+            'title': 'Execute Focused Work',
+            'description': 'Finish one concrete output that moves this task forward meaningfully.',
+        },
+        {
+            'step': 4,
+            'title': 'Review and Log Next Action',
+            'description': 'Validate what you completed and write the immediate next step.',
+        },
+    ]
+
+    if metadata.get('source') == 'exam_plan':
+        base_steps[2]['description'] = 'Solve focused exam-style work for this topic and verify correctness.'
+
+    return {
+        'generated': True,
+        'objective': objective,
+        'time_breakdown': [
+            {'duration': f'{setup_minutes} min', 'activity': 'Review objective and gather required context'},
+            {'duration': f'{execute_minutes} min', 'activity': 'Execute deep work on the main deliverable'},
+            {'duration': f'{wrap_minutes} min', 'activity': 'Validate output and capture follow-up actions'},
+        ],
+        'steps': base_steps,
+        'best_practices': [
+            'Commit to one outcome for this session before you begin.',
+            'Avoid context switching while the focus timer is active.',
+            'End the session only after validating the output quality.',
+        ],
+        'common_mistakes': [
+            'Starting work without defining what done looks like.',
+            'Over-scoping the session and shipping nothing concrete.',
+            'Skipping final review/logging before ending focus mode.',
+        ],
+        'quick_tips': [
+            'Keep just one priority tab/window open for the core task.',
+            'Use the time breakdown as a hard boundary for scope control.',
+            'Write one-line next action before ending the timer.',
+        ],
+        'estimated_minutes': planned_minutes,
+        'task_type': task.task_type,
+        'metadata': metadata,
+    }
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_today_task(request):
@@ -881,6 +946,18 @@ def execution_tasks(request):
         if request.method == 'GET':
             return Response([], status=status.HTTP_200_OK)
         return Response({'detail': 'Unable to load execution tasks.', 'error': str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def execution_task_guidance(request, task_id):
+    try:
+        task = ExecutionTask.objects.get(id=task_id, user=request.user)
+    except ExecutionTask.DoesNotExist:
+        return Response({'detail': 'Execution task not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    guidance = _build_execution_task_guidance(task)
+    return Response(guidance, status=status.HTTP_200_OK)
 
 
 @api_view(['POST', 'PATCH'])

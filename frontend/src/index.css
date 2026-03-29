@@ -58,7 +58,7 @@
   }
 
   .onboarding-panel {
-    @apply rounded-3xl border border-slate-200/90 bg-white/90 shadow-2xl backdrop-blur-sm p-6 md:p-10;
+    @apply rounded-[2rem] border border-slate-200/90 bg-white/90 shadow-[0_18px_40px_rgba(15,23,42,0.12)] backdrop-blur-sm p-6 md:p-10 overflow-hidden;
   }
 
   .dark .onboarding-panel {
@@ -90,21 +90,24 @@
   }
 
   .onboarding-input,
-  .onboarding-select,
+  .onboarding-select {
+    @apply w-full px-5 py-3 rounded-full border-2 border-slate-300 bg-white text-slate-900 placeholder:text-slate-500 outline-none transition-all shadow-sm;
+  }
+
   .onboarding-textarea {
-    @apply w-full px-4 py-3 rounded-xl border-2 border-slate-300 bg-white text-slate-900 placeholder:text-slate-500 outline-none transition-all;
+    @apply w-full px-4 py-3 rounded-2xl border-2 border-slate-300 bg-white text-slate-900 placeholder:text-slate-500 outline-none transition-all shadow-sm;
   }
 
   .onboarding-input:focus,
   .onboarding-select:focus,
   .onboarding-textarea:focus {
-    @apply border-slate-900 ring-2 ring-slate-900/10;
+    @apply border-slate-900 ring-2 ring-slate-900/10 shadow-md;
   }
 
   .dark .onboarding-input,
   .dark .onboarding-select,
   .dark .onboarding-textarea {
-    @apply border-slate-600 bg-slate-800/90 text-slate-100 placeholder:text-slate-400;
+    @apply border-slate-600 bg-slate-800/90 text-slate-100 placeholder:text-slate-400 shadow-[0_8px_20px_rgba(2,6,23,0.35)];
   }
 
   .dark .onboarding-input:focus,

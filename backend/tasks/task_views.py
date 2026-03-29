@@ -58,7 +58,7 @@ class TaskViewSet(viewsets.ReadOnlyModelViewSet):
         if due_date_param:
             queryset = queryset.filter(due_date=due_date_param)
 
-        return queryset.order_by('day', 'id')
+        return queryset.order_by('day', 'task_id')
 
     def list(self, request, *args, **kwargs):
         """List tasks with lightweight meta for better frontend empty states."""

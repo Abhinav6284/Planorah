@@ -4,6 +4,9 @@ import axios from "../../api/axios";
 import { motion, AnimatePresence } from "framer-motion";
 import OnboardingLayout from "./OnboardingLayout";
 
+// Keep this false in normal operation; set true only for emergency submit isolation.
+const DISABLE_ONBOARDING_SUBMIT = false;
+
 const STEPS = [
     {
         id: "field",
@@ -79,7 +82,7 @@ const STEPS = [
 export default function StepForm() {
     const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(0);
-    const [loading, setLoading] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
         phone_number: "",
@@ -126,73 +129,89 @@ export default function StepForm() {
     }, []);
 
     const stepData = STEPS[currentStep];
+    const isLastStep = currentStep === STEPS.length - 1;
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleNext = async () => {
-        if (currentStep < STEPS.length - 1) {
-            // Basic validation for current step
-            const currentFields = STEPS[currentStep].fields;
-            const emptyFields = currentFields.filter(f => !formData[f.name] && f.name !== 'skills'); // Skills can be empty? Maybe not.
+    const handleKeyDown = (e) => {
+        // Prevent implicit form submission via Enter on inputs/selects.
+        if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+        }
+    };
 
-            if (emptyFields.length > 0) {
-                // You might want to show an error state here
-                // alert(`Please fill in ${emptyFields.map(f => f.label).join(', ')}`);
-                // For now, let's just proceed or maybe restrict? 
-                // Let's restrict:
-                alert("Please fill in all required fields.");
+    const validateCurrentStep = () => {
+        const currentFields = STEPS[currentStep].fields;
+        const emptyFields = currentFields.filter(f => !formData[f.name] && f.name !== "skills");
+
+        if (emptyFields.length > 0) {
+            alert("Please fill in all required fields.");
+            return false;
+        }
+
+        return true;
+    };
+
+    const handleNext = async () => {
+        if (isSubmitting) return;
+        if (!validateCurrentStep()) return;
+
+        if (!isLastStep) {
+            setCurrentStep(prev => prev + 1);
+            return;
+        }
+
+        if (DISABLE_ONBOARDING_SUBMIT) {
+            sessionStorage.setItem("show_welcome_coach", formData.name?.split(" ")[0] || "true");
+            navigate("/dashboard");
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            // Parse skills to array
+            const payload = {
+                ...formData,
+                skills: formData.skills ? formData.skills.split(",").map(s => s.trim()).filter(s => s) : []
+            };
+
+            const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+            const response = await axios.patch(`/users/update-profile/`, payload, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response?.data?.onboarding_complete) {
+                sessionStorage.setItem("show_realtime_onboarding_intro", "true");
+                sessionStorage.removeItem("show_welcome_coach");
+            } else {
+                sessionStorage.setItem("show_welcome_coach", formData.name?.split(" ")[0] || "true");
+            }
+
+            // Redirect to dashboard
+            navigate("/dashboard");
+        } catch (error) {
+            console.error("Error updating profile:", error);
+
+            // Handle Auth Errors
+            if (error.response?.status === 401 || error.response?.data?.code === "token_not_valid") {
+                alert("Your session has expired. Please login again.");
+                localStorage.removeItem("access_token");
+                localStorage.removeItem("refresh_token");
+                sessionStorage.removeItem("access_token");
+                sessionStorage.removeItem("refresh_token");
+                navigate("/login");
                 return;
             }
 
-            setCurrentStep(currentStep + 1);
-        } else {
-            // Submit
-            setLoading(true);
-            try {
-                // Parse skills to array
-                const payload = {
-                    ...formData,
-                    skills: formData.skills ? formData.skills.split(',').map(s => s.trim()).filter(s => s) : []
-                };
-
-                const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
-                const response = await axios.patch(`/users/update-profile/`, payload, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                if (response?.data?.onboarding_complete) {
-                    sessionStorage.setItem("show_realtime_onboarding_intro", "true");
-                    sessionStorage.removeItem("show_welcome_coach");
-                } else {
-                    sessionStorage.setItem("show_welcome_coach", formData.name?.split(" ")[0] || "true");
-                }
-
-                // Redirect to dashboard
-                navigate("/dashboard");
-            } catch (error) {
-                console.error("Error updating profile:", error);
-
-                // Handle Auth Errors
-                if (error.response?.status === 401 || error.response?.data?.code === 'token_not_valid') {
-                    alert("Your session has expired. Please login again.");
-                    localStorage.removeItem("access_token");
-                    localStorage.removeItem("refresh_token");
-                    sessionStorage.removeItem("access_token");
-                    sessionStorage.removeItem("refresh_token");
-                    navigate("/login");
-                    return;
-                }
-
-                if (error.response) {
-                    console.error("Response data:", error.response.data);
-                    alert(`Failed to update profile: ${JSON.stringify(error.response.data)}`);
-                } else {
-                    alert("Failed to update profile. Please try again.");
-                }
-            } finally {
-                setLoading(false);
+            if (error.response) {
+                console.error("Response data:", error.response.data);
+                alert(`Failed to update profile: ${JSON.stringify(error.response.data)}`);
+            } else {
+                alert("Failed to update profile. Please try again.");
             }
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -211,6 +230,7 @@ export default function StepForm() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.3 }}
+                    onKeyDown={handleKeyDown}
                 >
                     <div className="grid grid-cols-2 gap-6">
                         {stepData.fields.map((field) => (
@@ -244,18 +264,20 @@ export default function StepForm() {
             <div className="mt-10 flex gap-4">
                 {currentStep > 0 && (
                     <button
+                        type="button"
                         onClick={handleBack}
-                        className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all"
+                        className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-full font-medium hover:bg-gray-200 transition-all"
                     >
                         Back
                     </button>
                 )}
                 <button
+                    type="button"
                     onClick={handleNext}
-                    disabled={loading}
-                    className="flex-1 py-3 bg-black text-white rounded-xl font-medium hover:bg-gray-900 transition-all shadow-lg shadow-black/20"
+                    disabled={isSubmitting}
+                    className="flex-1 py-3 bg-black text-white rounded-full font-medium hover:bg-gray-900 transition-all shadow-lg shadow-black/20"
                 >
-                    {loading ? "Saving..." : (currentStep === STEPS.length - 1 ? "Finish" : "Next")}
+                    {isLastStep && isSubmitting ? "Saving..." : (isLastStep ? "Finish" : "Next")}
                 </button>
             </div>
 

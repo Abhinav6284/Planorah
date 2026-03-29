@@ -40,6 +40,10 @@ urlpatterns = [
     # Delete roadmap by ID
     path('<int:roadmap_id>/delete/', views.delete_roadmap, name='delete_roadmap'),
 
+    # Generate missing tasks for roadmap
+    path('<int:roadmap_id>/generate-tasks/',
+         views.generate_roadmap_tasks, name='generate_roadmap_tasks'),
+
     # Update milestone completion status
     path('milestone/<int:milestone_id>/progress/',
          views.update_milestone_progress, name='update_milestone_progress'),

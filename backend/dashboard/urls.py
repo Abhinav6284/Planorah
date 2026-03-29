@@ -14,6 +14,9 @@ urlpatterns = [
     path('rewards/apply/', views.rewards_apply, name='dashboard_rewards_apply'),
     path('execution/tasks/', views.execution_tasks,
          name='dashboard_execution_tasks'),
+    path('execution/tasks/<uuid:task_id>/guidance/',
+         views.execution_task_guidance,
+         name='dashboard_execution_task_guidance'),
     path('execution/progress/', views.execution_progress,
          name='dashboard_execution_progress'),
 ]

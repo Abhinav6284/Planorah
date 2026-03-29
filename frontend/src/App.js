@@ -91,7 +91,7 @@ export default function App() {
       <ThemeProvider>
         <ToastProvider>
           <SubscriptionProvider>
-            <Router>
+            <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <ErrorBoundary>
                 <Suspense fallback={<DashboardSkeleton />}>
                   <Routes>
@@ -111,7 +111,7 @@ export default function App() {
     <ThemeProvider>
       <ToastProvider>
         <SubscriptionProvider>
-          <Router>
+          <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <ErrorBoundary>
               <Suspense fallback={<DashboardSkeleton />}>
                 <Routes>
@@ -119,8 +119,9 @@ export default function App() {
                   <Route path="/home" element={<WelcomePage />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
-                  <Route path="/onboarding" element={<UniversalOnboarding />} />
+                  <Route path="/onboarding" element={<StepForm />} />
                   <Route path="/onboarding/legacy" element={<StepForm />} />
+                  <Route path="/onboarding/new" element={<UniversalOnboarding />} />
                   <Route path="/complete-profile" element={<CompleteProfile />} />
                   <Route path="/verify-otp" element={<VerifyOtp />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />

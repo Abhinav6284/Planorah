@@ -60,24 +60,26 @@ const ProgressPanel = ({ tasks, stats }) => {
     }, [tasks]);
 
     // Circular ring calc
-    const radius = 32;
+    const ringSize = 72;
+    const radius = 28;
     const circumference = 2 * Math.PI * radius;
     const offset = circumference - (todayData.percent / 100) * circumference;
+    const center = ringSize / 2;
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-3">
             {/* XP Progress Card */}
-            <div className="rounded-3xl border border-slate-200 bg-white p-5 dark:border-white/10 dark:bg-[#121212]">
-                <div className="mb-4 flex items-center justify-between">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-[#121212]">
+                <div className="mb-3 flex items-center justify-between">
                     <div>
-                        <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">Your Level</h3>
-                        <p className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">
+                        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Your Level</h3>
+                        <p className="mt-1 text-xl font-bold text-slate-900 dark:text-white">
                             ⚡ {xpData.current.level}
                         </p>
                     </div>
                     <div className="text-right">
                         <p className="text-xs text-slate-500 dark:text-slate-400">Total XP</p>
-                        <p className="text-lg font-bold text-slate-900 dark:text-white">{xpData.xpTotal}</p>
+                        <p className="text-base font-bold text-slate-900 dark:text-white">{xpData.xpTotal}</p>
                     </div>
                 </div>
 
@@ -91,7 +93,7 @@ const ProgressPanel = ({ tasks, stats }) => {
                                 {xpData.remaining} XP left
                             </span>
                         </div>
-                        <div className="h-2.5 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
+                        <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${xpData.percent}%` }}
@@ -115,14 +117,14 @@ const ProgressPanel = ({ tasks, stats }) => {
             </div>
 
             {/* Today Progress */}
-            <div className="rounded-3xl border border-slate-200 bg-white p-5 dark:border-white/10 dark:bg-[#121212]">
-                <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Today's Focus</h3>
-                <div className="flex items-center gap-5">
-                    <div className="relative h-20 w-20">
-                        <svg className="h-full w-full -rotate-90 transform" viewBox="0 0 80 80">
-                            <circle cx="40" cy="40" r={radius} fill="none" strokeWidth="6" className="stroke-slate-100 dark:stroke-white/10" />
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-[#121212]">
+                <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Today's Focus</h3>
+                <div className="flex items-center gap-4">
+                    <div className="relative h-16 w-16">
+                        <svg className="h-full w-full -rotate-90 transform" viewBox={`0 0 ${ringSize} ${ringSize}`}>
+                            <circle cx={center} cy={center} r={radius} fill="none" strokeWidth="6" className="stroke-slate-100 dark:stroke-white/10" />
                             <circle
-                                cx="40" cy="40" r={radius} fill="none" strokeWidth="6"
+                                cx={center} cy={center} r={radius} fill="none" strokeWidth="6"
                                 strokeDasharray={circumference}
                                 strokeDashoffset={offset}
                                 strokeLinecap="round"
@@ -130,11 +132,11 @@ const ProgressPanel = ({ tasks, stats }) => {
                             />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-lg font-bold text-slate-900 dark:text-white">{todayData.percent}%</span>
+                            <span className="text-base font-bold text-slate-900 dark:text-white">{todayData.percent}%</span>
                         </div>
                     </div>
                     <div>
-                        <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                        <p className="text-xl font-bold text-slate-900 dark:text-white">
                             {todayData.completed}<span className="text-slate-400">/{todayData.total}</span>
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400">Missions completed</p>
@@ -143,13 +145,13 @@ const ProgressPanel = ({ tasks, stats }) => {
             </div>
 
             {/* Heatmap */}
-            <div className="rounded-3xl border border-slate-200 bg-white p-5 dark:border-white/10 dark:bg-[#121212]">
-                <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Weekly Consistency</h3>
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-[#121212]">
+                <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Weekly Consistency</h3>
                 <div className="flex justify-between gap-1">
                     {heatmap.map((day, i) => (
                         <div key={i} className="flex flex-col items-center gap-2">
                             <div
-                                className={`h-8 w-full rounded-md transition-colors ${day.count > 0
+                                className={`h-7 w-full rounded-md transition-colors ${day.count > 0
                                         ? `bg-emerald-500 ${day.count > 2 ? 'opacity-100' : 'opacity-70'}`
                                         : 'bg-slate-100 dark:bg-white/5'
                                     }`}

@@ -87,16 +87,16 @@ const Header = () => {
     const userAvatar = getUserAvatar(user);
 
     return (
-        <header className={`flex items-center justify-between px-4 md:px-8 py-3 md:py-4 sticky top-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isScrolled ? 'bg-transparent pointer-events-none' : 'bg-transparent'}`}>
+        <header className={`sticky top-0 z-50 flex items-center justify-between px-4 py-2.5 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] md:px-6 md:py-3 ${isScrolled ? 'bg-transparent pointer-events-none' : 'bg-transparent'}`}>
             {/* Logo - hides on scroll */}
             <div className={`flex items-center gap-2 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isScrolled ? 'opacity-0 -translate-x-8 pointer-events-none' : 'opacity-100 translate-x-0'}`}>
-                <Link to="/dashboard" className="text-xl md:text-2xl font-serif font-bold text-gray-900 dark:text-white tracking-tight whitespace-nowrap">
+                <Link to="/dashboard" className="whitespace-nowrap text-xl font-serif font-bold tracking-tight text-gray-900 dark:text-white md:text-[1.7rem]">
                     Planorah<span className="text-gray-400">.</span>
                 </Link>
             </div>
 
             {/* Navigation - Centered with consistent sizing */}
-            <nav className="hidden md:flex items-center bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-2xl px-1.5 py-1.5 shadow-lg border border-gray-200/50 dark:border-gray-700/50 absolute left-1/2 -translate-x-1/2 pointer-events-auto">
+            <nav className="pointer-events-auto absolute left-1/2 hidden -translate-x-1/2 items-center rounded-xl border border-gray-200/50 bg-white/95 px-1 py-1 shadow-md backdrop-blur-md dark:border-gray-700/50 dark:bg-gray-800/95 md:flex">
                 {navGroups.map((group, index) => {
                     const isActive = group.type === 'link'
                         ? location.pathname === group.path
@@ -107,7 +107,7 @@ const Header = () => {
                             <Link
                                 key={index}
                                 to={group.path}
-                                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap ${isActive
+                                className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-medium transition-all duration-200 ${isActive
                                     ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm"
                                     : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                                     }`}
@@ -125,7 +125,7 @@ const Header = () => {
                     return (
                         <div key={index} className="relative group">
                             <button
-                                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap ${isActive
+                                className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-medium transition-all duration-200 ${isActive
                                     ? "text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-700"
                                     : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                                     }`}
@@ -164,11 +164,11 @@ const Header = () => {
             </button>
 
             {/* Right Side Icons - hides on scroll */}
-            <div className={`hidden md:flex items-center gap-3 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isScrolled ? 'opacity-0 translate-x-8 pointer-events-none absolute right-8' : 'opacity-100 translate-x-0 relative'}`}>
+            <div className={`relative hidden items-center gap-2.5 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] md:flex ${isScrolled ? 'pointer-events-none absolute right-8 translate-x-8 opacity-0' : 'translate-x-0 opacity-100'}`}>
                 {/* Settings Dropdown */}
                 <div className="relative group">
-                    <button className="w-12 h-12 rounded-full bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:scale-105 transition-transform hover:text-gray-900 dark:hover:text-white shadow-sm" title="Settings">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition-transform hover:scale-105 hover:text-gray-900 dark:border-white/10 dark:bg-[#1C1C1E] dark:text-gray-400 dark:hover:text-white" title="Settings">
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
@@ -224,13 +224,13 @@ const Header = () => {
                 </div>
 
                 {/* Profile Section (Dynamic Data) */}
-                <div className="flex items-center gap-4 pl-4 border-l border-gray-200 dark:border-white/10">
+                <div className="flex items-center gap-3 border-l border-gray-200 pl-3 dark:border-white/10">
                     <div className="text-right hidden lg:block">
-                        <h4 className="text-sm font-bold text-gray-900 dark:text-white leading-tight">{displayName}</h4>
+                        <h4 className="text-[13px] font-bold leading-tight text-gray-900 dark:text-white">{displayName}</h4>
                         <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{userRole}</span>
                     </div>
                     <Link to="/profile" className="relative group cursor-pointer">
-                        <div className="w-12 h-12 rounded-full p-[2px] bg-gradient-to-tr from-indigo-500 to-purple-500 hover:shadow-lg transition-all">
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 p-[2px] transition-all hover:shadow-lg">
                             <div className="w-full h-full rounded-full bg-white dark:bg-black p-[2px]">
                                 <img
                                     src={userAvatar}
@@ -240,7 +240,7 @@ const Header = () => {
                             </div>
                         </div>
                         {/* Status Indicator */}
-                        <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-white dark:border-black"></div>
+                        <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white bg-green-500 dark:border-black"></div>
                     </Link>
                 </div>
             </div>

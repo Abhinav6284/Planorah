@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../../api/axios";
 
+// Temporary hard stop: keep onboarding navigation-only while submit flow is rebuilt.
+const DISABLE_ONBOARDING_SUBMIT = true;
+
 // ─── Quicky Mascot ─────────────────────────────────────────────────────────────
 function QuickyMessage({ stepId, fd }) {
     const getMessage = () => {
@@ -75,6 +78,7 @@ function QuickyMessage({ stepId, fd }) {
 function OptionCard({ emoji, iconText, label, sublabel, selected, onClick }) {
     return (
         <motion.button
+            type="button"
             whileTap={{ scale: 0.98, y: 2 }}
             onClick={onClick}
             className={`w-full p-4 rounded-2xl border-2 border-b-4 text-left transition-colors duration-200 focus:outline-none flex items-center gap-4 ${selected
@@ -483,10 +487,26 @@ export default function UniversalOnboarding() {
         return !!fd[currentStepId];
     };
 
-    const handleBack = () => setStepIndex(p => Math.max(p - 1, 0));
-    const handleNext = () => setStepIndex(p => Math.min(p + 1, totalSteps - 1));
+    const handleBack = () => {
+        if (loading) return;
+        setStepIndex(p => Math.max(p - 1, 0));
+    };
 
-    const handleSubmit = async () => {
+    const handleContinue = async () => {
+        if (loading || !canProceed()) return;
+
+        const isFinalStep = stepIndex === totalSteps - 1 && currentStepId === "personal";
+        if (!isFinalStep) {
+            setStepIndex(p => Math.min(p + 1, totalSteps - 1));
+            return;
+        }
+
+        if (DISABLE_ONBOARDING_SUBMIT) {
+            sessionStorage.setItem("show_welcome_coach", fd.name?.split(" ")[0] || "true");
+            navigate("/dashboard");
+            return;
+        }
+
         setLoading(true);
         try {
             const response = await api.patch("users/update-profile/", mapToBackend(fd));
@@ -627,6 +647,7 @@ export default function UniversalOnboarding() {
             {/* Duolingo Style Progress Header */}
             <div className="px-5 py-6 flex items-center justify-between mx-auto w-full max-w-xl">
                 <button
+                    type="button"
                     onClick={handleBack}
                     disabled={stepIndex === 0}
                     className={`shrink-0 w-10 h-10 flex items-center justify-center rounded-full transition ${stepIndex === 0 ? "text-gray-300 cursor-not-allowed" : "text-gray-500 hover:bg-gray-200 active:scale-90"
@@ -679,7 +700,8 @@ export default function UniversalOnboarding() {
                     <div className="max-w-xl mx-auto">
                         {isLastStep ? (
                             <button
-                                onClick={handleSubmit}
+                                type="button"
+                                onClick={handleContinue}
                                 disabled={!canProceed() || loading}
                                 className={`w-full py-4 rounded-2xl font-bold text-[16px] uppercase tracking-wide transition-all ${canProceed() && !loading
                                     ? "bg-[#58cc02] text-white hover:bg-[#46a302] border-b-4 border-[#46a302] active:border-b-0 active:translate-y-1"
@@ -690,8 +712,9 @@ export default function UniversalOnboarding() {
                             </button>
                         ) : (
                             <button
-                                onClick={handleNext}
-                                disabled={!canProceed()}
+                                type="button"
+                                onClick={handleContinue}
+                                disabled={!canProceed() || loading}
                                 className={`w-full py-4 rounded-2xl font-bold text-[16px] uppercase tracking-wide transition-all ${canProceed()
                                     ? "bg-blue-500 text-white hover:bg-blue-600 border-b-4 border-blue-600 active:border-b-0 active:translate-y-1"
                                     : "bg-gray-200 text-gray-400 cursor-not-allowed"

@@ -697,6 +697,91 @@ def delete_roadmap(request, roadmap_id):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def generate_roadmap_tasks(request, roadmap_id):
+    """
+    Generate missing tasks for an existing roadmap.
+
+    Optional body:
+    {
+        "force": true  // delete existing tasks and regenerate
+    }
+    """
+    try:
+        roadmap = Roadmap.objects.get(id=roadmap_id, user=request.user)
+    except Roadmap.DoesNotExist:
+        return Response({"error": "Roadmap not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        from tasks.models import Task
+        from tasks.task_generator import auto_create_tasks_from_roadmap
+
+        force = bool(request.data.get('force', False))
+        existing_tasks = Task.objects.filter(user=request.user, roadmap=roadmap)
+        existing_count = existing_tasks.count()
+
+        if existing_count > 0 and not force:
+            return Response({
+                "message": "Tasks already exist for this roadmap",
+                "roadmap_id": roadmap.id,
+                "created_count": 0,
+                "total_tasks": existing_count
+            }, status=status.HTTP_200_OK)
+
+        if force and existing_count > 0:
+            existing_tasks.delete()
+
+        # If roadmap has no milestones, create a minimal starter milestone/project.
+        # This prevents zero-task roadmaps from remaining permanently empty.
+        if not roadmap.milestones.exists():
+            fallback_milestone = Milestone.objects.create(
+                roadmap=roadmap,
+                title="Phase 1: Kickoff",
+                description="Starter phase generated to initialize daily tasks.",
+                order=1,
+                duration="1 week",
+                topics=[
+                    {
+                        "title": "Goal Breakdown",
+                        "description": "Break the roadmap goal into clear daily outcomes."
+                    },
+                    {
+                        "title": "Execution Plan",
+                        "description": "Define a practical work routine and first milestone."
+                    },
+                ],
+                resources=[],
+            )
+
+            Project.objects.create(
+                milestone=fallback_milestone,
+                title=f"Starter Build: {roadmap.title}",
+                description=f"Create a first deliverable aligned with: {roadmap.goal}",
+                difficulty='medium',
+                estimated_hours=8,
+                tech_stack=[roadmap.tech_stack] if roadmap.tech_stack else [],
+                learning_outcomes=["Clarity on scope", "First concrete output"],
+            )
+
+        created_tasks = auto_create_tasks_from_roadmap(roadmap)
+        total_tasks = Task.objects.filter(user=request.user, roadmap=roadmap).count()
+
+        return Response({
+            "message": "Tasks generated successfully",
+            "roadmap_id": roadmap.id,
+            "created_count": len(created_tasks),
+            "total_tasks": total_tasks
+        }, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        logger.exception(
+            "Failed to generate tasks for roadmap_id=%s user_id=%s", roadmap_id, request.user.id)
+        return Response({
+            "error": "Failed to generate tasks",
+            "details": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 def update_milestone_progress(request, milestone_id):

@@ -54,6 +54,12 @@ export const roadmapService = {
         return response.data;
     },
 
+    // Generate missing tasks for a roadmap
+    generateRoadmapTasks: async (id, force = false) => {
+        const response = await api.post(`roadmap/${id}/generate-tasks/`, { force });
+        return response.data;
+    },
+
     // Get all roadmap projects (for Projects tab)
     getRoadmapProjects: async () => {
         const response = await api.get("roadmap/projects/");

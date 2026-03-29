@@ -155,7 +155,10 @@ export const executionService = {
     },
 
     getTaskGuidance: async (taskId) => {
-        const response = await api.get(`tasks/${taskId}/guidance/`);
+        const response = await requestWith404Fallback(
+            () => api.get(`tasks/${taskId}/guidance/`),
+            () => api.get(`dashboard/execution/tasks/${taskId}/guidance/`)
+        );
         return response.data;
     },
 };

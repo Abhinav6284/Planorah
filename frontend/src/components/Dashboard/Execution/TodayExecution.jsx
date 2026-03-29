@@ -43,23 +43,23 @@ const TodayExecution = ({
     }, [streak]);
 
     return (
-        <section className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_16px_35px_-28px_rgba(15,23,42,0.55)] dark:border-white/10 dark:bg-[#121212] dark:shadow-none">
+        <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_12px_30px_-24px_rgba(15,23,42,0.55)] dark:border-white/10 dark:bg-[#121212] dark:shadow-none">
             {/* Background decoration */}
-            <div className="absolute top-0 right-0 -mt-16 -mr-16 h-64 w-64 rounded-full bg-blue-500/10 blur-[80px] dark:bg-blue-600/10" />
+            <div className="absolute right-0 top-0 -mr-20 -mt-20 h-56 w-56 rounded-full bg-blue-500/10 blur-[72px] dark:bg-blue-600/10" />
 
-            <div className="relative z-10 flex flex-col gap-6 p-6 lg:flex-row lg:items-center lg:justify-between">
-                <div className="flex-1 space-y-4">
-                    <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-xl font-bold dark:bg-white/10">
+            <div className="relative z-10 flex flex-col gap-4 p-4 sm:p-5 lg:flex-row lg:items-start lg:justify-between">
+                <div className="flex-1 space-y-3">
+                    <div className="flex items-start gap-3">
+                        <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-lg font-bold dark:bg-white/10">
                             👋
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+                            <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
                                 Ready to execute, {displayName}?
                             </h1>
-                            <div className="mt-1 flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400">
+                            <div className="mt-1 flex flex-wrap items-center gap-2 text-[13px] font-medium text-slate-500 dark:text-slate-400">
                                 <span className="flex items-center gap-1 text-orange-500">
-                                    <Flame className="h-4 w-4" fill="currentColor" />
+                                    <Flame className="h-3.5 w-3.5" fill="currentColor" />
                                     {streak || 0} day streak
                                 </span>
                                 <span>•</span>
@@ -78,8 +78,8 @@ const TodayExecution = ({
 
                     {/* Milestone Progress Bar */}
                     {milestoneData.current > 0 && (
-                        <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-500/20 dark:bg-blue-500/10">
-                            <div className="mb-2 flex items-center justify-between">
+                        <div className="rounded-xl border border-blue-200 bg-blue-50 p-3 dark:border-blue-500/20 dark:bg-blue-500/10">
+                            <div className="mb-1.5 flex items-center justify-between">
                                 <span className="text-xs font-semibold uppercase tracking-wider text-blue-700 dark:text-blue-300">
                                     Week {milestoneData.weekNumber} Progress
                                 </span>
@@ -87,7 +87,7 @@ const TodayExecution = ({
                                     {milestoneData.current % 7 || 7}/7 days
                                 </span>
                             </div>
-                            <div className="h-2 overflow-hidden rounded-full bg-blue-200 dark:bg-blue-900/30">
+                            <div className="h-1.5 overflow-hidden rounded-full bg-blue-200 dark:bg-blue-900/30">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${milestoneData.progressPercent}%` }}
@@ -95,7 +95,7 @@ const TodayExecution = ({
                                     className="h-full rounded-full bg-blue-600 dark:bg-blue-400"
                                 />
                             </div>
-                            <p className="mt-2 text-xs text-blue-700 dark:text-blue-300">
+                            <p className="mt-1.5 text-xs text-blue-700 dark:text-blue-300">
                                 {milestoneData.daysRemaining === 0 
                                     ? '🎉 Milestone reached!' 
                                     : `${milestoneData.daysRemaining} more days to complete this week!`}
@@ -103,38 +103,38 @@ const TodayExecution = ({
                         </div>
                     )}
 
-                    <div className="max-w-xl">
-                        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                    <div className="max-w-2xl">
+                        <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
                             Today's Prime Mission
                         </p>
-                        <h2 className="text-xl font-medium leading-relaxed text-slate-700 dark:text-slate-200">
+                        <h2 className="text-lg font-medium leading-snug text-slate-700 dark:text-slate-200 sm:text-xl">
                             {todayTask?.title || "Loading your mission..."}
                         </h2>
                         {todayTask?.reason && (
-                            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                                <Sparkles className="mr-1.5 inline-block h-3.5 w-3.5 text-amber-500" />
+                            <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
+                                <Sparkles className="mr-1.5 inline-block h-3 w-3 text-amber-500" />
                                 {todayTask.reason}
                             </p>
                         )}
                     </div>
                 </div>
 
-                <div className="flex flex-shrink-0 flex-col gap-3 sm:flex-row sm:items-center">
+                <div className="flex flex-shrink-0 flex-col gap-2 sm:flex-row sm:items-center lg:pt-1">
                     <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={onStartFocus}
                         disabled={!todayTask || loading}
-                        className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-2xl bg-blue-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-blue-500/25 transition-all hover:bg-blue-700 hover:shadow-blue-500/40 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-white dark:text-black dark:shadow-white/10 dark:hover:bg-slate-200"
+                        className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/25 transition-all hover:bg-blue-700 hover:shadow-blue-500/40 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-white dark:text-black dark:shadow-white/10 dark:hover:bg-slate-200"
                     >
-                        <Play className="h-5 w-5 fill-current" />
+                        <Play className="h-4 w-4 fill-current" />
                         <span>Start Focus Session</span>
                         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                     </motion.button>
 
                     <button
                         onClick={onChangeTask}
-                        className="rounded-2xl border border-slate-200 px-4 py-4 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:border-white/15 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"
+                        className="rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:border-white/15 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"
                     >
                         Change Task
                     </button>
@@ -142,7 +142,7 @@ const TodayExecution = ({
             </div>
 
             {/* Progress Bar Bottom */}
-            <div className="absolute bottom-0 left-0 h-1 w-full bg-slate-100 dark:bg-white/5">
+            <div className="absolute bottom-0 left-0 h-0.5 w-full bg-slate-100 dark:bg-white/5">
                 <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${(completedCount / Math.max(totalCount, 1)) * 100}%` }}
