@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Play, Clock, Target, Lightbulb, AlertCircle, CheckCircle2, ExternalLink, Loader2 } from 'lucide-react';
 import { executionService } from '../../../api/executionService';
@@ -7,15 +7,9 @@ const TaskDetailModal = ({ task, isOpen, onClose, onStartFocus }) => {
     const [guidance, setGuidance] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        if (isOpen && task?.id) {
-            fetchGuidance();
-        }
-    }, [isOpen, task?.id]);
-
-    const fetchGuidance = async () => {
+    const fetchGuidance = useCallback(async () => {
         if (!task?.id) return;
-        
+
         setLoading(true);
         try {
             const data = await executionService.getTaskGuidance(task.id);
@@ -43,7 +37,13 @@ const TaskDetailModal = ({ task, isOpen, onClose, onStartFocus }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [task]);
+
+    useEffect(() => {
+        if (isOpen && task?.id) {
+            fetchGuidance();
+        }
+    }, [isOpen, task?.id, fetchGuidance]);
 
     const handleStartFocusFromModal = () => {
         onStartFocus(task);

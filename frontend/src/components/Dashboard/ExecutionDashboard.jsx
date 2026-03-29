@@ -179,7 +179,7 @@ const ExecutionDashboard = () => {
 
     const activeTasks = useMemo(() => mode === 'exam' ? examTasks : tasks, [mode, examTasks, tasks]);
     const streak = userStats?.streak?.current || profile?.profile?.streak_count || progress?.stats?.current_streak || 0;
-    
+
     // Merge stats from multiple sources (profile has XP, userStats has task counts, progress has focus data)
     const mergedStats = useMemo(() => ({
         xp_points: profile?.profile?.xp_points || progress?.stats?.xp_points || 0,

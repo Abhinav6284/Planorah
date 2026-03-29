@@ -771,7 +771,26 @@ def get_today_task(request):
         data = ExecutionTaskSerializer(today_task).data
         return Response(data, status=status.HTTP_200_OK)
     except Exception as exc:
-        return Response({'detail': 'Unable to load today task.', 'error': str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        # Return a non-blocking fallback so dashboard can still render.
+        return Response({
+            'id': None,
+            'title': 'Start one focused 25-minute study sprint',
+            'type': 'learning',
+            'status': 'pending',
+            'priority': 'medium',
+            'difficulty': 'medium',
+            'estimated_time': '25 min',
+            'estimated_minutes': 25,
+            'reason': 'Service is temporarily recovering. You can still start a manual focus sprint.',
+            'ai_generated': True,
+            'metadata': {'fallback': True},
+            'scheduled_for': str(dj_timezone.localdate()),
+            'completed_at': None,
+            'created_at': None,
+            'updated_at': None,
+            'detail': 'Unable to load today task.',
+            'error': str(exc),
+        }, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -859,6 +878,8 @@ def execution_tasks(request):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as exc:
+        if request.method == 'GET':
+            return Response([], status=status.HTTP_200_OK)
         return Response({'detail': 'Unable to load execution tasks.', 'error': str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
 

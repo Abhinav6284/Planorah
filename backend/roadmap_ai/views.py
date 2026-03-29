@@ -15,29 +15,122 @@ from .serializers import RoadmapSerializer, RoadmapDetailSerializer
 logger = logging.getLogger(__name__)
 
 
+def _create_basic_roadmap_response(
+    user,
+    goal,
+    duration,
+    current_level,
+    category,
+    tech_stack,
+    output_format,
+    learning_constraints,
+    motivation_style,
+    success_definition,
+    fallback_reason,
+):
+    """Create a valid starter roadmap when AI generation is unavailable or fails."""
+    safe_goal = (goal or 'Your Goal').strip() or 'Your Goal'
+    safe_level = current_level if current_level in {
+        'beginner', 'intermediate', 'advanced'} else 'beginner'
+    safe_category = category if category in {
+        'project', 'career', 'research', 'skill_mastery', 'exam_prep'} else 'career'
+
+    roadmap = Roadmap.objects.create(
+        user=user,
+        title=f"Roadmap: {safe_goal}",
+        goal=safe_goal,
+        overview=f"Starter roadmap generated with fallback mode for {safe_goal}.",
+        estimated_duration=duration or '6 months',
+        difficulty_level=safe_level,
+        category=safe_category,
+        tech_stack=tech_stack or '',
+        output_format=output_format or 'Milestone-based',
+        learning_constraints=learning_constraints or '',
+        motivation_style=motivation_style or 'Milestones',
+        success_definition=success_definition or '',
+        prerequisites=['Define your weekly schedule',
+                       'Set a measurable first milestone'],
+        career_outcomes=['Consistent execution', 'Visible progress portfolio'],
+        tips=['Work in focused 25-minute sessions',
+              'Review progress every 7 days'],
+        faqs=[
+            {
+                'question': 'Why is this a starter roadmap?',
+                'answer': 'AI generation was temporarily unavailable, so we created a safe baseline you can start with immediately.'
+            }
+        ],
+    )
+
+    milestone = Milestone.objects.create(
+        roadmap=roadmap,
+        title='Phase 1: Foundation Sprint',
+        description='Establish baseline skills, plan your week, and complete first deliverable.',
+        order=1,
+        duration='1 week',
+        topics=[
+            {'title': 'Goal Breakdown',
+                'description': 'Convert your goal into weekly outcomes.'},
+            {'title': 'Focused Execution',
+                'description': 'Use distraction-free deep work blocks.'},
+        ],
+        resources=[
+            {'title': 'Official Documentation',
+                'url': 'https://developer.mozilla.org/', 'type': 'Documentation'},
+        ],
+    )
+
+    Project.objects.create(
+        milestone=milestone,
+        title='Starter Deliverable',
+        description='Build and submit one tangible output aligned to your roadmap goal.',
+        difficulty='medium',
+        estimated_hours=8,
+        tech_stack=[tech_stack] if tech_stack else [],
+        learning_outcomes=['Clarity on scope', 'First measurable output'],
+    )
+
+    created_tasks_count = 0
+    try:
+        from tasks.task_generator import auto_create_tasks_from_roadmap
+        created_tasks = auto_create_tasks_from_roadmap(roadmap)
+        created_tasks_count = len(created_tasks)
+    except Exception:
+        # Keep fallback generation successful even if task generation fails.
+        created_tasks_count = 0
+
+    serializer = RoadmapDetailSerializer(roadmap)
+    return Response({
+        **serializer.data,
+        'tasks_created': created_tasks_count > 0,
+        'tasks_count': created_tasks_count,
+        'ai_fallback': True,
+        'fallback_reason': str(fallback_reason or 'AI unavailable'),
+    }, status=status.HTTP_201_CREATED)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def generate_roadmap(request):
     """Generate AI-powered roadmap using Gemini"""
 
     # Lazy import - only load when function is called
+    ai_unavailable_reason = None
     try:
         import google.generativeai as genai
         from google.generativeai.types import GenerationConfig
     except (ImportError, TypeError):
-        return Response({
-            "error": "Gemini AI is not available. Please install google-generativeai package."
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        genai = None
+        GenerationConfig = None
+        ai_unavailable_reason = "Gemini AI SDK is not available"
 
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        return Response({
-            "error": "GEMINI_API_KEY environment variable is not set."
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        ai_unavailable_reason = "GEMINI_API_KEY environment variable is not set"
 
-    # Configure Gemini with API key
-    genai.configure(api_key=api_key)
-    logger.info("Gemini configured for roadmap generation")
+    if genai and api_key:
+        # Configure Gemini with API key
+        genai.configure(api_key=api_key)
+        logger.info("Gemini configured for roadmap generation")
 
     user = request.user
     goal = request.data.get('goal', '')
@@ -372,6 +465,21 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
     # Select the specific prompt based on category
     prompt = prompts.get(category, prompts['career'])
 
+    if not genai or not GenerationConfig or not api_key:
+        return _create_basic_roadmap_response(
+            user=user,
+            goal=goal,
+            duration=duration,
+            current_level=current_level,
+            category=category,
+            tech_stack=tech_stack,
+            output_format=output_format,
+            learning_constraints=learning_constraints,
+            motivation_style=motivation_style,
+            success_definition=success_definition,
+            fallback_reason=ai_unavailable_reason,
+        )
+
     try:
         # Call Gemini API with proper error handling
         # Using Gemini 2.5 Flash Lite - lightweight and cost-effective
@@ -500,21 +608,35 @@ This roadmap must be so precise and perfect that it feels like a cheat code for 
 
     except json.JSONDecodeError as e:
         logger.warning("JSON parse error while generating roadmap: %s", e)
-        return Response({
-            "error": "Failed to parse AI response",
-            "details": f"JSON parsing failed: {str(e)}",
-            "raw_response": response_text[:500] if 'response_text' in locals() else "No response"
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return _create_basic_roadmap_response(
+            user=user,
+            goal=goal,
+            duration=duration,
+            current_level=current_level,
+            category=category,
+            tech_stack=tech_stack,
+            output_format=output_format,
+            learning_constraints=learning_constraints,
+            motivation_style=motivation_style,
+            success_definition=success_definition,
+            fallback_reason=f"JSON parsing failed: {str(e)}",
+        )
 
     except Exception as e:
         logger.exception("Unexpected error during roadmap generation")
-        return Response({
-            "error": "Failed to generate roadmap",
-            "details": str(e),
-            "type": type(e).__name__,
-            "tasks_created": False,
-            "tasks_error": str(e)
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return _create_basic_roadmap_response(
+            user=user,
+            goal=goal,
+            duration=duration,
+            current_level=current_level,
+            category=category,
+            tech_stack=tech_stack,
+            output_format=output_format,
+            learning_constraints=learning_constraints,
+            motivation_style=motivation_style,
+            success_definition=success_definition,
+            fallback_reason=f"Unexpected generation error: {type(e).__name__}",
+        )
 
 
 @api_view(['GET'])
