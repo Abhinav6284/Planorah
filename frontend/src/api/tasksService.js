@@ -9,10 +9,14 @@ const normalizeArrayPayload = (payload, keys = []) => {
     return [];
 };
 
-const withNormalizedArrayData = (requestPromise, keys = []) => requestPromise.then((response) => ({
-    ...response,
-    data: normalizeArrayPayload(response?.data, keys),
-}));
+const withNormalizedArrayData = (requestPromise, keys = []) => requestPromise.then((response) => {
+    const rawData = response?.data;
+    return {
+        ...response,
+        data: normalizeArrayPayload(rawData, keys),
+        meta: rawData?.meta || null,
+    };
+});
 
 export const tasksService = {
     // Tasks

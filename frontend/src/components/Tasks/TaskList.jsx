@@ -14,6 +14,7 @@ export default function TaskList() {
     const [filter, setFilter] = useState('all');
     const [roadmaps, setRoadmaps] = useState([]);
     const [selectedRoadmap, setSelectedRoadmap] = useState('all');
+    const [tasksMeta, setTasksMeta] = useState(null);
     const [highlightedTaskId, setHighlightedTaskId] = useState(null);
 
     // Undo state
@@ -70,8 +71,10 @@ export default function TaskList() {
             if (selectedRoadmap !== 'all') filters.roadmap = selectedRoadmap;
             const response = await tasksService.getTasks(filters);
             setTasks(extractArrayPayload(response?.data, ['tasks', 'items']));
+            setTasksMeta(response?.meta || null);
         } catch (error) {
             console.error('Failed to fetch tasks:', error);
+            setTasksMeta(null);
         } finally {
             setLoading(false);
         }
@@ -166,6 +169,30 @@ export default function TaskList() {
         ? 'All Roadmaps'
         : roadmaps.find(r => r.id === Number(selectedRoadmap))?.title || 'Roadmap';
 
+    const isRoadmapScoped = selectedRoadmap !== 'all';
+    const hasStatusFilter = filter !== 'all';
+    const emptyReason = tasksMeta?.empty_reason;
+
+    const emptyTitle = (() => {
+        if (!isRoadmapScoped) {
+            return 'No tasks found. Generate a roadmap to get started!';
+        }
+        if (emptyReason === 'roadmap_not_found') {
+            return 'This roadmap is no longer available.';
+        }
+        if (emptyReason === 'no_tasks_for_status' || hasStatusFilter) {
+            return `No ${filter.split('_').join(' ')} tasks in this roadmap.`;
+        }
+        return 'No tasks have been generated for this roadmap yet.';
+    })();
+
+    const emptySubtitle = (() => {
+        if (!isRoadmapScoped) return 'Create or schedule a roadmap to start getting daily tasks.';
+        if (emptyReason === 'roadmap_not_found') return 'Try selecting another roadmap from the dropdown.';
+        if (emptyReason === 'no_tasks_for_status' || hasStatusFilter) return 'Try another status tab or clear the status filter.';
+        return 'Open Learning Path and schedule/generate tasks for this roadmap.';
+    })();
+
     if (loading) return <Loader message="Loading your tasks..." />;
 
     return (
@@ -250,7 +277,10 @@ export default function TaskList() {
                     {['all', 'not_started', 'in_progress', 'completed', 'needs_revision'].map(status => (
                         <button
                             key={status}
-                            onClick={() => setFilter(status)}
+                            onClick={() => {
+                                setFilter(status);
+                                setLoading(true);
+                            }}
                             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${filter === status
                                 ? 'bg-black dark:bg-white text-white dark:text-black'
                                 : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -265,17 +295,46 @@ export default function TaskList() {
                 <div className="space-y-12">
                     {Object.keys(groupedTasks).length === 0 ? (
                         <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
-                            <p className="text-gray-400 text-lg mb-6">
-                                {selectedRoadmap === 'all'
-                                    ? 'No tasks found. Generate a roadmap to get started! 🚀'
-                                    : 'No tasks found for this roadmap. Schedule your roadmap to generate tasks! 📅'}
-                            </p>
-                            <button
-                                onClick={() => window.location.href = '/roadmap/list'}
-                                className="px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl font-medium hover:scale-105 transition-transform shadow-lg"
-                            >
-                                Go to Learning Path
-                            </button>
+                            <p className="text-gray-300 text-xl font-semibold mb-2">{emptyTitle}</p>
+                            <p className="text-gray-500 mb-6">{emptySubtitle}</p>
+                            {isRoadmapScoped && tasksMeta?.selected_roadmap_name && (
+                                <p className="text-xs text-gray-500 mb-6">
+                                    {tasksMeta.selected_roadmap_name}
+                                    {typeof tasksMeta.total_for_selected_roadmap === 'number'
+                                        ? ` • ${tasksMeta.total_for_selected_roadmap} total tasks available`
+                                        : ''}
+                                </p>
+                            )}
+                            <div className="flex flex-wrap items-center justify-center gap-3">
+                                {hasStatusFilter && (
+                                    <button
+                                        onClick={() => {
+                                            setFilter('all');
+                                            setLoading(true);
+                                        }}
+                                        className="px-5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                    >
+                                        Clear Status Filter
+                                    </button>
+                                )}
+                                {isRoadmapScoped && (
+                                    <button
+                                        onClick={() => {
+                                            setSelectedRoadmap('all');
+                                            setLoading(true);
+                                        }}
+                                        className="px-5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                    >
+                                        Show All Roadmaps
+                                    </button>
+                                )}
+                                <button
+                                    onClick={() => window.location.href = '/roadmap/list'}
+                                    className="px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl font-medium hover:scale-105 transition-transform shadow-lg"
+                                >
+                                    Go to Learning Path
+                                </button>
+                            </div>
                         </div>
                     ) : (
                         Object.entries(groupedTasks).map(([roadmapTitle, days]) => (

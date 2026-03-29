@@ -60,6 +60,44 @@ class TaskViewSet(viewsets.ReadOnlyModelViewSet):
 
         return queryset.order_by('day', 'id')
 
+    def list(self, request, *args, **kwargs):
+        """List tasks with lightweight meta for better frontend empty states."""
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        tasks_data = serializer.data
+
+        selected_status = request.query_params.get('status') or 'all'
+        selected_roadmap = request.query_params.get('roadmap') or request.query_params.get('roadmap_id') or 'all'
+
+        meta = {
+            'selected_status': selected_status,
+            'selected_roadmap': selected_roadmap,
+            'result_count': len(tasks_data),
+            'empty_reason': None,
+            'selected_roadmap_name': None,
+            'total_for_selected_roadmap': None,
+        }
+
+        if selected_roadmap != 'all':
+            from roadmap_ai.models import Roadmap
+
+            roadmap = Roadmap.objects.filter(user=request.user, id=selected_roadmap).only('id', 'title').first()
+            if not roadmap:
+                meta['empty_reason'] = 'roadmap_not_found'
+            else:
+                total_for_roadmap = Task.objects.filter(user=request.user, roadmap_id=roadmap.id).count()
+                meta['selected_roadmap_name'] = roadmap.title
+                meta['total_for_selected_roadmap'] = total_for_roadmap
+
+                if total_for_roadmap == 0:
+                    meta['empty_reason'] = 'no_tasks_for_roadmap'
+                elif selected_status != 'all' and len(tasks_data) == 0:
+                    meta['empty_reason'] = 'no_tasks_for_status'
+        elif selected_status != 'all' and len(tasks_data) == 0:
+            meta['empty_reason'] = 'no_tasks_for_status'
+
+        return Response({'tasks': tasks_data, 'meta': meta}, status=status.HTTP_200_OK)
+
     @action(detail=True, methods=['post'])
     def submit_attempt(self, request, pk=None):
         """
