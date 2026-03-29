@@ -35,11 +35,30 @@ class TaskViewSet(viewsets.ReadOnlyModelViewSet):
         from roadmap_ai.models import Roadmap
         user_roadmaps = Roadmap.objects.filter(user=user)
 
-        # Get tasks for those roadmaps
-        return Task.objects.filter(
+        # Start with tasks for the current user's roadmaps.
+        queryset = Task.objects.filter(
             roadmap__in=user_roadmaps,
             user=user
         ).select_related('roadmap', 'milestone').prefetch_related('attempts')
+
+        # Optional filters used by frontend TaskList.
+        status_param = self.request.query_params.get('status')
+        if status_param and status_param != 'all':
+            queryset = queryset.filter(status=status_param)
+
+        roadmap_param = self.request.query_params.get('roadmap') or self.request.query_params.get('roadmap_id')
+        if roadmap_param and roadmap_param != 'all':
+            queryset = queryset.filter(roadmap_id=roadmap_param)
+
+        day_param = self.request.query_params.get('day')
+        if day_param:
+            queryset = queryset.filter(day=day_param)
+
+        due_date_param = self.request.query_params.get('due_date')
+        if due_date_param:
+            queryset = queryset.filter(due_date=due_date_param)
+
+        return queryset.order_by('day', 'id')
 
     @action(detail=True, methods=['post'])
     def submit_attempt(self, request, pk=None):
