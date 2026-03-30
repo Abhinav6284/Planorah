@@ -12,8 +12,6 @@ const ActivityChart = ({ data }) => {
         { day: 'S', value: 10, active: false },
     ];
 
-    const currentDay = "T"; // Mock current day
-
     return (
         <div className="bg-white dark:bg-gray-800 rounded-[30px] p-6 h-full flex flex-col justify-between relative shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">

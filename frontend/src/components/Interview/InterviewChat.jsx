@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { useParams } from "react-router-dom";
+import { motion } from "framer-motion";
 import axios from "../../api/axios";
 
 export default function InterviewChat() {
@@ -11,11 +11,12 @@ export default function InterviewChat() {
     const [sessionData, setSessionData] = useState(null);
     const [feedback, setFeedback] = useState(null);
     const messagesEndRef = useRef(null);
+    const getAuthToken = () => localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
 
     useEffect(() => {
         const fetchSession = async () => {
             try {
-                const token = localStorage.getItem("access_token");
+                const token = getAuthToken();
                 const res = await axios.get(`/interview/${sessionId}/`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
@@ -44,7 +45,7 @@ export default function InterviewChat() {
         setFeedback(null);
 
         try {
-            const token = localStorage.getItem("access_token");
+            const token = getAuthToken();
             const res = await axios.post(`/interview/${sessionId}/message/`, {
                 content: newMsg.content
             }, {

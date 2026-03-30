@@ -36,7 +36,9 @@ export default function ImportResumeModal({ isOpen, onClose, onSuccess }) {
         const validExtensions = ['.pdf', '.docx', '.txt'];
 
         const ext = selectedFile.name.toLowerCase().slice(selectedFile.name.lastIndexOf('.'));
-        if (!validExtensions.includes(ext)) {
+        const hasValidExtension = validExtensions.includes(ext);
+        const hasValidMime = !selectedFile.type || validTypes.includes(selectedFile.type);
+        if (!hasValidExtension || !hasValidMime) {
             setError('Please upload a PDF, DOCX, or TXT file.');
             return;
         }
