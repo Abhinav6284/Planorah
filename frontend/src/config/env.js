@@ -12,6 +12,11 @@ const currentHostname = typeof window !== 'undefined' ? window.location.hostname
 const isLocalFrontend = LOCAL_HOSTNAMES.has(currentHostname);
 
 const trimEnvValue = (value) => (typeof value === 'string' ? value.trim() : '');
+const parseBooleanEnv = (value, fallback = false) => {
+  const normalized = trimEnvValue(value).toLowerCase();
+  if (!normalized) return fallback;
+  return normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on';
+};
 
 const rawApiBaseInput = trimEnvValue(process.env.REACT_APP_API_BASE_URL);
 const apiFallbackOrigin = isLocalFrontend ? LOCAL_API_FALLBACK : PRODUCTION_API_FALLBACK;
@@ -117,6 +122,14 @@ const env = Object.freeze({
   APP_NAME: 'Planorah',
   APP_URL: trimEnvValue(process.env.REACT_APP_URL) || (typeof window !== 'undefined' ? window.location.origin : ''),
   PORTFOLIO_URL: trimEnvValue(process.env.REACT_APP_PORTFOLIO_URL) || 'https://portfolio.planorah.me',
+
+  AI_PIPELINE_ENABLED: parseBooleanEnv(process.env.REACT_APP_AI_PIPELINE_ENABLED, false),
+  AI_PIPELINE_ACTIONS_ENABLED: parseBooleanEnv(process.env.REACT_APP_AI_PIPELINE_ACTIONS_ENABLED, true),
+  AI_PIPELINE_FALLBACK_REALTIME_ENABLED: parseBooleanEnv(process.env.REACT_APP_AI_PIPELINE_FALLBACK_REALTIME_ENABLED, true),
+  AI_PIPELINE_CHANNELS: (trimEnvValue(process.env.REACT_APP_AI_PIPELINE_CHANNELS) || 'voice,text')
+    .split(',')
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean),
 });
 
 export default env;
