@@ -4,7 +4,7 @@ import { schedulerService } from "../../api/schedulerService";
 import { roadmapService } from "../../api/roadmapService";
 import { FaGoogle, FaClock, FaPlay, FaPause, FaRedo, FaSync, FaTrash, FaBars, FaTimes } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
-import WeeklyCalendar from "../common/WeeklyCalendar";
+import FullCalendar from "./FullCalendar";
 import { AnimatePresence, motion } from "framer-motion";
 
 const DEFAULT_FOCUS_MINUTES = 25;
@@ -493,7 +493,7 @@ export default function Scheduler() {
                     </div>
 
                     <div className="flex-1 p-3 md:p-6 overflow-auto">
-                        <WeeklyCalendar key={calendarKey} onEventClick={handleEventClick} />
+                        <FullCalendar key={calendarKey} onEventClick={handleEventClick} />
                     </div>
                 </div>
             </div>

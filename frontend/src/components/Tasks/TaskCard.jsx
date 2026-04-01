@@ -10,6 +10,22 @@ export default function TaskCard({ task, onUpdate, onComplete, onDelete, isHighl
     const [loadingGuidance, setLoadingGuidance] = useState(false);
     const canMarkComplete = task?.can_mark_complete !== false;
 
+    const getNormalizedTaskTitle = (rawTitle, taskDay) => {
+        const title = String(rawTitle || '').trim();
+        if (!title || !Number.isFinite(Number(taskDay))) {
+            return title;
+        }
+
+        // Keep existing prefix style (including emoji), but sync the day number to task.day.
+        if (/\bDay\s+\d+\s*:/i.test(title)) {
+            return title.replace(/(^.*?\bDay)\s+\d+\s*:/i, `$1 ${taskDay}:`);
+        }
+
+        return title;
+    };
+
+    const displayTitle = getNormalizedTaskTitle(task?.title, task?.day);
+
     const statusColors = {
         'not_started': 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400',
         'in_progress': 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
@@ -77,7 +93,7 @@ export default function TaskCard({ task, onUpdate, onComplete, onDelete, isHighl
                         <div className="flex items-start justify-between">
                             <div className="flex-1 cursor-pointer" onClick={handleGetGuidance}>
                                 <h3 className={`font-medium text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors ${task.status === 'completed' ? 'line-through opacity-50' : ''}`}>
-                                    {task.title}
+                                    {displayTitle}
                                 </h3>
                                 {task.description && (
                                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{task.description}</p>
@@ -154,7 +170,7 @@ export default function TaskCard({ task, onUpdate, onComplete, onDelete, isHighl
                                 <div className="sticky top-0 bg-white dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
                                     <div>
                                         <h2 className="text-xl font-bold text-gray-900 dark:text-white">Task Guidance</h2>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{task.title}</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{displayTitle}</p>
                                     </div>
                                     <button
                                         onClick={() => setShowGuidance(false)}

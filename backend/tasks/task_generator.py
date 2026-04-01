@@ -6,6 +6,7 @@ Each multi-day task is split into individual daily tasks with clear objectives.
 from datetime import timedelta
 from django.utils import timezone
 from .models import Task
+import re
 
 
 # Daily commitment in minutes (configurable)
@@ -112,6 +113,17 @@ def create_daily_tasks(daily_tasks_data, start_day, roadmap):
     created_tasks = []
     start_date = timezone.now().date()
     
+    def normalize_title_day(title, actual_day):
+        raw_title = str(title or "").strip()
+        if not raw_title:
+            return raw_title
+
+        # Convert local "Day X:" prefix to absolute day number for consistency in UI.
+        if re.search(r'\bDay\s+\d+\s*:', raw_title, flags=re.IGNORECASE):
+            return re.sub(r'(^.*?\bDay)\s+\d+\s*:', rf'\1 {actual_day}:', raw_title, count=1, flags=re.IGNORECASE)
+
+        return raw_title
+
     for task_data in daily_tasks_data:
         actual_day = start_day + task_data.get('day_offset', 0)
         
@@ -122,7 +134,7 @@ def create_daily_tasks(daily_tasks_data, start_day, roadmap):
             user=roadmap.user,
             roadmap=roadmap,
             milestone=task_data.get('milestone'),
-            title=task_data['title'],
+            title=normalize_title_day(task_data.get('title'), actual_day),
             description=task_data['description'],
             day=actual_day,
             due_date=start_date + timedelta(days=actual_day - 1),

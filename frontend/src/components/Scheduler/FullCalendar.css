@@ -1,0 +1,181 @@
+.scheduler-full-calendar {
+    position: relative;
+}
+
+.scheduler-full-calendar .rbc-calendar {
+    height: 100%;
+    min-height: 640px;
+    color: #111827;
+    font-family: inherit;
+}
+
+.scheduler-full-calendar .rbc-toolbar {
+    display: none;
+}
+
+.scheduler-full-calendar .rbc-custom-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.scheduler-full-calendar .rbc-toolbar-nav,
+.scheduler-full-calendar .rbc-toolbar-views {
+    display: inline-flex;
+    gap: 6px;
+    background: #f3f4f6;
+    padding: 4px;
+    border-radius: 12px;
+}
+
+.scheduler-full-calendar .rbc-toolbar-nav button,
+.scheduler-full-calendar .rbc-toolbar-views button {
+    border: 0;
+    border-radius: 9px;
+    padding: 7px 11px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4b5563;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.scheduler-full-calendar .rbc-toolbar-nav button:hover,
+.scheduler-full-calendar .rbc-toolbar-views button:hover {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+.scheduler-full-calendar .rbc-toolbar-views button.active {
+    background: #111827;
+    color: #ffffff;
+}
+
+.scheduler-full-calendar .rbc-toolbar-label {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.scheduler-full-calendar .rbc-header {
+    font-weight: 700;
+    font-size: 12px;
+    color: #4b5563;
+    border-color: #e5e7eb;
+    padding: 10px 4px;
+}
+
+.scheduler-full-calendar .rbc-month-view,
+.scheduler-full-calendar .rbc-time-view,
+.scheduler-full-calendar .rbc-agenda-view {
+    border-color: #e5e7eb;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.scheduler-full-calendar .rbc-off-range-bg {
+    background-color: #f9fafb;
+}
+
+.scheduler-full-calendar .rbc-today {
+    background: #eef2ff;
+}
+
+.scheduler-full-calendar .rbc-time-header-content,
+.scheduler-full-calendar .rbc-time-content,
+.scheduler-full-calendar .rbc-agenda-view table.rbc-agenda-table {
+    border-color: #e5e7eb;
+}
+
+.scheduler-full-calendar .rbc-time-slot,
+.scheduler-full-calendar .rbc-day-bg + .rbc-day-bg,
+.scheduler-full-calendar .rbc-month-row + .rbc-month-row {
+    border-color: #f0f1f3;
+}
+
+.scheduler-full-calendar .rbc-event-label {
+    display: none;
+}
+
+.scheduler-full-calendar .rbc-show-more {
+    color: #4f46e5;
+    font-weight: 600;
+}
+
+.scheduler-full-calendar .rbc-agenda-date-cell,
+.scheduler-full-calendar .rbc-agenda-time-cell,
+.scheduler-full-calendar .rbc-agenda-event-cell {
+    color: #1f2937;
+}
+
+.dark .scheduler-full-calendar .rbc-calendar {
+    color: #e5e7eb;
+}
+
+.dark .scheduler-full-calendar .rbc-toolbar-nav,
+.dark .scheduler-full-calendar .rbc-toolbar-views {
+    background: #1f2937;
+}
+
+.dark .scheduler-full-calendar .rbc-toolbar-nav button,
+.dark .scheduler-full-calendar .rbc-toolbar-views button {
+    color: #9ca3af;
+}
+
+.dark .scheduler-full-calendar .rbc-toolbar-nav button:hover,
+.dark .scheduler-full-calendar .rbc-toolbar-views button:hover {
+    background: #374151;
+    color: #f9fafb;
+}
+
+.dark .scheduler-full-calendar .rbc-toolbar-views button.active {
+    background: #f9fafb;
+    color: #111827;
+}
+
+.dark .scheduler-full-calendar .rbc-toolbar-label,
+.dark .scheduler-full-calendar .rbc-header {
+    color: #e5e7eb;
+}
+
+.dark .scheduler-full-calendar .rbc-month-view,
+.dark .scheduler-full-calendar .rbc-time-view,
+.dark .scheduler-full-calendar .rbc-agenda-view,
+.dark .scheduler-full-calendar .rbc-header,
+.dark .scheduler-full-calendar .rbc-time-header-content,
+.dark .scheduler-full-calendar .rbc-time-content,
+.dark .scheduler-full-calendar .rbc-agenda-view table.rbc-agenda-table {
+    border-color: #374151;
+}
+
+.dark .scheduler-full-calendar .rbc-time-slot,
+.dark .scheduler-full-calendar .rbc-day-bg + .rbc-day-bg,
+.dark .scheduler-full-calendar .rbc-month-row + .rbc-month-row {
+    border-color: #1f2937;
+}
+
+.dark .scheduler-full-calendar .rbc-off-range-bg {
+    background: #0b0f14;
+}
+
+.dark .scheduler-full-calendar .rbc-today {
+    background: rgba(79, 70, 229, 0.2);
+}
+
+.dark .scheduler-full-calendar .rbc-day-slot .rbc-time-slot,
+.dark .scheduler-full-calendar .rbc-time-gutter .rbc-timeslot-group,
+.dark .scheduler-full-calendar .rbc-time-content > * + * > *,
+.dark .scheduler-full-calendar .rbc-month-row,
+.dark .scheduler-full-calendar .rbc-date-cell {
+    color: #9ca3af;
+}
+
+.dark .scheduler-full-calendar .rbc-agenda-date-cell,
+.dark .scheduler-full-calendar .rbc-agenda-time-cell,
+.dark .scheduler-full-calendar .rbc-agenda-event-cell {
+    color: #d1d5db;
+}

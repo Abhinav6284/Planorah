@@ -64,20 +64,21 @@ export default function PricingSection() {
   ];
 
   return (
-    <section id="pricing" className="scroll-mt-36 py-28 md:py-36 px-4 md:px-8 bg-[#F5F5F7] dark:bg-gray-950/50 relative overflow-hidden">
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent" />
-      <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent" />
+    <section id="pricing" className="relative scroll-mt-36 py-32 md:py-40 overflow-hidden bg-white dark:bg-[#0f1117] border-y border-slate-200/60 dark:border-white/[0.05]">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-8 left-[8%] h-56 w-56 rounded-full bg-indigo-100/35 dark:bg-indigo-900/15 blur-3xl" />
+        <div className="absolute bottom-0 right-[10%] h-64 w-64 rounded-full bg-cyan-100/35 dark:bg-cyan-900/12 blur-3xl" />
+        <div className="absolute inset-0 opacity-[0.07] dark:opacity-[0.12] [background-image:radial-gradient(rgba(15,23,42,0.12)_1px,transparent_1px)] dark:[background-image:radial-gradient(rgba(255,255,255,0.07)_1px,transparent_1px)] [background-size:34px_34px]" />
+      </div>
 
-      {/* No decorative orb */}
-
-      <div className="max-w-6xl mx-auto relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
         {/* Header */}
         <div className="text-center mb-16">
           <motion.span
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-block px-4 py-1.5 rounded-full bg-violet-50 dark:bg-violet-950/50 border border-violet-100 dark:border-violet-800/50 text-violet-700 dark:text-violet-300 text-sm font-medium mb-4"
+            className="inline-block px-4 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-800/50 text-indigo-700 dark:text-indigo-300 text-sm font-semibold mb-4"
           >
             Simple pricing
           </motion.span>
@@ -86,7 +87,7 @@ export default function PricingSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-5 tracking-tight"
+            className="text-4xl md:text-5xl font-bold font-serif text-gray-900 dark:text-white mb-5 tracking-tight"
           >
             Invest in your{" "}
             <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
@@ -98,7 +99,7 @@ export default function PricingSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto font-light"
+            className="text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto font-medium"
           >
             No hidden fees. No surprise charges. Cancel anytime.
           </motion.p>
