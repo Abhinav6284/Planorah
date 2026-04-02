@@ -27,8 +27,8 @@ const ExecutionFeed = ({ tasks, focusOpen, todayTask, streak }) => {
             items.unshift({
                 id: 'focus-now',
                 icon: Timer,
-                tone: 'text-blue-500',
-                bg: 'bg-blue-500/10',
+                tone: 'text-terracotta',
+                bg: 'bg-terracotta/10',
                 title: todayTask?.title || 'Deep work session',
                 note: 'Focus session in progress',
                 time: 'Now',
@@ -54,8 +54,8 @@ const ExecutionFeed = ({ tasks, focusOpen, todayTask, streak }) => {
             items.push({
                 id: 'starter',
                 icon: Target,
-                tone: 'text-slate-400',
-                bg: 'bg-slate-100 dark:bg-white/5',
+                tone: 'text-textSecondary',
+                bg: 'bg-beigeMuted/50 dark:bg-white/5',
                 title: 'Ready to start?',
                 note: 'Complete your first mission to activate the feed.',
                 time: '',
@@ -66,21 +66,21 @@ const ExecutionFeed = ({ tasks, focusOpen, todayTask, streak }) => {
     }, [tasks, focusOpen, todayTask, streak]);
 
     return (
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-[#121212]">
-            <div className="mb-3 flex items-center justify-between">
+        <div className="rounded-2xl border border-borderMuted/50 bg-gradient-to-br from-white/80 to-beigePrimary/40 backdrop-blur-xl p-5 shadow-soft dark:border-white/5 dark:bg-gradient-to-br dark:from-[#1a1a1a]/80 dark:to-[#0f0f0f]/80 dark:shadow-darkSoft">
+            <div className="mb-4 flex items-center justify-between">
                 <div>
-                    <h3 className="text-sm font-bold text-slate-800 dark:text-white">Execution Feed</h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Live activity log</p>
+                    <h3 className="text-base font-bold text-textPrimary dark:text-white">Execution Feed</h3>
+                    <p className="text-xs text-textSecondary dark:text-slate-400">Live activity log</p>
                 </div>
                 <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
                 {feed.map((item, index) => (
                     <div key={item.id} className="relative flex gap-3">
                         {/* Connector Line */}
                         {index !== feed.length - 1 && (
-                            <div className="absolute -bottom-5 left-3.5 top-7 w-px bg-slate-100 dark:bg-white/10" />
+                            <div className="absolute -bottom-6 left-3.5 top-7 w-px bg-borderMuted dark:bg-white/5" />
                         )}
 
                         <div className={`relative z-10 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full ${item.bg} ${item.tone}`}>
@@ -92,14 +92,14 @@ const ExecutionFeed = ({ tasks, focusOpen, todayTask, streak }) => {
 
                         <div className="min-w-0 flex-1 py-0.5">
                             <div className="flex justify-between">
-                                <p className={`truncate text-[13px] font-semibold ${item.active ? 'text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-200'}`}>
+                                <p className={`truncate text-[13px] font-semibold ${item.active ? 'text-terracotta dark:text-terracotta' : 'text-textPrimary dark:text-slate-100'}`}>
                                     {item.title}
                                 </p>
-                                <span className="whitespace-nowrap text-xs text-slate-400 dark:text-slate-500">
+                                <span className="whitespace-nowrap text-xs text-textSecondary dark:text-slate-400">
                                     {item.time}
                                 </span>
                             </div>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                            <p className="text-[11px] text-textSecondary dark:text-slate-400">
                                 {item.note}
                             </p>
                         </div>

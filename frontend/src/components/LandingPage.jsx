@@ -12,7 +12,7 @@ import Footer from "./landing/Footer";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen font-sans selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black relative text-gray-900 dark:text-white overflow-x-hidden bg-white dark:bg-[#0f1117]">
+    <div className="min-h-screen font-sans selection:bg-terracotta selection:text-white dark:selection:bg-terracotta dark:selection:text-white relative text-charcoal dark:text-beigePrimary overflow-x-hidden bg-beigePrimary dark:bg-charcoalDark transition-colors duration-500">
       <div className="relative z-10">
         <Navbar />
         <main>

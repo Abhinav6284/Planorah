@@ -139,6 +139,13 @@ export default function App() {
                   {/* Public Support Page - No Auth Required */}
                   <Route path="/support" element={<SupportPage />} />
                   <Route path="/contact" element={<Navigate to="/support" replace />} />
+                  {/* Legal pages are routed to support until dedicated pages are shipped */}
+                  <Route path="/privacy" element={<Navigate to="/support" replace />} />
+                  <Route path="/terms" element={<Navigate to="/support" replace />} />
+                  <Route path="/cookies" element={<Navigate to="/support" replace />} />
+                  {/* Backward-compatible legacy legal paths */}
+                  <Route path="/privacy-policy" element={<Navigate to="/privacy" replace />} />
+                  <Route path="/terms-of-service" element={<Navigate to="/terms" replace />} />
 
                   {/* Protected App Routes */}
                   <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>

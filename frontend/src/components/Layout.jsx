@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
-import Header from './Dashboard/Header';
+import { Outlet, useLocation, Link } from 'react-router-dom';
+import Sidebar from './Sidebar';
 import AITalkPanel from './Mentoring/AITalkPanel';
 import AIVoicePanel from './Mentoring/AIVoicePanel';
 import WelcomeCoach from './Onboarding/WelcomeCoach';
 import { FaBrain, FaMicrophone } from 'react-icons/fa';
+import { Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { userService } from '../api/userService';
+import { getUserAvatar } from '../utils/avatar';
 
 const REALTIME_ONBOARDING_INTRO_KEY = 'show_realtime_onboarding_intro';
 
@@ -33,6 +36,8 @@ const Layout = () => {
     const [fabExpanded, setFabExpanded] = useState(false);
     const [welcomeUser, setWelcomeUser] = useState(null);
     const [autoVoiceStart, setAutoVoiceStart] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [user, setUser] = useState(null);
     const location = useLocation();
     const contextSource = getContextSource(location.pathname);
 
@@ -59,12 +64,44 @@ const Layout = () => {
         }
     }, [location.pathname]);
 
+    useEffect(() => {
+        userService.getProfile()
+            .then(profileData => setUser(profileData))
+            .catch(() => setUser(null));
+    }, []);
+
+    const userAvatar = user ? getUserAvatar(user?.user?.profile_picture || user?.profile?.profile_picture || '') : '';
+    const userName = user?.user?.first_name || user?.profile?.first_name || 'User';
+
     return (
-        <div className="min-h-screen bg-[#F5F5F7] dark:bg-gray-900 transition-colors duration-200 font-sans flex flex-col">
-            <Header />
-            <main className="flex-1 overflow-auto">
-                <Outlet />
-            </main>
+        <div className="min-h-screen bg-gradient-to-br from-beigePrimary via-beigeSecondary to-beigeMuted dark:bg-gray-900 transition-colors duration-200 font-sans flex">
+            {/* Desktop Sidebar */}
+            <Sidebar mobileOpen={sidebarOpen} onMobileClose={() => setSidebarOpen(false)} user={user} />
+
+            {/* Main Content Column */}
+            <div className="flex-1 min-w-0 flex flex-col">
+                {/* Mobile Top Bar */}
+                <div className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-beigePrimary/95 dark:bg-[#0f0f0f]/95 border-b border-borderMuted dark:border-white/10 backdrop-blur-md">
+                    <button
+                        onClick={() => setSidebarOpen(true)}
+                        className="flex items-center justify-center w-9 h-9 rounded-lg border border-borderMuted dark:border-white/10 bg-white dark:bg-white/5 text-textPrimary dark:text-white hover:bg-beigeMuted dark:hover:bg-white/10 transition-colors"
+                        aria-label="Open navigation"
+                    >
+                        <Menu className="h-5 w-5" />
+                    </button>
+                    <Link to="/dashboard" className="text-lg font-serif font-bold text-textPrimary dark:text-white">
+                        Planora<span className="text-terracotta">.</span>
+                    </Link>
+                    <Link to="/profile" className="w-9 h-9 rounded-full overflow-hidden border border-borderMuted hover:border-terracotta transition-colors">
+                        <img src={userAvatar} alt={userName} className="w-full h-full object-cover" />
+                    </Link>
+                </div>
+
+                {/* Page Content */}
+                <main className="flex-1 overflow-auto">
+                    <Outlet />
+                </main>
+            </div>
 
             {/* Floating AI Mentor FAB */}
             <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-2">

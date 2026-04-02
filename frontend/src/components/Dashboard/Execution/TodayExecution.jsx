@@ -43,19 +43,20 @@ const TodayExecution = ({
     }, [streak]);
 
     return (
-        <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_12px_30px_-24px_rgba(15,23,42,0.55)] dark:border-white/10 dark:bg-[#121212] dark:shadow-none">
+        <section className="relative overflow-hidden rounded-3xl border border-borderMuted/50 bg-gradient-to-br from-white via-white/95 to-beigePrimary/40 backdrop-blur-xl shadow-warmHover dark:border-white/5 dark:bg-gradient-to-br dark:from-[#1a1a1a] dark:via-[#121212] dark:to-[#0f0f0f] dark:shadow-darkDepth">
             {/* Background decoration */}
-            <div className="absolute right-0 top-0 -mr-20 -mt-20 h-56 w-56 rounded-full bg-blue-500/10 blur-[72px] dark:bg-blue-600/10" />
+            <div className="absolute -right-32 -top-32 h-80 w-80 rounded-full bg-gradient-to-br from-terracotta/15 to-transparent blur-[100px] dark:from-terracotta/5" />
+            <div className="absolute -left-40 -bottom-40 h-96 w-96 rounded-full bg-gradient-to-tr from-sage/10 to-transparent blur-[100px] dark:from-sage/5" />
 
-            <div className="relative z-10 flex flex-col gap-4 p-4 sm:p-5 lg:flex-row lg:items-start lg:justify-between">
+            <div className="relative z-10 flex flex-col gap-6 p-6 sm:p-8 lg:flex-row lg:items-start lg:justify-between">
                 <div className="flex-1 space-y-3">
-                    <div className="flex items-start gap-3">
-                        <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-lg font-bold dark:bg-white/10">
+                    <div className="flex items-start gap-4">
+                        <div className="mt-1 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-terracotta/20 to-sage/20 text-2xl font-bold dark:from-terracotta/10 dark:to-sage/10">
                             👋
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
-                                Ready to execute, {displayName}?
+                            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl lg:text-4xl">
+                                Ready to execute, <span className="text-terracotta">{displayName}</span>?
                             </h1>
                             <div className="mt-1 flex flex-wrap items-center gap-2 text-[13px] font-medium text-slate-500 dark:text-slate-400">
                                 <span className="flex items-center gap-1 text-orange-500">
@@ -67,7 +68,7 @@ const TodayExecution = ({
                                 {milestoneData.current > 0 && (
                                     <>
                                         <span>•</span>
-                                        <span className="text-blue-600 dark:text-blue-400">
+                                        <span className="text-terracotta dark:text-terracotta/80">
                                             {milestoneData.daysRemaining} days to {milestoneData.nextMilestone}-day milestone
                                         </span>
                                     </>
@@ -78,36 +79,36 @@ const TodayExecution = ({
 
                     {/* Milestone Progress Bar */}
                     {milestoneData.current > 0 && (
-                        <div className="rounded-xl border border-blue-200 bg-blue-50 p-3 dark:border-blue-500/20 dark:bg-blue-500/10">
+                        <div className="rounded-2xl border border-terracotta/30 bg-gradient-to-br from-terracotta/8 to-transparent p-4 backdrop-blur-sm dark:border-terracotta/20 dark:bg-gradient-to-br dark:from-terracotta/10 dark:to-transparent">
                             <div className="mb-1.5 flex items-center justify-between">
-                                <span className="text-xs font-semibold uppercase tracking-wider text-blue-700 dark:text-blue-300">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-terracotta dark:text-terracotta/80">
                                     Week {milestoneData.weekNumber} Progress
                                 </span>
-                                <span className="text-xs font-bold text-blue-700 dark:text-blue-300">
+                                <span className="text-xs font-bold text-terracotta dark:text-terracotta/80">
                                     {milestoneData.current % 7 || 7}/7 days
                                 </span>
                             </div>
-                            <div className="h-1.5 overflow-hidden rounded-full bg-blue-200 dark:bg-blue-900/30">
+                            <div className="h-2 overflow-hidden rounded-full bg-gradient-to-r from-terracotta/20 to-terracotta/10 dark:from-terracotta/10 dark:to-terracotta/5">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${milestoneData.progressPercent}%` }}
-                                    transition={{ duration: 1, ease: "easeOut" }}
-                                    className="h-full rounded-full bg-blue-600 dark:bg-blue-400"
+                                    transition={{ duration: 1.2, ease: "easeOut" }}
+                                    className="h-full rounded-full bg-gradient-to-r from-terracotta to-terracottaHover shadow-lg shadow-terracotta/30 dark:from-terracotta dark:to-terracotta/80"
                                 />
                             </div>
-                            <p className="mt-1.5 text-xs text-blue-700 dark:text-blue-300">
-                                {milestoneData.daysRemaining === 0 
-                                    ? '🎉 Milestone reached!' 
+                            <p className="mt-1.5 text-xs text-terracotta dark:text-terracotta/80">
+                                {milestoneData.daysRemaining === 0
+                                    ? '🎉 Milestone reached!'
                                     : `${milestoneData.daysRemaining} more days to complete this week!`}
                             </p>
                         </div>
                     )}
 
                     <div className="max-w-2xl">
-                        <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                            Today's Prime Mission
+                        <p className="mb-2 text-[12px] font-bold uppercase tracking-widest text-terracotta dark:text-terracotta/80">
+                            ✦ Today's Prime Mission
                         </p>
-                        <h2 className="text-lg font-medium leading-snug text-slate-700 dark:text-slate-200 sm:text-xl">
+                        <h2 className="text-xl font-semibold leading-snug text-slate-900 dark:text-white sm:text-2xl">
                             {todayTask?.title || "Loading your mission..."}
                         </h2>
                         {todayTask?.reason && (
@@ -119,34 +120,36 @@ const TodayExecution = ({
                     </div>
                 </div>
 
-                <div className="flex flex-shrink-0 flex-col gap-2 sm:flex-row sm:items-center lg:pt-1">
+                <div className="flex flex-shrink-0 flex-col gap-3 sm:flex-row sm:items-center lg:pt-1">
                     <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={onStartFocus}
                         disabled={!todayTask || loading}
-                        className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/25 transition-all hover:bg-blue-700 hover:shadow-blue-500/40 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-white dark:text-black dark:shadow-white/10 dark:hover:bg-slate-200"
+                        className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-br from-terracotta to-terracottaHover px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-terracotta/40 transition-all hover:shadow-terracotta/60 disabled:cursor-not-allowed disabled:opacity-70 dark:from-terracotta dark:to-terracottaHover dark:shadow-terracotta/30 dark:hover:shadow-terracotta/50"
                     >
                         <Play className="h-4 w-4 fill-current" />
                         <span>Start Focus Session</span>
                         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                     </motion.button>
 
-                    <button
+                    <motion.button
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={onChangeTask}
-                        className="rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:border-white/15 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"
+                        className="rounded-xl border border-borderMuted/60 bg-white/40 px-5 py-3.5 text-sm font-semibold text-textPrimary backdrop-blur-sm transition-all hover:bg-white/70 hover:border-terracotta/30 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10 dark:hover:border-terracotta/30"
                     >
                         Change Task
-                    </button>
+                    </motion.button>
                 </div>
             </div>
 
             {/* Progress Bar Bottom */}
-            <div className="absolute bottom-0 left-0 h-0.5 w-full bg-slate-100 dark:bg-white/5">
+            <div className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-transparent via-terracotta/10 to-transparent dark:via-terracotta/5">
                 <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${(completedCount / Math.max(totalCount, 1)) * 100}%` }}
-                    className="h-full bg-blue-500 dark:bg-white"
+                    className="h-full bg-gradient-to-r from-terracotta to-terracottaHover"
                 />
             </div>
         </section>

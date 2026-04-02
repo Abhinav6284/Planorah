@@ -1,213 +1,169 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Check } from "lucide-react";
 
 export default function PricingSection() {
   const plans = [
     {
-      name: "Starter",
-      price: "Free",
-      period: null,
-      desc: "Perfect for getting started",
+      name: "Free",
+      price: "$0",
+      description: "Quiet focus for beginners.",
       features: [
-        "5 Active Goals",
-        "Basic Roadmaps",
-        "Community Support",
-        "Public Portfolio",
-        "3 Resume Exports",
+        "Create up to 3 AI Roadmaps",
+        "Basic Daily Tracking",
+        "Standard Progress Analytics",
+        "Community Access",
       ],
-      cta: "Get Started Free",
+      cta: "Embrace Clarity",
       href: "/register",
       popular: false,
-      gradient: "from-gray-50 to-gray-100 dark:from-gray-800/60 dark:to-gray-800/40",
-      border: "border-gray-200 dark:border-gray-700",
     },
     {
       name: "Pro",
       price: "$9",
       period: "/month",
-      desc: "For serious creators and learners",
+      description: "For the ambitious architect.",
       features: [
-        "Unlimited Goals",
-        "AI Roadmap Generator",
-        "Priority AI Mentor",
-        "Custom Portfolio Domain",
-        "Unlimited Resume Exports",
-        "ATS Resume Scanner",
-        "Advanced Analytics",
+        "Unlimited AI Roadmaps",
+        "Advanced Behavioral Streaks",
+        "Dynamic Task Readjustment",
+        "Full Analytics Dashboard",
+        "Priority AI Processing",
       ],
-      cta: "Start Pro Trial",
+      cta: "Begin Pro Trial",
       href: "/register",
       popular: true,
-      gradient: "from-gray-50 to-gray-100 dark:from-gray-800/60 dark:to-gray-800/40",
-      border: "border-violet-400/30",
     },
     {
-      name: "Team",
+      name: "Pro+",
       price: "$29",
       period: "/month",
-      desc: "For ambitious groups and teams",
+      description: "Uncompromising accountability.",
       features: [
         "Everything in Pro",
-        "Up to 10 Members",
-        "Team Dashboard",
-        "Shared Roadmaps",
-        "Dedicated Support",
-        "Custom Integrations",
+        "1-on-1 AI Mentorship Chat",
+        "Export to Notion/Calendar",
+        "Early Access to New Features",
       ],
-      cta: "Start Team Trial",
+      cta: "Secure Mastery",
       href: "/register",
       popular: false,
-      gradient: "from-gray-50 to-gray-100 dark:from-gray-800/60 dark:to-gray-800/40",
-      border: "border-gray-200 dark:border-gray-700",
     },
   ];
 
   return (
-    <section id="pricing" className="relative scroll-mt-36 py-32 md:py-40 overflow-hidden bg-white dark:bg-[#0f1117] border-y border-slate-200/60 dark:border-white/[0.05]">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-8 left-[8%] h-56 w-56 rounded-full bg-indigo-100/35 dark:bg-indigo-900/15 blur-3xl" />
-        <div className="absolute bottom-0 right-[10%] h-64 w-64 rounded-full bg-cyan-100/35 dark:bg-cyan-900/12 blur-3xl" />
-        <div className="absolute inset-0 opacity-[0.07] dark:opacity-[0.12] [background-image:radial-gradient(rgba(15,23,42,0.12)_1px,transparent_1px)] dark:[background-image:radial-gradient(rgba(255,255,255,0.07)_1px,transparent_1px)] [background-size:34px_34px]" />
-      </div>
+    <section id="pricing" className="py-32 px-4 sm:px-6 lg:px-8 bg-beigePrimary dark:bg-charcoalDark">
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
+          className="mb-24 text-center"
+        >
+          <h2 className="text-[44px] md:text-[56px] font-cormorant font-medium text-charcoal dark:text-beigePrimary mb-4">
+            Transparent Investment
+          </h2>
+          <p className="text-[18px] text-textSecondary dark:text-gray-400 font-outfit max-w-2xl mx-auto">
+            Choose the pace that fits your ambitions. Unshackle your potential without the hidden fees.
+          </p>
+        </motion.div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-block px-4 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-800/50 text-indigo-700 dark:text-indigo-300 text-sm font-semibold mb-4"
-          >
-            Simple pricing
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-4xl md:text-5xl font-bold font-serif text-gray-900 dark:text-white mb-5 tracking-tight"
-          >
-            Invest in your{" "}
-            <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
-              future
-            </span>
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto font-medium"
-          >
-            No hidden fees. No surprise charges. Cancel anytime.
-          </motion.p>
-        </div>
-
-        {/* Pricing cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-          {plans.map((plan, index) => (
+        <div className="grid md:grid-cols-3 gap-8 items-center max-w-6xl mx-auto">
+          {plans.map((plan, idx) => (
             <motion.div
-              key={plan.name}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ y: plan.popular ? -6 : -3, transition: { duration: 0.2 } }}
-              className="relative"
+              key={idx}
+              initial={{ opacity: 0, scale: 0.95, y: 40 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, delay: idx * 0.1, type: "spring", stiffness: 60 }}
+              className={`relative rounded-[2rem] p-10 transition-all duration-500 h-full flex flex-col ${
+                plan.popular
+                  ? "bg-charcoal dark:bg-beigePrimary text-white dark:text-charcoal shadow-darkDepth dark:shadow-warmHover scale-105 z-10 border border-charcoal dark:border-beigePrimary hover:-translate-y-2"
+                  : "bg-white dark:bg-charcoal border text-charcoal dark:text-beigePrimary border-beigeMuted dark:border-charcoalMuted shadow-sm hover:shadow-warmHover dark:hover:shadow-darkHover hover:-translate-y-1"
+              }`}
             >
               {plan.popular && (
-                <div className="absolute -top-4 inset-x-0 flex justify-center z-10">
-                  <span className="px-4 py-1 bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-xs font-bold rounded-full shadow-lg shadow-violet-500/30 tracking-wide uppercase">
-                    Most Popular
-                  </span>
-                </div>
+                <motion.div 
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8, type: "spring" }}
+                  className="absolute -top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 rounded-full bg-terracotta text-white text-[12px] font-bold uppercase tracking-widest font-outfit shadow-md"
+                >
+                  Most Popular
+                </motion.div>
               )}
 
-              <div
-                className={`relative rounded-2xl border ${plan.border} overflow-hidden ${
-                  plan.popular
-                    ? "bg-gradient-to-br from-violet-600 to-indigo-700 text-white shadow-2xl shadow-violet-500/25 pt-6"
-                    : `bg-white dark:bg-gray-900 shadow-sm pt-0`
-                } p-8 flex flex-col h-full`}
-              >
-                {/* Plan name & price */}
-                <div className="mb-8">
-                  <h3 className={`text-lg font-bold mb-1 ${plan.popular ? "text-white" : "text-gray-900 dark:text-white"}`}>
-                    {plan.name}
-                  </h3>
-                  <p className={`text-sm mb-6 ${plan.popular ? "text-violet-200" : "text-gray-500 dark:text-gray-400"}`}>
-                    {plan.desc}
-                  </p>
-                  <div className="flex items-end gap-1">
-                    <span className={`text-4xl font-bold ${plan.popular ? "text-white" : "text-gray-900 dark:text-white"}`}>
-                      {plan.price}
+              <div className="mb-8 pt-4">
+                <h3 className="text-3xl font-cormorant font-bold mb-2 tracking-wide">
+                  {plan.name}
+                </h3>
+                <p className={`text-[15px] font-outfit mb-8 h-10 ${
+                  plan.popular 
+                    ? "text-gray-300 dark:text-gray-600" 
+                    : "text-textSecondary dark:text-gray-400"
+                }`}>
+                  {plan.description}
+                </p>
+                <div className="flex items-end gap-1">
+                  <span className="text-[56px] font-space font-bold leading-none tracking-tighter">
+                    {plan.price}
+                  </span>
+                  {plan.period && (
+                    <span className={`text-[14px] font-outfit mb-3 ${
+                      plan.popular 
+                        ? "text-gray-400 dark:text-gray-500" 
+                        : "text-textSecondary dark:text-gray-500"
+                    }`}>
+                      {plan.period}
                     </span>
-                    {plan.period && (
-                      <span className={`text-sm mb-1 ${plan.popular ? "text-violet-200" : "text-gray-500 dark:text-gray-400"}`}>
-                        {plan.period}
-                      </span>
-                    )}
-                  </div>
+                  )}
                 </div>
-
-                {/* Features */}
-                <ul className="space-y-3 mb-8 flex-1">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center ${
-                        plan.popular ? "bg-white/20" : "bg-violet-100 dark:bg-violet-900/40"
-                      }`}>
-                        <svg
-                          className={`w-3 h-3 ${plan.popular ? "text-white" : "text-violet-600 dark:text-violet-400"}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                      <span className={`text-sm ${plan.popular ? "text-violet-100" : "text-gray-600 dark:text-gray-300"}`}>
-                        {feature}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-
-                {/* CTA */}
-                <Link to={plan.href}>
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all ${
-                      plan.popular
-                        ? "bg-white text-violet-700 hover:bg-violet-50 shadow-sm"
-                        : "bg-violet-600 hover:bg-violet-700 text-white shadow-md shadow-violet-500/20"
-                    }`}
-                  >
-                    {plan.cta}
-                  </motion.button>
-                </Link>
               </div>
+
+              <div className={`space-y-5 mb-10 flex-1 border-t pt-8 ${
+                plan.popular 
+                  ? "border-white/10 dark:border-black/10" 
+                  : "border-beigeMuted dark:border-charcoalMuted"
+              }`}>
+                {plan.features.map((feature) => (
+                  <div key={feature} className="flex items-start gap-4">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                      plan.popular 
+                        ? "bg-white/10 dark:bg-black/10" 
+                        : "bg-beigeSecondary dark:bg-charcoalDark"
+                    }`}>
+                      <Check className={`w-3.5 h-3.5 ${
+                        plan.popular 
+                          ? "text-terracotta" 
+                          : "text-charcoal dark:text-beigePrimary"
+                      }`} strokeWidth={3} />
+                    </div>
+                    <span className={`text-[16px] font-outfit ${
+                      plan.popular 
+                        ? "text-gray-200 dark:text-charcoal" 
+                        : "text-charcoal dark:text-beigePrimary"
+                    }`}>
+                      {feature}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <Link to={plan.href} className="block mt-auto">
+                <button
+                  className={`w-full py-4 rounded-xl font-outfit font-medium text-[16px] transition-all duration-300 ${
+                    plan.popular
+                      ? "bg-white dark:bg-charcoal text-charcoal dark:text-beigePrimary hover:bg-beigeSecondary dark:hover:bg-charcoalMuted shadow-md"
+                      : "bg-beigeSecondary dark:bg-charcoalDark text-charcoal dark:text-beigePrimary hover:bg-charcoal hover:text-white dark:hover:bg-charcoalMuted"
+                  }`}
+                >
+                  {plan.cta}
+                </button>
+              </Link>
             </motion.div>
           ))}
         </div>
-
-        {/* Enterprise note */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.4 }}
-          className="text-center text-sm text-gray-400 dark:text-gray-500 mt-10"
-        >
-          Need a custom plan?{" "}
-            <a href="mailto:support@planorah.me" className="text-violet-600 dark:text-violet-400 hover:underline font-medium">
-            Contact us
-          </a>{" "}
-          for enterprise pricing.
-        </motion.p>
       </div>
     </section>
   );

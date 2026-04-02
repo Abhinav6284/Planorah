@@ -3,7 +3,54 @@ import { Terminal as XTerm } from 'xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import 'xterm/css/xterm.css';
-import { FaPlus, FaTimes, FaTerminal, FaChevronDown, FaCircle, FaWifi } from 'react-icons/fa';
+import { FaPlus, FaTimes, FaTerminal, FaChevronDown, FaCircle } from 'react-icons/fa';
+
+const TERMINAL_THEME = {
+    dark: {
+        background: '#1e1e1e',
+        foreground: '#cccccc',
+        cursor: '#ffffff',
+        cursorAccent: '#1e1e1e',
+        black: '#000000',
+        red: '#cd3131',
+        green: '#0dbc79',
+        yellow: '#e5e510',
+        blue: '#2472c8',
+        magenta: '#bc3fbc',
+        cyan: '#11a8cd',
+        white: '#e5e5e5',
+        brightBlack: '#666666',
+        brightRed: '#f14c4c',
+        brightGreen: '#23d18b',
+        brightYellow: '#f5f543',
+        brightBlue: '#3b8eea',
+        brightMagenta: '#d670d6',
+        brightCyan: '#29b8db',
+        brightWhite: '#ffffff',
+    },
+    light: {
+        background: '#ffffff',
+        foreground: '#333333',
+        cursor: '#333333',
+        cursorAccent: '#ffffff',
+        black: '#000000',
+        red: '#cd3131',
+        green: '#00bc7c',
+        yellow: '#949800',
+        blue: '#0451a5',
+        magenta: '#bc05bc',
+        cyan: '#0598bc',
+        white: '#555555',
+        brightBlack: '#666666',
+        brightRed: '#cd3131',
+        brightGreen: '#14ce14',
+        brightYellow: '#b5ba00',
+        brightBlue: '#0451a5',
+        brightMagenta: '#bc05bc',
+        brightCyan: '#0598bc',
+        brightWhite: '#a5a5a5',
+    }
+};
 
 const XTerminal = ({
     fileSystem,
@@ -29,54 +76,6 @@ const XTerminal = ({
     const [currentDirectory, setCurrentDirectory] = useState(currentDir);
     const [commandHistory, setCommandHistory] = useState([]);
     const [historyIndex, setHistoryIndex] = useState(-1);
-
-    // Terminal theme
-    const terminalTheme = {
-        dark: {
-            background: '#1e1e1e',
-            foreground: '#cccccc',
-            cursor: '#ffffff',
-            cursorAccent: '#1e1e1e',
-            black: '#000000',
-            red: '#cd3131',
-            green: '#0dbc79',
-            yellow: '#e5e510',
-            blue: '#2472c8',
-            magenta: '#bc3fbc',
-            cyan: '#11a8cd',
-            white: '#e5e5e5',
-            brightBlack: '#666666',
-            brightRed: '#f14c4c',
-            brightGreen: '#23d18b',
-            brightYellow: '#f5f543',
-            brightBlue: '#3b8eea',
-            brightMagenta: '#d670d6',
-            brightCyan: '#29b8db',
-            brightWhite: '#ffffff',
-        },
-        light: {
-            background: '#ffffff',
-            foreground: '#333333',
-            cursor: '#333333',
-            cursorAccent: '#ffffff',
-            black: '#000000',
-            red: '#cd3131',
-            green: '#00bc7c',
-            yellow: '#949800',
-            blue: '#0451a5',
-            magenta: '#bc05bc',
-            cyan: '#0598bc',
-            white: '#555555',
-            brightBlack: '#666666',
-            brightRed: '#cd3131',
-            brightGreen: '#14ce14',
-            brightYellow: '#b5ba00',
-            brightBlue: '#0451a5',
-            brightMagenta: '#bc05bc',
-            brightCyan: '#0598bc',
-            brightWhite: '#a5a5a5',
-        }
-    };
 
     // Get WebSocket URL
     const getWsUrl = () => {
@@ -151,7 +150,7 @@ const XTerminal = ({
             fontSize: 14,
             fontFamily: '"Cascadia Code", "Fira Code", "JetBrains Mono", Menlo, Monaco, "Courier New", monospace',
             lineHeight: 1.4,
-            theme: terminalTheme[theme],
+            theme: TERMINAL_THEME[theme],
             allowTransparency: true,
             scrollback: 5000,
         });
@@ -168,9 +167,12 @@ const XTerminal = ({
         xtermRef.current = term;
         fitAddonRef.current = fitAddon;
 
-        // Start immediately in simulated mode (no WebSocket needed)
+        // Start immediately in simulated mode so terminal is usable instantly.
         setUseSimulated(true);
         setConnectionStatus('local');
+
+        // Attempt real backend terminal connection in parallel.
+        connectWebSocket();
 
         // Show welcome message immediately
         term.writeln('\x1b[1;36m╔══════════════════════════════════════════════════════════╗\x1b[0m');
@@ -289,12 +291,13 @@ const XTerminal = ({
             term.dispose();
             xtermRef.current = null;
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Update theme
     useEffect(() => {
         if (xtermRef.current) {
-            xtermRef.current.options.theme = terminalTheme[theme];
+            xtermRef.current.options.theme = TERMINAL_THEME[theme];
         }
     }, [theme]);
 

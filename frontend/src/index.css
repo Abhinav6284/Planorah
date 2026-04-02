@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,162 +6,170 @@
 
 @layer base {
   body {
-    @apply antialiased text-gray-900 bg-white dark:bg-gray-900 dark:text-white;
-  }
-
-  /* Smooth scrolling for better UX */
-  html {
-    scroll-behavior: smooth;
+    @apply bg-beigePrimary text-textPrimary dark:bg-charcoalDark dark:text-beigePrimary font-outfit antialiased selection:bg-terracotta selection:text-white transition-colors duration-500;
   }
 }
 
-@layer utilities {
-
-  /* Safe area padding for mobile devices with notches */
-  .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom, 0);
-  }
-
-  .safe-top {
-    padding-top: env(safe-area-inset-top, 0);
-  }
-
-  /* Hide scrollbar utility */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  /* Touch action for better mobile scrolling */
-  .touch-pan-y {
-    touch-action: pan-y;
-  }
+/* Claude-like Minimalist Utilities */
+.bg-noise {
+  /* Noise removed to achieve "plain" look as requested */
+  position: relative;
+}
+.bg-noise::before {
+  display: none;
 }
 
-@layer components {
-  .onboarding-shell {
-    background-image:
-      radial-gradient(circle at 0% 0%, rgba(251, 191, 36, 0.15) 0%, transparent 35%),
-      radial-gradient(circle at 100% 20%, rgba(14, 165, 233, 0.14) 0%, transparent 40%),
-      linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
-  }
+/* Base resets & scrollbar for beige */
+html {
+  scroll-behavior: smooth;
+}
 
-  .dark .onboarding-shell {
-    background-image:
-      radial-gradient(circle at 0% 0%, rgba(250, 204, 21, 0.12) 0%, transparent 35%),
-      radial-gradient(circle at 100% 20%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
-      linear-gradient(180deg, #020617 0%, #0f172a 100%);
-  }
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-beigePrimary dark:bg-charcoalDark transition-colors duration-500;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-borderMuted dark:bg-charcoalMuted rounded-full hover:bg-beigeMuted dark:hover:bg-charcoal transition-colors duration-500;
+}
 
-  .onboarding-panel {
-    @apply rounded-[2rem] border border-slate-200/90 bg-white/90 shadow-[0_18px_40px_rgba(15,23,42,0.12)] backdrop-blur-sm p-6 md:p-10 overflow-hidden;
-  }
+.auth-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #FDFBF7;
+}
 
-  .dark .onboarding-panel {
-    @apply border-slate-700/80 bg-slate-900/85;
-  }
+.dark .auth-container {
+  background-color: #1E1C19;
+}
 
-  .dark .onboarding-content .text-gray-900 {
-    color: rgb(241 245 249) !important;
-  }
+.auth-sidebar {
+  flex: 1;
+  background-color: #2D2A26;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem;
+  position: relative;
+  overflow: hidden;
+}
 
-  .dark .onboarding-content .text-gray-700 {
-    color: rgb(226 232 240) !important;
-  }
+.dark .auth-sidebar {
+  background-color: #0d0c0b;
+}
 
-  .dark .onboarding-content .text-gray-600 {
-    color: rgb(203 213 225) !important;
-  }
+.auth-sidebar-decoration {
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(217,108,74,0.15) 0%, transparent 70%); 
+  border-radius: 50%;
+  z-index: 0;
+}
 
-  .dark .onboarding-content .text-gray-500 {
-    color: rgb(148 163 184) !important;
-  }
+.auth-sidebar-content {
+  position: relative;
+  z-index: 1;
+  max-width: 480px;
+}
 
-  .dark .onboarding-content .border-gray-200 {
-    border-color: rgb(71 85 105) !important;
-  }
+.auth-main {
+  flex: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+}
 
-  .dark .onboarding-content .bg-gray-50 {
-    background-color: rgba(30, 41, 59, 0.75) !important;
-  }
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  padding: 3rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 40px -15px rgba(180, 170, 150, 0.15);
+  border: 1px solid #E8E2D6;
+}
 
-  .onboarding-input,
-  .onboarding-select {
-    @apply w-full px-5 py-3 rounded-full border-2 border-slate-300 bg-white text-slate-900 placeholder:text-slate-500 outline-none transition-all shadow-sm;
-  }
+.dark .auth-card {
+  background: #2D2A26;
+  border-color: #4A4641;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+  color: #FDFBF7;
+}
 
-  .onboarding-textarea {
-    @apply w-full px-4 py-3 rounded-2xl border-2 border-slate-300 bg-white text-slate-900 placeholder:text-slate-500 outline-none transition-all shadow-sm;
-  }
+.input-field {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: #FDFBF7;
+  border: 1px solid #E8E2D6;
+  border-radius: 0.75rem;
+  font-family: "Outfit", sans-serif;
+  color: #2D2A26;
+  outline: none;
+  transition: all 0.2s ease;
+}
 
-  .onboarding-input:focus,
-  .onboarding-select:focus,
-  .onboarding-textarea:focus {
-    @apply border-slate-900 ring-2 ring-slate-900/10 shadow-md;
-  }
+.dark .input-field {
+  background: #1E1C19;
+  border-color: #4A4641;
+  color: #FDFBF7;
+}
 
-  .dark .onboarding-input,
-  .dark .onboarding-select,
-  .dark .onboarding-textarea {
-    @apply border-slate-600 bg-slate-800/90 text-slate-100 placeholder:text-slate-400 shadow-[0_8px_20px_rgba(2,6,23,0.35)];
-  }
+.input-field:focus {
+  border-color: #D96C4A; 
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(217, 108, 74, 0.1);
+}
 
-  .dark .onboarding-input:focus,
-  .dark .onboarding-select:focus,
-  .dark .onboarding-textarea:focus {
-    @apply border-slate-100 ring-slate-300/20;
-  }
+.dark .input-field:focus {
+  background: #36332E;
+  box-shadow: 0 0 0 3px rgba(217, 108, 74, 0.2);
+}
 
-  .onboarding-checkbox {
-    @apply mt-1 h-5 w-5 rounded border-slate-400 text-slate-900 focus:ring-slate-900;
-  }
+.btn-primary {
+  width: 100%;
+  padding: 0.875rem;
+  background: #2D2A26;
+  color: #fff;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
 
-  .dark .onboarding-checkbox {
-    @apply border-slate-500 text-slate-100 focus:ring-slate-300;
-  }
+.dark .btn-primary {
+  background: #FDFBF7;
+  color: #2D2A26;
+}
 
-  .onboarding-input[type="date"] {
-    color-scheme: light;
-  }
+.btn-primary:hover {
+  background: #4A4641;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(45, 42, 38, 0.2);
+}
 
-  .dark .onboarding-input[type="date"] {
-    color-scheme: dark;
-  }
+.dark .btn-primary:hover {
+  background: #E8E2D6;
+  box-shadow: 0 4px 12px rgba(253, 251, 247, 0.1);
+}
 
-  .planorah-blog-content {
-    @apply text-slate-700 dark:text-slate-300;
-  }
+.auth-link {
+  color: #D96C4A;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
 
-  .planorah-blog-content h2 {
-    @apply mt-8 mb-3 text-2xl md:text-3xl font-bold text-slate-900 dark:text-white;
-  }
-
-  .planorah-blog-content h3 {
-    @apply mt-6 mb-2 text-xl font-semibold text-slate-900 dark:text-slate-100;
-  }
-
-  .planorah-blog-content p {
-    @apply mb-4 text-base leading-8;
-  }
-
-  .planorah-blog-content ul,
-  .planorah-blog-content ol {
-    @apply mb-5 pl-5 space-y-2;
-  }
-
-  .planorah-blog-content li {
-    @apply leading-7;
-  }
-
-  .planorah-blog-content strong {
-    @apply text-slate-900 dark:text-slate-100;
-  }
-
-  .planorah-blog-content .callout {
-    @apply rounded-r-2xl border-l-4 border-emerald-400 bg-emerald-50/80 px-5 py-4 text-slate-700 dark:border-emerald-400/70 dark:bg-emerald-500/10 dark:text-slate-200;
-  }
+.auth-link:hover {
+  opacity: 0.8;
 }

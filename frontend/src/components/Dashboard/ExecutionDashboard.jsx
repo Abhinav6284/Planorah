@@ -19,7 +19,7 @@ import { roadmapService } from '../../api/roadmapService';
 import { planoraService } from '../../api/planoraService';
 import { useMissionFlow } from '../../hooks/useMissionFlow';
 
-const shellCardClass = 'rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_12px_30px_-24px_rgba(15,23,42,0.55)] dark:border-white/10 dark:bg-[#121212] dark:shadow-none';
+const shellCardClass = 'rounded-2xl border border-borderMuted/50 bg-gradient-to-br from-white/80 to-beigePrimary/40 backdrop-blur-xl p-5 shadow-soft dark:border-white/5 dark:bg-gradient-to-br dark:from-[#1a1a1a]/80 dark:to-[#0f0f0f]/80 dark:shadow-darkSoft';
 
 const buildDateKey = (dateValue) => {
     if (!dateValue) {
@@ -286,7 +286,7 @@ const ExecutionDashboard = () => {
     }, [subjects]);
 
     return (
-        <div className={`min-h-screen text-slate-800 transition-colors duration-500 dark:text-slate-100 ${currentState === 'IN_PROGRESS' ? 'bg-[#050505]' : 'bg-[#F5F5F7] dark:bg-[#0b0b0b]'}`}>
+        <div className={`min-h-screen text-slate-800 transition-colors duration-500 dark:text-slate-100 ${currentState === 'IN_PROGRESS' ? 'bg-[#050505]' : 'bg-transparent dark:bg-[#0b0b0b]'}`}>
 
             {/* Focus Mode Overlay */}
             <AnimatePresence>
@@ -306,7 +306,7 @@ const ExecutionDashboard = () => {
                 )}
             </AnimatePresence>
 
-            <div className={`mx-auto max-w-[1320px] p-3 transition-all duration-500 lg:p-4 ${currentState === 'IN_PROGRESS' ? 'opacity-20 blur-sm pointer-events-none' : 'opacity-100'}`}>
+            <div className={`mx-auto max-w-[1320px] px-4 py-6 transition-all duration-500 lg:px-6 lg:py-8 ${currentState === 'IN_PROGRESS' ? 'opacity-20 blur-sm pointer-events-none' : 'opacity-100'}`}>
 
                 {/* 1. HERO SECTION */}
                 <TodayExecution
@@ -319,21 +319,21 @@ const ExecutionDashboard = () => {
                     loading={loading.bootstrap}
                 />
 
-                <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-12">
+                <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-12">
 
                     {/* LEFT COLUMN: Main Activities */}
-                    <div className="space-y-4 lg:col-span-8">
+                    <div className="space-y-6 lg:col-span-8">
                         {/* Mode Switcher Block */}
-                        <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-3 dark:border-white/10 dark:bg-[#121212]">
+                        <div className="flex items-center justify-between rounded-2xl border border-borderMuted/50 bg-gradient-to-br from-white/80 to-beigePrimary/40 backdrop-blur-xl p-4 shadow-soft dark:border-white/5 dark:bg-gradient-to-br dark:from-[#1a1a1a]/80 dark:to-[#0f0f0f]/80 dark:shadow-darkSoft">
                             <div className="flex items-center gap-3">
                                 <ModeSwitch mode={mode} onChange={setMode} />
-                                <span className="text-xs font-medium text-slate-500 dark:text-slate-400 sm:text-sm">
+                                <span className="text-xs font-medium text-textSecondary dark:text-slate-400 sm:text-sm">
                                     {mode === 'learning' ? 'Learning Mode Active' : 'Exam Mode Active'}
                                 </span>
                             </div>
                             <button
                                 onClick={() => setVoicePanelOpen(true)}
-                                className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-200 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 sm:px-3 sm:py-1.5 sm:text-xs"
+                                className="inline-flex items-center gap-1.5 rounded-full bg-terracotta/10 px-2.5 py-1 text-[11px] font-semibold text-textPrimary hover:bg-terracotta/20 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 sm:px-3 sm:py-1.5 sm:text-xs"
                             >
                                 <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5" /> AI Coach
                             </button>
@@ -341,13 +341,13 @@ const ExecutionDashboard = () => {
 
                         {/* Schedule Section */}
                         <div className={shellCardClass}>
-                            <div className="mb-3 flex items-center justify-between pb-1.5">
-                                <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">Schedule</h3>
+                            <div className="mb-4 flex items-center justify-between pb-2">
+                                <h3 className="text-lg font-bold text-textPrimary dark:text-white">Schedule</h3>
                                 <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">Days</span>
                             </div>
 
                             {pendingTaskData.orderedDates.length === 0 && (
-                                <p className="mb-4 text-sm text-slate-500">No pending tasks. You're all caught up!</p>
+                                <p className="mb-4 text-sm text-textSecondary dark:text-slate-400">No pending tasks. You're all caught up!</p>
                             )}
 
                             <div className="space-y-4">
@@ -358,12 +358,12 @@ const ExecutionDashboard = () => {
                                             type="button"
                                             onClick={() => setSelectedDateKey(day.key)}
                                             className={`flex h-[52px] w-[44px] flex-shrink-0 flex-col items-center justify-center gap-[2px] rounded-xl text-xs font-semibold transition-all ${day.isSelected
-                                                ? 'bg-[#e2cfff] text-[#1e1e1e] shadow-sm'
-                                                : 'bg-slate-100 hover:bg-slate-200 dark:bg-[#1a1921] dark:hover:bg-[#25242e]'
+                                                ? 'bg-gradient-to-br from-terracotta to-terracottaHover text-white shadow-lg shadow-terracotta/40'
+                                                : 'bg-beigeMuted/60 hover:bg-terracotta/20 dark:bg-white/5 dark:hover:bg-white/10'
                                                 }`}
                                         >
-                                            <span className={`text-sm font-bold leading-none ${day.isSelected ? 'text-[#1e1e1e]' : 'text-slate-700 dark:text-white/80'}`}>{day.dayNumber}</span>
-                                            <span className={`text-[9px] capitalize tracking-wide ${day.isSelected ? 'text-[#1e1e1e]' : 'text-slate-400 dark:text-[#6a6a72]'}`}>
+                                            <span className={`text-sm font-bold leading-none ${day.isSelected ? 'text-white' : 'text-textPrimary dark:text-white/80'}`}>{day.dayNumber}</span>
+                                            <span className={`text-[9px] capitalize tracking-wide ${day.isSelected ? 'text-white/80' : 'text-textSecondary dark:text-slate-400'}`}>
                                                 {day.dayName}
                                             </span>
                                         </button>
@@ -371,17 +371,17 @@ const ExecutionDashboard = () => {
                                 </div>
 
                                 <div className="flex items-center justify-between">
-                                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Tasks ({selectedTasks.length})</p>
+                                    <p className="text-sm font-bold text-textPrimary dark:text-slate-200">Tasks ({selectedTasks.length})</p>
                                     <div className="flex items-center gap-3">
-                                        <div className="h-1.5 w-24 overflow-hidden rounded-full bg-slate-200 dark:bg-[#25242e]">
-                                            <div className="h-full rounded-full bg-slate-500/60 transition-all dark:bg-white/20" style={{ width: `${selectedTaskProgress}%` }} />
+                                        <div className="h-1.5 w-24 overflow-hidden rounded-full bg-beigeMuted dark:bg-white/10">
+                                            <div className="h-full rounded-full bg-terracotta/60 transition-all dark:bg-terracotta/60" style={{ width: `${selectedTaskProgress}%` }} />
                                         </div>
-                                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-500">{selectedTaskProgress}%</span>
+                                        <span className="text-xs font-semibold text-textSecondary dark:text-slate-400">{selectedTaskProgress}%</span>
                                     </div>
                                 </div>
 
                                 {selectedTasks.length === 0 ? (
-                                    <p className="text-sm text-slate-500">No tasks scheduled for {formatDateLabel(selectedDateKey)}.</p>
+                                    <p className="text-sm text-textSecondary dark:text-slate-400">No tasks scheduled for {formatDateLabel(selectedDateKey)}.</p>
                                 ) : (
                                     <div className="grid grid-cols-1 gap-3">
                                         {selectedTasks.map((card, index) => (
@@ -396,28 +396,28 @@ const ExecutionDashboard = () => {
                                                         handleOpenTaskGuide(card);
                                                     }
                                                 }}
-                                                className="relative flex cursor-pointer items-center gap-3 rounded-2xl bg-slate-50 p-3 transition-all hover:bg-white hover:shadow-md dark:bg-[#1a1921] dark:hover:bg-[#25242e]"
+                                                className="relative flex cursor-pointer items-center gap-3 rounded-2xl bg-beigeMuted/50 p-3 transition-all hover:bg-white/80 hover:shadow-md dark:bg-white/5 dark:hover:bg-white/10"
                                             >
-                                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-100 text-xs font-bold text-violet-800 dark:bg-[#311f4d] dark:text-violet-200">
+                                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-terracotta/10 text-xs font-bold text-terracotta dark:bg-terracotta/20 dark:text-terracotta">
                                                     {index + 1}
                                                 </div>
                                                 <div className="min-w-0 flex-1">
-                                                    <h4 className="truncate text-sm font-bold text-slate-800 dark:text-slate-100">
-                                                        <span className="mr-1.5 inline-flex items-center justify-center rounded bg-[#e8e8e8] p-[2px] dark:bg-[#2a2a2a]">
+                                                    <h4 className="truncate text-sm font-bold text-textPrimary dark:text-slate-100">
+                                                        <span className="mr-1.5 inline-flex items-center justify-center rounded bg-beigeMuted p-[2px] dark:bg-white/10">
                                                             <span className="text-[10px]">📚</span>
                                                         </span>
                                                         {card.title}
                                                     </h4>
-                                                    <p className="mt-0.5 flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                                                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-slate-200 text-[9px] dark:bg-[#25242e]">⏱</span>
+                                                    <p className="mt-0.5 flex items-center gap-1.5 text-[11px] font-medium text-textSecondary dark:text-slate-400">
+                                                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-beigeMuted text-[9px] dark:bg-white/10">⏱</span>
                                                         {card.estimatedMinutes} min
                                                     </p>
                                                 </div>
                                                 <div className="flex items-center gap-3">
-                                                    <span className="rounded-full border border-slate-200 px-2.5 py-0.5 text-[10px] font-semibold lowercase tracking-wide text-slate-600 dark:border-white/10 dark:text-slate-400">
+                                                    <span className="rounded-full border border-borderMuted px-2.5 py-0.5 text-[10px] font-semibold lowercase tracking-wide text-textSecondary dark:border-white/10 dark:text-slate-400">
                                                         {getTaskStatusLabel(card.status)}
                                                     </span>
-                                                    <ArrowRight className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                                                    <ArrowRight className="h-3.5 w-3.5 text-textSecondary dark:text-slate-400" />
                                                 </div>
                                             </div>
                                         ))}
@@ -429,26 +429,26 @@ const ExecutionDashboard = () => {
                         {/* Mode-specific Linked Section */}
                         {mode === 'learning' ? (
                             <div className={shellCardClass}>
-                                <div className="mb-3 flex items-center justify-between pb-1.5">
-                                    <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">Learning Path Roadmaps</h3>
-                                    <Link to="/roadmap/list" className="text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-200">
+                                <div className="mb-4 flex items-center justify-between pb-2">
+                                    <h3 className="text-lg font-bold text-textPrimary dark:text-white">Learning Path Roadmaps</h3>
+                                    <Link to="/roadmap/list" className="text-xs font-semibold text-terracotta hover:text-terracottaHover dark:text-terracotta/80 dark:hover:text-terracotta">
                                         View all
                                     </Link>
                                 </div>
 
                                 {roadmapCards.length === 0 ? (
-                                    <p className="text-sm text-slate-500">No roadmaps found. Create one to link tasks with your learning path.</p>
+                                    <p className="text-sm text-textSecondary dark:text-slate-400">No roadmaps found. Create one to link tasks with your learning path.</p>
                                 ) : (
                                     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                                         {roadmapCards.map((roadmap) => (
                                             <Link
                                                 key={roadmap.key}
                                                 to={roadmap.ctaTo}
-                                                className="rounded-xl border border-slate-200 bg-slate-50 p-3 transition hover:bg-white hover:shadow-sm dark:border-white/10 dark:bg-[#1a1921] dark:hover:bg-[#25242e]"
+                                                className="rounded-xl border border-borderMuted bg-beigeMuted/30 p-3 transition hover:bg-white/80 hover:shadow-sm dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
                                             >
-                                                <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{roadmap.title}</p>
-                                                <p className="mt-1 line-clamp-2 text-xs text-slate-500 dark:text-slate-400">{roadmap.subtitle}</p>
-                                                <p className="mt-2 text-[11px] font-semibold text-slate-500 dark:text-slate-400">Open roadmap →</p>
+                                                <p className="truncate text-sm font-semibold text-textPrimary dark:text-slate-100">{roadmap.title}</p>
+                                                <p className="mt-1 line-clamp-2 text-xs text-textSecondary dark:text-slate-400">{roadmap.subtitle}</p>
+                                                <p className="mt-2 text-[11px] font-semibold text-terracotta dark:text-terracotta/80">Open roadmap →</p>
                                             </Link>
                                         ))}
                                     </div>
@@ -456,26 +456,26 @@ const ExecutionDashboard = () => {
                             </div>
                         ) : (
                             <div className={shellCardClass}>
-                                <div className="mb-3 flex items-center justify-between pb-1.5">
-                                    <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">Exam Subjects & Topics</h3>
-                                    <Link to="/planora" className="text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-200">
+                                <div className="mb-4 flex items-center justify-between pb-2">
+                                    <h3 className="text-lg font-bold text-textPrimary dark:text-white">Exam Subjects & Topics</h3>
+                                    <Link to="/planora" className="text-xs font-semibold text-terracotta hover:text-terracottaHover dark:text-terracotta/80 dark:hover:text-terracotta">
                                         Open study platform
                                     </Link>
                                 </div>
 
                                 {subjectCards.length === 0 ? (
-                                    <p className="text-sm text-slate-500">No exam subjects found. Create subjects and generate topics in the study platform.</p>
+                                    <p className="text-sm text-textSecondary dark:text-slate-400">No exam subjects found. Create subjects and generate topics in the study platform.</p>
                                 ) : (
                                     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                                         {subjectCards.map((subject) => (
                                             <Link
                                                 key={subject.key}
                                                 to={subject.ctaTo}
-                                                className="rounded-xl border border-slate-200 bg-slate-50 p-3 transition hover:bg-white hover:shadow-sm dark:border-white/10 dark:bg-[#1a1921] dark:hover:bg-[#25242e]"
+                                                className="rounded-xl border border-borderMuted bg-beigeMuted/30 p-3 transition hover:bg-white/80 hover:shadow-sm dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
                                             >
-                                                <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{subject.title}</p>
-                                                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{subject.topicCount} topics</p>
-                                                <p className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
+                                                <p className="truncate text-sm font-semibold text-textPrimary dark:text-slate-100">{subject.title}</p>
+                                                <p className="mt-1 text-xs text-textSecondary dark:text-slate-400">{subject.topicCount} topics</p>
+                                                <p className="mt-2 text-[11px] text-textSecondary dark:text-slate-400">
                                                     {subject.strong} strong • {subject.weak} weak • {subject.notStarted} not started
                                                 </p>
                                             </Link>
@@ -487,7 +487,7 @@ const ExecutionDashboard = () => {
                     </div>
 
                     {/* RIGHT COLUMN: Feed, Progress & AI */}
-                    <aside className="space-y-4 lg:col-span-4">
+                    <aside className="space-y-6 lg:col-span-4">
                         {/* 4. EXECUTION FEED */}
                         <ExecutionFeed
                             tasks={activeTasks}
@@ -500,20 +500,22 @@ const ExecutionDashboard = () => {
                         <ProgressPanel tasks={activeTasks} stats={mergedStats} />
 
                         {/* AI Insight Card */}
-                        <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-indigo-50 to-white p-4 dark:border-white/10 dark:from-[#1a1a2e] dark:to-[#121212]">
-                            <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+                        <div className="rounded-2xl border border-terracotta/30 bg-gradient-to-br from-terracotta/10 via-transparent to-beigePrimary/30 p-5 shadow-soft backdrop-blur-sm dark:border-terracotta/20 dark:from-terracotta/5 dark:to-transparent dark:shadow-darkSoft">
+                            <div className="flex items-center gap-2 text-terracotta dark:text-terracotta/80">
                                 <BrainCircuit className="h-4 w-4" />
                                 <span className="text-[11px] font-bold uppercase tracking-wider">AI Insight</span>
                             </div>
                             <p className="mt-2.5 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
                                 {coach?.reason || "Consistency is your superpower. One focused session today beats zero."}
                             </p>
-                            <button
+                            <motion.button
+                                whileHover={{ y: -2 }}
+                                whileTap={{ scale: 0.98 }}
                                 onClick={() => setVoicePanelOpen(true)}
-                                className="mt-3 w-full rounded-xl bg-indigo-100 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-300 dark:hover:bg-indigo-500/30"
+                                className="mt-4 w-full rounded-xl bg-gradient-to-r from-terracotta/20 to-terracotta/10 py-2.5 text-sm font-semibold text-terracotta hover:from-terracotta/30 hover:to-terracotta/20 dark:from-terracotta/15 dark:to-terracotta/10 dark:text-terracotta dark:hover:from-terracotta/25 dark:hover:to-terracotta/15"
                             >
                                 Get Strategy
-                            </button>
+                            </motion.button>
                         </div>
                     </aside>
                 </div>

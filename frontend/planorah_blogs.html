@@ -1,378 +1,445 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Planorah Blog Content — 20 SEO Articles</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Planorah Blog Content — 20 SEO Articles</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
 
-  :root {
-    --bg: #0a0a0f;
-    --surface: #111118;
-    --border: #1e1e2e;
-    --accent: #6c63ff;
-    --accent2: #00d4aa;
-    --text: #e2e2f0;
-    --muted: #6b6b8a;
-    --tier1: #ff6b6b;
-    --tier2: #ffa94d;
-    --tier3: #4dabf7;
-    --tier4: #69db7c;
-  }
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --border: #1e1e2e;
+      --accent: #6c63ff;
+      --accent2: #00d4aa;
+      --text: #e2e2f0;
+      --muted: #6b6b8a;
+      --tier1: #ff6b6b;
+      --tier2: #ffa94d;
+      --tier3: #4dabf7;
+      --tier4: #69db7c;
+    }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    display: flex;
-    min-height: 100vh;
-    font-size: 15px;
-    line-height: 1.7;
-  }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+      font-size: 15px;
+      line-height: 1.7;
+    }
 
-  /* SIDEBAR */
-  #sidebar {
-    width: 300px;
-    min-width: 300px;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    height: 100vh;
-    position: sticky;
-    top: 0;
-    overflow-y: auto;
-    padding: 24px 0;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-  }
+    /* SIDEBAR */
+    #sidebar {
+      width: 300px;
+      min-width: 300px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+      padding: 24px 0;
+    }
 
-  .sidebar-logo {
-    padding: 0 20px 20px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 16px;
-  }
+    .sidebar-logo {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
 
-  .sidebar-logo h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: 18px;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+    .sidebar-logo h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
 
-  .sidebar-logo p {
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 2px;
-  }
+    .sidebar-logo p {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
 
-  .tier-label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    padding: 12px 20px 6px;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+    .tier-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 12px 20px 6px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-  .tier-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
+    .tier-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
 
-  .t1 .tier-dot { background: var(--tier1); }
-  .t2 .tier-dot { background: var(--tier2); }
-  .t3 .tier-dot { background: var(--tier3); }
-  .t4 .tier-dot { background: var(--tier4); }
+    .t1 .tier-dot {
+      background: var(--tier1);
+    }
 
-  .nav-item {
-    display: block;
-    padding: 9px 20px;
-    font-size: 13px;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
-    border-left: 2px solid transparent;
-    line-height: 1.4;
-  }
+    .t2 .tier-dot {
+      background: var(--tier2);
+    }
 
-  .nav-item:hover { color: var(--text); background: rgba(108,99,255,0.06); }
+    .t3 .tier-dot {
+      background: var(--tier3);
+    }
 
-  .nav-item.active {
-    color: var(--text);
-    border-left-color: var(--accent);
-    background: rgba(108,99,255,0.1);
-  }
+    .t4 .tier-dot {
+      background: var(--tier4);
+    }
 
-  .num {
-    font-size: 10px;
-    color: var(--muted);
-    margin-right: 6px;
-    font-family: 'Syne', sans-serif;
-  }
+    .nav-item {
+      display: block;
+      padding: 9px 20px;
+      font-size: 13px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      border-left: 2px solid transparent;
+      line-height: 1.4;
+    }
 
-  /* MAIN */
-  #main {
-    flex: 1;
-    overflow-y: auto;
-    padding: 48px 64px;
-    max-width: 800px;
-  }
+    .nav-item:hover {
+      color: var(--text);
+      background: rgba(108, 99, 255, 0.06);
+    }
 
-  .blog-header {
-    margin-bottom: 32px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid var(--border);
-  }
+    .nav-item.active {
+      color: var(--text);
+      border-left-color: var(--accent);
+      background: rgba(108, 99, 255, 0.1);
+    }
 
-  .meta-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-  }
+    .num {
+      font-size: 10px;
+      color: var(--muted);
+      margin-right: 6px;
+      font-family: 'Syne', sans-serif;
+    }
 
-  .tier-badge {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 3px 10px;
-    border-radius: 20px;
-  }
+    /* MAIN */
+    #main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 48px 64px;
+      max-width: 800px;
+    }
 
-  .badge-t1 { background: rgba(255,107,107,0.15); color: var(--tier1); border: 1px solid rgba(255,107,107,0.3); }
-  .badge-t2 { background: rgba(255,169,77,0.15); color: var(--tier2); border: 1px solid rgba(255,169,77,0.3); }
-  .badge-t3 { background: rgba(77,171,247,0.15); color: var(--tier3); border: 1px solid rgba(77,171,247,0.3); }
-  .badge-t4 { background: rgba(105,219,124,0.15); color: var(--tier4); border: 1px solid rgba(105,219,124,0.3); }
+    .blog-header {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
 
-  .blog-meta {
-    font-size: 12px;
-    color: var(--muted);
-  }
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
 
-  .blog-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 28px;
-    font-weight: 800;
-    line-height: 1.25;
-    color: #fff;
-    margin-bottom: 12px;
-  }
+    .tier-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
 
-  .seo-box {
-    background: rgba(108,99,255,0.08);
-    border: 1px solid rgba(108,99,255,0.2);
-    border-radius: 8px;
-    padding: 14px 18px;
-    margin-bottom: 28px;
-    font-size: 12px;
-  }
+    .badge-t1 {
+      background: rgba(255, 107, 107, 0.15);
+      color: var(--tier1);
+      border: 1px solid rgba(255, 107, 107, 0.3);
+    }
 
-  .seo-box .seo-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--accent);
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
+    .badge-t2 {
+      background: rgba(255, 169, 77, 0.15);
+      color: var(--tier2);
+      border: 1px solid rgba(255, 169, 77, 0.3);
+    }
 
-  .seo-box p { color: var(--muted); line-height: 1.5; }
-  .seo-box strong { color: var(--text); }
+    .badge-t3 {
+      background: rgba(77, 171, 247, 0.15);
+      color: var(--tier3);
+      border: 1px solid rgba(77, 171, 247, 0.3);
+    }
 
-  .blog-content h2 {
-    font-family: 'Syne', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    color: #fff;
-    margin: 32px 0 12px;
-    line-height: 1.3;
-  }
+    .badge-t4 {
+      background: rgba(105, 219, 124, 0.15);
+      color: var(--tier4);
+      border: 1px solid rgba(105, 219, 124, 0.3);
+    }
 
-  .blog-content h3 {
-    font-family: 'Syne', sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text);
-    margin: 24px 0 8px;
-  }
+    .blog-meta {
+      font-size: 12px;
+      color: var(--muted);
+    }
 
-  .blog-content p {
-    color: #c8c8df;
-    margin-bottom: 16px;
-    font-size: 15px;
-    line-height: 1.8;
-  }
+    .blog-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.25;
+      color: #fff;
+      margin-bottom: 12px;
+    }
 
-  .blog-content ul, .blog-content ol {
-    padding-left: 20px;
-    margin-bottom: 16px;
-    color: #c8c8df;
-  }
+    .seo-box {
+      background: rgba(108, 99, 255, 0.08);
+      border: 1px solid rgba(108, 99, 255, 0.2);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 28px;
+      font-size: 12px;
+    }
 
-  .blog-content li {
-    margin-bottom: 8px;
-    line-height: 1.7;
-  }
+    .seo-box .seo-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
 
-  .blog-content strong { color: var(--text); }
+    .seo-box p {
+      color: var(--muted);
+      line-height: 1.5;
+    }
 
-  .callout {
-    background: rgba(0,212,170,0.07);
-    border-left: 3px solid var(--accent2);
-    border-radius: 0 8px 8px 0;
-    padding: 14px 18px;
-    margin: 20px 0;
-    color: #c8c8df;
-    font-size: 14px;
-  }
+    .seo-box strong {
+      color: var(--text);
+    }
 
-  .cta-box {
-    background: linear-gradient(135deg, rgba(108,99,255,0.12), rgba(0,212,170,0.08));
-    border: 1px solid rgba(108,99,255,0.25);
-    border-radius: 12px;
-    padding: 24px;
-    margin: 32px 0 16px;
-    text-align: center;
-  }
+    .blog-content h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      margin: 32px 0 12px;
+      line-height: 1.3;
+    }
 
-  .cta-box h3 {
-    font-family: 'Syne', sans-serif;
-    font-size: 17px;
-    color: #fff;
-    margin-bottom: 8px;
-  }
+    .blog-content h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 24px 0 8px;
+    }
 
-  .cta-box p { color: var(--muted); font-size: 14px; margin-bottom: 14px; }
+    .blog-content p {
+      color: #c8c8df;
+      margin-bottom: 16px;
+      font-size: 15px;
+      line-height: 1.8;
+    }
 
-  .cta-btn {
-    display: inline-block;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #fff;
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    padding: 10px 24px;
-    border-radius: 6px;
-    text-decoration: none;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-  }
+    .blog-content ul,
+    .blog-content ol {
+      padding-left: 20px;
+      margin-bottom: 16px;
+      color: #c8c8df;
+    }
 
-  .kw-chip {
-    display: inline-block;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    font-size: 11px;
-    color: var(--muted);
-    padding: 2px 10px;
-    margin: 2px;
-  }
+    .blog-content li {
+      margin-bottom: 8px;
+      line-height: 1.7;
+    }
 
-  .nav-btns {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 40px;
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
-  }
+    .blog-content strong {
+      color: var(--text);
+    }
 
-  .nav-btn {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    transition: all 0.15s;
-  }
+    .callout {
+      background: rgba(0, 212, 170, 0.07);
+      border-left: 3px solid var(--accent2);
+      border-radius: 0 8px 8px 0;
+      padding: 14px 18px;
+      margin: 20px 0;
+      color: #c8c8df;
+      font-size: 14px;
+    }
 
-  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .cta-box {
+      background: linear-gradient(135deg, rgba(108, 99, 255, 0.12), rgba(0, 212, 170, 0.08));
+      border: 1px solid rgba(108, 99, 255, 0.25);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 32px 0 16px;
+      text-align: center;
+    }
 
-  .word-count {
-    font-size: 11px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 2px 8px;
-    color: var(--muted);
-  }
+    .cta-box h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 17px;
+      color: #fff;
+      margin-bottom: 8px;
+    }
 
-  @media (max-width: 900px) {
-    #sidebar { display: none; }
-    #main { padding: 24px 20px; max-width: 100%; }
-    .blog-title { font-size: 22px; }
-  }
-</style>
+    .cta-box p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 24px;
+      border-radius: 6px;
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+    }
+
+    .kw-chip {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 11px;
+      color: var(--muted);
+      padding: 2px 10px;
+      margin: 2px;
+    }
+
+    .nav-btns {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .nav-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      transition: all 0.15s;
+    }
+
+    .nav-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .word-count {
+      font-size: 11px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 8px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      #sidebar {
+        display: none;
+      }
+
+      #main {
+        padding: 24px 20px;
+        max-width: 100%;
+      }
+
+      .blog-title {
+        font-size: 22px;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<nav id="sidebar">
-  <div class="sidebar-logo">
-    <h1>Planorah Blogs</h1>
-    <p>20 SEO Articles · Ready to publish</p>
-  </div>
+  <nav id="sidebar">
+    <div class="sidebar-logo">
+      <h1>Planorah Blogs</h1>
+      <p>20 SEO Articles · Ready to publish</p>
+    </div>
 
-  <div class="tier-label t1"><span class="tier-dot"></span>Tier 1 — Traffic + Conversion</div>
-  <div class="nav-item active" onclick="show(0)"><span class="num">01</span>Web Dev Roadmap 2026</div>
-  <div class="nav-item" onclick="show(1)"><span class="num">02</span>AI Engineer Roadmap</div>
-  <div class="nav-item" onclick="show(2)"><span class="num">03</span>Become a Data Scientist</div>
-  <div class="nav-item" onclick="show(3)"><span class="num">04</span>I Don't Know What to Do</div>
-  <div class="nav-item" onclick="show(4)"><span class="num">05</span>Career Options After 12th</div>
+    <div class="tier-label t1"><span class="tier-dot"></span>Tier 1 — Traffic + Conversion</div>
+    <div class="nav-item active" onclick="show(0)"><span class="num">01</span>Web Dev Roadmap 2026</div>
+    <div class="nav-item" onclick="show(1)"><span class="num">02</span>AI Engineer Roadmap</div>
+    <div class="nav-item" onclick="show(2)"><span class="num">03</span>Become a Data Scientist</div>
+    <div class="nav-item" onclick="show(3)"><span class="num">04</span>I Don't Know What to Do</div>
+    <div class="nav-item" onclick="show(4)"><span class="num">05</span>Career Options After 12th</div>
 
-  <div class="tier-label t2"><span class="tier-dot"></span>Tier 2 — Viral + Brand Trust</div>
-  <div class="nav-item" onclick="show(5)"><span class="num">06</span>Procrastination Cure</div>
-  <div class="nav-item" onclick="show(6)"><span class="num">07</span>Student Burnout Guide</div>
-  <div class="nav-item" onclick="show(7)"><span class="num">08</span>No Motivation to Study</div>
-  <div class="nav-item" onclick="show(8)"><span class="num">09</span>Stop Scrolling, Start Studying</div>
-  <div class="nav-item" onclick="show(9)"><span class="num">10</span>Earn ₹10,000 Online</div>
+    <div class="tier-label t2"><span class="tier-dot"></span>Tier 2 — Viral + Brand Trust</div>
+    <div class="nav-item" onclick="show(5)"><span class="num">06</span>Procrastination Cure</div>
+    <div class="nav-item" onclick="show(6)"><span class="num">07</span>Student Burnout Guide</div>
+    <div class="nav-item" onclick="show(7)"><span class="num">08</span>No Motivation to Study</div>
+    <div class="nav-item" onclick="show(8)"><span class="num">09</span>Stop Scrolling, Start Studying</div>
+    <div class="nav-item" onclick="show(9)"><span class="num">10</span>Earn ₹10,000 Online</div>
 
-  <div class="tier-label t3"><span class="tier-dot"></span>Tier 3 — Evergreen High Volume</div>
-  <div class="nav-item" onclick="show(10)"><span class="num">11</span>Study for Exams in 30 Days</div>
-  <div class="nav-item" onclick="show(11)"><span class="num">12</span>Last 7 Days Before Exams</div>
-  <div class="nav-item" onclick="show(12)"><span class="num">13</span>Best Resume Format Freshers</div>
-  <div class="nav-item" onclick="show(13)"><span class="num">14</span>ATS-Friendly Resume Guide</div>
-  <div class="nav-item" onclick="show(14)"><span class="num">15</span>Get an Internship Zero Experience</div>
+    <div class="tier-label t3"><span class="tier-dot"></span>Tier 3 — Evergreen High Volume</div>
+    <div class="nav-item" onclick="show(10)"><span class="num">11</span>Study for Exams in 30 Days</div>
+    <div class="nav-item" onclick="show(11)"><span class="num">12</span>Last 7 Days Before Exams</div>
+    <div class="nav-item" onclick="show(12)"><span class="num">13</span>Best Resume Format Freshers</div>
+    <div class="nav-item" onclick="show(13)"><span class="num">14</span>ATS-Friendly Resume Guide</div>
+    <div class="nav-item" onclick="show(14)"><span class="num">15</span>Get an Internship Zero Experience</div>
 
-  <div class="tier-label t4"><span class="tier-dot"></span>Tier 4 — Authority Builders</div>
-  <div class="nav-item" onclick="show(15)"><span class="num">16</span>Best AI Tools for Studying</div>
-  <div class="nav-item" onclick="show(16)"><span class="num">17</span>Use ChatGPT to Study Smarter</div>
-  <div class="nav-item" onclick="show(17)"><span class="num">18</span>LinkedIn Profile for Students</div>
-  <div class="nav-item" onclick="show(18)"><span class="num">19</span>GATE 2026 Prep Roadmap</div>
-  <div class="nav-item" onclick="show(19)"><span class="num">20</span>Study 8 Hours Without Burnout</div>
-</nav>
+    <div class="tier-label t4"><span class="tier-dot"></span>Tier 4 — Authority Builders</div>
+    <div class="nav-item" onclick="show(15)"><span class="num">16</span>Best AI Tools for Studying</div>
+    <div class="nav-item" onclick="show(16)"><span class="num">17</span>Use ChatGPT to Study Smarter</div>
+    <div class="nav-item" onclick="show(17)"><span class="num">18</span>LinkedIn Profile for Students</div>
+    <div class="nav-item" onclick="show(18)"><span class="num">19</span>GATE 2026 Prep Roadmap</div>
+    <div class="nav-item" onclick="show(19)"><span class="num">20</span>Study 8 Hours Without Burnout</div>
+  </nav>
 
-<main id="main"></main>
+  <main id="main"></main>
 
-<script>
-const blogs = [
+  <script>
+    const blogs = [
 
-// ─── TIER 1 ───────────────────────────────────────────────────────────
+      // ─── TIER 1 ───────────────────────────────────────────────────────────
 
-{
-tier: 1,
-tierLabel: "Tier 1 — Traffic + Conversion",
-badgeClass: "badge-t1",
-slug: "web-dev-roadmap-2026",
-title: "Web Dev Roadmap 2026: The Honest Guide (No Fluff)",
-metaDesc: "A realistic, step-by-step web development roadmap for 2026. Learn exactly what to study, in what order, and how to get your first job — no fluff, no confusion.",
-keywords: ["web development roadmap 2026", "how to learn web development", "web dev roadmap India", "full stack developer roadmap", "web development for beginners"],
-words: "~870",
-content: `
+      {
+        tier: 1,
+        tierLabel: "Tier 1 — Traffic + Conversion",
+        badgeClass: "badge-t1",
+        slug: "web-dev-roadmap-2026",
+        title: "Web Dev Roadmap 2026: The Honest Guide (No Fluff)",
+        metaDesc: "A realistic, step-by-step web development roadmap for 2026. Learn exactly what to study, in what order, and how to get your first job — no fluff, no confusion.",
+        keywords: ["web development roadmap 2026", "how to learn web development", "web dev roadmap India", "full stack developer roadmap", "web development for beginners"],
+        words: "~870",
+        content: `
 <p>Every year, a thousand "web dev roadmaps" appear online that look like a subway map of Tokyo. You open them, panic, and close the tab. This guide is different. This is the honest, ordered, no-nonsense path to becoming a working web developer in 2026 — written for Indian students who want a real job, not just a certificate.</p>
 
 <h2>First, Understand What "Web Dev" Actually Means in 2026</h2>
@@ -431,19 +498,19 @@ content: `
 💡 The honest truth: Every developer you admire was once confused by CSS box model. The path is the same for everyone. What separates the ones who get hired is showing up every day and building things.
 </div>
 `
-},
+      },
 
-// ─────────────────────────────────────────────────────────────────────
-{
-tier: 1,
-tierLabel: "Tier 1 — Traffic + Conversion",
-badgeClass: "badge-t1",
-slug: "ai-engineer-roadmap-bca-btech",
-title: "AI Engineer Roadmap from Zero to Job (BCA/B.Tech Edition)",
-metaDesc: "A complete, realistic roadmap to become an AI engineer in India — tailored for BCA and B.Tech students. Learn what skills actually matter and how to land your first role.",
-keywords: ["AI engineer roadmap India", "how to become AI engineer", "AI ML roadmap BCA BTech", "machine learning roadmap for beginners", "AI jobs India 2026"],
-words: "~880",
-content: `
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        tier: 1,
+        tierLabel: "Tier 1 — Traffic + Conversion",
+        badgeClass: "badge-t1",
+        slug: "ai-engineer-roadmap-bca-btech",
+        title: "AI Engineer Roadmap from Zero to Job (BCA/B.Tech Edition)",
+        metaDesc: "A complete, realistic roadmap to become an AI engineer in India — tailored for BCA and B.Tech students. Learn what skills actually matter and how to land your first role.",
+        keywords: ["AI engineer roadmap India", "how to become AI engineer", "AI ML roadmap BCA BTech", "machine learning roadmap for beginners", "AI jobs India 2026"],
+        words: "~880",
+        content: `
 <p>AI is the most talked-about career in India right now. And yet most BCA and B.Tech students have no idea where to actually start. The internet will tell you to "learn Python, then ML, then deep learning" — but nobody tells you <em>how long it takes, what to skip, and what actually matters for a job</em>. This guide does.</p>
 
 <h2>Who Is This Roadmap For?</h2>
@@ -517,19 +584,19 @@ content: `
 💡 The fastest path: skip tutorials after the basics. Find a real problem, try to solve it with ML, fail, search for solutions, fail again, solve it. That struggle is worth 10x more than any video course.
 </div>
 `
-},
+      },
 
-// ─────────────────────────────────────────────────────────────────────
-{
-tier: 1,
-tierLabel: "Tier 1 — Traffic + Conversion",
-badgeClass: "badge-t1",
-slug: "how-to-become-data-scientist-india",
-title: "How to Become a Data Scientist in India — Realistic Path",
-metaDesc: "Forget the hype. This is the realistic, step-by-step path to becoming a data scientist in India in 2026 — with honest timelines, salary expectations, and what skills actually matter.",
-keywords: ["how to become data scientist India", "data science roadmap India 2026", "data scientist salary India", "data science for beginners", "data science after graduation India"],
-words: "~850",
-content: `
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        tier: 1,
+        tierLabel: "Tier 1 — Traffic + Conversion",
+        badgeClass: "badge-t1",
+        slug: "how-to-become-data-scientist-india",
+        title: "How to Become a Data Scientist in India — Realistic Path",
+        metaDesc: "Forget the hype. This is the realistic, step-by-step path to becoming a data scientist in India in 2026 — with honest timelines, salary expectations, and what skills actually matter.",
+        keywords: ["how to become data scientist India", "data science roadmap India 2026", "data scientist salary India", "data science for beginners", "data science after graduation India"],
+        words: "~850",
+        content: `
 <p>Data scientist was called "the sexiest job of the 21st century" by Harvard Business Review back in 2012. Over a decade later, it's still one of the most in-demand roles in India — but it's also one of the most misunderstood. This guide cuts through the hype and gives you an honest, India-specific path to getting there.</p>
 
 <h2>What Does a Data Scientist in India Actually Do?</h2>
@@ -589,19 +656,19 @@ content: `
 💡 The single best move: get any data-adjacent internship — even as a data entry analyst or BI intern. Real-world data experience accelerates your learning more than any course.
 </div>
 `
-},
+      },
 
-// ─────────────────────────────────────────────────────────────────────
-{
-tier: 1,
-tierLabel: "Tier 1 — Traffic + Conversion",
-badgeClass: "badge-t1",
-slug: "i-dont-know-what-to-do-in-life",
-title: '"I Don\'t Know What to Do in Life" — A Guide for Confused Students',
-metaDesc: "Feeling lost about your career and future? You're not alone. This honest guide helps confused Indian students find direction, clarity, and a path forward — step by step.",
-keywords: ["confused about career", "don't know what to do in life student", "career guidance India", "how to find your career path", "career confusion after graduation India"],
-words: "~830",
-content: `
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        tier: 1,
+        tierLabel: "Tier 1 — Traffic + Conversion",
+        badgeClass: "badge-t1",
+        slug: "i-dont-know-what-to-do-in-life",
+        title: '"I Don\'t Know What to Do in Life" — A Guide for Confused Students',
+        metaDesc: "Feeling lost about your career and future? You're not alone. This honest guide helps confused Indian students find direction, clarity, and a path forward — step by step.",
+        keywords: ["confused about career", "don't know what to do in life student", "career guidance India", "how to find your career path", "career confusion after graduation India"],
+        words: "~830",
+        content: `
 <p>You're reading this because at some point — maybe right now — you've sat in your room, phone in hand, and thought: <em>"Everyone else seems to know what they're doing. Why don't I?"</em> Maybe you're in your second year of college, or you just graduated, or you're somewhere in between. Either way, this feeling has a name: career confusion. And it is far more common than anyone admits.</p>
 
 <h2>Why You Feel This Way (And Why It's Not Your Fault)</h2>
@@ -656,19 +723,19 @@ content: `
 💡 Use Planorah's Career Roadmap Generator to get a personalized direction based on your skills, interests, and goals — in under 5 minutes.
 </div>
 `
-},
+      },
 
-// ─────────────────────────────────────────────────────────────────────
-{
-tier: 1,
-tierLabel: "Tier 1 — Traffic + Conversion",
-badgeClass: "badge-t1",
-slug: "career-options-after-12th-india-2026",
-title: "Career Options After 12th in India 2026 (The Honest List)",
-metaDesc: "Confused about what to do after 12th? Here's an honest, updated list of the best career options in India for 2026 — with realistic salary ranges, entrance requirements, and future scope.",
-keywords: ["career options after 12th India", "what to do after 12th", "courses after 12th India 2026", "best career after 12th science commerce arts", "career guidance after 12th"],
-words: "~890",
-content: `
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        tier: 1,
+        tierLabel: "Tier 1 — Traffic + Conversion",
+        badgeClass: "badge-t1",
+        slug: "career-options-after-12th-india-2026",
+        title: "Career Options After 12th in India 2026 (The Honest List)",
+        metaDesc: "Confused about what to do after 12th? Here's an honest, updated list of the best career options in India for 2026 — with realistic salary ranges, entrance requirements, and future scope.",
+        keywords: ["career options after 12th India", "what to do after 12th", "courses after 12th India 2026", "best career after 12th science commerce arts", "career guidance after 12th"],
+        words: "~890",
+        content: `
 <p>The question every 17-year-old in India faces: <em>What do I do after 12th?</em> The standard answers — engineering, medicine, CA — haven't changed in 30 years. But India's job market has changed dramatically. This guide gives you an honest look at what's actually worth pursuing in 2026 — across all three streams.</p>
 
 <h2>Before We Start: The Two Biggest Mistakes</h2>
@@ -735,20 +802,20 @@ content: `
 💡 Use Planorah's Career Roadmap Generator to get a personalized path based on your stream, interests, and goals — with step-by-step milestones.
 </div>
 `
-},
+      },
 
-// ─── TIER 2 ───────────────────────────────────────────────────────────
+      // ─── TIER 2 ───────────────────────────────────────────────────────────
 
-{
-tier: 2,
-tierLabel: "Tier 2 — Viral + Brand Trust",
-badgeClass: "badge-t2",
-slug: "procrastination-cure",
-title: "Procrastination Cure: Why You Do It and How to Actually Stop",
-metaDesc: "Procrastination isn't a time management problem — it's an emotional one. Here's the science of why you procrastinate and practical methods that actually work.",
-keywords: ["how to stop procrastinating", "procrastination cure", "why do I procrastinate", "overcome procrastination student", "procrastination tips India"],
-words: "~810",
-content: `
+      {
+        tier: 2,
+        tierLabel: "Tier 2 — Viral + Brand Trust",
+        badgeClass: "badge-t2",
+        slug: "procrastination-cure",
+        title: "Procrastination Cure: Why You Do It and How to Actually Stop",
+        metaDesc: "Procrastination isn't a time management problem — it's an emotional one. Here's the science of why you procrastinate and practical methods that actually work.",
+        keywords: ["how to stop procrastinating", "procrastination cure", "why do I procrastinate", "overcome procrastination student", "procrastination tips India"],
+        words: "~810",
+        content: `
 <p>You've read 14 articles about procrastination. You've downloaded four productivity apps. You've made three "fresh start" Monday schedules. And yet — here you are, reading another article about procrastination instead of doing the thing you're supposed to be doing.</p>
 <p>Here's why nothing has worked so far: almost everything you've been told about procrastination is wrong.</p>
 
@@ -792,19 +859,19 @@ content: `
 💡 Procrastination often points to an unclear path. When you know exactly what to do next, starting becomes easier. Planorah's Study Planner and Roadmap Generator give you a clear, step-by-step plan — so the next task is never a mystery.
 </div>
 `
-},
+      },
 
-// ─────────────────────────────────────────────────────────────────────
-{
-tier: 2,
-tierLabel: "Tier 2 — Viral + Brand Trust",
-badgeClass: "badge-t2",
-slug: "student-burnout-guide",
-title: "Student Burnout: Signs, Causes, and the Recovery Plan",
-metaDesc: "Student burnout is real and rising in India. Learn to recognize the signs, understand what causes it, and follow a practical recovery plan to regain your energy and focus.",
-keywords: ["student burnout India", "how to recover from burnout", "signs of burnout student", "burnout vs laziness", "student mental health India"],
-words: "~820",
-content: `
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        tier: 2,
+        tierLabel: "Tier 2 — Viral + Brand Trust",
+        badgeClass: "badge-t2",
+        slug: "student-burnout-guide",
+        title: "Student Burnout: Signs, Causes, and the Recovery Plan",
+        metaDesc: "Student burnout is real and rising in India. Learn to recognize the signs, understand what causes it, and follow a practical recovery plan to regain your energy and focus.",
+        keywords: ["student burnout India", "how to recover from burnout", "signs of burnout student", "burnout vs laziness", "student mental health India"],
+        words: "~820",
+        content: `
 <p>There's a version of burnout that nobody warns you about — the kind that doesn't look like collapse. You're still attending classes, still submitting assignments, still doing "fine" from the outside. But inside, you feel nothing. No motivation, no enthusiasm, no sense that any of it matters. That's burnout, and it is quietly affecting millions of Indian students.</p>
 
 <h2>Burnout vs. Laziness: The Critical Distinction</h2>
@@ -865,19 +932,19 @@ content: `
 💡 The students who avoid burnout aren't the ones who work less — they're the ones who work smarter with better structure. Planorah's Study Planner helps you build sustainable study schedules that protect your energy as much as your grades.
 </div>
 `
-},
+      },
 
-// ─────────────────────────────────────────────────────────────────────
-{
-tier: 2,
-tierLabel: "Tier 2 — Viral + Brand Trust",
-badgeClass: "badge-t2",
-slug: "no-motivation-to-study",
-title: "No Motivation to Study? Here's What's Actually Happening in Your Brain",
-metaDesc: "Lost all motivation to study? It's not about discipline — it's neuroscience. Here's what's actually happening and how to get your drive back.",
-keywords: ["no motivation to study", "how to get motivation to study", "lost motivation student", "why am I not motivated to study", "study motivation tips"],
-words: "~800",
-content: `
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        tier: 2,
+        tierLabel: "Tier 2 — Viral + Brand Trust",
+        badgeClass: "badge-t2",
+        slug: "no-motivation-to-study",
+        title: "No Motivation to Study? Here's What's Actually Happening in Your Brain",
+        metaDesc: "Lost all motivation to study? It's not about discipline — it's neuroscience. Here's what's actually happening and how to get your drive back.",
+        keywords: ["no motivation to study", "how to get motivation to study", "lost motivation student", "why am I not motivated to study", "study motivation tips"],
+        words: "~800",
+        content: `
 <p>You open your textbook. You stare at it. You close it. You open YouTube. You feel guilty. You open your textbook again. You stare at it longer. You close it. Sound familiar?</p>
 <p>This isn't a character flaw. This is your brain doing exactly what it was designed to do — and understanding that design is the first step to working with it instead of against it.</p>
 
@@ -919,19 +986,19 @@ content: `
 💡 Motivation is easier when you know exactly what you're working toward. Planorah's Study Planner creates a daily plan so clear that the next step is never unclear — removing one of the biggest motivation killers.
 </div>
 `
-},
+      },
 
-// ─────────────────────────────────────────────────────────────────────
-{
-tier: 2,
-tierLabel: "Tier 2 — Viral + Brand Trust",
-badgeClass: "badge-t2",
-slug: "stop-scrolling-start-studying",
-title: "How to Stop Scrolling and Start Studying (5-Step Method)",
-metaDesc: "Can't stop scrolling? You're not weak — your phone is designed to hook you. Here's a 5-step system to break the scroll habit and actually study.",
-keywords: ["how to stop scrolling and study", "phone addiction student", "stop social media addiction", "how to focus on studies", "screen time student India"],
-words: "~760",
-content: `
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        tier: 2,
+        tierLabel: "Tier 2 — Viral + Brand Trust",
+        badgeClass: "badge-t2",
+        slug: "stop-scrolling-start-studying",
+        title: "How to Stop Scrolling and Start Studying (5-Step Method)",
+        metaDesc: "Can't stop scrolling? You're not weak — your phone is designed to hook you. Here's a 5-step system to break the scroll habit and actually study.",
+        keywords: ["how to stop scrolling and study", "phone addiction student", "stop social media addiction", "how to focus on studies", "screen time student India"],
+        words: "~760",
+        content: `
 <p>The average Indian college student spends 6–7 hours per day on their phone. This isn't a discipline problem. It's a design problem. Instagram, YouTube, and Reels are built by teams of engineers and behavioral scientists specifically to make you stay. Your willpower never stood a chance — until you change the game.</p>
 
 <h2>Why Willpower Alone Always Fails</h2>
@@ -975,19 +1042,19 @@ content: `
 💡 Once you've freed up time, you need a plan for it. Planorah's Study Planner turns your newly reclaimed hours into structured, progress-tracking study sessions.
 </div>
 `
-},
+      },
 
-// ─────────────────────────────────────────────────────────────────────
-{
-tier: 2,
-tierLabel: "Tier 2 — Viral + Brand Trust",
-badgeClass: "badge-t2",
-slug: "earn-first-10000-online-student",
-title: "How to Earn Your First ₹10,000 Online as a Student",
-metaDesc: "A realistic, no-BS guide to earning your first ₹10,000 online as an Indian student — with actual methods that work, estimated timeframes, and how to get started today.",
-keywords: ["earn money online student India", "how to make money online student", "freelancing for students India", "online income student", "earn 10000 online India"],
-words: "~820",
-content: `
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        tier: 2,
+        tierLabel: "Tier 2 — Viral + Brand Trust",
+        badgeClass: "badge-t2",
+        slug: "earn-first-10000-online-student",
+        title: "How to Earn Your First ₹10,000 Online as a Student",
+        metaDesc: "A realistic, no-BS guide to earning your first ₹10,000 online as an Indian student — with actual methods that work, estimated timeframes, and how to get started today.",
+        keywords: ["earn money online student India", "how to make money online student", "freelancing for students India", "online income student", "earn 10000 online India"],
+        words: "~820",
+        content: `
 <p>₹10,000. For most Indian students, that's a semester's pocket money or a few months of phone bills. But earning your first ₹10,000 online isn't just about the money — it's the proof that your skills have real-world value. And that proof changes how you think about your future completely.</p>
 <p>This guide is realistic. No crypto, no "refer 50 friends," no passive income myths. Just actual methods that Indian students have used to earn their first money online.</p>
 
@@ -1030,20 +1097,20 @@ content: `
 💡 Your portfolio is the key to your first freelance gig. Build it on Planorah's Portfolio Builder — a free, professional showcase for your work that you can send to any potential client.
 </div>
 `
-},
+      },
 
-// ─── TIER 3 ───────────────────────────────────────────────────────────
+      // ─── TIER 3 ───────────────────────────────────────────────────────────
 
-{
-tier: 3,
-tierLabel: "Tier 3 — Evergreen High Volume",
-badgeClass: "badge-t3",
-slug: "how-to-study-30-days",
-title: "How to Study for Exams in 30 Days (The Only Guide You Need)",
-metaDesc: "A complete 30-day study plan for exam preparation — with week-by-week strategy, study techniques, and a daily schedule that actually works for Indian students.",
-keywords: ["how to study for exams", "30 day study plan", "exam preparation guide India", "study plan for exam", "how to prepare for exams in 1 month"],
-words: "~820",
-content: `
+      {
+        tier: 3,
+        tierLabel: "Tier 3 — Evergreen High Volume",
+        badgeClass: "badge-t3",
+        slug: "how-to-study-30-days",
+        title: "How to Study for Exams in 30 Days (The Only Guide You Need)",
+        metaDesc: "A complete 30-day study plan for exam preparation — with week-by-week strategy, study techniques, and a daily schedule that actually works for Indian students.",
+        keywords: ["how to study for exams", "30 day study plan", "exam preparation guide India", "study plan for exam", "how to prepare for exams in 1 month"],
+        words: "~820",
+        content: `
 <p>Thirty days to exams feels like either a lot of time (if you're calm) or no time at all (if you're anxious). The students who do well in exams aren't necessarily the smartest — they're the ones with a clear strategy and the ability to execute it without panicking. This guide gives you exactly that.</p>
 
 <h2>The Core Principle: Revision > First-Time Reading</h2>
@@ -1087,19 +1154,19 @@ content: `
 💡 Use Planorah's Study Planner to build your personalized 30-day schedule — with daily tasks, topic tracking, and progress visualization so you always know exactly where you stand.
 </div>
 `
-},
+      },
 
-// ─────────────────────────────────────────────────────────────────────
-{
-tier: 3,
-tierLabel: "Tier 3 — Evergreen High Volume",
-badgeClass: "badge-t3",
-slug: "last-7-days-before-exams",
-title: "Last 7 Days Before Exams: The Exact Strategy Toppers Use",
-metaDesc: "The final 7 days before your exam can make or break your result. Here's the exact, day-by-day strategy that top-scoring students use to maximize their marks in the final stretch.",
-keywords: ["last 7 days exam strategy", "exam preparation last week", "topper strategy before exam", "how to study in last week before exam", "exam tips India"],
-words: "~780",
-content: `
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        tier: 3,
+        tierLabel: "Tier 3 — Evergreen High Volume",
+        badgeClass: "badge-t3",
+        slug: "last-7-days-before-exams",
+        title: "Last 7 Days Before Exams: The Exact Strategy Toppers Use",
+        metaDesc: "The final 7 days before your exam can make or break your result. Here's the exact, day-by-day strategy that top-scoring students use to maximize their marks in the final stretch.",
+        keywords: ["last 7 days exam strategy", "exam preparation last week", "topper strategy before exam", "how to study in last week before exam", "exam tips India"],
+        words: "~780",
+        content: `
 <p>The last 7 days before an exam are not about learning new things. They are about converting what you already know into marks. Most students get this wrong — they spend these days in a panic, re-reading everything, and going into the exam room exhausted and confused. Toppers do something entirely different.</p>
 
 <h2>The Core Mindset Shift</h2>
@@ -1133,19 +1200,19 @@ content: `
 💡 A 7-day exam sprint is powerful only when your 30-day preparation is solid. Planorah's Study Planner helps you build the full preparation schedule so the last 7 days are confident, not chaotic.
 </div>
 `
-},
+      },
 
-// ─────────────────────────────────────────────────────────────────────
-{
-tier: 3,
-tierLabel: "Tier 3 — Evergreen High Volume",
-badgeClass: "badge-t3",
-slug: "best-resume-format-freshers-2026",
-title: "Best Resume Format for Freshers in 2026 (With Real Examples)",
-metaDesc: "As a fresher in 2026, your resume needs to work harder than ever. Here's the best resume format, structure, and tips — including what Indian recruiters actually look for.",
-keywords: ["best resume format freshers India", "fresher resume 2026", "how to make resume for fresher", "resume format for fresh graduates India", "first job resume tips"],
-words: "~840",
-content: `
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        tier: 3,
+        tierLabel: "Tier 3 — Evergreen High Volume",
+        badgeClass: "badge-t3",
+        slug: "best-resume-format-freshers-2026",
+        title: "Best Resume Format for Freshers in 2026 (With Real Examples)",
+        metaDesc: "As a fresher in 2026, your resume needs to work harder than ever. Here's the best resume format, structure, and tips — including what Indian recruiters actually look for.",
+        keywords: ["best resume format freshers India", "fresher resume 2026", "how to make resume for fresher", "resume format for fresh graduates India", "first job resume tips"],
+        words: "~840",
+        content: `
 <p>Most fresher resumes are rejected in under 10 seconds. Not because the candidate isn't qualified — but because the resume is structured in a way that buries the most important information or looks like every other resume in the pile. Here's how to build one that actually gets read.</p>
 
 <h2>The Golden Rule: One Page</h2>
@@ -1211,19 +1278,19 @@ content: `
 💡 Build your ATS-optimized resume in minutes with Planorah's Resume Builder — featuring fresher-specific templates, AI suggestions, and one-click PDF export.
 </div>
 `
-},
+      },
 
-// ─────────────────────────────────────────────────────────────────────
-{
-tier: 3,
-tierLabel: "Tier 3 — Evergreen High Volume",
-badgeClass: "badge-t3",
-slug: "ats-friendly-resume-guide",
-title: "ATS-Friendly Resume Guide: How to Beat the Bots in 2026",
-metaDesc: "Most resumes are rejected by ATS software before a human ever reads them. Here's how to write an ATS-friendly resume that gets past the bots and into recruiters' hands.",
-keywords: ["ATS friendly resume India", "how to beat ATS resume", "applicant tracking system resume tips", "ATS resume 2026", "resume ATS optimization India"],
-words: "~800",
-content: `
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        tier: 3,
+        tierLabel: "Tier 3 — Evergreen High Volume",
+        badgeClass: "badge-t3",
+        slug: "ats-friendly-resume-guide",
+        title: "ATS-Friendly Resume Guide: How to Beat the Bots in 2026",
+        metaDesc: "Most resumes are rejected by ATS software before a human ever reads them. Here's how to write an ATS-friendly resume that gets past the bots and into recruiters' hands.",
+        keywords: ["ATS friendly resume India", "how to beat ATS resume", "applicant tracking system resume tips", "ATS resume 2026", "resume ATS optimization India"],
+        words: "~800",
+        content: `
 <p>You spent three hours perfecting your resume. You applied to 40 companies. You heard back from two. Here's what likely happened: your resume was rejected by an Applicant Tracking System (ATS) before any human ever read it. In 2026, this is the reality for most Indian job seekers — especially in large companies, MNCs, and high-volume hiring roles.</p>
 
 <h2>What Is an ATS and Why Should You Care?</h2>
@@ -1275,19 +1342,19 @@ content: `
 💡 Planorah's Resume Builder automatically optimizes your resume for ATS — with keyword suggestions, format checking, and role-specific tailoring built in.
 </div>
 `
-},
+      },
 
-// ─────────────────────────────────────────────────────────────────────
-{
-tier: 3,
-tierLabel: "Tier 3 — Evergreen High Volume",
-badgeClass: "badge-t3",
-slug: "get-internship-zero-experience",
-title: "How to Get an Internship With Zero Experience",
-metaDesc: "No experience, no internship. No internship, no experience. Here's how to break this loop and land your first internship as a student — even with zero prior work history.",
-keywords: ["how to get internship with no experience", "first internship India student", "internship tips freshers India", "how to find internship", "internship for students India 2026"],
-words: "~810",
-content: `
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        tier: 3,
+        tierLabel: "Tier 3 — Evergreen High Volume",
+        badgeClass: "badge-t3",
+        slug: "get-internship-zero-experience",
+        title: "How to Get an Internship With Zero Experience",
+        metaDesc: "No experience, no internship. No internship, no experience. Here's how to break this loop and land your first internship as a student — even with zero prior work history.",
+        keywords: ["how to get internship with no experience", "first internship India student", "internship tips freshers India", "how to find internship", "internship for students India 2026"],
+        words: "~810",
+        content: `
 <p>The most frustrating paradox in every student's career: companies want experience. But to get experience, you need a company to take a chance on you. How do you break in? The answer is not to wait or to apply and hope. It's to change what you're offering before you apply.</p>
 
 <h2>Why "Zero Experience" Is a Story, Not a Fact</h2>
@@ -1332,20 +1399,20 @@ content: `
 💡 Build your portfolio before you apply. Planorah's Portfolio Builder lets you create a professional, shareable portfolio in under 30 minutes — no design skills needed.
 </div>
 `
-},
+      },
 
-// ─── TIER 4 ───────────────────────────────────────────────────────────
+      // ─── TIER 4 ───────────────────────────────────────────────────────────
 
-{
-tier: 4,
-tierLabel: "Tier 4 — Authority Builders",
-badgeClass: "badge-t4",
-slug: "best-ai-tools-studying-2026",
-title: "Best AI Tools for Studying in 2026 (Free + Paid)",
-metaDesc: "A curated, honest list of the best AI tools for studying in 2026 — tested for Indian students. Includes free and paid options for note-taking, research, flashcards, and more.",
-keywords: ["best AI tools for studying 2026", "AI tools for students India", "AI study tools free", "AI for students", "best AI apps for learning"],
-words: "~810",
-content: `
+      {
+        tier: 4,
+        tierLabel: "Tier 4 — Authority Builders",
+        badgeClass: "badge-t4",
+        slug: "best-ai-tools-studying-2026",
+        title: "Best AI Tools for Studying in 2026 (Free + Paid)",
+        metaDesc: "A curated, honest list of the best AI tools for studying in 2026 — tested for Indian students. Includes free and paid options for note-taking, research, flashcards, and more.",
+        keywords: ["best AI tools for studying 2026", "AI tools for students India", "AI study tools free", "AI for students", "best AI apps for learning"],
+        words: "~810",
+        content: `
 <p>AI tools for students went from novelty to necessity between 2023 and 2026. The right combination of tools can cut your study time in half and dramatically improve comprehension. But the market is flooded with tools — most of which are either overhyped, overpriced, or both. Here's a tested, honest list of what actually works for Indian students.</p>
 
 <h2>The Golden Rule Before We Start</h2>
@@ -1403,19 +1470,19 @@ content: `
 💡 Planorah integrates with your study workflow — combining roadmap planning, daily study scheduling, and progress tracking in one place. AI tools work best when they're part of a structured system.
 </div>
 `
-},
+      },
 
-// ─────────────────────────────────────────────────────────────────────
-{
-tier: 4,
-tierLabel: "Tier 4 — Authority Builders",
-badgeClass: "badge-t4",
-slug: "how-to-use-chatgpt-study-smarter",
-title: "How to Use ChatGPT to Study Smarter (Not Cheat)",
-metaDesc: "ChatGPT is the most powerful study tool most students are using wrong. Here's how to use it to genuinely learn faster, understand deeper, and prepare better — not to cheat.",
-keywords: ["how to use ChatGPT to study", "ChatGPT for students India", "study smarter with AI", "ChatGPT study tips", "AI study assistant India"],
-words: "~790",
-content: `
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        tier: 4,
+        tierLabel: "Tier 4 — Authority Builders",
+        badgeClass: "badge-t4",
+        slug: "how-to-use-chatgpt-study-smarter",
+        title: "How to Use ChatGPT to Study Smarter (Not Cheat)",
+        metaDesc: "ChatGPT is the most powerful study tool most students are using wrong. Here's how to use it to genuinely learn faster, understand deeper, and prepare better — not to cheat.",
+        keywords: ["how to use ChatGPT to study", "ChatGPT for students India", "study smarter with AI", "ChatGPT study tips", "AI study assistant India"],
+        words: "~790",
+        content: `
 <p>Most students use ChatGPT the same way they use Google — they ask it a question, copy the answer, and move on. This approach teaches you nothing and creates a dangerous dependence on a tool that isn't always right. The students who actually benefit from ChatGPT use it like a tutor, a study partner, and a sparring partner — not like a homework machine.</p>
 
 <h2>The Right Mental Model</h2>
@@ -1468,19 +1535,19 @@ content: `
 💡 Combine AI-powered learning with structured planning. Planorah's Study Planner helps you organize what to study; AI tools like ChatGPT help you understand it deeply. Together, they're unbeatable.
 </div>
 `
-},
+      },
 
-// ─────────────────────────────────────────────────────────────────────
-{
-tier: 4,
-tierLabel: "Tier 4 — Authority Builders",
-badgeClass: "badge-t4",
-slug: "linkedin-profile-students-2026",
-title: "LinkedIn Profile for Students: The Complete 2026 Makeover Guide",
-metaDesc: "A step-by-step LinkedIn profile optimization guide for Indian students in 2026 — covering every section, connection strategy, and content tips to get noticed by recruiters.",
-keywords: ["LinkedIn profile for students India", "how to make LinkedIn profile student", "LinkedIn tips freshers 2026", "LinkedIn optimization India", "LinkedIn for college students"],
-words: "~820",
-content: `
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        tier: 4,
+        tierLabel: "Tier 4 — Authority Builders",
+        badgeClass: "badge-t4",
+        slug: "linkedin-profile-students-2026",
+        title: "LinkedIn Profile for Students: The Complete 2026 Makeover Guide",
+        metaDesc: "A step-by-step LinkedIn profile optimization guide for Indian students in 2026 — covering every section, connection strategy, and content tips to get noticed by recruiters.",
+        keywords: ["LinkedIn profile for students India", "how to make LinkedIn profile student", "LinkedIn tips freshers 2026", "LinkedIn optimization India", "LinkedIn for college students"],
+        words: "~820",
+        content: `
 <p>Most Indian students create a LinkedIn profile, fill in their education, add a few skills, and then wonder why nothing happens. LinkedIn is not a resume database. It's a networking and visibility engine — but only if you know how to use it. Here's how to build a profile that attracts recruiters, generates opportunities, and positions you as someone worth watching — even as a student.</p>
 
 <h2>Why LinkedIn Matters More Than Ever for Students</h2>
@@ -1532,19 +1599,19 @@ content: `
 💡 Your LinkedIn profile is one part of your professional identity. Planorah's Portfolio Builder helps you build the other part — a custom website that showcases your work beyond what LinkedIn allows.
 </div>
 `
-},
+      },
 
-// ─────────────────────────────────────────────────────────────────────
-{
-tier: 4,
-tierLabel: "Tier 4 — Authority Builders",
-badgeClass: "badge-t4",
-slug: "gate-2026-preparation-roadmap",
-title: "GATE 2026 Preparation Roadmap from Scratch (6-Month Plan)",
-metaDesc: "A complete, realistic 6-month GATE 2026 preparation roadmap for CSE, ECE, and other branches — with subject-wise strategy, resource list, and monthly milestones.",
-keywords: ["GATE 2026 preparation", "GATE exam roadmap", "how to prepare for GATE", "GATE preparation from scratch", "GATE CSE preparation plan"],
-words: "~850",
-content: `
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        tier: 4,
+        tierLabel: "Tier 4 — Authority Builders",
+        badgeClass: "badge-t4",
+        slug: "gate-2026-preparation-roadmap",
+        title: "GATE 2026 Preparation Roadmap from Scratch (6-Month Plan)",
+        metaDesc: "A complete, realistic 6-month GATE 2026 preparation roadmap for CSE, ECE, and other branches — with subject-wise strategy, resource list, and monthly milestones.",
+        keywords: ["GATE 2026 preparation", "GATE exam roadmap", "how to prepare for GATE", "GATE preparation from scratch", "GATE CSE preparation plan"],
+        words: "~850",
+        content: `
 <p>GATE is one of the most valuable exams an engineering student can crack — it opens doors to M.Tech at IITs/NITs, PSU jobs with starting salaries of ₹8–12 LPA, and research careers. But most students either start too late, study without direction, or burn out halfway through. This 6-month roadmap is built to avoid all three.</p>
 
 <h2>Understanding GATE Before You Start</h2>
@@ -1598,19 +1665,19 @@ content: `
 💡 Planorah's Study Planner can generate a customized GATE preparation schedule based on your exam date, current level per subject, and daily available hours. Start your plan in under 5 minutes.
 </div>
 `
-},
+      },
 
-// ─────────────────────────────────────────────────────────────────────
-{
-tier: 4,
-tierLabel: "Tier 4 — Authority Builders",
-badgeClass: "badge-t4",
-slug: "study-8-hours-without-burnout",
-title: "How to Study 8 Hours a Day Without Burning Out",
-metaDesc: "Studying 8 hours a day is possible — but only with the right structure, breaks, and mental approach. Here's how top Indian students sustain long study days without losing motivation or health.",
-keywords: ["how to study 8 hours a day", "long study hours tips", "study marathon tips India", "how to focus for long hours", "productive study tips India"],
-words: "~800",
-content: `
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        tier: 4,
+        tierLabel: "Tier 4 — Authority Builders",
+        badgeClass: "badge-t4",
+        slug: "study-8-hours-without-burnout",
+        title: "How to Study 8 Hours a Day Without Burning Out",
+        metaDesc: "Studying 8 hours a day is possible — but only with the right structure, breaks, and mental approach. Here's how top Indian students sustain long study days without losing motivation or health.",
+        keywords: ["how to study 8 hours a day", "long study hours tips", "study marathon tips India", "how to focus for long hours", "productive study tips India"],
+        words: "~800",
+        content: `
 <p>Eight hours of studying sounds like a lot. And done wrong — with your phone nearby, no structure, and no breaks — it is. Genuinely unproductive, draining, and demoralizing. Done right, 8 hours of studying per day is not only achievable — it's what separates GATE toppers, IIT aspirants, and UPSC qualifiers from the rest. The difference is architecture, not willpower.</p>
 
 <h2>First: What "8 Hours" Actually Means</h2>
@@ -1664,25 +1731,25 @@ content: `
 💡 An 8-hour study day needs a clear, pre-planned schedule to fill productively. Planorah's Study Planner generates your daily study schedule based on your syllabus, exam date, and daily hours — so you never waste time deciding what to study next.
 </div>
 `
-}
+      }
 
-]; // end of blogs array
+    ]; // end of blogs array
 
-let current = 0;
+    let current = 0;
 
-function show(index) {
-  current = index;
-  const b = blogs[index];
-  const main = document.getElementById('main');
+    function show(index) {
+      current = index;
+      const b = blogs[index];
+      const main = document.getElementById('main');
 
-  // Update nav active state
-  document.querySelectorAll('.nav-item').forEach((el, i) => {
-    el.classList.toggle('active', i === index);
-  });
+      // Update nav active state
+      document.querySelectorAll('.nav-item').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+      });
 
-  const kwHtml = b.keywords.map(k => `<span class="kw-chip">${k}</span>`).join('');
+      const kwHtml = b.keywords.map(k => `<span class="kw-chip">${k}</span>`).join('');
 
-  main.innerHTML = `
+      main.innerHTML = `
     <div class="blog-header">
       <div class="meta-row">
         <span class="tier-badge ${b.badgeClass}">${b.tierLabel}</span>
@@ -1713,11 +1780,12 @@ function show(index) {
     </div>
   `;
 
-  main.scrollTop = 0;
-}
+      main.scrollTop = 0;
+    }
 
-// Initialize
-show(0);
-</script>
+    // Initialize
+    show(0);
+  </script>
 </body>
+
 </html>

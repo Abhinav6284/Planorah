@@ -67,49 +67,49 @@ const ProgressPanel = ({ tasks, stats }) => {
     const center = ringSize / 2;
 
     return (
-        <div className="space-y-3">
+        <div className="space-y-6">
             {/* XP Progress Card */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-[#121212]">
-                <div className="mb-3 flex items-center justify-between">
+            <div className="rounded-2xl border border-borderMuted/50 bg-gradient-to-br from-white/80 to-beigePrimary/40 backdrop-blur-xl p-5 shadow-soft dark:border-white/5 dark:bg-gradient-to-br dark:from-[#1a1a1a]/80 dark:to-[#0f0f0f]/80 dark:shadow-darkSoft">
+                <div className="mb-4 flex items-center justify-between">
                     <div>
-                        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Your Level</h3>
-                        <p className="mt-1 text-xl font-bold text-slate-900 dark:text-white">
+                        <h3 className="text-[11px] font-bold uppercase tracking-widest text-terracotta dark:text-terracotta/80">Your Level</h3>
+                        <p className="mt-2 text-2xl font-bold text-textPrimary dark:text-white">
                             ⚡ {xpData.current.level}
                         </p>
                     </div>
                     <div className="text-right">
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Total XP</p>
-                        <p className="text-base font-bold text-slate-900 dark:text-white">{xpData.xpTotal}</p>
+                        <p className="text-xs text-textSecondary dark:text-slate-400">Total XP</p>
+                        <p className="text-lg font-bold text-textPrimary dark:text-white">{xpData.xpTotal}</p>
                     </div>
                 </div>
 
                 {xpData.next && (
                     <>
-                        <div className="mb-2 flex items-center justify-between text-xs">
-                            <span className="text-slate-600 dark:text-slate-400">
+                        <div className="mb-3 flex items-center justify-between text-xs">
+                            <span className="font-medium text-textSecondary dark:text-slate-400">
                                 Progress to {xpData.next.level}
                             </span>
-                            <span className="font-semibold text-slate-700 dark:text-slate-300">
+                            <span className="font-bold text-textPrimary dark:text-slate-200">
                                 {xpData.remaining} XP left
                             </span>
                         </div>
-                        <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
+                        <div className="h-2.5 overflow-hidden rounded-full bg-beigeMuted/60 dark:bg-white/10">
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${xpData.percent}%` }}
-                                transition={{ duration: 1, ease: "easeOut" }}
-                                className="h-full rounded-full bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400"
+                                transition={{ duration: 1.2, ease: "easeOut" }}
+                                className="h-full rounded-full bg-gradient-to-r from-terracotta to-terracottaHover shadow-lg shadow-terracotta/30 dark:from-terracotta dark:to-terracotta/80"
                             />
                         </div>
-                        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                        <p className="mt-2.5 text-xs text-textSecondary dark:text-slate-400">
                             {xpData.xpInCurrentLevel} / {xpData.next.min - xpData.current.min} XP in current level
                         </p>
                     </>
                 )}
 
                 {!xpData.next && (
-                    <div className="rounded-xl bg-gradient-to-r from-yellow-100 to-amber-100 p-3 text-center dark:from-yellow-500/20 dark:to-amber-500/20">
-                        <p className="text-sm font-bold text-amber-900 dark:text-amber-200">
+                    <div className="rounded-xl bg-gradient-to-r from-terracotta/20 to-sage/20 p-4 text-center dark:from-terracotta/10 dark:to-sage/10">
+                        <p className="text-sm font-bold text-terracotta dark:text-terracotta/80">
                             🎖️ Max Level Reached!
                         </p>
                     </div>
@@ -117,47 +117,47 @@ const ProgressPanel = ({ tasks, stats }) => {
             </div>
 
             {/* Today Progress */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-[#121212]">
-                <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Today's Focus</h3>
+            <div className="rounded-2xl border border-borderMuted/50 bg-gradient-to-br from-white/80 to-beigePrimary/40 backdrop-blur-xl p-5 shadow-soft dark:border-white/5 dark:bg-gradient-to-br dark:from-[#1a1a1a]/80 dark:to-[#0f0f0f]/80 dark:shadow-darkSoft">
+                <h3 className="mb-4 text-[11px] font-bold uppercase tracking-widest text-terracotta dark:text-terracotta/80">Today's Focus</h3>
                 <div className="flex items-center gap-4">
                     <div className="relative h-16 w-16">
                         <svg className="h-full w-full -rotate-90 transform" viewBox={`0 0 ${ringSize} ${ringSize}`}>
-                            <circle cx={center} cy={center} r={radius} fill="none" strokeWidth="6" className="stroke-slate-100 dark:stroke-white/10" />
+                            <circle cx={center} cy={center} r={radius} fill="none" strokeWidth="6" className="stroke-beigeMuted dark:stroke-white/10" />
                             <circle
                                 cx={center} cy={center} r={radius} fill="none" strokeWidth="6"
                                 strokeDasharray={circumference}
                                 strokeDashoffset={offset}
                                 strokeLinecap="round"
-                                className="stroke-blue-600 transition-all duration-1000 dark:stroke-white"
+                                className="stroke-terracotta transition-all duration-1000 dark:stroke-terracotta"
                             />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-base font-bold text-slate-900 dark:text-white">{todayData.percent}%</span>
+                            <span className="text-lg font-bold text-textPrimary dark:text-white">{todayData.percent}%</span>
                         </div>
                     </div>
                     <div>
-                        <p className="text-xl font-bold text-slate-900 dark:text-white">
-                            {todayData.completed}<span className="text-slate-400">/{todayData.total}</span>
+                        <p className="text-2xl font-bold text-textPrimary dark:text-white">
+                            {todayData.completed}<span className="text-textSecondary dark:text-slate-400">/{todayData.total}</span>
                         </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Missions completed</p>
+                        <p className="text-xs text-textSecondary dark:text-slate-400">Missions completed</p>
                     </div>
                 </div>
             </div>
 
             {/* Heatmap */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-[#121212]">
-                <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Weekly Consistency</h3>
+            <div className="rounded-2xl border border-borderMuted/50 bg-gradient-to-br from-white/80 to-beigePrimary/40 backdrop-blur-xl p-5 shadow-soft dark:border-white/5 dark:bg-gradient-to-br dark:from-[#1a1a1a]/80 dark:to-[#0f0f0f]/80 dark:shadow-darkSoft">
+                <h3 className="mb-4 text-[11px] font-bold uppercase tracking-widest text-terracotta dark:text-terracotta/80">Weekly Consistency</h3>
                 <div className="flex justify-between gap-1">
                     {heatmap.map((day, i) => (
                         <div key={i} className="flex flex-col items-center gap-2">
                             <div
                                 className={`h-7 w-full rounded-md transition-colors ${day.count > 0
-                                        ? `bg-emerald-500 ${day.count > 2 ? 'opacity-100' : 'opacity-70'}`
-                                        : 'bg-slate-100 dark:bg-white/5'
+                                        ? `bg-gradient-to-br from-terracotta to-terracottaHover ${day.count > 2 ? 'opacity-100' : 'opacity-70'}`
+                                        : 'bg-beigeMuted/50 dark:bg-white/5'
                                     }`}
                                 style={{ width: '100%' }}
                             />
-                            <span className="text-[10px] font-medium text-slate-400">{day.label}</span>
+                            <span className="text-[10px] font-medium text-textSecondary dark:text-slate-400">{day.label}</span>
                         </div>
                     ))}
                 </div>

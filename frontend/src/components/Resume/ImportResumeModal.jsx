@@ -32,7 +32,6 @@ export default function ImportResumeModal({ isOpen, onClose, onSuccess }) {
     };
 
     const handleFile = (selectedFile) => {
-        const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
         const validExtensions = ['.pdf', '.docx', '.txt'];
 
         const ext = selectedFile.name.toLowerCase().slice(selectedFile.name.lastIndexOf('.'));
