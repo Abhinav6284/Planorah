@@ -131,4 +131,37 @@
   .dark .onboarding-input[type="date"] {
     color-scheme: dark;
   }
+
+  .planorah-blog-content {
+    @apply text-slate-700 dark:text-slate-300;
+  }
+
+  .planorah-blog-content h2 {
+    @apply mt-8 mb-3 text-2xl md:text-3xl font-bold text-slate-900 dark:text-white;
+  }
+
+  .planorah-blog-content h3 {
+    @apply mt-6 mb-2 text-xl font-semibold text-slate-900 dark:text-slate-100;
+  }
+
+  .planorah-blog-content p {
+    @apply mb-4 text-base leading-8;
+  }
+
+  .planorah-blog-content ul,
+  .planorah-blog-content ol {
+    @apply mb-5 pl-5 space-y-2;
+  }
+
+  .planorah-blog-content li {
+    @apply leading-7;
+  }
+
+  .planorah-blog-content strong {
+    @apply text-slate-900 dark:text-slate-100;
+  }
+
+  .planorah-blog-content .callout {
+    @apply rounded-r-2xl border-l-4 border-emerald-400 bg-emerald-50/80 px-5 py-4 text-slate-700 dark:border-emerald-400/70 dark:bg-emerald-500/10 dark:text-slate-200;
+  }
 }

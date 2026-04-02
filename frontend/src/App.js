@@ -16,6 +16,7 @@ import Layout from './components/Layout';
 // Lazy-loaded (non-critical, code-split)
 const WelcomePage = lazy(() => import("./components/WelcomePage"));
 const LandingPage = lazy(() => import("./components/LandingPage"));
+const PlanorahBlogsPage = lazy(() => import("./components/blogs/PlanorahBlogsPage"));
 const CompleteProfile = lazy(() => import("./components/CompleteProfile"));
 const VerifyOtp = lazy(() => import("./components/VerifyOTP"));
 const Dashboard = lazy(() => import("./components/Dashboard/Dashboard"));
@@ -116,6 +117,7 @@ export default function App() {
               <Suspense fallback={<DashboardSkeleton />}>
                 <Routes>
                   <Route path="/" element={<LandingPage />} />
+                  <Route path="/blogs" element={<PlanorahBlogsPage />} />
                   <Route path="/home" element={<WelcomePage />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
