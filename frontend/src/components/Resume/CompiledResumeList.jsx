@@ -54,7 +54,7 @@ export default function CompiledResumeList() {
                             Complete tasks on a roadmap and generate your first compiled resume
                         </p>
                         <button
-                            onClick={() => navigate('/roadmap')}
+                            onClick={() => navigate('/roadmap/list')}
                             className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
                         >
                             View Roadmaps

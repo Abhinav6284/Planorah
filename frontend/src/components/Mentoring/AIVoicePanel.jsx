@@ -5,7 +5,10 @@ import { FaTimes } from "react-icons/fa";
 // import VoiceAvatar3D from "./VoiceAvatar3D"; // Removed 3D Avatar
 import AudioVisualizer from "./AudioVisualizer"; // New Visualizer
 import { mentoringService } from "../../api/mentoringService";
+import { assistantPipelineService } from "../../api/assistantPipelineService";
+import env from "../../config/env";
 import { useVoiceSession } from "../../hooks/useVoiceSession";
+import { useVoicePipelineSession } from "../../hooks/useVoicePipelineSession";
 
 /**
  * AIVoicePanel — Apple/ElevenLabs-style premium full-screen voice experience.
@@ -34,15 +37,26 @@ export default function AIVoicePanel({
     const [switchingToText, setSwitchingToText] = useState(false);
     const autoStartTriggeredRef = useRef(false);
 
+    const realtimeSession = useVoiceSession();
+    const pipelineSession = useVoicePipelineSession();
+    const pipelineEnabled = env.AI_PIPELINE_ENABLED && env.AI_PIPELINE_CHANNELS.includes("voice");
+    const session = pipelineEnabled ? pipelineSession : realtimeSession;
+
     const {
         status,
         error,
         transcript,
         isSpeaking,
         audioLevel,
+        isCapturing,
+        actionProposals = [],
+        latestResult = null,
+        startTurn = () => { },
+        stopTurn = () => { },
+        confirmProposal = async () => null,
         connect,
         disconnect,
-    } = useVoiceSession();
+    } = session;
 
     // Sync isOpen prop â†’ panelState
     useEffect(() => {
@@ -56,12 +70,28 @@ export default function AIVoicePanel({
     // Fetch voice config when panel opens
     useEffect(() => {
         if (panelState === "open" && !voiceConfig) {
-            mentoringService
-                .getVoiceConfig()
-                .then(setVoiceConfig)
-                .catch((err) => console.error("Voice config error:", err));
+            const loadConfig = async () => {
+                try {
+                    if (pipelineEnabled) {
+                        const cfg = await assistantPipelineService.getConfig();
+                        setVoiceConfig({
+                            ws_url: "",
+                            session_memory: [],
+                            onboarding_context: {},
+                            auto_intro_prompt: "",
+                            available_voices: cfg?.available_voices || [],
+                        });
+                    } else {
+                        const cfg = await mentoringService.getVoiceConfig();
+                        setVoiceConfig(cfg);
+                    }
+                } catch (err) {
+                    console.error("Voice config error:", err);
+                }
+            };
+            loadConfig();
         }
-    }, [panelState, voiceConfig]);
+    }, [panelState, voiceConfig, pipelineEnabled]);
 
     const isActive = status === "active";
 
@@ -91,6 +121,7 @@ export default function AIVoicePanel({
             voiceName: selectedVoice,
             onboardingContext: voiceConfig.onboarding_context || {},
             initialPrompt: triggeredByAutoStart ? (voiceConfig.auto_intro_prompt || "") : "",
+            languagePreference: "hinglish",
         });
     }, [voiceConfig, connect, contextSource, studentGoal, selectedVoice]);
 
@@ -139,7 +170,7 @@ export default function AIVoicePanel({
     const statusLabel = isConnecting
         ? "Connecting"
         : isActive
-            ? (isSpeaking ? "Speaking" : "Listening")
+            ? (isSpeaking ? "Speaking" : (pipelineEnabled ? (isCapturing ? "Recording" : "Ready to record") : "Listening"))
             : "Ready";
     const endLabel = isConnecting ? "Cancel" : "End Session";
     const voiceLabel = selectedVoice.substring(0, 2).toLowerCase() === "ao"
@@ -340,6 +371,28 @@ export default function AIVoicePanel({
                                             </motion.button>
                                         )}
 
+                                        {pipelineEnabled && isActive && (
+                                            <div className="mt-4">
+                                                <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-2">
+                                                    Push To Talk
+                                                </p>
+                                                <button
+                                                    type="button"
+                                                    onMouseDown={startTurn}
+                                                    onMouseUp={stopTurn}
+                                                    onMouseLeave={() => { if (isCapturing) stopTurn(); }}
+                                                    onTouchStart={startTurn}
+                                                    onTouchEnd={stopTurn}
+                                                    className={`w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${isCapturing
+                                                        ? "bg-emerald-600 text-white"
+                                                        : "bg-slate-200 dark:bg-white/10 text-slate-800 dark:text-slate-100 hover:bg-slate-300 dark:hover:bg-white/20"
+                                                        }`}
+                                                >
+                                                    {isCapturing ? "Release to send turn" : "Hold to speak"}
+                                                </button>
+                                            </div>
+                                        )}
+
                                         {voiceConfig && (
                                             <div className="mt-6">
                                                 <div className="flex items-center justify-between text-[12px] font-semibold text-slate-500 dark:text-slate-400">
@@ -366,8 +419,46 @@ export default function AIVoicePanel({
 
                                     <div className="rounded-[24px] border border-white/70 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-2xl px-5 py-4 text-sm text-slate-600 dark:text-slate-300">
                                         <p className="font-semibold text-slate-800 dark:text-white">Session flow</p>
-                                        <p className="mt-2">Introduce your goal, talk for a minute, then ask for targeted feedback.</p>
+                                        <p className="mt-2">
+                                            {pipelineEnabled
+                                                ? "Use push-to-talk turns for fast STT → LLM → TTS responses."
+                                                : "Introduce your goal, talk for a minute, then ask for targeted feedback."}
+                                        </p>
                                     </div>
+
+                                    {pipelineEnabled && latestResult?.assistant_text && (
+                                        <div className="rounded-[24px] border border-violet-200/70 dark:border-violet-800/40 bg-violet-50/70 dark:bg-violet-900/20 backdrop-blur-2xl px-5 py-4 text-sm text-slate-700 dark:text-slate-200">
+                                            <p className="font-semibold text-violet-700 dark:text-violet-300 mb-1">Latest Response</p>
+                                            <p>{latestResult.assistant_text}</p>
+                                        </div>
+                                    )}
+
+                                    {pipelineEnabled && Array.isArray(actionProposals) && actionProposals.length > 0 && (
+                                        <div className="rounded-[24px] border border-emerald-200/70 dark:border-emerald-800/40 bg-emerald-50/70 dark:bg-emerald-900/20 backdrop-blur-2xl px-5 py-4 text-sm text-slate-700 dark:text-slate-200 space-y-3">
+                                            <p className="font-semibold text-emerald-700 dark:text-emerald-300">Confirm Actions</p>
+                                            {actionProposals.map((proposal) => (
+                                                <div key={proposal.proposal_id} className="rounded-xl border border-emerald-200 dark:border-emerald-800 p-3">
+                                                    <p className="text-xs font-semibold mb-2">{proposal.summary}</p>
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => confirmProposal(proposal.proposal_id, true)}
+                                                            className="px-3 py-1.5 text-xs rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+                                                        >
+                                                            Confirm
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => confirmProposal(proposal.proposal_id, false)}
+                                                            className="px-3 py-1.5 text-xs rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
 
                                     {error && (
                                         <p className="text-red-600 font-semibold bg-white/90 px-4 py-3 rounded-xl text-sm text-center border border-red-200">
