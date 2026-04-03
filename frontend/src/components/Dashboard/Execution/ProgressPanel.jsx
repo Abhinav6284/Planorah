@@ -1,5 +1,4 @@
-import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { useMemo } from 'react';
 
 const XP_LEVELS = [
     { level: 'Beginner', min: 0, max: 499 },
@@ -10,7 +9,6 @@ const XP_LEVELS = [
 const ProgressPanel = ({ tasks, stats }) => {
     const xpPoints = stats?.xp_points || 0;
 
-    // XP Logic
     const xpData = useMemo(() => {
         const current = XP_LEVELS.find((item) => xpPoints >= item.min && xpPoints <= item.max) || XP_LEVELS[0];
         const next = XP_LEVELS.find((item) => item.min > current.min) || null;
@@ -18,17 +16,16 @@ const ProgressPanel = ({ tasks, stats }) => {
         const inLevel = Math.max(0, xpPoints - current.min);
         const percent = Math.min(100, Math.round((inLevel / currentSpan) * 100));
 
-        return { 
-            current, 
-            next, 
-            percent, 
+        return {
+            current,
+            next,
+            percent,
             remaining: next ? next.min - xpPoints : 0,
             xpInCurrentLevel: inLevel,
             xpTotal: xpPoints
         };
     }, [xpPoints]);
 
-    // Today Circular Logic — count all completed tasks vs total missions
     const todayData = useMemo(() => {
         const allTasks = tasks || [];
         const completed = allTasks.filter(t => t.status === 'completed').length;
@@ -38,7 +35,6 @@ const ProgressPanel = ({ tasks, stats }) => {
         return { completed, total, percent };
     }, [tasks]);
 
-    // Heatmap Logic
     const heatmap = useMemo(() => {
         const days = [];
         const now = new Date();
@@ -59,110 +55,69 @@ const ProgressPanel = ({ tasks, stats }) => {
         return days;
     }, [tasks]);
 
-    // Circular ring calc
-    const ringSize = 72;
-    const radius = 28;
-    const circumference = 2 * Math.PI * radius;
-    const offset = circumference - (todayData.percent / 100) * circumference;
-    const center = ringSize / 2;
-
     return (
-        <div className="space-y-6">
-            {/* XP Progress Card */}
-            <div className="rounded-2xl border border-borderMuted/50 bg-gradient-to-br from-white/80 to-beigePrimary/40 backdrop-blur-xl p-5 shadow-soft dark:border-white/5 dark:bg-gradient-to-br dark:from-[#1a1a1a]/80 dark:to-[#0f0f0f]/80 dark:shadow-darkSoft">
-                <div className="mb-4 flex items-center justify-between">
+        <div className="space-y-5">
+            {/* Level Card */}
+            <div className="rounded-2xl border border-white/20 bg-[#1a2540] p-6">
+                <div className="flex items-start justify-between mb-6">
                     <div>
-                        <h3 className="text-[11px] font-bold uppercase tracking-widest text-terracotta dark:text-terracotta/80">Your Level</h3>
-                        <p className="mt-2 text-2xl font-bold text-textPrimary dark:text-white">
-                            ⚡ {xpData.current.level}
-                        </p>
+                        <p className="text-xs font-bold text-terracotta/80 uppercase tracking-wider mb-2">⚡ Your Level</p>
+                        <p className="text-4xl font-bold text-white">{xpData.current.level}</p>
                     </div>
                     <div className="text-right">
-                        <p className="text-xs text-textSecondary dark:text-slate-400">Total XP</p>
-                        <p className="text-lg font-bold text-textPrimary dark:text-white">{xpData.xpTotal}</p>
+                        <p className="text-xs text-gray-400 mb-1">Total XP</p>
+                        <p className="text-2xl font-bold text-gradient bg-gradient-to-r from-terracotta to-orange-400 bg-clip-text text-transparent">
+                            {xpData.xpTotal}
+                        </p>
                     </div>
                 </div>
 
                 {xpData.next && (
-                    <>
-                        <div className="mb-3 flex items-center justify-between text-xs">
-                            <span className="font-medium text-textSecondary dark:text-slate-400">
-                                Progress to {xpData.next.level}
-                            </span>
-                            <span className="font-bold text-textPrimary dark:text-slate-200">
-                                {xpData.remaining} XP left
-                            </span>
+                    <div>
+                        <div className="flex justify-between text-xs mb-2.5 text-gray-400">
+                            <span>Progress to {xpData.next.level}</span>
+                            <span className="text-terracotta">{xpData.remaining} XP left</span>
                         </div>
-                        <div className="h-2.5 overflow-hidden rounded-full bg-beigeMuted/60 dark:bg-white/10">
-                            <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${xpData.percent}%` }}
-                                transition={{ duration: 1.2, ease: "easeOut" }}
-                                className="h-full rounded-full bg-gradient-to-r from-terracotta to-terracottaHover shadow-lg shadow-terracotta/30 dark:from-terracotta dark:to-terracotta/80"
+                        <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-gradient-to-r from-terracotta to-orange-400 transition-all duration-500"
+                                style={{ width: `${xpData.percent}%` }}
                             />
                         </div>
-                        <p className="mt-2.5 text-xs text-textSecondary dark:text-slate-400">
-                            {xpData.xpInCurrentLevel} / {xpData.next.min - xpData.current.min} XP in current level
-                        </p>
-                    </>
-                )}
-
-                {!xpData.next && (
-                    <div className="rounded-xl bg-gradient-to-r from-terracotta/20 to-sage/20 p-4 text-center dark:from-terracotta/10 dark:to-sage/10">
-                        <p className="text-sm font-bold text-terracotta dark:text-terracotta/80">
-                            🎖️ Max Level Reached!
-                        </p>
                     </div>
                 )}
             </div>
 
-            {/* Today Progress */}
-            <div className="rounded-2xl border border-borderMuted/50 bg-gradient-to-br from-white/80 to-beigePrimary/40 backdrop-blur-xl p-5 shadow-soft dark:border-white/5 dark:bg-gradient-to-br dark:from-[#1a1a1a]/80 dark:to-[#0f0f0f]/80 dark:shadow-darkSoft">
-                <h3 className="mb-4 text-[11px] font-bold uppercase tracking-widest text-terracotta dark:text-terracotta/80">Today's Focus</h3>
-                <div className="flex items-center gap-4">
-                    <div className="relative h-16 w-16">
-                        <svg className="h-full w-full -rotate-90 transform" viewBox={`0 0 ${ringSize} ${ringSize}`}>
-                            <circle cx={center} cy={center} r={radius} fill="none" strokeWidth="6" className="stroke-beigeMuted dark:stroke-white/10" />
-                            <circle
-                                cx={center} cy={center} r={radius} fill="none" strokeWidth="6"
-                                strokeDasharray={circumference}
-                                strokeDashoffset={offset}
-                                strokeLinecap="round"
-                                className="stroke-terracotta transition-all duration-1000 dark:stroke-terracotta"
-                            />
-                        </svg>
-                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-lg font-bold text-textPrimary dark:text-white">{todayData.percent}%</span>
-                        </div>
-                    </div>
-                    <div>
-                        <p className="text-2xl font-bold text-textPrimary dark:text-white">
-                            {todayData.completed}<span className="text-textSecondary dark:text-slate-400">/{todayData.total}</span>
-                        </p>
-                        <p className="text-xs text-textSecondary dark:text-slate-400">Missions completed</p>
-                    </div>
+            {/* Today's Focus */}
+            <div className="rounded-2xl border border-white/20 bg-[#1a2540] p-6">
+                <p className="text-xs font-bold text-terracotta/80 uppercase tracking-wider mb-5">📊 Today's Focus</p>
+                <div className="text-center">
+                    <p className="text-6xl font-bold bg-gradient-to-r from-terracotta to-orange-400 bg-clip-text text-transparent mb-2">
+                        {todayData.percent}%
+                    </p>
+                    <p className="text-gray-400 text-sm">
+                        <span className="text-white font-bold">{todayData.completed}/{todayData.total}</span> missions completed
+                    </p>
                 </div>
             </div>
 
-            {/* Heatmap */}
-            <div className="rounded-2xl border border-borderMuted/50 bg-gradient-to-br from-white/80 to-beigePrimary/40 backdrop-blur-xl p-5 shadow-soft dark:border-white/5 dark:bg-gradient-to-br dark:from-[#1a1a1a]/80 dark:to-[#0f0f0f]/80 dark:shadow-darkSoft">
-                <h3 className="mb-4 text-[11px] font-bold uppercase tracking-widest text-terracotta dark:text-terracotta/80">Weekly Consistency</h3>
-                <div className="flex justify-between gap-1">
+            {/* Weekly Heatmap */}
+            <div className="rounded-2xl border border-white/20 bg-[#1a2540] p-6">
+                <p className="text-xs font-bold text-terracotta/80 uppercase tracking-wider mb-5">🔥 Weekly Consistency</p>
+                <div className="flex justify-between gap-2.5">
                     {heatmap.map((day, i) => (
-                        <div key={i} className="flex flex-col items-center gap-2">
+                        <div key={i} className="flex-1 flex flex-col items-center gap-2.5">
                             <div
-                                className={`h-7 w-full rounded-md transition-colors ${day.count > 0
-                                        ? `bg-gradient-to-br from-terracotta to-terracottaHover ${day.count > 2 ? 'opacity-100' : 'opacity-70'}`
-                                        : 'bg-beigeMuted/50 dark:bg-white/5'
+                                className={`w-full h-10 rounded-lg transition-all ${day.count > 0
+                                        ? `bg-gradient-to-br from-terracotta to-orange-500 ${day.count > 2 ? 'opacity-100 shadow-lg shadow-terracotta/30' : 'opacity-70'}`
+                                        : 'bg-white/10'
                                     }`}
-                                style={{ width: '100%' }}
                             />
-                            <span className="text-[10px] font-medium text-textSecondary dark:text-slate-400">{day.label}</span>
+                            <span className="text-xs font-semibold text-gray-400">{day.label}</span>
                         </div>
                     ))}
                 </div>
             </div>
-
         </div>
     );
 };

@@ -17,7 +17,8 @@
       "Bash(bash /tmp/replace_remaining.sh)",
       "Bash(grep -v \":0$\")",
       "Bash(chmod +x /tmp/verify_report.sh)",
-      "Bash(bash /tmp/verify_report.sh)"
+      "Bash(bash /tmp/verify_report.sh)",
+      "Bash(npm install:*)"
     ]
   }
 }

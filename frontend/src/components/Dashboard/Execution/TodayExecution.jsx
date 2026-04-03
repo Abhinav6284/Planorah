@@ -1,6 +1,5 @@
-import React, { useMemo } from 'react';
-import { Play, Sparkles, Flame } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { useMemo } from 'react';
+import { Play, Flame, Sparkles, ArrowRight } from 'lucide-react';
 
 const TodayExecution = ({
     user,
@@ -25,14 +24,13 @@ const TodayExecution = ({
         return Math.max((tasks || []).length, completedCount + (todayTask ? 1 : 0));
     }, [tasks, todayTask, completedCount]);
 
-    // Milestone calculation: 7, 14, 21, 28...
     const milestoneData = useMemo(() => {
         const currentStreak = streak || 0;
         const weekNumber = Math.ceil(currentStreak / 7) || 1;
         const nextMilestone = weekNumber * 7;
         const daysIntoCurrentWeek = currentStreak % 7;
         const progressPercent = currentStreak > 0 ? Math.round((daysIntoCurrentWeek / 7) * 100) : 0;
-        
+
         return {
             current: currentStreak,
             nextMilestone,
@@ -43,114 +41,86 @@ const TodayExecution = ({
     }, [streak]);
 
     return (
-        <section className="relative overflow-hidden rounded-3xl border border-borderMuted/50 bg-gradient-to-br from-white via-white/95 to-beigePrimary/40 backdrop-blur-xl shadow-warmHover dark:border-white/5 dark:bg-gradient-to-br dark:from-[#1a1a1a] dark:via-[#121212] dark:to-[#0f0f0f] dark:shadow-darkDepth">
-            {/* Background decoration */}
-            <div className="absolute -right-32 -top-32 h-80 w-80 rounded-full bg-gradient-to-br from-terracotta/15 to-transparent blur-[100px] dark:from-terracotta/5" />
-            <div className="absolute -left-40 -bottom-40 h-96 w-96 rounded-full bg-gradient-to-tr from-sage/10 to-transparent blur-[100px] dark:from-sage/5" />
+        <section className="rounded-2xl border border-white/20 bg-[#1a2540] p-8 relative overflow-hidden">
 
-            <div className="relative z-10 flex flex-col gap-6 p-6 sm:p-8 lg:flex-row lg:items-start lg:justify-between">
-                <div className="flex-1 space-y-3">
-                    <div className="flex items-start gap-4">
-                        <div className="mt-1 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-terracotta/20 to-sage/20 text-2xl font-bold dark:from-terracotta/10 dark:to-sage/10">
-                            👋
-                        </div>
-                        <div>
-                            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl lg:text-4xl">
-                                Ready to execute, <span className="text-terracotta">{displayName}</span>?
-                            </h1>
-                            <div className="mt-1 flex flex-wrap items-center gap-2 text-[13px] font-medium text-slate-500 dark:text-slate-400">
-                                <span className="flex items-center gap-1 text-orange-500">
-                                    <Flame className="h-3.5 w-3.5" fill="currentColor" />
-                                    {streak || 0} day streak
-                                </span>
-                                <span>•</span>
-                                <span>{completedCount}/{totalCount} missions done</span>
-                                {milestoneData.current > 0 && (
-                                    <>
-                                        <span>•</span>
-                                        <span className="text-terracotta dark:text-terracotta/80">
-                                            {milestoneData.daysRemaining} days to {milestoneData.nextMilestone}-day milestone
-                                        </span>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+            <div>
+                {/* Header */}
+                <div className="mb-8">
+                    <h1 className="text-4xl font-bold text-white mb-3">
+                        Ready to execute,{' '}
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-terracotta to-orange-400">
+                            {displayName}
+                        </span>
+                        ?
+                    </h1>
 
-                    {/* Milestone Progress Bar */}
-                    {milestoneData.current > 0 && (
-                        <div className="rounded-2xl border border-terracotta/30 bg-gradient-to-br from-terracotta/8 to-transparent p-4 backdrop-blur-sm dark:border-terracotta/20 dark:bg-gradient-to-br dark:from-terracotta/10 dark:to-transparent">
-                            <div className="mb-1.5 flex items-center justify-between">
-                                <span className="text-xs font-semibold uppercase tracking-wider text-terracotta dark:text-terracotta/80">
-                                    Week {milestoneData.weekNumber} Progress
-                                </span>
-                                <span className="text-xs font-bold text-terracotta dark:text-terracotta/80">
-                                    {milestoneData.current % 7 || 7}/7 days
-                                </span>
+                    {/* Stats Pills */}
+                    <div className="flex flex-wrap gap-3 mt-4">
+                        {streak > 0 && (
+                            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/15 border border-orange-500/30 backdrop-blur-sm">
+                                <Flame className="h-5 w-5 text-orange-400" fill="currentColor" />
+                                <span className="font-semibold text-orange-300">{streak} day streak</span>
                             </div>
-                            <div className="h-2 overflow-hidden rounded-full bg-gradient-to-r from-terracotta/20 to-terracotta/10 dark:from-terracotta/10 dark:to-terracotta/5">
-                                <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${milestoneData.progressPercent}%` }}
-                                    transition={{ duration: 1.2, ease: "easeOut" }}
-                                    className="h-full rounded-full bg-gradient-to-r from-terracotta to-terracottaHover shadow-lg shadow-terracotta/30 dark:from-terracotta dark:to-terracotta/80"
-                                />
-                            </div>
-                            <p className="mt-1.5 text-xs text-terracotta dark:text-terracotta/80">
-                                {milestoneData.daysRemaining === 0
-                                    ? '🎉 Milestone reached!'
-                                    : `${milestoneData.daysRemaining} more days to complete this week!`}
-                            </p>
+                        )}
+                        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-terracotta/15 border border-terracotta/30 backdrop-blur-sm">
+                            <span className="font-semibold text-terracotta">{completedCount}/{totalCount} missions</span>
                         </div>
-                    )}
-
-                    <div className="max-w-2xl">
-                        <p className="mb-2 text-[12px] font-bold uppercase tracking-widest text-terracotta dark:text-terracotta/80">
-                            ✦ Today's Prime Mission
-                        </p>
-                        <h2 className="text-xl font-semibold leading-snug text-slate-900 dark:text-white sm:text-2xl">
-                            {todayTask?.title || "Loading your mission..."}
-                        </h2>
-                        {todayTask?.reason && (
-                            <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
-                                <Sparkles className="mr-1.5 inline-block h-3 w-3 text-amber-500" />
-                                {todayTask.reason}
-                            </p>
+                        {milestoneData.current > 0 && (
+                            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/15 border border-blue-500/30 backdrop-blur-sm">
+                                <span className="font-semibold text-blue-300">{milestoneData.daysRemaining}d to {milestoneData.nextMilestone}-day</span>
+                            </div>
                         )}
                     </div>
                 </div>
 
-                <div className="flex flex-shrink-0 flex-col gap-3 sm:flex-row sm:items-center lg:pt-1">
-                    <motion.button
-                        whileHover={{ scale: 1.05, y: -2 }}
-                        whileTap={{ scale: 0.95 }}
+                {/* Mission Card */}
+                {todayTask && (
+                    <div className="mb-6 p-6 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors">
+                        <p className="text-xs font-bold text-terracotta/80 uppercase tracking-wider mb-2">⚡ Today's Mission</p>
+                        <h2 className="text-2xl font-bold text-white mb-2">
+                            {todayTask.title}
+                        </h2>
+                        {todayTask.reason && (
+                            <p className="text-gray-300 flex items-start gap-2">
+                                <Sparkles className="h-4 w-4 text-yellow-400 flex-shrink-0 mt-0.5" />
+                                {todayTask.reason}
+                            </p>
+                        )}
+                    </div>
+                )}
+
+                {/* Progress Bar */}
+                <div className="mb-6 space-y-2">
+                    <div className="flex justify-between text-xs text-gray-400">
+                        <span>Progress</span>
+                        <span>{Math.round((completedCount / Math.max(totalCount, 1)) * 100)}%</span>
+                    </div>
+                    <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
+                        <div
+                            className="h-full bg-gradient-to-r from-terracotta to-orange-400 transition-all duration-500"
+                            style={{ width: `${(completedCount / Math.max(totalCount, 1)) * 100}%` }}
+                        />
+                    </div>
+                </div>
+
+                {/* Buttons */}
+                <div className="flex flex-col sm:flex-row gap-3">
+                    <button
                         onClick={onStartFocus}
                         disabled={!todayTask || loading}
-                        className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-br from-terracotta to-terracottaHover px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-terracotta/40 transition-all hover:shadow-terracotta/60 disabled:cursor-not-allowed disabled:opacity-70 dark:from-terracotta dark:to-terracottaHover dark:shadow-terracotta/30 dark:hover:shadow-terracotta/50"
+                        className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-terracotta to-orange-500 text-white font-bold rounded-lg hover:shadow-lg hover:shadow-terracotta/50 disabled:opacity-50 transition-all"
                     >
-                        <Play className="h-4 w-4 fill-current" />
-                        <span>Start Focus Session</span>
-                        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                    </motion.button>
-
-                    <motion.button
-                        whileHover={{ scale: 1.05, y: -2 }}
-                        whileTap={{ scale: 0.95 }}
+                        <Play className="h-5 w-5 fill-current" />
+                        Start Focus Session
+                        <ArrowRight className="h-4 w-4" />
+                    </button>
+                    <button
                         onClick={onChangeTask}
-                        className="rounded-xl border border-borderMuted/60 bg-white/40 px-5 py-3.5 text-sm font-semibold text-textPrimary backdrop-blur-sm transition-all hover:bg-white/70 hover:border-terracotta/30 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10 dark:hover:border-terracotta/30"
+                        className="px-6 py-3 border border-white/20 text-white font-semibold rounded-lg hover:bg-white/10 transition-colors"
                     >
                         Change Task
-                    </motion.button>
+                    </button>
                 </div>
-            </div>
-
-            {/* Progress Bar Bottom */}
-            <div className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-transparent via-terracotta/10 to-transparent dark:via-terracotta/5">
-                <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(completedCount / Math.max(totalCount, 1)) * 100}%` }}
-                    className="h-full bg-gradient-to-r from-terracotta to-terracottaHover"
-                />
             </div>
         </section>
     );

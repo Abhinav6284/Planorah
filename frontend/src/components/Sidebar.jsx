@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -119,43 +119,41 @@ const SidebarContent = ({ onNavClick = () => {}, user = null }) => {
   return (
     <>
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-borderMuted dark:border-white/10">
-        <Link to="/dashboard" className="text-2xl font-serif font-bold tracking-tight text-textPrimary dark:text-white">
+      <div className="px-4 py-4 border-b border-white/10">
+        <Link to="/dashboard" className="text-xl font-bold tracking-tight text-white font-serif">
           Planora<span className="text-terracotta">.</span>
         </Link>
       </div>
 
-      {/* User Profile Mini-Card */}
-      <div className="px-4 py-4 border-b border-borderMuted dark:border-white/10">
-        <div className="flex items-center gap-3">
+      {/* User Profile Section */}
+      <div className="px-4 py-5 border-b border-white/10 bg-white/5">
+        <div className="flex items-center gap-3 mb-3">
           <div className="relative flex-shrink-0">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-terracotta/60 to-terracotta p-[2px]">
-              <div className="w-full h-full rounded-full bg-white dark:bg-black p-[1px]">
-                <img
-                  src={userAvatar}
-                  alt="Profile"
-                  className="w-full h-full rounded-full object-cover"
-                />
-              </div>
-            </div>
-            <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-beigePrimary dark:border-[#1a1a1a] bg-green-500" />
+            <img
+              src={userAvatar}
+              alt="Profile"
+              className="h-12 w-12 rounded-lg object-cover border-2 border-terracotta"
+            />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-textPrimary dark:text-white truncate">
+            <p className="font-semibold text-white text-sm truncate">
               {getUserName()}
             </p>
-            <p className="text-xs text-textSecondary dark:text-slate-400 truncate">
+            <p className="text-xs text-gray-400">
               {getUserRole()}
             </p>
           </div>
-          <span className="flex-shrink-0 rounded-full bg-terracotta/10 px-2 py-0.5 text-[10px] font-bold text-terracotta dark:text-terracotta/80">
+        </div>
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-gray-600 dark:text-gray-400">Level</span>
+          <span className="font-semibold text-terracotta bg-terracotta/10 px-2 py-1 rounded">
             {getUserLevel()}
           </span>
         </div>
       </div>
 
       {/* Navigation Groups */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {navGroups.map((group) => {
           const isGroupActive = group.type === 'link'
             ? location.pathname === group.path
@@ -167,10 +165,10 @@ const SidebarContent = ({ onNavClick = () => {}, user = null }) => {
                 key={group.label}
                 to={group.path}
                 onClick={onNavClick}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isGroupActive
-                    ? 'bg-terracotta/10 text-terracotta border-l-2 border-terracotta pl-[10px]'
-                    : 'text-textSecondary hover:text-textPrimary hover:bg-beigeMuted dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5'
+                    ? 'bg-terracotta text-white'
+                    : 'text-gray-300 hover:bg-white/10'
                 }`}
               >
                 <group.icon className="h-4 w-4 flex-shrink-0" />
@@ -179,21 +177,20 @@ const SidebarContent = ({ onNavClick = () => {}, user = null }) => {
             );
           }
 
-          // Dropdown group
           const isOpen = expandedGroup === group.label;
           return (
             <div key={group.label}>
               <button
                 onClick={() => setExpandedGroup(isOpen ? null : group.label)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isGroupActive
-                    ? 'text-terracotta bg-terracotta/5'
-                    : 'text-textSecondary hover:text-textPrimary hover:bg-beigeMuted dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5'
+                    ? 'text-terracotta bg-terracotta/10'
+                    : 'text-gray-300 hover:bg-white/10'
                 }`}
               >
                 <group.icon className="h-4 w-4 flex-shrink-0" />
                 <span className="flex-1 text-left">{group.label}</span>
-                <ChevronDown className={`h-3.5 w-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`h-4 w-4 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
               </button>
 
               <AnimatePresence>
@@ -202,10 +199,10 @@ const SidebarContent = ({ onNavClick = () => {}, user = null }) => {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
+                    transition={{ duration: 0.15 }}
                     className="overflow-hidden"
                   >
-                    <div className="ml-7 mt-1 space-y-0.5 border-l border-borderMuted dark:border-white/10 pl-3">
+                    <div className="ml-5 mt-0.5 space-y-0.5">
                       {group.items.map((item) => {
                         const itemActive = location.pathname.startsWith(item.path);
                         return (
@@ -213,10 +210,10 @@ const SidebarContent = ({ onNavClick = () => {}, user = null }) => {
                             key={item.path}
                             to={item.path}
                             onClick={onNavClick}
-                            className={`block px-3 py-2 rounded-lg text-[13px] transition-colors ${
+                            className={`block px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
                               itemActive
-                                ? 'text-terracotta font-semibold bg-terracotta/5'
-                                : 'text-textSecondary hover:text-textPrimary hover:bg-beigeMuted dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5'
+                                ? 'text-terracotta bg-terracotta/10 font-semibold'
+                                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
                             }`}
                           >
                             {item.label}
@@ -233,25 +230,25 @@ const SidebarContent = ({ onNavClick = () => {}, user = null }) => {
       </nav>
 
       {/* Bottom Actions */}
-      <div className="px-3 py-4 border-t border-borderMuted dark:border-white/10 space-y-1">
+      <div className="px-3 py-4 border-t border-gray-200 dark:border-white/10 space-y-1">
         <button
           onClick={toggleTheme}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-textSecondary hover:text-textPrimary hover:bg-beigeMuted dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5 transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
         >
           {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-          {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+          <span className="text-sm">{theme === 'light' ? 'Dark' : 'Light'}</span>
         </button>
         <Link
           to="/profile"
           onClick={onNavClick}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-textSecondary hover:text-textPrimary hover:bg-beigeMuted dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5 transition-colors"
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
         >
           <Settings className="h-4 w-4" />
           Settings
         </Link>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
         >
           <LogOut className="h-4 w-4" />
           Logout
@@ -265,7 +262,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose = () => {}, user = null }) 
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="w-64 flex-shrink-0 hidden lg:flex flex-col h-screen sticky top-0 bg-gradient-to-b from-beigePrimary to-beigeSecondary border-r border-borderMuted dark:from-[#0f0f0f] dark:to-[#1a1a1a] dark:border-white/10 overflow-y-auto">
+      <aside className="w-64 flex-shrink-0 hidden lg:flex flex-col h-screen sticky top-0 bg-[#0f1419] border-r border-white/10 overflow-y-auto">
         <SidebarContent onNavClick={() => {}} user={user} />
       </aside>
 
@@ -285,12 +282,12 @@ const Sidebar = ({ mobileOpen = false, onMobileClose = () => {}, user = null }) 
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed top-0 left-0 bottom-0 w-72 z-50 lg:hidden flex flex-col bg-gradient-to-b from-beigePrimary to-beigeSecondary dark:from-[#0f0f0f] dark:to-[#1a1a1a] border-r border-borderMuted dark:border-white/10 overflow-y-auto shadow-2xl"
+              className="fixed top-0 left-0 bottom-0 w-72 z-50 lg:hidden flex flex-col bg-[#0f1419] border-r border-white/10 overflow-y-auto shadow-2xl"
             >
               <div className="absolute top-4 right-4">
                 <button
                   onClick={onMobileClose}
-                  className="flex items-center justify-center w-9 h-9 rounded-lg border border-borderMuted dark:border-white/10 bg-white dark:bg-white/5 text-textPrimary dark:text-white hover:bg-beigeMuted dark:hover:bg-white/10 transition-colors"
+                  className="flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
                   aria-label="Close navigation"
                 >
                   <X className="h-5 w-5" />

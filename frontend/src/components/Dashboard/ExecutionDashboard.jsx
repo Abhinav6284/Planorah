@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { BrainCircuit, Sparkles, ArrowRight } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
+import { BrainCircuit, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import AIVoicePanel from '../Mentoring/AIVoicePanel';
@@ -19,7 +19,7 @@ import { roadmapService } from '../../api/roadmapService';
 import { planoraService } from '../../api/planoraService';
 import { useMissionFlow } from '../../hooks/useMissionFlow';
 
-const shellCardClass = 'rounded-2xl border border-borderMuted/50 bg-gradient-to-br from-white/80 to-beigePrimary/40 backdrop-blur-xl p-5 shadow-soft dark:border-white/5 dark:bg-gradient-to-br dark:from-[#1a1a1a]/80 dark:to-[#0f0f0f]/80 dark:shadow-darkSoft';
+const shellCardClass = 'rounded-2xl border border-white/20 bg-[#1a2540] p-6';
 
 const buildDateKey = (dateValue) => {
     if (!dateValue) {
@@ -291,8 +291,7 @@ const ExecutionDashboard = () => {
             {/* Focus Mode Overlay */}
             <AnimatePresence>
                 {currentState === 'IN_PROGRESS' && (
-                    <motion.div
-                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    <div
                         className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 p-6 backdrop-blur-sm"
                     >
                         <FocusMode
@@ -302,7 +301,7 @@ const ExecutionDashboard = () => {
                             onComplete={onComplete}
                             embedded={true}
                         />
-                    </motion.div>
+                    </div>
                 )}
             </AnimatePresence>
 
@@ -324,18 +323,19 @@ const ExecutionDashboard = () => {
                     {/* LEFT COLUMN: Main Activities */}
                     <div className="space-y-6 lg:col-span-8">
                         {/* Mode Switcher Block */}
-                        <div className="flex items-center justify-between rounded-2xl border border-borderMuted/50 bg-gradient-to-br from-white/80 to-beigePrimary/40 backdrop-blur-xl p-4 shadow-soft dark:border-white/5 dark:bg-gradient-to-br dark:from-[#1a1a1a]/80 dark:to-[#0f0f0f]/80 dark:shadow-darkSoft">
+                        <div className="rounded-2xl border border-white/20 bg-[#1a2540] p-5 flex items-center justify-between gap-4">
                             <div className="flex items-center gap-3">
                                 <ModeSwitch mode={mode} onChange={setMode} />
-                                <span className="text-xs font-medium text-textSecondary dark:text-slate-400 sm:text-sm">
-                                    {mode === 'learning' ? 'Learning Mode Active' : 'Exam Mode Active'}
+                                <span className="text-sm text-gray-400 hidden sm:inline font-medium">
+                                    {mode === 'learning' ? 'Learning' : 'Exam'} Mode
                                 </span>
                             </div>
                             <button
                                 onClick={() => setVoicePanelOpen(true)}
-                                className="inline-flex items-center gap-1.5 rounded-full bg-terracotta/10 px-2.5 py-1 text-[11px] font-semibold text-textPrimary hover:bg-terracotta/20 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 sm:px-3 sm:py-1.5 sm:text-xs"
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-terracotta/20 to-orange-500/20 hover:from-terracotta/30 hover:to-orange-500/30 border border-terracotta/30 text-terracotta font-semibold text-sm transition-all"
                             >
-                                <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5" /> AI Coach
+                                <Sparkles className="h-4 w-4" />
+                                <span className="hidden sm:inline">AI Coach</span>
                             </button>
                         </div>
 
@@ -351,21 +351,19 @@ const ExecutionDashboard = () => {
                             )}
 
                             <div className="space-y-4">
-                                <div className="flex gap-2 overflow-x-auto pb-2">
+                                <div className="flex gap-2.5 overflow-x-auto pb-2">
                                     {scheduleDays.map((day) => (
                                         <button
                                             key={day.key}
                                             type="button"
                                             onClick={() => setSelectedDateKey(day.key)}
-                                            className={`flex h-[52px] w-[44px] flex-shrink-0 flex-col items-center justify-center gap-[2px] rounded-xl text-xs font-semibold transition-all ${day.isSelected
-                                                ? 'bg-gradient-to-br from-terracotta to-terracottaHover text-white shadow-lg shadow-terracotta/40'
-                                                : 'bg-beigeMuted/60 hover:bg-terracotta/20 dark:bg-white/5 dark:hover:bg-white/10'
+                                            className={`flex h-14 w-11 flex-shrink-0 flex-col items-center justify-center gap-0.5 rounded-xl font-semibold transition-all border ${day.isSelected
+                                                ? 'bg-terracotta text-white border-terracotta'
+                                                : 'bg-white/5 border-white/20 text-gray-300 hover:bg-white/10'
                                                 }`}
                                         >
-                                            <span className={`text-sm font-bold leading-none ${day.isSelected ? 'text-white' : 'text-textPrimary dark:text-white/80'}`}>{day.dayNumber}</span>
-                                            <span className={`text-[9px] capitalize tracking-wide ${day.isSelected ? 'text-white/80' : 'text-textSecondary dark:text-slate-400'}`}>
-                                                {day.dayName}
-                                            </span>
+                                            <span className="text-sm font-bold">{day.dayNumber}</span>
+                                            <span className="text-[9px]">{day.dayName}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -383,7 +381,7 @@ const ExecutionDashboard = () => {
                                 {selectedTasks.length === 0 ? (
                                     <p className="text-sm text-textSecondary dark:text-slate-400">No tasks scheduled for {formatDateLabel(selectedDateKey)}.</p>
                                 ) : (
-                                    <div className="grid grid-cols-1 gap-3">
+                                    <div className="space-y-3">
                                         {selectedTasks.map((card, index) => (
                                             <div
                                                 key={card.key}
@@ -396,29 +394,27 @@ const ExecutionDashboard = () => {
                                                         handleOpenTaskGuide(card);
                                                     }
                                                 }}
-                                                className="relative flex cursor-pointer items-center gap-3 rounded-2xl bg-beigeMuted/50 p-3 transition-all hover:bg-white/80 hover:shadow-md dark:bg-white/5 dark:hover:bg-white/10"
+                                                className="relative flex cursor-pointer items-center gap-4 p-4 bg-white/5 border border-white/20 rounded-xl hover:bg-white/10 transition-all group"
                                             >
-                                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-terracotta/10 text-xs font-bold text-terracotta dark:bg-terracotta/20 dark:text-terracotta">
+                                                {/* Number Badge */}
+                                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-terracotta/20 to-orange-500/20 border border-terracotta/30 text-sm font-bold text-terracotta">
                                                     {index + 1}
                                                 </div>
+
+                                                {/* Info */}
                                                 <div className="min-w-0 flex-1">
-                                                    <h4 className="truncate text-sm font-bold text-textPrimary dark:text-slate-100">
-                                                        <span className="mr-1.5 inline-flex items-center justify-center rounded bg-beigeMuted p-[2px] dark:bg-white/10">
-                                                            <span className="text-[10px]">📚</span>
-                                                        </span>
+                                                    <h4 className="truncate text-sm font-semibold text-white group-hover:text-terracotta transition-colors">
                                                         {card.title}
                                                     </h4>
-                                                    <p className="mt-0.5 flex items-center gap-1.5 text-[11px] font-medium text-textSecondary dark:text-slate-400">
-                                                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-beigeMuted text-[9px] dark:bg-white/10">⏱</span>
-                                                        {card.estimatedMinutes} min
+                                                    <p className="text-xs text-gray-400 mt-1">
+                                                        ⏱ {card.estimatedMinutes} min
                                                     </p>
                                                 </div>
-                                                <div className="flex items-center gap-3">
-                                                    <span className="rounded-full border border-borderMuted px-2.5 py-0.5 text-[10px] font-semibold lowercase tracking-wide text-textSecondary dark:border-white/10 dark:text-slate-400">
-                                                        {getTaskStatusLabel(card.status)}
-                                                    </span>
-                                                    <ArrowRight className="h-3.5 w-3.5 text-textSecondary dark:text-slate-400" />
-                                                </div>
+
+                                                {/* Status */}
+                                                <span className="text-xs px-3 py-1.5 rounded-lg bg-white/10 text-gray-300 border border-white/10">
+                                                    {getTaskStatusLabel(card.status)}
+                                                </span>
                                             </div>
                                         ))}
                                     </div>
@@ -508,14 +504,12 @@ const ExecutionDashboard = () => {
                             <p className="mt-2.5 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
                                 {coach?.reason || "Consistency is your superpower. One focused session today beats zero."}
                             </p>
-                            <motion.button
-                                whileHover={{ y: -2 }}
-                                whileTap={{ scale: 0.98 }}
+                            <button
                                 onClick={() => setVoicePanelOpen(true)}
-                                className="mt-4 w-full rounded-xl bg-gradient-to-r from-terracotta/20 to-terracotta/10 py-2.5 text-sm font-semibold text-terracotta hover:from-terracotta/30 hover:to-terracotta/20 dark:from-terracotta/15 dark:to-terracotta/10 dark:text-terracotta dark:hover:from-terracotta/25 dark:hover:to-terracotta/15"
+                                className="mt-4 w-full rounded-lg bg-terracotta/10 py-2.5 px-4 text-sm font-semibold text-terracotta hover:bg-terracotta/20 dark:bg-terracotta/10 dark:text-terracotta dark:hover:bg-terracotta/20 transition-colors"
                             >
                                 Get Strategy
-                            </motion.button>
+                            </button>
                         </div>
                     </aside>
                 </div>
