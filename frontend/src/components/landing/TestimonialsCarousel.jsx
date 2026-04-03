@@ -46,7 +46,7 @@ export default function TestimonialsCarousel() {
   const prev = () => setCurrent((current - 1 + testimonials.length) % testimonials.length);
 
   return (
-    <section className="py-20 px-6 bg-white dark:bg-slate-950">
+    <section className="py-20 px-6 bg-white dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -59,7 +59,7 @@ export default function TestimonialsCarousel() {
         {/* Carousel */}
         <div className="relative max-w-3xl mx-auto">
           {/* Testimonial Card */}
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/[0.08] rounded-3xl p-8 md:p-12 min-h-96 flex flex-col justify-between">
+          <div className="bg-white dark:bg-charcoalDark border border-gray-200 dark:border-white/[0.08] rounded-3xl p-8 md:p-12 min-h-96 flex flex-col justify-between">
             {/* Stars */}
             <div className="flex gap-1 mb-6">
               {[...Array(5)].map((_, i) => (

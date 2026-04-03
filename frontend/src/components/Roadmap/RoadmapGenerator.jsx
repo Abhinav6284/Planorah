@@ -60,7 +60,7 @@ export default function RoadmapGenerator() {
     };
 
     return (
-        <div className="relative min-h-[calc(100vh-80px)] bg-gray-50 dark:bg-gray-900 overflow-auto transition-colors duration-300 flex items-center justify-center">
+        <div className="relative min-h-[calc(100vh-80px)] bg-gray-50 dark:bg-charcoalDark overflow-auto transition-colors duration-300 flex items-center justify-center">
             <div className="relative w-full max-w-3xl p-4">
                 {/* Background Effects */}
                 <div
@@ -73,10 +73,10 @@ export default function RoadmapGenerator() {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="relative z-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl p-8 shadow-xl dark:shadow-black/30 transition-colors duration-300"
+                    className="relative z-10 bg-white dark:bg-charcoal border border-gray-200 dark:border-charcoalMuted rounded-3xl p-8 shadow-xl dark:shadow-black/30 transition-colors duration-300"
                 >
                     <div className="text-center mb-8">
-                        <span className="inline-block px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-[10px] font-bold tracking-widest uppercase mb-3 text-gray-900 dark:text-gray-300">
+                        <span className="inline-block px-3 py-1 rounded-full bg-gray-100 dark:bg-charcoalMuted text-[10px] font-bold tracking-widest uppercase mb-3 text-gray-900 dark:text-gray-300">
                             Design Your Path
                         </span>
                         <h2 className="text-3xl font-serif font-medium text-gray-900 dark:text-white mb-2">
@@ -102,7 +102,7 @@ export default function RoadmapGenerator() {
                                     onClick={() => setFormData({ ...formData, category: cat.id })}
                                     className={`p-3 rounded-xl border text-center transition-all duration-200 ${formData.category === cat.id
                                         ? 'border-black bg-black text-white shadow-md dark:border-white dark:bg-white dark:text-black'
-                                        : 'border-gray-100 bg-white text-gray-400 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500 dark:hover:bg-gray-700'
+                                        : 'border-gray-100 bg-white text-gray-400 hover:bg-gray-50 dark:border-charcoalMuted dark:bg-charcoal dark:text-gray-500 dark:hover:bg-charcoalMuted'
                                         }`}
                                 >
                                     <div className="text-xl mb-1">{cat.icon}</div>
@@ -130,7 +130,7 @@ export default function RoadmapGenerator() {
                                                 formData.category === 'skill_mastery' ? "e.g. Advanced Python..." :
                                                     "e.g. Become a Data Scientist..."
                                     }
-                                    className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 focus:border-black dark:focus:border-white outline-none transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600"
+                                    className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-charcoalMuted rounded-xl bg-gray-50 dark:bg-charcoalDark focus:bg-white dark:focus:bg-charcoal focus:border-black dark:focus:border-white outline-none transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600"
                                     required
                                 />
                             </div>
@@ -143,7 +143,7 @@ export default function RoadmapGenerator() {
                                     value={formData.duration}
                                     onChange={handleChange}
                                     placeholder="e.g. 3 months"
-                                    className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 focus:border-black dark:focus:border-white outline-none transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600"
+                                    className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-charcoalMuted rounded-xl bg-gray-50 dark:bg-charcoalDark focus:bg-white dark:focus:bg-charcoal focus:border-black dark:focus:border-white outline-none transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600"
                                     required
                                 />
                             </div>
@@ -156,7 +156,7 @@ export default function RoadmapGenerator() {
                                         name="current_level"
                                         value={formData.current_level}
                                         onChange={handleChange}
-                                        className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 focus:border-black dark:focus:border-white outline-none transition-all duration-200 appearance-none cursor-pointer text-gray-900 dark:text-white"
+                                        className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-charcoalMuted rounded-xl bg-gray-50 dark:bg-charcoalDark focus:bg-white dark:focus:bg-charcoal focus:border-black dark:focus:border-white outline-none transition-all duration-200 appearance-none cursor-pointer text-gray-900 dark:text-white"
                                     >
                                         <option value="beginner">Beginner</option>
                                         <option value="intermediate">Intermediate</option>
@@ -176,7 +176,7 @@ export default function RoadmapGenerator() {
                                             value={formData.tech_stack}
                                             onChange={handleChange}
                                             placeholder="e.g. React, Node.js, PostgreSQL..."
-                                            className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 focus:border-black dark:focus:border-white outline-none transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600"
+                                            className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-charcoalMuted rounded-xl bg-gray-50 dark:bg-charcoalDark focus:bg-white dark:focus:bg-charcoal focus:border-black dark:focus:border-white outline-none transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600"
                                         />
                                     </div>
                                     <div className="group md:col-span-2">
@@ -186,7 +186,7 @@ export default function RoadmapGenerator() {
                                             value={formData.success_definition}
                                             onChange={handleChange}
                                             placeholder="e.g. Deploy to Vercel, Get 100 users..."
-                                            className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 focus:border-black dark:focus:border-white outline-none transition-all duration-200 min-h-[80px] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600"
+                                            className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-charcoalMuted rounded-xl bg-gray-50 dark:bg-charcoalDark focus:bg-white dark:focus:bg-charcoal focus:border-black dark:focus:border-white outline-none transition-all duration-200 min-h-[80px] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600"
                                         />
                                     </div>
                                 </>
@@ -201,7 +201,7 @@ export default function RoadmapGenerator() {
                                             value={formData.interests}
                                             onChange={handleChange}
                                             placeholder="e.g. Fintech, Startups, Remote work..."
-                                            className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 focus:border-black dark:focus:border-white outline-none transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600"
+                                            className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-charcoalMuted rounded-xl bg-gray-50 dark:bg-charcoalDark focus:bg-white dark:focus:bg-charcoal focus:border-black dark:focus:border-white outline-none transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600"
                                         />
                                     </div>
                                     <div className="group md:col-span-2">
@@ -211,7 +211,7 @@ export default function RoadmapGenerator() {
                                                 name="motivation_style"
                                                 value={formData.motivation_style}
                                                 onChange={handleChange}
-                                                className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 focus:border-black dark:focus:border-white outline-none transition-all duration-200 appearance-none cursor-pointer text-gray-900 dark:text-white"
+                                                className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-charcoalMuted rounded-xl bg-gray-50 dark:bg-charcoalDark focus:bg-white dark:focus:bg-charcoal focus:border-black dark:focus:border-white outline-none transition-all duration-200 appearance-none cursor-pointer text-gray-900 dark:text-white"
                                             >
                                                 <option value="Milestones">Milestones (Standard)</option>
                                                 <option value="Gamified">Gamified (XP & Badges)</option>
@@ -232,7 +232,7 @@ export default function RoadmapGenerator() {
                                             value={formData.tech_stack}
                                             onChange={handleChange}
                                             placeholder="e.g. NLP, Computer Vision, PyTorch..."
-                                            className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 focus:border-black dark:focus:border-white outline-none transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600"
+                                            className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-charcoalMuted rounded-xl bg-gray-50 dark:bg-charcoalDark focus:bg-white dark:focus:bg-charcoal focus:border-black dark:focus:border-white outline-none transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600"
                                         />
                                     </div>
                                     <div className="group md:col-span-2">
@@ -242,7 +242,7 @@ export default function RoadmapGenerator() {
                                                 name="output_format"
                                                 value={formData.output_format}
                                                 onChange={handleChange}
-                                                className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 focus:border-black dark:focus:border-white outline-none transition-all duration-200 appearance-none cursor-pointer text-gray-900 dark:text-white"
+                                                className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-charcoalMuted rounded-xl bg-gray-50 dark:bg-charcoalDark focus:bg-white dark:focus:bg-charcoal focus:border-black dark:focus:border-white outline-none transition-all duration-200 appearance-none cursor-pointer text-gray-900 dark:text-white"
                                             >
                                                 <option value="Milestone-based">Milestone-based</option>
                                                 <option value="Weekly plan">Weekly Plan</option>
@@ -263,7 +263,7 @@ export default function RoadmapGenerator() {
                                             value={formData.learning_constraints}
                                             onChange={handleChange}
                                             placeholder="e.g. 1 hour/day, Free resources only..."
-                                            className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 focus:border-black dark:focus:border-white outline-none transition-all duration-200 min-h-[80px] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600"
+                                            className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-charcoalMuted rounded-xl bg-gray-50 dark:bg-charcoalDark focus:bg-white dark:focus:bg-charcoal focus:border-black dark:focus:border-white outline-none transition-all duration-200 min-h-[80px] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600"
                                         />
                                     </div>
                                 </>

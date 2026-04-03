@@ -235,14 +235,14 @@ export default function Scheduler() {
 
     return (
         <>
-            <div className="flex flex-col md:flex-row h-full bg-gray-50 dark:bg-gray-900 overflow-hidden font-sans transition-colors duration-200">
+            <div className="flex flex-col md:flex-row h-full bg-gray-50 dark:bg-charcoalDark overflow-hidden font-sans transition-colors duration-200">
 
                 {/* Mobile Header with Menu Button */}
-                <div className="md:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <div className="md:hidden flex items-center justify-between p-4 bg-white dark:bg-charcoal border-b border-gray-200 dark:border-charcoalMuted">
                     <h1 className="text-xl font-serif font-bold text-gray-900 dark:text-white">Schedule</h1>
                     <button
                         onClick={() => setSidebarOpen(true)}
-                        className="p-2 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                        className="p-2 rounded-xl bg-gray-100 dark:bg-charcoalMuted text-gray-600 dark:text-gray-300"
                     >
                         <FaBars />
                     </button>
@@ -264,14 +264,14 @@ export default function Scheduler() {
                                 animate={{ x: 0 }}
                                 exit={{ x: '-100%' }}
                                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                                className="md:hidden fixed top-0 left-0 bottom-0 w-full max-w-[320px] bg-white dark:bg-gray-800 z-50 overflow-y-auto shadow-2xl"
+                                className="md:hidden fixed top-0 left-0 bottom-0 w-full max-w-[320px] bg-white dark:bg-charcoal z-50 overflow-y-auto shadow-2xl"
                             >
                                 {/* Mobile Sidebar Header */}
-                                <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                                <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-charcoalMuted">
                                     <h2 className="text-xl font-serif font-bold text-gray-900 dark:text-white">My Tasks</h2>
                                     <button
                                         onClick={() => setSidebarOpen(false)}
-                                        className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                                        className="p-2 rounded-full bg-gray-100 dark:bg-charcoalMuted text-gray-600 dark:text-gray-400"
                                     >
                                         <FaTimes />
                                     </button>
@@ -313,7 +313,7 @@ export default function Scheduler() {
                                             <p className="text-sm text-gray-400 dark:text-gray-500">No roadmaps available</p>
                                         ) : (
                                             roadmaps.map(r => (
-                                                <div key={r.id} className="flex justify-between items-center text-sm mb-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                                                <div key={r.id} className="flex justify-between items-center text-sm mb-2 p-2 hover:bg-gray-100 dark:hover:bg-charcoalMuted rounded-lg transition-colors">
                                                     <span className="truncate flex-1 mr-2 font-medium text-gray-700 dark:text-gray-300">{r.title}</span>
                                                     <button
                                                         onClick={() => {
@@ -330,13 +330,13 @@ export default function Scheduler() {
                                     </div>
 
                                     {/* Tasks List */}
-                                    <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                                    <div className="border-t border-gray-200 dark:border-charcoalMuted pt-4">
                                         <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Tasks</h3>
                                         <div className="space-y-3">
                                             {tasks.map((task) => (
                                                 <div
                                                     key={task.id}
-                                                    className="p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl shadow-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                                                    className="p-3 bg-gray-50 dark:bg-charcoalMuted border border-gray-200 dark:border-charcoalMuted rounded-xl shadow-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-charcoalMuted transition-colors"
                                                     onClick={() => {
                                                         selectTask(task);
                                                         setSidebarOpen(false);
@@ -367,8 +367,8 @@ export default function Scheduler() {
                 </AnimatePresence>
 
                 {/* Desktop Sidebar / Task List */}
-                <div className="hidden md:flex w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-col shadow-sm z-10">
-                    <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div className="hidden md:flex w-80 bg-white dark:bg-charcoal border-r border-gray-200 dark:border-charcoalMuted flex-col shadow-sm z-10">
+                    <div className="p-6 border-b border-gray-200 dark:border-charcoalMuted">
                         <h2 className="text-xl font-serif font-bold text-gray-900 dark:text-white mb-6">My Tasks</h2>
 
                         {/* Focus Timer Widget */}
@@ -405,7 +405,7 @@ export default function Scheduler() {
                                 <p className="text-sm text-gray-400 dark:text-gray-500">No roadmaps available</p>
                             ) : (
                                 roadmaps.map(r => (
-                                    <div key={r.id} className="flex justify-between items-center text-sm mb-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                                    <div key={r.id} className="flex justify-between items-center text-sm mb-2 p-2 hover:bg-gray-100 dark:hover:bg-charcoalMuted rounded-lg transition-colors">
                                         <span className="truncate w-40 font-medium text-gray-700 dark:text-gray-300">{r.title}</span>
                                         <button
                                             onClick={() => handleScheduleRoadmap(r.id, r.title)}
@@ -431,7 +431,7 @@ export default function Scheduler() {
                                                         ref={provided.innerRef}
                                                         {...provided.draggableProps}
                                                         {...provided.dragHandleProps}
-                                                        className="p-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing group"
+                                                        className="p-4 bg-gray-50 dark:bg-charcoalMuted border border-gray-200 dark:border-charcoalMuted rounded-xl shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing group"
                                                         onClick={() => selectTask(task)}
                                                     >
                                                         <div className="flex justify-between items-start mb-2">
@@ -459,14 +459,14 @@ export default function Scheduler() {
                 </div>
 
                 {/* Main Calendar Area */}
-                <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900 min-w-0">
-                    <div className="px-4 md:px-8 py-4 md:py-6 border-b border-gray-200 dark:border-gray-700 flex flex-wrap gap-3 justify-between items-center bg-white dark:bg-gray-800">
+                <div className="flex-1 flex flex-col bg-gray-50 dark:bg-charcoalDark min-w-0">
+                    <div className="px-4 md:px-8 py-4 md:py-6 border-b border-gray-200 dark:border-charcoalMuted flex flex-wrap gap-3 justify-between items-center bg-white dark:bg-charcoal">
                         <h1 className="hidden md:block text-2xl font-serif font-bold text-gray-900 dark:text-white">Schedule</h1>
 
                         <div className="flex items-center gap-2 md:gap-4 flex-wrap">
                             <button
                                 onClick={connectGoogleCalendar}
-                                className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-xs md:text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-white transition-colors"
+                                className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white dark:bg-charcoalMuted border border-gray-200 dark:border-charcoalMuted rounded-xl text-xs md:text-sm font-medium hover:bg-gray-50 dark:hover:bg-charcoalMuted text-gray-700 dark:text-white transition-colors"
                             >
                                 <FaGoogle className="text-red-500" />
                                 <span className="hidden sm:inline">Connect Calendar</span>
@@ -476,7 +476,7 @@ export default function Scheduler() {
                             <button
                                 onClick={syncCalendar}
                                 disabled={syncing}
-                                className={`p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-white transition-colors ${syncing ? 'animate-spin' : ''}`}
+                                className={`p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-charcoalMuted hover:text-gray-700 dark:hover:text-white transition-colors ${syncing ? 'animate-spin' : ''}`}
                                 title="Sync with Google Calendar"
                             >
                                 <FaSync />
@@ -513,7 +513,7 @@ export default function Scheduler() {
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.9, opacity: 0, y: 20 }}
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6"
+                            className="bg-white dark:bg-charcoal rounded-2xl shadow-2xl w-full max-w-md p-6"
                         >
                             <div className="flex items-center justify-between mb-5">
                                 <div>
@@ -522,7 +522,7 @@ export default function Scheduler() {
                                 </div>
                                 <button
                                     onClick={() => setScheduleModal(null)}
-                                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-charcoalMuted text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
                                 >
                                     <FaTimes />
                                 </button>
@@ -538,7 +538,7 @@ export default function Scheduler() {
                                         value={scheduleForm.startDate}
                                         min={new Date().toISOString().split('T')[0]}
                                         onChange={e => setScheduleForm(f => ({ ...f, startDate: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-charcoalMuted bg-gray-50 dark:bg-charcoalMuted text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
                                     />
                                 </div>
 
@@ -550,7 +550,7 @@ export default function Scheduler() {
                                         type="time"
                                         value={scheduleForm.startTime}
                                         onChange={e => setScheduleForm(f => ({ ...f, startTime: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-charcoalMuted bg-gray-50 dark:bg-charcoalMuted text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
                                     />
                                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1.5">Tasks will be scheduled starting from this time each day.</p>
                                 </div>
@@ -566,7 +566,7 @@ export default function Scheduler() {
                             <div className="flex gap-3 mt-6">
                                 <button
                                     onClick={() => setScheduleModal(null)}
-                                    className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium text-sm transition-colors"
+                                    className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoalMuted font-medium text-sm transition-colors"
                                 >
                                     Cancel
                                 </button>

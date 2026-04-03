@@ -79,7 +79,7 @@ export default function PublishResearch() {
     ];
 
     return (
-        <div className="min-h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+        <div className="min-h-full bg-gray-50 dark:bg-charcoalDark transition-colors duration-300">
             <div className="p-6 md:p-10 max-w-7xl mx-auto font-sans">
                 {/* Back Button */}
                 <Link
@@ -126,13 +126,13 @@ export default function PublishResearch() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.05 }}
                             whileHover={{ y: -5 }}
-                            className="group bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-xl transition-all duration-300"
+                            className="group bg-white dark:bg-charcoal p-6 rounded-2xl border border-gray-100 dark:border-charcoalMuted shadow-sm hover:shadow-xl transition-all duration-300"
                         >
                             <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${publisher.color} flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform`}>
                                 {publisher.icon}
                             </div>
 
-                            <span className="inline-block px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs font-medium rounded-full mb-3">
+                            <span className="inline-block px-2 py-1 bg-gray-100 dark:bg-charcoalMuted text-gray-600 dark:text-gray-400 text-xs font-medium rounded-full mb-3">
                                 {publisher.category}
                             </span>
 

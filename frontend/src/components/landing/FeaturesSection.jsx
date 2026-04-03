@@ -77,7 +77,7 @@ const features = [
 
 export default function FeaturesSection() {
   return (
-    <section className="py-20 px-6 bg-white dark:bg-slate-950">
+    <section className="py-20 px-6 bg-white dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -99,7 +99,7 @@ export default function FeaturesSection() {
                 key={feature.id}
                 className="group h-full"
               >
-                <div className="h-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/[0.08] rounded-2xl p-6 hover:border-gray-300 dark:hover:border-white/[0.12] transition-all duration-300">
+                <div className="h-full bg-white dark:bg-charcoalDark border border-gray-200 dark:border-white/[0.08] rounded-2xl p-6 hover:border-gray-300 dark:hover:border-white/[0.12] transition-all duration-300">
                   {/* Icon */}
                   <div className="mb-4 inline-flex p-3 rounded-lg bg-gray-100 dark:bg-white/[0.06]">
                     <Icon className="w-6 h-6 text-gray-950 dark:text-white" />

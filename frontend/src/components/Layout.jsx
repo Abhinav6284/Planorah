@@ -74,7 +74,7 @@ const Layout = () => {
     const userName = user?.user?.first_name || user?.profile?.first_name || 'User';
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-beigePrimary via-beigeSecondary to-beigeMuted dark:bg-gray-900 transition-colors duration-200 font-sans flex">
+        <div className="min-h-screen bg-gradient-to-br from-beigePrimary via-beigeSecondary to-beigeMuted dark:bg-charcoalDark transition-colors duration-200 font-sans flex">
             {/* Desktop Sidebar */}
             <Sidebar mobileOpen={sidebarOpen} onMobileClose={() => setSidebarOpen(false)} user={user} />
 

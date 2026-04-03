@@ -22,7 +22,7 @@ const fallbackInsight = {
 };
 
 function SkeletonLine({ w = "full" }) {
-    return <div className={`h-3.5 w-${w} bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse`} />;
+    return <div className={`h-3.5 w-${w} bg-gray-100 dark:bg-charcoal rounded-lg animate-pulse`} />;
 }
 
 export default function OnboardingWidget({ variant = "default" }) {
@@ -62,14 +62,14 @@ export default function OnboardingWidget({ variant = "default" }) {
                 : "from-rose-400 to-pink-500";
 
     return (
-        <div className={`h-full rounded-3xl border shadow-sm flex flex-col overflow-hidden ${isExecution ? "border-cyan-300/20 bg-[linear-gradient(145deg,#0f1520,#161d29)] shadow-[0_20px_45px_rgba(0,0,0,0.4)]" : "border-gray-200 dark:border-white/10 bg-white dark:bg-[#1C1C1E]"}`}>
+        <div className={`h-full rounded-3xl border shadow-sm flex flex-col overflow-hidden ${isExecution ? "border-cyan-300/20 bg-[linear-gradient(145deg,#0f1520,#161d29)] shadow-[0_20px_45px_rgba(0,0,0,0.4)]" : "border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal"}`}>
             {/* ── Header ── */}
             <div className="px-5 pt-5 pb-3">
                 <div className="flex items-start justify-between gap-2 mb-3">
                     <div className="min-w-0">
                         <p className={`text-[10px] uppercase tracking-widest mb-0.5 ${isExecution ? "text-cyan-100/55" : "text-gray-400 dark:text-gray-500"}`}>AI Learning Intelligence</p>
                         {loading ? (
-                            <div className={`h-5 w-40 rounded-lg animate-pulse mt-1 ${isExecution ? "bg-cyan-200/10" : "bg-gray-100 dark:bg-gray-800"}`} />
+                            <div className={`h-5 w-40 rounded-lg animate-pulse mt-1 ${isExecution ? "bg-cyan-200/10" : "bg-gray-100 dark:bg-charcoal"}`} />
                         ) : (
                             <h3 className={`text-base font-bold leading-snug truncate ${isExecution ? "text-cyan-50" : "text-gray-900 dark:text-white"}`}>
                                 {insight.identity_tag || "Your Strategy"}
@@ -86,7 +86,7 @@ export default function OnboardingWidget({ variant = "default" }) {
                 </div>
 
                 {/* Readiness bar */}
-                <div className={`h-1.5 w-full rounded-full overflow-hidden mb-3 ${isExecution ? "bg-cyan-200/10" : "bg-gray-100 dark:bg-gray-800"}`}>
+                <div className={`h-1.5 w-full rounded-full overflow-hidden mb-3 ${isExecution ? "bg-cyan-200/10" : "bg-gray-100 dark:bg-charcoal"}`}>
                     <div
                         className={`h-full bg-gradient-to-r ${readinessColor} transition-all duration-700`}
                         style={{ width: `${readiness}%` }}
@@ -97,7 +97,7 @@ export default function OnboardingWidget({ variant = "default" }) {
                 {!loading && highlights.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mb-2">
                         {highlights.slice(0, 4).map((item, i) => (
-                            <span key={i} className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${isExecution ? "bg-cyan-300/10 text-cyan-100/80 border border-cyan-300/20" : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"}`}>
+                            <span key={i} className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${isExecution ? "bg-cyan-300/10 text-cyan-100/80 border border-cyan-300/20" : "bg-gray-100 text-gray-600 dark:bg-charcoal dark:text-gray-300"}`}>
                                 {item}
                             </span>
                         ))}
@@ -292,7 +292,7 @@ export default function OnboardingWidget({ variant = "default" }) {
                 {!onboardingComplete && (
                     <button
                         onClick={() => navigate("/onboarding")}
-                        className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${isExecution ? "border-cyan-300/25 text-cyan-100/90 hover:bg-cyan-400/10" : "border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5"}`}
+                        className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${isExecution ? "border-cyan-300/25 text-cyan-100/90 hover:bg-cyan-400/10" : "border-gray-300 dark:border-charcoalMuted text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5"}`}
                     >
                         Finish Onboarding
                     </button>

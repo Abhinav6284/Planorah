@@ -6,7 +6,7 @@ export default function ProjectsTab({ portfolio }) {
 
   return (
     <div className="space-y-5">
-      <div className="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
+      <div className="bg-white dark:bg-charcoal border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
         <div className="flex items-center justify-between mb-5">
           <div>
             <h3 className="text-gray-900 dark:text-white font-semibold">Portfolio Projects</h3>
@@ -25,7 +25,7 @@ export default function ProjectsTab({ portfolio }) {
             {projects.map((project) => (
               <div
                 key={project.id}
-                className="p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-white/10 rounded-2xl"
+                className="p-4 bg-gray-50 dark:bg-charcoalDark/50 border border-gray-100 dark:border-white/10 rounded-2xl"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex-1">
@@ -40,7 +40,7 @@ export default function ProjectsTab({ portfolio }) {
                         {project.tech_stack.slice(0, 5).map((tech) => (
                           <span
                             key={tech}
-                            className="px-2 py-0.5 text-[11px] bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-md"
+                            className="px-2 py-0.5 text-[11px] bg-gray-200 dark:bg-charcoal text-gray-600 dark:text-gray-400 rounded-md"
                           >
                             {tech}
                           </span>
@@ -65,7 +65,7 @@ export default function ProjectsTab({ portfolio }) {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-2xl">
+          <div className="text-center py-12 border-2 border-dashed border-gray-200 dark:border-charcoalMuted rounded-2xl">
             <p className="text-gray-400 dark:text-gray-500 text-sm mb-4">No projects added yet</p>
             <Link
               to="/projects"

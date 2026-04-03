@@ -32,8 +32,8 @@ export default function PaymentHistory() {
             case 'completed': return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
             case 'pending': return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
             case 'failed': return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
-            case 'refunded': return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400';
-            default: return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400';
+            case 'refunded': return 'bg-gray-100 text-gray-700 dark:bg-charcoal dark:text-gray-400';
+            default: return 'bg-gray-100 text-gray-700 dark:bg-charcoal dark:text-gray-400';
         }
     };
 
@@ -73,7 +73,7 @@ export default function PaymentHistory() {
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                             activeTab === 'payments'
                                 ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
-                                : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                                : 'bg-white dark:bg-charcoal border border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300'
                         }`}
                     >
                         Payments
@@ -83,7 +83,7 @@ export default function PaymentHistory() {
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                             activeTab === 'invoices'
                                 ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
-                                : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                                : 'bg-white dark:bg-charcoal border border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300'
                         }`}
                     >
                         Invoices
@@ -98,7 +98,7 @@ export default function PaymentHistory() {
                         className="space-y-4"
                     >
                         {payments.length === 0 ? (
-                            <div className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-8 text-center">
+                            <div className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-8 text-center">
                                 <div className="text-4xl mb-4">💳</div>
                                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2">No payments yet</h3>
                                 <p className="text-gray-500 text-sm">Your payment history will appear here</p>
@@ -110,7 +110,7 @@ export default function PaymentHistory() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.05 }}
-                                    className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6"
+                                    className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-6"
                                 >
                                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                         <div>
@@ -148,7 +148,7 @@ export default function PaymentHistory() {
                         className="space-y-4"
                     >
                         {invoices.length === 0 ? (
-                            <div className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-8 text-center">
+                            <div className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-8 text-center">
                                 <div className="text-4xl mb-4">📄</div>
                                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2">No invoices yet</h3>
                                 <p className="text-gray-500 text-sm">Invoices are generated after successful payments</p>
@@ -160,7 +160,7 @@ export default function PaymentHistory() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.05 }}
-                                    className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6"
+                                    className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-6"
                                 >
                                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                         <div>
@@ -183,7 +183,7 @@ export default function PaymentHistory() {
                                                     href={invoice.pdf_url}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                                                    className="px-4 py-2 border border-gray-200 dark:border-charcoalMuted rounded-xl text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoalDark transition-colors"
                                                 >
                                                     Download
                                                 </a>

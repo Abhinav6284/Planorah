@@ -44,7 +44,7 @@ const SubscriptionWidget = () => {
 
     if (loading) {
         return (
-            <div className="bg-white dark:bg-[#1C1C1E] rounded-[28px] p-5 h-full flex items-center justify-center border border-gray-100 dark:border-gray-800">
+            <div className="bg-white dark:bg-charcoal rounded-[28px] p-5 h-full flex items-center justify-center border border-gray-100 dark:border-charcoalMuted">
                 <div className="text-gray-400 dark:text-gray-500 animate-pulse">Loading...</div>
             </div>
         );
@@ -55,7 +55,7 @@ const SubscriptionWidget = () => {
     const daysRemaining = subscription?.days_remaining || 0;
 
     return (
-        <div className="bg-white dark:bg-[#1C1C1E] rounded-[28px] p-5 h-full flex flex-col relative overflow-hidden border border-gray-100 dark:border-gray-800">
+        <div className="bg-white dark:bg-charcoal rounded-[28px] p-5 h-full flex flex-col relative overflow-hidden border border-gray-100 dark:border-charcoalMuted">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Subscription</h3>
@@ -106,7 +106,7 @@ const SubscriptionWidget = () => {
             <div className="flex gap-2">
                 <Link
                     to="/subscription"
-                    className="flex-1 text-center py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    className="flex-1 text-center py-2 bg-gray-100 dark:bg-charcoal text-gray-700 dark:text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-200 dark:hover:bg-charcoalMuted transition-colors"
                 >
                     Manage
                 </Link>

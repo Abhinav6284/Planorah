@@ -2,39 +2,18 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Sun, Moon } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isDark, setIsDark] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
-    // Check initial system/localStorage preference
-    const isDarkGlobal = document.documentElement.classList.contains("dark") || 
-      localStorage.getItem("theme") === "dark" || 
-      (!localStorage.getItem("theme") && window.matchMedia("(prefers-color-scheme: dark)").matches);
-      
-    if (isDarkGlobal) {
-      document.documentElement.classList.add("dark");
-      setIsDark(true);
-    }
-
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const toggleTheme = () => {
-    if (isDark) {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-      setIsDark(false);
-    } else {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-      setIsDark(true);
-    }
-  };
 
   const navLinks = [
     { name: "Product", href: "#features" },
@@ -50,11 +29,10 @@ export default function Navbar() {
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: "spring", stiffness: 100, damping: 20 }}
-          className={`flex items-center justify-between gap-8 px-8 py-3.5 rounded-full transition-all duration-300 max-w-6xl w-full ${
-            scrolled
+          className={`flex items-center justify-between gap-8 px-8 py-3.5 rounded-full transition-all duration-300 max-w-6xl w-full ${scrolled
               ? "bg-white/70 dark:bg-charcoalDark/70 backdrop-blur-xl border border-beigeMuted dark:border-charcoal shadow-sm"
               : "bg-beigePrimary/40 dark:bg-charcoalDark/40 backdrop-blur-md border border-transparent"
-          }`}
+            }`}
         >
           {/* Logo */}
           <Link
@@ -84,11 +62,11 @@ export default function Navbar() {
           {/* Actions */}
           <div className="flex items-center gap-3 md:gap-5 ml-auto">
             {/* Theme Toggle */}
-            <button 
+            <button
               onClick={toggleTheme}
               className="p-2 rounded-full text-textSecondary dark:text-gray-400 hover:bg-beigeSecondary dark:hover:bg-charcoal transition-colors group"
             >
-              {isDark ? (
+              {theme === "dark" ? (
                 <Sun className="w-5 h-5 group-hover:text-terracotta transition-colors" />
               ) : (
                 <Moon className="w-5 h-5 group-hover:text-charcoal transition-colors" />
@@ -146,9 +124,9 @@ export default function Navbar() {
                   {link.name}
                 </motion.a>
               ))}
-              <motion.div 
-                initial={{ opacity: 0 }} 
-                animate={{ opacity: 1 }} 
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
                 className="flex flex-col gap-4 mt-8 pt-8 border-t border-beigeMuted dark:border-charcoalMuted"
               >

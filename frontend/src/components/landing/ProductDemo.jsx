@@ -6,17 +6,17 @@ import { Target, Cpu, Calendar, TrendingUp, Trophy, CheckCircle2, ArrowRight, Fl
 
 const GoalMockup = () => (
   <div className="p-[1px] rounded-3xl bg-gradient-to-br from-blue-400/70 via-purple-400/50 to-cyan-400/40">
-    <div className="w-full h-full rounded-3xl bg-white dark:bg-gray-900/90 backdrop-blur-sm shadow-soft dark:shadow-darkSoft p-10 flex flex-col justify-center relative overflow-hidden font-outfit transition-colors duration-500">
+    <div className="w-full h-full rounded-3xl bg-white dark:bg-charcoalDark/90 backdrop-blur-sm shadow-soft dark:shadow-darkSoft p-10 flex flex-col justify-center relative overflow-hidden font-outfit transition-colors duration-500">
       <div className="space-y-8 relative z-10 w-[90%] mx-auto">
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-14 h-14 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center border border-white dark:border-white/[0.08] shadow-sm text-[#D96C4A]">
+          <div className="w-14 h-14 bg-gray-100 dark:bg-charcoal rounded-2xl flex items-center justify-center border border-white dark:border-white/[0.08] shadow-sm text-[#D96C4A]">
             <Target className="w-6 h-6" />
           </div>
           <h4 className="font-bold text-gray-950 dark:text-white text-[22px] font-outfit font-bold tracking-wide">Determine Focus</h4>
         </div>
         <div className="space-y-3">
           <label className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em]">Primary Objective</label>
-          <div className="h-14 w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-white/[0.08] rounded-2xl flex items-center px-5 text-[15px] text-gray-950 dark:text-white font-medium shadow-sm">
+          <div className="h-14 w-full bg-gray-50 dark:bg-charcoalDark border border-gray-200 dark:border-white/[0.08] rounded-2xl flex items-center px-5 text-[15px] text-gray-950 dark:text-white font-medium shadow-sm">
             Full Stack Data Engineering
             <span className="ml-auto w-1.5 h-6 bg-[#D96C4A] rounded-full animate-pulse" />
           </div>
@@ -34,7 +34,7 @@ const GoalMockup = () => (
             ))}
           </div>
         </div>
-        <button className="w-full h-14 bg-gray-100 dark:bg-gray-800 text-gray-950 dark:text-white rounded-xl flex items-center justify-center gap-3 text-[14px] font-bold shadow-sm border border-gray-200 dark:border-white/[0.08] mt-4">
+        <button className="w-full h-14 bg-gray-100 dark:bg-charcoal text-gray-950 dark:text-white rounded-xl flex items-center justify-center gap-3 text-[14px] font-bold shadow-sm border border-gray-200 dark:border-white/[0.08] mt-4">
           <Cpu className="w-4 h-4 text-[#D96C4A]" />
           <span>Generate Architecture</span>
           <ArrowRight className="w-4 h-4" />
@@ -46,11 +46,11 @@ const GoalMockup = () => (
 
 const RoadmapMockup = () => (
   <div className="p-[1px] rounded-3xl bg-gradient-to-br from-purple-400/70 via-pink-400/50 to-red-400/40">
-    <div className="w-full h-full rounded-3xl bg-white dark:bg-gray-900/90 backdrop-blur-sm shadow-soft dark:shadow-darkSoft p-10 flex flex-col justify-center relative overflow-hidden font-outfit transition-colors duration-500">
+    <div className="w-full h-full rounded-3xl bg-white dark:bg-charcoalDark/90 backdrop-blur-sm shadow-soft dark:shadow-darkSoft p-10 flex flex-col justify-center relative overflow-hidden font-outfit transition-colors duration-500">
       <div className="space-y-6 relative z-10 w-[94%] mx-auto">
         <div className="flex items-center justify-between border-b border-gray-200 dark:border-white/[0.08] pb-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-white/[0.08] rounded-2xl flex items-center justify-center">
+            <div className="w-14 h-14 bg-gray-100 dark:bg-charcoal border border-gray-200 dark:border-white/[0.08] rounded-2xl flex items-center justify-center">
               <Cpu className="w-6 h-6 text-gray-950 dark:text-white" />
             </div>
             <h4 className="font-bold text-gray-950 dark:text-white text-[22px] font-outfit font-bold tracking-wide">Path Mapping</h4>
@@ -61,10 +61,10 @@ const RoadmapMockup = () => (
           {[
             { m: "M1", title: "Python Foundations", weeks: "Week 1-3", color: "bg-[#D96C4A] text-white" },
             { m: "M2", title: "SQL Models", weeks: "Week 4-8", color: "bg-gray-950 dark:bg-white text-white dark:text-gray-950" },
-            { m: "M3", title: "Airflow Pipelines", weeks: "Week 9-14", color: "bg-gray-100 dark:bg-gray-800" },
-            { m: "M4", title: "Distributed Data", weeks: "Week 15-20", color: "bg-gray-100 dark:bg-gray-800" },
+            { m: "M3", title: "Airflow Pipelines", weeks: "Week 9-14", color: "bg-gray-100 dark:bg-charcoal" },
+            { m: "M4", title: "Distributed Data", weeks: "Week 15-20", color: "bg-gray-100 dark:bg-charcoal" },
           ].map((item, i) => (
-            <div key={i} className="bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-white/[0.08] p-3.5 flex gap-4 items-center transition-colors">
+            <div key={i} className="bg-gray-50 dark:bg-charcoalDark rounded-xl border border-gray-200 dark:border-white/[0.08] p-3.5 flex gap-4 items-center transition-colors">
               <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold font-outfit font-bold text-[11px] flex-shrink-0 ${item.color}`}>{item.m}</div>
               <div className="flex-1 min-w-0">
                 <h5 className="text-[14px] font-bold text-gray-950 dark:text-white truncate">{item.title}</h5>
@@ -81,11 +81,11 @@ const RoadmapMockup = () => (
 
 const TasksMockup = () => (
   <div className="p-[1px] rounded-3xl bg-gradient-to-br from-emerald-400/70 via-teal-400/50 to-cyan-400/40">
-    <div className="w-full h-full rounded-3xl bg-white dark:bg-gray-900/90 backdrop-blur-sm shadow-soft dark:shadow-darkSoft p-10 flex flex-col justify-center relative overflow-hidden font-outfit transition-colors duration-500">
+    <div className="w-full h-full rounded-3xl bg-white dark:bg-charcoalDark/90 backdrop-blur-sm shadow-soft dark:shadow-darkSoft p-10 flex flex-col justify-center relative overflow-hidden font-outfit transition-colors duration-500">
       <div className="space-y-6 relative z-10 w-[94%] mx-auto">
         <div className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-white/[0.08] text-gray-950 dark:text-white">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-white/[0.08] rounded-2xl flex items-center justify-center">
+            <div className="w-14 h-14 bg-gray-100 dark:bg-charcoal border border-gray-200 dark:border-white/[0.08] rounded-2xl flex items-center justify-center">
               <Calendar className="w-6 h-6" />
             </div>
             <h4 className="font-bold text-[22px] font-outfit font-bold tracking-wide">Daily Regimen</h4>
@@ -103,7 +103,7 @@ const TasksMockup = () => (
           ].map((item, i) => (
             <div key={i} className={`rounded-xl border p-4 flex items-center gap-4 transition-all ${item.current
               ? "bg-gray-950 dark:bg-white text-white dark:text-gray-950 border-gray-950 dark:border-white shadow-md scale-105 z-10"
-              : "bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-white/[0.08] opacity-60"
+              : "bg-gray-50 dark:bg-charcoalDark border-gray-200 dark:border-white/[0.08] opacity-60"
               }`}>
               <div className={`w-5 h-5 rounded-full flex items-center justify-center border-2 transition-colors ${item.done ? "border-[#D96C4A] bg-[#D96C4A] text-white" : "border-gray-200 dark:border-white/[0.08]"}`}>
                 {item.done && <CheckCircle2 className="w-3 h-3" />}
@@ -120,10 +120,10 @@ const TasksMockup = () => (
 
 const ProgressMockup = () => (
   <div className="p-[1px] rounded-3xl bg-gradient-to-br from-amber-400/70 via-orange-400/50 to-red-400/40">
-    <div className="w-full h-full rounded-3xl bg-white dark:bg-gray-900/90 backdrop-blur-sm shadow-soft dark:shadow-darkSoft p-10 flex flex-col justify-center relative overflow-hidden font-outfit transition-colors duration-500">
+    <div className="w-full h-full rounded-3xl bg-white dark:bg-charcoalDark/90 backdrop-blur-sm shadow-soft dark:shadow-darkSoft p-10 flex flex-col justify-center relative overflow-hidden font-outfit transition-colors duration-500">
       <div className="space-y-8 relative z-10 w-[94%] mx-auto">
         <div className="flex items-center gap-4 border-b border-gray-200 dark:border-white/[0.08] pb-6 text-gray-950 dark:text-white">
-          <div className="w-14 h-14 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-white/[0.08] rounded-2xl flex items-center justify-center">
+          <div className="w-14 h-14 bg-gray-100 dark:bg-charcoal border border-gray-200 dark:border-white/[0.08] rounded-2xl flex items-center justify-center">
             <TrendingUp className="w-6 h-6 text-[#D96C4A]" />
           </div>
           <h4 className="font-bold text-[22px] font-outfit font-bold tracking-wide">Tracking</h4>
@@ -144,7 +144,7 @@ const ProgressMockup = () => (
               { label: "Milestones", value: "3/4" },
               { label: "Tasks Done", value: "186" },
             ].map((s, i) => (
-              <div key={i} className="p-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-white/[0.08] text-gray-950 dark:text-white transition-colors">
+              <div key={i} className="p-3 rounded-xl bg-gray-50 dark:bg-charcoalDark border border-gray-200 dark:border-white/[0.08] text-gray-950 dark:text-white transition-colors">
                 <div className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">{s.label}</div>
                 <div className="text-[18px] font-bold font-outfit font-bold">{s.value}</div>
               </div>
@@ -158,9 +158,9 @@ const ProgressMockup = () => (
 
 const MasteryMockup = () => (
   <div className="p-[1px] rounded-3xl bg-gradient-to-br from-violet-400/70 via-purple-400/50 to-indigo-400/40">
-    <div className="w-full h-full rounded-3xl bg-white dark:bg-gray-900/90 backdrop-blur-sm shadow-soft dark:shadow-darkSoft p-10 flex flex-col items-center justify-center relative overflow-hidden text-center font-outfit transition-colors duration-500">
+    <div className="w-full h-full rounded-3xl bg-white dark:bg-charcoalDark/90 backdrop-blur-sm shadow-soft dark:shadow-darkSoft p-10 flex flex-col items-center justify-center relative overflow-hidden text-center font-outfit transition-colors duration-500">
       <div className="relative z-10 space-y-8 w-full max-w-sm">
-        <div className="w-28 h-28 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-white/[0.08] rounded-[2.5rem] flex items-center justify-center mx-auto shadow-sm text-[#D96C4A]">
+        <div className="w-28 h-28 bg-gray-100 dark:bg-charcoal border border-gray-200 dark:border-white/[0.08] rounded-[2.5rem] flex items-center justify-center mx-auto shadow-sm text-[#D96C4A]">
           <Trophy className="w-12 h-12" />
         </div>
         <div className="space-y-3">
@@ -199,7 +199,7 @@ export default function ProductDemo() {
   return (
     <section
       id="how-it-works"
-      className="py-32 bg-white dark:bg-slate-950 transition-colors duration-500"
+      className="py-32 bg-white dark:bg-charcoal transition-colors duration-500"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Block */}
@@ -236,7 +236,7 @@ export default function ProductDemo() {
                 onClick={() => setActiveTab(idx)}
                 className={`w-full text-left p-5 lg:p-6 rounded-[1.5rem] border transition-all duration-500 group relative overflow-hidden ${
                   activeTab === idx
-                    ? "bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-white/[0.08] shadow-soft dark:shadow-darkSoft opacity-100"
+                    ? "bg-gray-50 dark:bg-charcoalDark border-gray-200 dark:border-white/[0.08] shadow-soft dark:shadow-darkSoft opacity-100"
                     : "bg-transparent border-transparent opacity-40 hover:opacity-100 translate-x-0"
                 }`}
               >
@@ -251,7 +251,7 @@ export default function ProductDemo() {
 
                 <div className="flex items-start gap-5 relative z-10">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors duration-500 ${
-                    activeTab === idx ? "bg-[#D96C4A] text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-950 dark:text-white"
+                    activeTab === idx ? "bg-[#D96C4A] text-white" : "bg-gray-100 dark:bg-charcoal text-gray-950 dark:text-white"
                   }`}>
                     <step.icon className="w-5 h-5" />
                   </div>

@@ -99,7 +99,7 @@ export default function Register() {
 
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-sans selection:bg-yellow-100 dark:selection:bg-yellow-900 flex flex-col justify-between p-4 md:p-6 lg:p-12 transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-charcoalDark text-gray-900 dark:text-white font-sans selection:bg-yellow-100 dark:selection:bg-yellow-900 flex flex-col justify-between p-4 md:p-6 lg:p-12 transition-colors duration-300">
       {/* Header */}
       <header className="flex justify-between items-center w-full max-w-7xl mx-auto">
         <Link to="/" className="text-xl md:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Planorah.</Link>
@@ -108,7 +108,7 @@ export default function Register() {
           <Link to="/login" className="text-sm font-medium hover:opacity-70 text-gray-700 dark:text-gray-300 md:hidden">Sign In</Link>
           <button
             onClick={toggleTheme}
-            className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            className="w-9 h-9 rounded-full bg-gray-100 dark:bg-charcoal flex items-center justify-center hover:bg-gray-200 dark:hover:bg-charcoalMuted transition-colors"
             aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
           >
             {theme === 'light' ? (
@@ -166,7 +166,7 @@ export default function Register() {
                   value={formData.username}
                   onChange={handleChange}
                   placeholder="Choose a Username"
-                  className="w-full px-8 py-5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-sm text-lg text-gray-900 dark:text-white"
+                  className="w-full px-8 py-5 rounded-full bg-white dark:bg-charcoal border border-gray-200 dark:border-charcoalMuted focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-sm text-lg text-gray-900 dark:text-white"
                   required
                 />
                 <input
@@ -175,7 +175,7 @@ export default function Register() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="Email Address"
-                  className="w-full px-8 py-5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-sm text-lg text-gray-900 dark:text-white"
+                  className="w-full px-8 py-5 rounded-full bg-white dark:bg-charcoal border border-gray-200 dark:border-charcoalMuted focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-sm text-lg text-gray-900 dark:text-white"
                   required
                 />
                 <div className="relative">
@@ -185,7 +185,7 @@ export default function Register() {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="Create Password"
-                    className="w-full px-8 py-5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-sm text-lg pr-14 text-gray-900 dark:text-white"
+                    className="w-full px-8 py-5 rounded-full bg-white dark:bg-charcoal border border-gray-200 dark:border-charcoalMuted focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-sm text-lg pr-14 text-gray-900 dark:text-white"
                     required
                   />
                   <button
@@ -226,14 +226,14 @@ export default function Register() {
 
           {/* Divider */}
           <div className="hidden md:flex flex-col items-center justify-center">
-            <div className="h-full w-px bg-gray-200/50 dark:bg-gray-700/50"></div>
+            <div className="h-full w-px bg-gray-200/50 dark:bg-charcoalMuted/50"></div>
             <span className="py-4 text-gray-400 dark:text-gray-500 italic font-serif text-xl">/</span>
-            <div className="h-full w-px bg-gray-200/50 dark:bg-gray-700/50"></div>
+            <div className="h-full w-px bg-gray-200/50 dark:bg-charcoalMuted/50"></div>
           </div>
           <div className="md:hidden flex items-center gap-4 w-full">
-            <div className="h-px bg-gray-200 dark:bg-gray-700 flex-1"></div>
+            <div className="h-px bg-gray-200 dark:bg-charcoalMuted flex-1"></div>
             <span className="text-gray-400 dark:text-gray-500 italic">or</span>
-            <div className="h-px bg-gray-200 dark:bg-gray-700 flex-1"></div>
+            <div className="h-px bg-gray-200 dark:bg-charcoalMuted flex-1"></div>
           </div>
 
           {/* Right Column: Social Login */}
@@ -241,9 +241,9 @@ export default function Register() {
             {/* Google Button */}
             <button
               onClick={() => login()}
-              className="w-full py-4 px-8 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center justify-start gap-4 group bg-white dark:bg-gray-800/50 shadow-sm hover:shadow-md"
+              className="w-full py-4 px-8 rounded-full border border-gray-200 dark:border-charcoalMuted hover:bg-gray-50 dark:hover:bg-charcoalMuted transition-all flex items-center justify-start gap-4 group bg-white dark:bg-charcoal/50 shadow-sm hover:shadow-md"
             >
-              <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-full group-hover:scale-110 transition-transform">
+              <div className="p-2 bg-gray-50 dark:bg-charcoalMuted rounded-full group-hover:scale-110 transition-transform">
                 <svg className="w-6 h-6" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                   <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -265,9 +265,9 @@ export default function Register() {
                 const state = encodeURIComponent('signup');
                 window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
               }}
-              className="w-full py-4 px-8 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center justify-start gap-4 group bg-white dark:bg-gray-800/50 shadow-sm hover:shadow-md"
+              className="w-full py-4 px-8 rounded-full border border-gray-200 dark:border-charcoalMuted hover:bg-gray-50 dark:hover:bg-charcoalMuted transition-all flex items-center justify-start gap-4 group bg-white dark:bg-charcoal/50 shadow-sm hover:shadow-md"
             >
-              <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-full group-hover:scale-110 transition-transform">
+              <div className="p-2 bg-gray-50 dark:bg-charcoalMuted rounded-full group-hover:scale-110 transition-transform">
                 <svg className="w-6 h-6 text-gray-900 dark:text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path fillRule="evenodd" clipRule="evenodd" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
                 </svg>
@@ -276,8 +276,8 @@ export default function Register() {
             </button>
 
             {/* Placeholder for more buttons (Apple, Facebook etc) */}
-            <div className="w-full py-4 px-8 rounded-full border border-gray-100 dark:border-gray-800 flex items-center justify-start gap-4 opacity-50 cursor-not-allowed">
-              <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-full">
+            <div className="w-full py-4 px-8 rounded-full border border-gray-100 dark:border-charcoalMuted flex items-center justify-start gap-4 opacity-50 cursor-not-allowed">
+              <div className="p-2 bg-gray-50 dark:bg-charcoal rounded-full">
                 <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M17.05 20.28c-.98.95-2.05.88-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.78 1.18-.19 2.31-.89 3.51-.84 1.54.02 2.68.75 3.37 1.74-2.69 1.63-2.12 5.04.5 6.13-.57 1.4-1.31 2.76-2.46 3.16zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.17 2.29-2.08 4.28-3.74 4.25z" />
                 </svg>
@@ -297,7 +297,7 @@ export default function Register() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-400 dark:text-gray-500 mt-12 py-4 border-t border-gray-100 dark:border-gray-800 md:border-none">
+      <footer className="w-full max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-400 dark:text-gray-500 mt-12 py-4 border-t border-gray-100 dark:border-charcoalMuted md:border-none">
         <div className="flex gap-6">
           <Link to="/privacy">Privacy Policy</Link>
           <Link to="/terms">Terms & Conditions</Link>

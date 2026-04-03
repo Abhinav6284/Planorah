@@ -74,7 +74,7 @@ export default function FeaturesCarousel() {
   const Icon = feature.icon;
 
   return (
-    <section className="py-20 px-6 bg-gray-50 dark:bg-slate-900">
+    <section className="py-20 px-6 bg-gray-50 dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -107,7 +107,7 @@ export default function FeaturesCarousel() {
             {/* Stats */}
             <div className="grid grid-cols-2 gap-4">
               {feature.stats.map((stat, idx) => (
-                <div key={idx} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/[0.08] rounded-xl p-4">
+                <div key={idx} className="bg-white dark:bg-charcoalDark border border-gray-200 dark:border-white/[0.08] rounded-xl p-4">
                   <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">{stat.label}</p>
                   <p className="text-lg font-bold text-gray-950 dark:text-white">{stat.value}</p>
                 </div>

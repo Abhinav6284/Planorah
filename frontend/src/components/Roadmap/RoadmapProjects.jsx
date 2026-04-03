@@ -64,8 +64,8 @@ export default function RoadmapProjects() {
     const getStatusBadge = (status) => {
         const styles = {
             'completed': 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
-            'in_progress': 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
-            'not_started': 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+            'in_progress': 'bg-blue-100 dark:bg-charcoal/30 text-blue-700 dark:text-blue-400',
+            'not_started': 'bg-gray-100 dark:bg-charcoalMuted text-gray-600 dark:text-gray-400'
         };
         const labels = {
             'completed': 'Completed',
@@ -103,7 +103,7 @@ export default function RoadmapProjects() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+            <div className="min-h-screen bg-gray-50 dark:bg-charcoalDark flex items-center justify-center">
                 <div className="text-center">
                     <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                     <p className="text-gray-500 dark:text-gray-400">Loading projects...</p>
@@ -113,7 +113,7 @@ export default function RoadmapProjects() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+        <div className="min-h-screen bg-gray-50 dark:bg-charcoalDark transition-colors duration-300">
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
                 {/* Header */}
                 <motion.div
@@ -135,7 +135,7 @@ export default function RoadmapProjects() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700"
+                        className="bg-white dark:bg-charcoal rounded-2xl p-4 border border-gray-100 dark:border-charcoalMuted"
                     >
                         <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Projects</p>
                         <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
@@ -144,7 +144,7 @@ export default function RoadmapProjects() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700"
+                        className="bg-white dark:bg-charcoal rounded-2xl p-4 border border-gray-100 dark:border-charcoalMuted"
                     >
                         <p className="text-sm text-green-600 dark:text-green-400 mb-1">Completed</p>
                         <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.completed}</p>
@@ -153,7 +153,7 @@ export default function RoadmapProjects() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700"
+                        className="bg-white dark:bg-charcoal rounded-2xl p-4 border border-gray-100 dark:border-charcoalMuted"
                     >
                         <p className="text-sm text-blue-600 dark:text-blue-400 mb-1">In Progress</p>
                         <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.inProgress}</p>
@@ -162,7 +162,7 @@ export default function RoadmapProjects() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4 }}
-                        className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700"
+                        className="bg-white dark:bg-charcoal rounded-2xl p-4 border border-gray-100 dark:border-charcoalMuted"
                     >
                         <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Not Started</p>
                         <p className="text-2xl font-bold text-gray-600 dark:text-gray-300">{stats.notStarted}</p>
@@ -170,7 +170,7 @@ export default function RoadmapProjects() {
                 </div>
 
                 {/* Filters */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 mb-6 border border-gray-100 dark:border-gray-700">
+                <div className="bg-white dark:bg-charcoal rounded-2xl p-4 mb-6 border border-gray-100 dark:border-charcoalMuted">
                     <div className="flex flex-col md:flex-row gap-4">
                         {/* Status Filter */}
                         <div className="flex-1">
@@ -184,7 +184,7 @@ export default function RoadmapProjects() {
                                         onClick={() => setFilter(status)}
                                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${filter === status
                                             ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
-                                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                            : 'bg-gray-100 dark:bg-charcoalMuted text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-charcoalMuted'
                                             }`}
                                     >
                                         {status === 'all' ? 'All' : status.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
@@ -201,7 +201,7 @@ export default function RoadmapProjects() {
                             <select
                                 value={roadmapFilter}
                                 onChange={(e) => setRoadmapFilter(e.target.value)}
-                                className="w-full md:w-auto px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600"
+                                className="w-full md:w-auto px-4 py-2.5 bg-gray-50 dark:bg-charcoalDark border border-gray-200 dark:border-charcoalMuted rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600"
                             >
                                 <option value="all">All Roadmaps</option>
                                 {roadmaps.map(roadmap => (
@@ -216,8 +216,8 @@ export default function RoadmapProjects() {
 
                 {/* Projects List */}
                 {filteredProjects.length === 0 ? (
-                    <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
-                        <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <div className="text-center py-20 bg-white dark:bg-charcoal rounded-2xl border border-gray-100 dark:border-charcoalMuted">
+                        <div className="w-16 h-16 bg-gray-100 dark:bg-charcoalMuted rounded-2xl flex items-center justify-center mx-auto mb-4">
                             <FaCode className="text-2xl text-gray-400 dark:text-gray-500" />
                         </div>
                         <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2">No projects found</h3>
@@ -247,13 +247,13 @@ export default function RoadmapProjects() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.05 }}
-                                    className={`bg-white dark:bg-gray-800 rounded-2xl border ${isExpanded ? 'border-blue-300 dark:border-blue-600 shadow-lg' : 'border-gray-100 dark:border-gray-700'} overflow-hidden transition-all duration-300`}
+                                    className={`bg-white dark:bg-charcoal rounded-2xl border ${isExpanded ? 'border-blue-300 dark:border-blue-600 shadow-lg' : 'border-gray-100 dark:border-charcoalMuted'} overflow-hidden transition-all duration-300`}
                                 >
                                     {/* Progress Bar */}
-                                    <div className="h-1.5 bg-gray-100 dark:bg-gray-700">
+                                    <div className="h-1.5 bg-gray-100 dark:bg-charcoalMuted">
                                         <div
                                             className={`h-full transition-all duration-500 ${project.status === 'completed' ? 'bg-green-500' :
-                                                project.status === 'in_progress' ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                                                project.status === 'in_progress' ? 'bg-blue-500' : 'bg-gray-300 dark:bg-charcoalMuted'
                                                 }`}
                                             style={{ width: `${project.progress}%` }}
                                         />
@@ -331,7 +331,7 @@ export default function RoadmapProjects() {
                                                 </div>
 
                                                 {/* Expand Button */}
-                                                <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                                <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-charcoalMuted transition-colors">
                                                     {isExpanded ?
                                                         <FaChevronUp className="text-gray-500 dark:text-gray-400" /> :
                                                         <FaChevronDown className="text-gray-500 dark:text-gray-400" />
@@ -351,7 +351,7 @@ export default function RoadmapProjects() {
                                                 transition={{ duration: 0.3 }}
                                                 className="overflow-hidden"
                                             >
-                                                <div className="px-5 pb-5 border-t border-gray-100 dark:border-gray-700 pt-4">
+                                                <div className="px-5 pb-5 border-t border-gray-100 dark:border-charcoalMuted pt-4">
                                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                                         {/* Tech Stack Section */}
                                                         <div className="space-y-3">
@@ -382,15 +382,15 @@ export default function RoadmapProjects() {
                                                                 Project Details
                                                             </h4>
                                                             <div className="space-y-2 text-sm">
-                                                                <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                                                                <div className="flex justify-between py-2 border-b border-gray-100 dark:border-charcoalMuted">
                                                                     <span className="text-gray-500 dark:text-gray-400">Phase:</span>
                                                                     <span className="font-medium text-gray-900 dark:text-white">{project.milestone_title}</span>
                                                                 </div>
-                                                                <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                                                                <div className="flex justify-between py-2 border-b border-gray-100 dark:border-charcoalMuted">
                                                                     <span className="text-gray-500 dark:text-gray-400">Estimated Time:</span>
                                                                     <span className="font-medium text-gray-900 dark:text-white">{project.estimated_hours} hours</span>
                                                                 </div>
-                                                                <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                                                                <div className="flex justify-between py-2 border-b border-gray-100 dark:border-charcoalMuted">
                                                                     <span className="text-gray-500 dark:text-gray-400">Tasks Completed:</span>
                                                                     <span className="font-medium text-gray-900 dark:text-white">{project.completed_tasks} / {project.total_tasks}</span>
                                                                 </div>
@@ -426,7 +426,7 @@ export default function RoadmapProjects() {
                                                                         e.stopPropagation();
                                                                         navigate(`/roadmap/${project.roadmap_id}`);
                                                                     }}
-                                                                    className="w-full flex items-center justify-between px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+                                                                    className="w-full flex items-center justify-between px-4 py-3 bg-gray-100 dark:bg-charcoalMuted text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-charcoalMuted transition-all"
                                                                 >
                                                                     <span className="flex items-center gap-2">
                                                                         <FaLayerGroup />
@@ -439,7 +439,7 @@ export default function RoadmapProjects() {
                                                                         e.stopPropagation();
                                                                         navigate('/codespace');
                                                                     }}
-                                                                    className="w-full flex items-center justify-between px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+                                                                    className="w-full flex items-center justify-between px-4 py-3 bg-gray-100 dark:bg-charcoalMuted text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-charcoalMuted transition-all"
                                                                 >
                                                                     <span className="flex items-center gap-2">
                                                                         <FaCode />

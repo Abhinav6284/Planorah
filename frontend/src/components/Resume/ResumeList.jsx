@@ -63,7 +63,7 @@ const ResumeCard = ({ resume, onEdit, onDelete, onPreview, onAnalyze }) => {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow"
+            className="bg-white dark:bg-charcoal rounded-xl border border-gray-200 dark:border-charcoalMuted overflow-hidden hover:shadow-lg transition-shadow"
         >
             <div className="p-5">
                 {/* Header */}
@@ -81,7 +81,7 @@ const ResumeCard = ({ resume, onEdit, onDelete, onPreview, onAnalyze }) => {
                     </div>
                     <span className={`text-xs px-2 py-1 rounded-full ${resume.ats_score >= 80 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
                         resume.ats_score >= 60 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                            'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                            'bg-gray-100 text-gray-600 dark:bg-charcoalMuted dark:text-gray-400'
                         }`}>
                         {resume.ats_score ? 'Analyzed' : 'Not Analyzed'}
                     </span>
@@ -114,18 +114,18 @@ const ResumeCard = ({ resume, onEdit, onDelete, onPreview, onAnalyze }) => {
                 )}
 
                 {/* Actions */}
-                <div className="border-t border-gray-100 dark:border-gray-700 pt-4 mt-2">
+                <div className="border-t border-gray-100 dark:border-charcoalMuted pt-4 mt-2">
                     <p className="text-xs text-gray-500 mb-3">Actions</p>
                     <div className="flex flex-wrap gap-2">
                         <button
                             onClick={() => onPreview(resume)}
-                            className="flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                            className="flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-100 dark:bg-charcoalMuted text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-charcoalMuted transition-colors"
                         >
                             👁️ Preview
                         </button>
                         <button
                             onClick={() => onEdit(resume)}
-                            className="flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                            className="flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-100 dark:bg-charcoalMuted text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-charcoalMuted transition-colors"
                         >
                             ✏️ Edit
                         </button>
@@ -187,10 +187,10 @@ const JobMatchModal = ({ isOpen, onClose, resume, onMatch }) => {
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden"
+                className="bg-white dark:bg-charcoal rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden"
                 onClick={e => e.stopPropagation()}
             >
-                <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div className="p-6 border-b border-gray-200 dark:border-charcoalMuted">
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                         🎯 Job Match Analysis
                     </h2>
@@ -210,7 +210,7 @@ const JobMatchModal = ({ isOpen, onClose, resume, onMatch }) => {
                                 onChange={(e) => setJobDescription(e.target.value)}
                                 placeholder="Paste the full job description here to see how well your resume matches..."
                                 rows={8}
-                                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-green-500 outline-none resize-none"
+                                className="w-full px-4 py-3 bg-gray-50 dark:bg-charcoalMuted border border-gray-200 dark:border-charcoalMuted rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-green-500 outline-none resize-none"
                             />
                             <button
                                 onClick={handleMatch}
@@ -274,7 +274,7 @@ const JobMatchModal = ({ isOpen, onClose, resume, onMatch }) => {
 
                             <button
                                 onClick={() => setResult(null)}
-                                className="w-full py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg"
+                                className="w-full py-2 bg-gray-100 dark:bg-charcoalMuted text-gray-700 dark:text-gray-300 rounded-lg"
                             >
                                 ← Try Another Job
                             </button>
@@ -363,10 +363,10 @@ const ImportAnalyzeModal = ({ isOpen, onClose, onSuccess }) => {
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden"
+                className="bg-white dark:bg-charcoal rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden"
                 onClick={e => e.stopPropagation()}
             >
-                <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div className="p-6 border-b border-gray-200 dark:border-charcoalMuted">
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                         📥 Import & Analyze Resume
                     </h2>
@@ -384,7 +384,7 @@ const ImportAnalyzeModal = ({ isOpen, onClose, onSuccess }) => {
                                 onDragOver={(e) => e.preventDefault()}
                                 onDrop={(e) => { e.preventDefault(); setDragActive(false); handleFile(e.dataTransfer.files[0]); }}
                                 onClick={() => fileInputRef.current?.click()}
-                                className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${dragActive || file ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-gray-300 dark:border-gray-600 hover:border-green-400'
+                                className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${dragActive || file ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-gray-300 dark:border-charcoalMuted hover:border-green-400'
                                     }`}
                             >
                                 <input
@@ -436,7 +436,7 @@ const ImportAnalyzeModal = ({ isOpen, onClose, onSuccess }) => {
                     {step === 'results' && result && (
                         <div className="space-y-4">
                             {/* Score */}
-                            <div className="text-center p-6 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                            <div className="text-center p-6 bg-gray-50 dark:bg-charcoalMuted/50 rounded-xl">
                                 <div className={`text-5xl font-bold ${result.overall_score >= 80 ? 'text-green-500' :
                                     result.overall_score >= 60 ? 'text-yellow-500' : 'text-red-500'
                                     }`}>
@@ -457,7 +457,7 @@ const ImportAnalyzeModal = ({ isOpen, onClose, onSuccess }) => {
                             <div className="flex gap-3 pt-2">
                                 <button
                                     onClick={() => setStep('upload')}
-                                    className="flex-1 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg"
+                                    className="flex-1 py-2 border border-gray-300 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 rounded-lg"
                                 >
                                     ← Back
                                 </button>
@@ -533,7 +533,7 @@ export default function ResumeList() {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 lg:p-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-charcoalDark p-6 lg:p-8">
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">
@@ -541,7 +541,7 @@ export default function ResumeList() {
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                         ATS friendly resume that will make you stand out
                     </p>
-                    <div className="mt-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg text-sm inline-block">
+                    <div className="mt-2 px-3 py-1.5 bg-blue-50 dark:bg-charcoal/20 text-blue-600 dark:text-blue-400 rounded-lg text-sm inline-block">
                         View and edit your existing resumes or create a new one
                     </div>
                 </div>
@@ -554,14 +554,14 @@ export default function ResumeList() {
                             placeholder="Search resume..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-green-500 outline-none"
+                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-charcoal border border-gray-200 dark:border-charcoalMuted rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-green-500 outline-none"
                         />
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
                     </div>
                     <div className="flex gap-3">
                         <button
                             onClick={() => setShowImportModal(true)}
-                            className="px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center gap-2"
+                            className="px-4 py-2.5 border border-gray-300 dark:border-charcoalMuted rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-charcoalMuted transition-colors flex items-center gap-2"
                         >
                             📥 Import Resume
                         </button>
@@ -580,7 +580,7 @@ export default function ResumeList() {
                         <div className="w-10 h-10 border-4 border-gray-200 border-t-green-600 rounded-full animate-spin" />
                     </div>
                 ) : filteredResumes.length === 0 ? (
-                    <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl">
+                    <div className="text-center py-16 bg-white dark:bg-charcoal rounded-2xl">
                         <div className="text-5xl mb-4">📄</div>
                         <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No resumes yet</h3>
                         <p className="text-gray-500 mb-4">Create your first ATS-optimized resume</p>

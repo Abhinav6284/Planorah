@@ -69,7 +69,7 @@ export default function PlanorahBlogsPage() {
         <div className="absolute bottom-[-8rem] left-[18%] h-96 w-[40rem] rounded-full bg-amber-100/50 blur-3xl dark:bg-amber-700/10" />
       </div>
 
-      <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/85 backdrop-blur dark:border-white/10 dark:bg-slate-950/75">
+      <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/85 backdrop-blur dark:border-white/10 dark:bg-charcoal/75">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-10">
           <div className="flex items-center gap-3">
             <Link
@@ -130,7 +130,7 @@ export default function PlanorahBlogsPage() {
           </div>
         </aside>
 
-        <article className="rounded-3xl border border-slate-200/70 bg-white/90 p-6 shadow-[0_18px_48px_rgba(15,23,42,0.08)] backdrop-blur dark:border-white/10 dark:bg-slate-950/70 md:p-10">
+        <article className="rounded-3xl border border-slate-200/70 bg-white/90 p-6 shadow-[0_18px_48px_rgba(15,23,42,0.08)] backdrop-blur dark:border-white/10 dark:bg-charcoal/70 md:p-10">
           <div className="mb-7 flex flex-wrap items-center gap-3 border-b border-slate-200/80 pb-6 dark:border-white/10">
             <span
               className={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-[0.08em] ${tierStyles[activeBlog.tier].badge}`}

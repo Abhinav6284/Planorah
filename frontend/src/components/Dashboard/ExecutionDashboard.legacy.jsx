@@ -638,7 +638,7 @@ const ExecutionDashboard = () => {
                                     <span className="text-slate-500 dark:text-slate-400">{xpPoints} XP</span>
                                 </div>
                                 <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
-                                    <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 dark:from-slate-100 dark:to-slate-400" style={{ width: `${xpProgress.percent}%` }} />
+                                    <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 dark:from-charcoalMuted dark:to-charcoalMuted" style={{ width: `${xpProgress.percent}%` }} />
                                 </div>
                                 <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{xpProgress.current.level}{xpProgress.next ? ` -> ${xpProgress.next.level}` : ' • Max level reached'}</p>
                             </div>

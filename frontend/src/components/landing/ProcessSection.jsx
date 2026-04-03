@@ -29,7 +29,7 @@ const steps = [
 
 export default function ProcessSection() {
   return (
-    <section className="py-20 px-6 bg-gray-50 dark:bg-slate-900">
+    <section className="py-20 px-6 bg-gray-50 dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -54,7 +54,7 @@ export default function ProcessSection() {
                 )}
 
                 {/* Card */}
-                <div className="h-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/[0.08] rounded-2xl p-8">
+                <div className="h-full bg-white dark:bg-charcoalDark border border-gray-200 dark:border-white/[0.08] rounded-2xl p-8">
                   {/* Step Number */}
                   <div className="text-5xl font-outfit font-bold text-gray-200 dark:text-white/[0.08] mb-4">
                     {item.step}

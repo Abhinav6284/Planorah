@@ -10,7 +10,7 @@ const toneBadgeStyles = {
   encouraging: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300',
   empathetic: 'bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300',
   motivating: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
-  neutral: 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300',
+  neutral: 'bg-slate-100 text-slate-700 dark:bg-charcoal dark:text-slate-300',
   supportive: 'bg-violet-100 text-violet-800 dark:bg-violet-900/40 dark:text-violet-300',
   challenging: 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300',
   celebratory: 'bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300',
@@ -305,7 +305,7 @@ export default function AITalkPanel({
                             <button
                               type="button"
                               onClick={() => handleProposalDecision(proposal.proposal_id, false)}
-                              className="px-3 py-1.5 text-xs rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600"
+                              className="px-3 py-1.5 text-xs rounded-lg bg-gray-200 dark:bg-charcoalMuted text-gray-800 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-charcoalMuted"
                             >
                               Cancel
                             </button>

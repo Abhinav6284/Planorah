@@ -8,12 +8,12 @@ export default function ToolsWidget({ stats }) {
             <Link to="/resume" className="block h-full">
                 <motion.div
                     whileHover={{ scale: 1.02 }}
-                    className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm h-full flex flex-col justify-between"
+                    className="bg-white dark:bg-charcoal p-6 rounded-3xl border border-gray-100 dark:border-charcoalMuted shadow-sm h-full flex flex-col justify-between"
                 >
                     <div className="flex justify-between items-start">
-                        <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-2xl text-2xl">📄</div>
+                        <div className="p-3 bg-blue-50 dark:bg-charcoal/20 rounded-2xl text-2xl">📄</div>
                         {stats?.resumes_created > 0 && (
-                            <span className="bg-gray-100 dark:bg-gray-700 font-bold px-2 py-1 rounded-lg text-xs">
+                            <span className="bg-gray-100 dark:bg-charcoalMuted font-bold px-2 py-1 rounded-lg text-xs">
                                 {stats.resumes_created} Created
                             </span>
                         )}
@@ -28,7 +28,7 @@ export default function ToolsWidget({ stats }) {
             <Link to="/ats" className="block h-full">
                 <motion.div
                     whileHover={{ scale: 1.02 }}
-                    className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm h-full flex flex-col justify-between"
+                    className="bg-white dark:bg-charcoal p-6 rounded-3xl border border-gray-100 dark:border-charcoalMuted shadow-sm h-full flex flex-col justify-between"
                 >
                     <div className="flex justify-between items-start">
                         <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-2xl text-2xl">🎯</div>

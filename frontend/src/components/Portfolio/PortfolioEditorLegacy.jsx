@@ -5,7 +5,7 @@ import { portfolioService } from '../../api/portfolioService';
 import { useSubscription } from '../../context/SubscriptionContext';
 
 // Shared input class for light theme
-const inputCls = "w-full px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-colors text-sm";
+const inputCls = "w-full px-4 py-2.5 bg-white dark:bg-charcoalDark border border-gray-200 dark:border-charcoalMuted rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-colors text-sm";
 
 export default function PortfolioEditor() {
     const { canAccess } = useSubscription();
@@ -99,11 +99,11 @@ export default function PortfolioEditor() {
     };
 
     const getStatusInfo = () => {
-        if (!portfolio) return { badge: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400', label: 'Loading' };
+        if (!portfolio) return { badge: 'bg-gray-100 text-gray-500 dark:bg-charcoal dark:text-gray-400', label: 'Loading' };
         const statuses = {
             active: { badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400', label: '● Live' },
             grace: { badge: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400', label: '● Grace Period' },
-            read_only: { badge: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', label: '● Free Plan' },
+            read_only: { badge: 'bg-blue-100 text-blue-700 dark:bg-charcoal/30 dark:text-blue-400', label: '● Free Plan' },
             archived: { badge: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', label: '○ Archived' }
         };
         return statuses[portfolio.status] || statuses.archived;
@@ -161,7 +161,7 @@ export default function PortfolioEditor() {
     return (
         <div className="min-h-screen bg-[#F5F5F7] dark:bg-black font-sans">
             {/* Top Header */}
-            <div className="bg-white dark:bg-[#1C1C1E] border-b border-gray-200 dark:border-white/10">
+            <div className="bg-white dark:bg-charcoal border-b border-gray-200 dark:border-white/10">
                 <div className="max-w-6xl mx-auto px-6 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -192,13 +192,13 @@ export default function PortfolioEditor() {
             </div>
 
             {/* URL Banner */}
-            <div className="bg-white dark:bg-[#1C1C1E] border-b border-gray-200 dark:border-white/10">
+            <div className="bg-white dark:bg-charcoal border-b border-gray-200 dark:border-white/10">
                 <div className="max-w-6xl mx-auto px-6 py-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                             <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1.5">Your Portfolio URL</p>
                             <div className="flex items-center gap-2">
-                                <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl">
+                                <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-charcoalDark border border-gray-200 dark:border-charcoalMuted rounded-xl">
                                     <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9" />
                                     </svg>
@@ -206,7 +206,7 @@ export default function PortfolioEditor() {
                                 </div>
                                 <button
                                     onClick={copyToClipboard}
-                                    className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                                    className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-charcoalMuted rounded-lg transition-colors"
                                     title="Copy URL"
                                 >
                                     {copied ? (
@@ -226,7 +226,7 @@ export default function PortfolioEditor() {
                             href={publicUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm"
+                            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-charcoalMuted transition-colors text-sm"
                         >
                             <span>Visit</span>
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -290,7 +290,7 @@ export default function PortfolioEditor() {
                     <div className="lg:col-span-2 space-y-5">
                         {activeTab === 'general' && (
                             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
-                                <div className="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
+                                <div className="bg-white dark:bg-charcoal border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
                                     <h3 className="text-gray-900 dark:text-white font-semibold mb-5">Basic Information</h3>
                                     <div className="space-y-4">
                                         <div>
@@ -312,7 +312,7 @@ export default function PortfolioEditor() {
 
                         {activeTab === 'social' && (
                             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
-                                <div className="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
+                                <div className="bg-white dark:bg-charcoal border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
                                     <h3 className="text-gray-900 dark:text-white font-semibold mb-5">Social Links</h3>
                                     <div className="space-y-4">
                                         {[
@@ -336,7 +336,7 @@ export default function PortfolioEditor() {
 
                         {activeTab === 'projects' && (
                             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
-                                <div className="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
+                                <div className="bg-white dark:bg-charcoal border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
                                     <div className="flex items-center justify-between mb-5">
                                         <div>
                                             <h3 className="text-gray-900 dark:text-white font-semibold">Portfolio Projects</h3>
@@ -350,13 +350,13 @@ export default function PortfolioEditor() {
                                     {portfolio?.portfolio_projects && portfolio.portfolio_projects.length > 0 ? (
                                         <div className="space-y-3">
                                             {portfolio.portfolio_projects.map((project, idx) => (
-                                                <div key={idx} className="p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-white/10 rounded-2xl flex items-center justify-between">
+                                                <div key={idx} className="p-4 bg-gray-50 dark:bg-charcoalDark/50 border border-gray-100 dark:border-white/10 rounded-2xl flex items-center justify-between">
                                                     <div className="flex-1">
                                                         <h4 className="text-gray-900 dark:text-white font-medium text-sm">{project.display_title || project.project_title}</h4>
                                                         {project.tech_stack && project.tech_stack.length > 0 && (
                                                             <div className="flex gap-1.5 mt-2">
                                                                 {project.tech_stack.slice(0, 3).map((tech, i) => (
-                                                                    <span key={i} className="px-2 py-0.5 text-[11px] bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-md">{tech}</span>
+                                                                    <span key={i} className="px-2 py-0.5 text-[11px] bg-gray-200 dark:bg-charcoal text-gray-600 dark:text-gray-400 rounded-md">{tech}</span>
                                                                 ))}
                                                             </div>
                                                         )}
@@ -368,8 +368,8 @@ export default function PortfolioEditor() {
                                             ))}
                                         </div>
                                     ) : (
-                                        <div className="text-center py-12 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-2xl">
-                                            <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+                                        <div className="text-center py-12 border-2 border-dashed border-gray-200 dark:border-charcoalMuted rounded-2xl">
+                                            <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-gray-100 dark:bg-charcoalDark flex items-center justify-center">
                                                 <svg className="w-6 h-6 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                                 </svg>
@@ -386,17 +386,17 @@ export default function PortfolioEditor() {
 
                         {activeTab === 'settings' && (
                             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
-                                <div className="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
+                                <div className="bg-white dark:bg-charcoal border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
                                     <h3 className="text-gray-900 dark:text-white font-semibold mb-5">Display Settings</h3>
                                     <div className="space-y-4">
-                                        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-white/10 rounded-2xl">
+                                        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-charcoalDark/50 border border-gray-100 dark:border-white/10 rounded-2xl">
                                             <div>
                                                 <h4 className="text-gray-900 dark:text-white font-medium text-sm">Show Email</h4>
                                                 <p className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">Display your email on portfolio</p>
                                             </div>
                                             <button
                                                 onClick={() => handleToggle('show_email')}
-                                                className={`w-11 h-6 rounded-full transition-all relative ${portfolio?.show_email ? 'bg-emerald-500' : 'bg-gray-200 dark:bg-gray-700'}`}
+                                                className={`w-11 h-6 rounded-full transition-all relative ${portfolio?.show_email ? 'bg-emerald-500' : 'bg-gray-200 dark:bg-charcoalMuted'}`}
                                             >
                                                 <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${portfolio?.show_email ? 'translate-x-5' : 'translate-x-0.5'}`} />
                                             </button>
@@ -413,20 +413,20 @@ export default function PortfolioEditor() {
                                 </div>
 
                                 {canAccess('custom_subdomain') && (
-                                    <div className="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
+                                    <div className="bg-white dark:bg-charcoal border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
                                         <h3 className="text-gray-900 dark:text-white font-semibold mb-5">Custom Subdomain</h3>
                                         <div className="space-y-4">
                                             <div>
                                                 <label className="block text-gray-500 dark:text-gray-400 text-xs font-medium mb-1.5 uppercase tracking-wide">Claim your subdomain</label>
                                                 <div className="flex gap-2">
-                                                    <div className="flex-1 flex items-center bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden focus-within:border-indigo-400 transition-colors">
+                                                    <div className="flex-1 flex items-center bg-white dark:bg-charcoalDark border border-gray-200 dark:border-charcoalMuted rounded-xl overflow-hidden focus-within:border-indigo-400 transition-colors">
                                                         <input
                                                             value={newSubdomain}
                                                             onChange={(e) => setNewSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
                                                             placeholder={portfolio?.custom_subdomain || "your-name"}
                                                             className="flex-1 bg-transparent px-4 py-2.5 text-gray-900 dark:text-white text-sm outline-none"
                                                         />
-                                                        <span className="px-3 py-2.5 bg-gray-50 dark:bg-gray-800 text-gray-400 text-xs border-l border-gray-200 dark:border-gray-700">.{portfolioRootDomain}</span>
+                                                        <span className="px-3 py-2.5 bg-gray-50 dark:bg-charcoal text-gray-400 text-xs border-l border-gray-200 dark:border-charcoalMuted">.{portfolioRootDomain}</span>
                                                     </div>
                                                     <button
                                                         onClick={handleSetSubdomain}

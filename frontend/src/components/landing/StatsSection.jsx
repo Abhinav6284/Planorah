@@ -64,7 +64,7 @@ const testimonials = [
 
 export default function StatsSection() {
   return (
-    <section id="testimonials" className="py-28 md:py-36 px-4 md:px-8 bg-white dark:bg-gray-950 relative overflow-hidden">
+    <section id="testimonials" className="py-28 md:py-36 px-4 md:px-8 bg-white dark:bg-charcoalDark relative overflow-hidden">
       {/* No decorative background */}
 
       <div className="max-w-7xl mx-auto relative">
@@ -107,7 +107,7 @@ export default function StatsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.6 }}
-              className="relative bg-white dark:bg-gray-800/60 rounded-2xl border border-gray-100 dark:border-gray-700/60 p-6 text-center overflow-hidden group hover:shadow-lg hover:shadow-gray-100/80 dark:hover:shadow-gray-900/80 transition-shadow"
+              className="relative bg-white dark:bg-charcoal/60 rounded-2xl border border-gray-100 dark:border-charcoalMuted/60 p-6 text-center overflow-hidden group hover:shadow-lg hover:shadow-gray-100/80 dark:hover:shadow-gray-900/80 transition-shadow"
             >
               <div className="absolute inset-0 bg-gray-500 opacity-0 group-hover:opacity-[0.03] dark:group-hover:opacity-[0.06] transition-opacity rounded-2xl" />
               <div className="text-3xl mb-3">{stat.icon}</div>
@@ -129,7 +129,7 @@ export default function StatsSection() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.12, duration: 0.6 }}
               whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="bg-white dark:bg-gray-800/60 rounded-2xl border border-gray-100 dark:border-gray-700/60 p-6 shadow-sm relative overflow-hidden group"
+              className="bg-white dark:bg-charcoal/60 rounded-2xl border border-gray-100 dark:border-charcoalMuted/60 p-6 shadow-sm relative overflow-hidden group"
             >
               {/* Quote mark */}
               <div className="absolute -top-2 -right-2 text-8xl font-bold text-gray-200 dark:text-gray-700 opacity-60 group-hover:opacity-100 transition-opacity">

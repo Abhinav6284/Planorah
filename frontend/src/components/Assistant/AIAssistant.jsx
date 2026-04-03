@@ -242,7 +242,7 @@ export default function AIAssistant() {
 
                   <div className={`relative px-4 py-3 rounded-2xl ${msg.role === 'user'
                     ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-br-md'
-                    : 'bg-white dark:bg-[#1C1C1E] text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-800 rounded-bl-md shadow-sm'
+                    : 'bg-white dark:bg-charcoal text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-charcoalMuted rounded-bl-md shadow-sm'
                     }`}
                   >
                     {msg.role === 'assistant' ? (
@@ -269,7 +269,7 @@ export default function AIAssistant() {
                               <button
                                 type="button"
                                 onClick={() => handleProposalDecision(msg.id, proposal.proposal_id, false)}
-                                className="px-3 py-1.5 text-xs rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600"
+                                className="px-3 py-1.5 text-xs rounded-lg bg-gray-200 dark:bg-charcoalMuted text-gray-800 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-charcoalMuted"
                               >
                                 Cancel
                               </button>
@@ -295,7 +295,7 @@ export default function AIAssistant() {
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-sm">
                       ✨
                     </div>
-                    <div className="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
+                    <div className="bg-white dark:bg-charcoal border border-gray-200 dark:border-charcoalMuted rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
                       <div className="flex gap-1.5">
                         <span className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                         <span className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -312,7 +312,7 @@ export default function AIAssistant() {
         </div>
       </div>
 
-      <div className="flex-shrink-0 bg-gray-50 dark:bg-[#0A0A0A] border-t border-gray-200 dark:border-gray-800 py-3 md:py-4">
+      <div className="flex-shrink-0 bg-gray-50 dark:bg-[#0A0A0A] border-t border-gray-200 dark:border-charcoalMuted py-3 md:py-4">
         <div className="max-w-3xl mx-auto px-3 md:px-4">
           <AnimatePresence>
             {messages.length <= 2 && (
@@ -330,7 +330,7 @@ export default function AIAssistant() {
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: i * 0.05 }}
                       onClick={() => sendMessage(q.text)}
-                      className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#1C1C1E] text-gray-700 dark:text-gray-300 rounded-full border border-gray-200 dark:border-gray-700 hover:border-violet-400 dark:hover:border-violet-500 hover:shadow-md transition-all text-sm"
+                      className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-charcoal text-gray-700 dark:text-gray-300 rounded-full border border-gray-200 dark:border-charcoalMuted hover:border-violet-400 dark:hover:border-violet-500 hover:shadow-md transition-all text-sm"
                     >
                       <span>{q.icon}</span>
                       <span>{q.text}</span>
@@ -341,7 +341,7 @@ export default function AIAssistant() {
             )}
           </AnimatePresence>
 
-          <div className="bg-white dark:bg-[#1C1C1E] rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-2">
+          <div className="bg-white dark:bg-charcoal rounded-2xl border border-gray-200 dark:border-charcoalMuted shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-2">
             <form onSubmit={handleSend} className="flex items-end gap-2">
               <textarea
                 ref={inputRef}
@@ -365,7 +365,7 @@ export default function AIAssistant() {
                   <button
                     type="button"
                     onClick={clearChat}
-                    className="p-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all"
+                    className="p-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-charcoalMuted rounded-xl transition-all"
                     title="Clear Chat"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

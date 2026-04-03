@@ -5,7 +5,19 @@
       "Bash(npm run:*)",
       "Read(//p//**)",
       "Read(//p/.claude/**)",
-      "Bash(grep -c \"^{$\" p:/Planora/.claude/worktrees/musing-dewdney/frontend/planorah_blogs.html)"
+      "Bash(grep -c \"^{$\" p:/Planora/.claude/worktrees/musing-dewdney/frontend/planorah_blogs.html)",
+      "Bash(chmod +x /tmp/replace_colors.sh)",
+      "Bash(bash /tmp/replace_colors.sh)",
+      "Bash(chmod +x /tmp/replace_colors_v2.sh)",
+      "Bash(bash /tmp/replace_colors_v2.sh)",
+      "Bash(find frontend/src/components -name \"*.jsx\" -type f -exec sed -i 's/dark:bg-\\\\[#1C1C1E\\\\]/dark:bg-charcoal/g' {} +)",
+      "Bash(chmod +x /tmp/replace_gradients.sh)",
+      "Bash(bash /tmp/replace_gradients.sh)",
+      "Bash(chmod +x /tmp/replace_remaining.sh)",
+      "Bash(bash /tmp/replace_remaining.sh)",
+      "Bash(grep -v \":0$\")",
+      "Bash(chmod +x /tmp/verify_report.sh)",
+      "Bash(bash /tmp/verify_report.sh)"
     ]
   }
 }

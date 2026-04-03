@@ -108,11 +108,11 @@ export default function CheckoutPage() {
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 mb-6"
+                    className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-6 mb-6"
                 >
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Order Summary</h3>
                     
-                    <div className="flex items-center justify-between py-4 border-b border-gray-200 dark:border-gray-800">
+                    <div className="flex items-center justify-between py-4 border-b border-gray-200 dark:border-charcoalMuted">
                         <div>
                             <h4 className="font-semibold text-gray-900 dark:text-white">{plan.display_name}</h4>
                             <p className="text-sm text-gray-500">{plan.validity_days} days access</p>
@@ -123,7 +123,7 @@ export default function CheckoutPage() {
                     </div>
 
                     {/* Coupon Section */}
-                    <div className="py-4 border-b border-gray-200 dark:border-gray-800">
+                    <div className="py-4 border-b border-gray-200 dark:border-charcoalMuted">
                         <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                             Coupon Code
                         </label>
@@ -150,7 +150,7 @@ export default function CheckoutPage() {
                                     value={couponCode}
                                     onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                                     placeholder="Enter coupon code"
-                                    className="flex-1 px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white font-mono uppercase"
+                                    className="flex-1 px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-charcoalMuted focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white font-mono uppercase"
                                 />
                                 <button
                                     onClick={handleApplyCoupon}
@@ -184,7 +184,7 @@ export default function CheckoutPage() {
                         </div>
                     </div>
 
-                    <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
+                    <div className="pt-4 border-t border-gray-200 dark:border-charcoalMuted">
                         <div className="flex justify-between items-center">
                             <span className="text-lg font-bold text-gray-900 dark:text-white">Total</span>
                             <span className="text-2xl font-bold text-gray-900 dark:text-white">₹{finalPrice.toFixed(2)}</span>
@@ -197,7 +197,7 @@ export default function CheckoutPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 mb-6"
+                    className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-6 mb-6"
                 >
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">What You'll Get</h3>
                     <div className="space-y-3">
@@ -265,7 +265,7 @@ export default function CheckoutPage() {
                     >
                         {processing ? (
                             <>
-                                <div className="w-5 h-5 border-2 border-white dark:border-gray-900 border-t-transparent rounded-full animate-spin" />
+                                <div className="w-5 h-5 border-2 border-white dark:border-charcoalMuted border-t-transparent rounded-full animate-spin" />
                                 Processing...
                             </>
                         ) : (

@@ -16,7 +16,7 @@ const UsageMeter = ({ used, limit, label }) => {
                     {isUnlimited ? 'Unlimited' : `${used} / ${limit}`}
                 </span>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+            <div className="w-full bg-gray-200 dark:bg-charcoal rounded-full h-2">
                 <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: isUnlimited ? '0%' : `${percentage}%` }}
@@ -56,7 +56,7 @@ export default function SubscriptionStatus() {
             case 'active': return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
             case 'grace': return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
             case 'expired': return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
-            default: return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400';
+            default: return 'bg-gray-100 text-gray-700 dark:bg-charcoal dark:text-gray-400';
         }
     };
 
@@ -75,7 +75,7 @@ export default function SubscriptionStatus() {
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-8 text-center"
+                        className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-8 text-center"
                     >
                         <div className="text-5xl mb-4">📋</div>
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
@@ -117,7 +117,7 @@ export default function SubscriptionStatus() {
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 mb-6"
+                    className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-6 mb-6"
                 >
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                         <div>
@@ -147,7 +147,7 @@ export default function SubscriptionStatus() {
                             <span>Started {new Date(subscription.start_date).toLocaleDateString()}</span>
                             <span>Expires {new Date(subscription.end_date).toLocaleDateString()}</span>
                         </div>
-                        <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+                        <div className="w-full bg-gray-200 dark:bg-charcoal rounded-full h-2">
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${Math.max(0, 100 - (subscription.days_remaining / subscription.plan_details?.validity_days) * 100)}%` }}
@@ -181,7 +181,7 @@ export default function SubscriptionStatus() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 mb-6"
+                        className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-6 mb-6"
                     >
                         <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Usage</h3>
                         <div className="grid md:grid-cols-2 gap-6">
@@ -224,7 +224,7 @@ export default function SubscriptionStatus() {
                     </button>
                     <button
                         onClick={() => navigate('/billing/history')}
-                        className="flex-1 px-6 py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-900 transition-all text-center"
+                        className="flex-1 px-6 py-3 border border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-charcoalDark transition-all text-center"
                     >
                         Billing History
                     </button>

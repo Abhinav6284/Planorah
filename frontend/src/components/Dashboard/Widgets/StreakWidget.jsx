@@ -6,7 +6,7 @@ export default function StreakWidget({ streak, xp, level }) {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-black to-gray-800 dark:from-white dark:to-gray-200 p-6 rounded-3xl text-white dark:text-black shadow-lg"
+            className="bg-gradient-to-br from-black to-gray-800 dark:from-white dark:to-charcoalMuted p-6 rounded-3xl text-white dark:text-black shadow-lg"
         >
             <div className="flex justify-between items-start mb-4">
                 <div className="text-xs font-bold uppercase tracking-widest opacity-70">Current Streak</div>

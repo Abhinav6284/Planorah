@@ -52,7 +52,7 @@ const plans = [
 
 export default function PricingSection() {
   return (
-    <section id="pricing" className="py-20 px-6 bg-gray-50 dark:bg-slate-900">
+    <section id="pricing" className="py-20 px-6 bg-gray-50 dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -70,11 +70,10 @@ export default function PricingSection() {
           {plans.map((plan, idx) => (
             <div
               key={idx}
-              className={`relative rounded-2xl transition-all duration-300 ${
-                plan.highlighted
+              className={`relative rounded-2xl transition-all duration-300 ${plan.highlighted
                   ? "md:scale-105 bg-gray-950 dark:bg-white text-white dark:text-gray-950"
-                  : "bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.12]"
-              }`}
+                  : "bg-white dark:bg-charcoalDark border border-gray-200 dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.12]"
+                }`}
             >
               {plan.highlighted && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-gray-950 dark:bg-white text-white dark:text-gray-950 text-xs font-semibold rounded-full">
@@ -107,11 +106,10 @@ export default function PricingSection() {
 
                 {/* CTA Button */}
                 <button
-                  className={`w-full py-3 rounded-lg font-medium mb-8 transition-all duration-300 ${
-                    plan.highlighted
-                      ? "bg-white dark:bg-gray-950 text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-900"
+                  className={`w-full py-3 rounded-lg font-medium mb-8 transition-all duration-300 ${plan.highlighted
+                      ? "bg-white dark:bg-charcoalDark text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-charcoal"
                       : "bg-gray-100 dark:bg-white/[0.06] text-gray-950 dark:text-white hover:bg-gray-200 dark:hover:bg-white/[0.08]"
-                  }`}
+                    }`}
                 >
                   {plan.cta}
                 </button>

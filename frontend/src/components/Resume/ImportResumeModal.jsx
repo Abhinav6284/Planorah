@@ -140,11 +140,11 @@ export default function ImportResumeModal({ isOpen, onClose, onSuccess }) {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
                     transition={{ type: "spring", duration: 0.3 }}
-                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden"
+                    className="bg-white dark:bg-charcoal rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden"
                     onClick={(e) => e.stopPropagation()}
                 >
                     {/* Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-charcoalMuted">
                         <div>
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                                 {step === 'results' ? 'ATS Analysis Results' : 'Import Resume'}
@@ -157,7 +157,7 @@ export default function ImportResumeModal({ isOpen, onClose, onSuccess }) {
                         </div>
                         <button
                             onClick={() => { resetModal(); onClose(); }}
-                            className="w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center text-gray-500 transition-colors"
+                            className="w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-charcoalMuted flex items-center justify-center text-gray-500 transition-colors"
                         >
                             ✕
                         </button>
@@ -178,7 +178,7 @@ export default function ImportResumeModal({ isOpen, onClose, onSuccess }) {
                                         ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
                                         : file
                                             ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                                            : 'border-gray-300 dark:border-gray-600 hover:border-green-400'
+                                            : 'border-gray-300 dark:border-charcoalMuted hover:border-green-400'
                                         }`}
                                 >
                                     <input
@@ -256,7 +256,7 @@ export default function ImportResumeModal({ isOpen, onClose, onSuccess }) {
                         {step === 'results' && atsResult && (
                             <div className="space-y-6">
                                 {/* Overall Score */}
-                                <div className="text-center p-6 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                                <div className="text-center p-6 bg-gray-50 dark:bg-charcoalMuted/50 rounded-xl">
                                     <div className={`text-6xl font-bold ${getScoreColor(atsResult.overall_score)}`}>
                                         {atsResult.overall_score}
                                     </div>
@@ -279,7 +279,7 @@ export default function ImportResumeModal({ isOpen, onClose, onSuccess }) {
                                                     {data.score}%
                                                 </span>
                                             </div>
-                                            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                            <div className="h-2 bg-gray-200 dark:bg-charcoalMuted rounded-full overflow-hidden">
                                                 <div
                                                     className={`h-full ${getScoreBg(data.score)} transition-all`}
                                                     style={{ width: `${data.score}%` }}
@@ -326,7 +326,7 @@ export default function ImportResumeModal({ isOpen, onClose, onSuccess }) {
                                 <div className="pt-4 flex gap-3">
                                     <button
                                         onClick={() => setStep('upload')}
-                                        className="flex-1 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg font-medium transition-colors"
+                                        className="flex-1 py-3 border border-gray-300 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoalMuted rounded-lg font-medium transition-colors"
                                     >
                                         ← Back
                                     </button>

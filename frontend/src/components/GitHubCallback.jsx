@@ -66,7 +66,7 @@ export default function GitHubCallback() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+            <div className="min-h-screen bg-gray-50 dark:bg-charcoalDark flex items-center justify-center">
                 <div className="text-center">
                     <div className="w-16 h-16 border-4 border-gray-200 border-t-black dark:border-t-white rounded-full animate-spin mx-auto mb-4"></div>
                     <h2 className="text-xl font-medium text-gray-900 dark:text-white">Signing in with GitHub...</h2>
@@ -77,8 +77,8 @@ export default function GitHubCallback() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-6">
-            <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg max-w-md w-full text-center">
+        <div className="min-h-screen bg-gray-50 dark:bg-charcoalDark flex items-center justify-center p-6">
+            <div className="bg-white dark:bg-charcoal p-8 rounded-2xl shadow-lg max-w-md w-full text-center">
                 <div className="text-5xl mb-4">❌</div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Login Failed</h2>
                 <p className="text-gray-500 dark:text-gray-400 mb-6">{error}</p>

@@ -12,10 +12,10 @@ import Footer from "./landing/Footer";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#F5F1E8] dark:bg-gray-950 text-gray-950 dark:text-white font-outfit transition-colors duration-500">
+    <div className="min-h-screen bg-[#F5F1E8] dark:bg-charcoalDark text-gray-950 dark:text-white font-outfit transition-colors duration-500">
       <div className="relative z-10">
         <Navbar />
-        <main>
+        <main className="pt-6 sm:pt-8">
           <HeroSection />
           <FeaturesCarousel />
           <DashboardShowcase />

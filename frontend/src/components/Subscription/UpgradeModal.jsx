@@ -64,7 +64,7 @@ export default function UpgradeModal({ feature, isOpen, onClose }) {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         onClick={(e) => e.stopPropagation()}
-                        className="bg-white dark:bg-[#1C1C1E] rounded-2xl border border-gray-200 dark:border-gray-800 w-full max-w-md shadow-2xl overflow-hidden"
+                        className="bg-white dark:bg-charcoal rounded-2xl border border-gray-200 dark:border-charcoalMuted w-full max-w-md shadow-2xl overflow-hidden"
                     >
                         <div className="p-6 text-center">
                             <div className="text-5xl mb-4">{featureInfo.icon}</div>
@@ -84,7 +84,7 @@ export default function UpgradeModal({ feature, isOpen, onClose }) {
                                 </button>
                                 <button
                                     onClick={onClose}
-                                    className="w-full py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                                    className="w-full py-3 border border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-charcoalDark transition-colors"
                                 >
                                     Maybe Later
                                 </button>

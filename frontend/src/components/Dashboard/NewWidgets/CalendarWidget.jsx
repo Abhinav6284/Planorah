@@ -79,14 +79,14 @@ const CalendarWidget = ({ variant = 'default' }) => {
 
     if (loading) {
         return (
-            <div className={`rounded-[24px] sm:rounded-[28px] p-4 sm:p-5 h-full flex items-center justify-center border ${isExecution ? 'bg-[linear-gradient(145deg,#0f1520,#161d29)] border-cyan-300/20' : 'bg-white dark:bg-[#1C1C1E] border-gray-100 dark:border-gray-800'}`}>
+            <div className={`rounded-[24px] sm:rounded-[28px] p-4 sm:p-5 h-full flex items-center justify-center border ${isExecution ? 'bg-[linear-gradient(145deg,#0f1520,#161d29)] border-cyan-300/20' : 'bg-white dark:bg-charcoal border-gray-100 dark:border-charcoalMuted'}`}>
                 <div className={`animate-pulse text-sm ${isExecution ? 'text-cyan-100/65' : 'text-gray-400 dark:text-gray-500'}`}>Loading...</div>
             </div>
         );
     }
 
     return (
-        <div className={`rounded-[24px] sm:rounded-[28px] p-4 sm:p-5 h-full flex flex-col relative overflow-hidden border ${isExecution ? 'bg-[linear-gradient(145deg,#0f1520,#161d29)] border-cyan-300/20 shadow-[0_20px_45px_rgba(0,0,0,0.4)]' : 'bg-white dark:bg-[#1C1C1E] border-gray-100 dark:border-gray-800'}`}>
+        <div className={`rounded-[24px] sm:rounded-[28px] p-4 sm:p-5 h-full flex flex-col relative overflow-hidden border ${isExecution ? 'bg-[linear-gradient(145deg,#0f1520,#161d29)] border-cyan-300/20 shadow-[0_20px_45px_rgba(0,0,0,0.4)]' : 'bg-white dark:bg-charcoal border-gray-100 dark:border-charcoalMuted'}`}>
             {/* Header */}
             <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <div className="flex items-center gap-2 sm:gap-3">
@@ -104,7 +104,7 @@ const CalendarWidget = ({ variant = 'default' }) => {
                 </div>
                 <Link
                     to="/scheduler"
-                    className={`text-[10px] sm:text-xs px-2 py-1 rounded-full transition-colors ${isExecution ? 'bg-cyan-400/10 text-cyan-100/80 hover:bg-cyan-400/20' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                    className={`text-[10px] sm:text-xs px-2 py-1 rounded-full transition-colors ${isExecution ? 'bg-cyan-400/10 text-cyan-100/80 hover:bg-cyan-400/20' : 'bg-gray-100 dark:bg-charcoal text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-charcoalMuted'}`}
                 >
                     View All
                 </Link>
@@ -116,7 +116,7 @@ const CalendarWidget = ({ variant = 'default' }) => {
                     {events.map((event, index) => (
                         <div
                             key={event.id || index}
-                            className={`flex items-start gap-3 p-3 rounded-xl transition-colors cursor-pointer ${isExecution ? 'bg-black/20 border border-cyan-300/10 hover:bg-black/30' : 'bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                            className={`flex items-start gap-3 p-3 rounded-xl transition-colors cursor-pointer ${isExecution ? 'bg-black/20 border border-cyan-300/10 hover:bg-black/30' : 'bg-gray-50 dark:bg-charcoal/50 hover:bg-gray-100 dark:hover:bg-charcoalMuted'}`}
                         >
                             <div className={`w-1 h-full min-h-[40px] ${getEventColor(index)} rounded-full`} />
                             <div className="flex-1 min-w-0">
@@ -139,7 +139,7 @@ const CalendarWidget = ({ variant = 'default' }) => {
                 </div>
             ) : (
                 <div className="flex-1 flex flex-col items-center justify-center text-center">
-                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 ${isExecution ? 'bg-black/30 border border-cyan-300/15' : 'bg-gray-100 dark:bg-gray-800'}`}>
+                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 ${isExecution ? 'bg-black/30 border border-cyan-300/15' : 'bg-gray-100 dark:bg-charcoal'}`}>
                         <svg className={`w-8 h-8 ${isExecution ? 'text-cyan-100/55' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
@@ -152,7 +152,7 @@ const CalendarWidget = ({ variant = 'default' }) => {
                     </p>
                     <button
                         onClick={handleConnect}
-                        className={`flex items-center gap-2 px-4 py-2 border rounded-xl text-sm font-medium transition-colors ${isExecution ? 'bg-cyan-400/10 border-cyan-300/25 text-cyan-50 hover:bg-cyan-400/20' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                        className={`flex items-center gap-2 px-4 py-2 border rounded-xl text-sm font-medium transition-colors ${isExecution ? 'bg-cyan-400/10 border-cyan-300/25 text-cyan-50 hover:bg-cyan-400/20' : 'bg-white dark:bg-charcoal border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoalMuted'}`}
                     >
                         <svg className="w-4 h-4 text-red-500" viewBox="0 0 24 24">
                             <path fill="currentColor" d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z" />
@@ -164,7 +164,7 @@ const CalendarWidget = ({ variant = 'default' }) => {
 
             {/* Quick Action */}
             {events.length > 0 && (
-                <div className={`mt-4 pt-4 border-t ${isExecution ? 'border-cyan-300/15' : 'border-gray-100 dark:border-gray-800'}`}>
+                <div className={`mt-4 pt-4 border-t ${isExecution ? 'border-cyan-300/15' : 'border-gray-100 dark:border-charcoalMuted'}`}>
                     <Link
                         to="/scheduler"
                         className={`flex items-center justify-center gap-2 text-sm font-medium transition-colors ${isExecution ? 'text-cyan-200 hover:text-cyan-100' : 'text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300'}`}

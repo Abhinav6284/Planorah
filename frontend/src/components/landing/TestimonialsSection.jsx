@@ -41,7 +41,7 @@ const testimonials = [
 
 export default function TestimonialsSection() {
   return (
-    <section className="py-20 px-6 bg-white dark:bg-slate-950">
+    <section className="py-20 px-6 bg-white dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -59,7 +59,7 @@ export default function TestimonialsSection() {
           {testimonials.map((testimonial, idx) => (
             <div
               key={idx}
-              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/[0.08] rounded-2xl p-6 hover:border-gray-300 dark:hover:border-white/[0.12] transition-all duration-300"
+              className="bg-white dark:bg-charcoalDark border border-gray-200 dark:border-white/[0.08] rounded-2xl p-6 hover:border-gray-300 dark:hover:border-white/[0.12] transition-all duration-300"
             >
               {/* Stars */}
               <div className="flex gap-1 mb-4">

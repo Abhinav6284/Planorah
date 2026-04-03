@@ -13,9 +13,9 @@ const InfoWidget = () => {
     const toggle = (id) => setOpenSection(openSection === id ? null : id);
 
     return (
-        <div className="bg-[#FFFFF0] dark:bg-gray-800 rounded-[30px] p-6 h-full flex flex-col justify-center space-y-4">
+        <div className="bg-[#FFFFF0] dark:bg-charcoal rounded-[30px] p-6 h-full flex flex-col justify-center space-y-4">
             {sections.map((section) => (
-                <div key={section.id} className="border-b border-dashed border-gray-200 dark:border-gray-700 last:border-0 pb-2 last:pb-0">
+                <div key={section.id} className="border-b border-dashed border-gray-200 dark:border-charcoalMuted last:border-0 pb-2 last:pb-0">
                     <button
                         onClick={() => toggle(section.id)}
                         className="w-full flex items-center justify-between text-left py-2 group"

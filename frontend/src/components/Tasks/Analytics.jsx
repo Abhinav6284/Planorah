@@ -22,7 +22,7 @@ export default function Analytics() {
     };
 
     if (loading || !analytics) {
-        return <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        return <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-charcoalDark">
             <p className="text-gray-400">Loading analytics...</p>
         </div>;
     }
@@ -73,7 +73,7 @@ export default function Analytics() {
 
     const colorMap = {
         green: 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400',
-        blue: 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400',
+        blue: 'bg-blue-50 dark:bg-charcoal/20 text-blue-600 dark:text-blue-400',
         orange: 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400',
         purple: 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400',
         indigo: 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400',
@@ -81,7 +81,7 @@ export default function Analytics() {
     };
 
     return (
-        <div className="min-h-full bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-full bg-gray-50 dark:bg-charcoalDark">
             <div className="p-6 md:p-10">
                 <header className="mb-8">
                     <h1 className="text-3xl font-serif font-medium text-gray-900 dark:text-white mb-2">Analytics</h1>
@@ -96,7 +96,7 @@ export default function Analytics() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: idx * 0.1 }}
-                            className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700"
+                            className="bg-white dark:bg-charcoal rounded-2xl p-6 border border-gray-100 dark:border-charcoalMuted"
                         >
                             <div className="flex items-start justify-between">
                                 <div>

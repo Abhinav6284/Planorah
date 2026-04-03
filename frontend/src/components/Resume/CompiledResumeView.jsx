@@ -72,7 +72,7 @@ export default function CompiledResumeView() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+            <div className="min-h-screen bg-gray-50 dark:bg-charcoalDark flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-500 border-t-transparent"></div>
             </div>
         );
@@ -80,7 +80,7 @@ export default function CompiledResumeView() {
 
     if (!resume) {
         return (
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+            <div className="min-h-screen bg-gray-50 dark:bg-charcoalDark flex items-center justify-center p-4">
                 <div className="text-center">
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Resume Not Found</h2>
                     <button
@@ -99,7 +99,7 @@ export default function CompiledResumeView() {
     const sections = content.sections || [];
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+        <div className="min-h-screen bg-gray-50 dark:bg-charcoalDark transition-colors duration-300">
             <div className="max-w-5xl mx-auto p-4 sm:p-8">
                 {/* Header */}
                 <div className="mb-8">
@@ -139,16 +139,16 @@ export default function CompiledResumeView() {
                                     <FaDownload />
                                     {exporting ? "Exporting..." : "Export"}
                                 </button>
-                                <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                                <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-charcoal rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
                                     <button
                                         onClick={() => handleExport('json')}
-                                        className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg"
+                                        className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-charcoalMuted rounded-t-lg"
                                     >
                                         JSON
                                     </button>
                                     <button
                                         onClick={() => handleExport('markdown')}
-                                        className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg"
+                                        className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-charcoalMuted rounded-b-lg"
                                     >
                                         Markdown
                                     </button>
@@ -159,19 +159,19 @@ export default function CompiledResumeView() {
 
                     {/* Stats */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                        <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                        <div className="bg-white dark:bg-charcoal p-4 rounded-xl border border-gray-200 dark:border-charcoalMuted">
                             <div className="text-2xl font-bold text-green-600">{resume.total_tasks_completed}</div>
                             <div className="text-sm text-gray-600 dark:text-gray-400">Total Tasks</div>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                        <div className="bg-white dark:bg-charcoal p-4 rounded-xl border border-gray-200 dark:border-charcoalMuted">
                             <div className="text-2xl font-bold text-blue-600">{resume.core_tasks_completed}</div>
                             <div className="text-sm text-gray-600 dark:text-gray-400">Core Tasks</div>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                        <div className="bg-white dark:bg-charcoal p-4 rounded-xl border border-gray-200 dark:border-charcoalMuted">
                             <div className="text-2xl font-bold text-purple-600">{resume.average_score?.toFixed(1)}%</div>
                             <div className="text-sm text-gray-600 dark:text-gray-400">Avg Score</div>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                        <div className="bg-white dark:bg-charcoal p-4 rounded-xl border border-gray-200 dark:border-charcoalMuted">
                             <div className="text-2xl font-bold text-orange-600">{resume.entries?.length || 0}</div>
                             <div className="text-sm text-gray-600 dark:text-gray-400">Resume Lines</div>
                         </div>
@@ -219,9 +219,9 @@ export default function CompiledResumeView() {
                 )}
 
                 {/* Resume Content */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div className="bg-white dark:bg-charcoal rounded-2xl border border-gray-200 dark:border-charcoalMuted overflow-hidden">
                     {/* Header Section */}
-                    <div className="p-8 border-b border-gray-200 dark:border-gray-700">
+                    <div className="p-8 border-b border-gray-200 dark:border-charcoalMuted">
                         <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                             {header.name}
                         </h2>
@@ -230,7 +230,7 @@ export default function CompiledResumeView() {
 
                     {/* Sections */}
                     {sections.map((section, idx) => (
-                        <div key={idx} className="p-8 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
+                        <div key={idx} className="p-8 border-b border-gray-200 dark:border-charcoalMuted last:border-b-0">
                             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                                 {section.name}
                                 <span className="text-sm font-normal text-gray-500">
@@ -255,7 +255,7 @@ export default function CompiledResumeView() {
                                                 <span className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded">
                                                     {entry.score?.toFixed(0)}%
                                                 </span>
-                                                <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded">
+                                                <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-charcoal/30 text-blue-700 dark:text-blue-400 rounded">
                                                     Weight: {entry.weight}/5
                                                 </span>
                                             </div>
@@ -282,7 +282,7 @@ export default function CompiledResumeView() {
                                                 {entry.tags.map((tag, tagIdx) => (
                                                     <span
                                                         key={tagIdx}
-                                                        className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded"
+                                                        className="text-xs px-2 py-1 bg-gray-100 dark:bg-charcoalMuted text-gray-600 dark:text-gray-400 rounded"
                                                     >
                                                         {tag}
                                                     </span>

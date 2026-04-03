@@ -25,7 +25,7 @@ const shimmer = {
 
 const SkeletonLine = ({ width = '100%', height = '12px', className = '' }) => (
   <motion.div
-    className={`rounded-full bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 ${className}`}
+    className={`rounded-full bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-charcoalMuted dark:via-charcoalMuted dark:to-charcoalMuted ${className}`}
     style={{ width, height, backgroundSize: '400% 100%' }}
     animate={shimmer.animate}
     transition={shimmer.transition}
@@ -34,7 +34,7 @@ const SkeletonLine = ({ width = '100%', height = '12px', className = '' }) => (
 
 const SkeletonCircle = ({ size = '40px', className = '' }) => (
   <motion.div
-    className={`rounded-full bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 ${className}`}
+    className={`rounded-full bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-charcoalMuted dark:via-charcoalMuted dark:to-charcoalMuted ${className}`}
     style={{ width: size, height: size, backgroundSize: '400% 100%' }}
     animate={shimmer.animate}
     transition={shimmer.transition}
@@ -42,7 +42,7 @@ const SkeletonCircle = ({ size = '40px', className = '' }) => (
 );
 
 export const SkeletonCard = ({ className = '' }) => (
-  <div className={`bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6 space-y-4 ${className}`}>
+  <div className={`bg-white dark:bg-charcoal rounded-2xl border border-gray-100 dark:border-charcoalMuted p-6 space-y-4 ${className}`}>
     <div className="flex items-center gap-3">
       <SkeletonCircle size="36px" />
       <SkeletonLine width="40%" height="16px" />
@@ -54,13 +54,13 @@ export const SkeletonCard = ({ className = '' }) => (
 );
 
 export const SkeletonChart = ({ className = '' }) => (
-  <div className={`bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6 space-y-4 ${className}`}>
+  <div className={`bg-white dark:bg-charcoal rounded-2xl border border-gray-100 dark:border-charcoalMuted p-6 space-y-4 ${className}`}>
     <SkeletonLine width="30%" height="16px" />
     <div className="flex items-end gap-2 h-32 pt-4">
       {[40, 65, 45, 80, 55, 70, 50].map((h, i) => (
         <motion.div
           key={i}
-          className="flex-1 rounded-t-md bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700"
+          className="flex-1 rounded-t-md bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-charcoalMuted dark:via-charcoalMuted dark:to-charcoalMuted"
           style={{ height: `${h}%`, backgroundSize: '400% 100%' }}
           animate={shimmer.animate}
           transition={{ ...shimmer.transition, delay: i * 0.1 }}

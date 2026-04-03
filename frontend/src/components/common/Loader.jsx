@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 export default function Loader({ message = "Loading..." }) {
     return (
-        <div className="fixed inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-charcoalDark dark:via-charcoalDark dark:to-charcoal flex items-center justify-center z-50">
             {/* Subtle background pattern */}
             <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]"
                 style={{
@@ -36,7 +36,7 @@ export default function Loader({ message = "Loading..." }) {
                     />
 
                     {/* Center circle */}
-                    <div className="absolute inset-3 bg-white dark:bg-gray-900 rounded-full shadow-inner" />
+                    <div className="absolute inset-3 bg-white dark:bg-charcoalDark rounded-full shadow-inner" />
 
                     {/* Pulsing core */}
                     <motion.div
@@ -61,7 +61,7 @@ export default function Loader({ message = "Loading..." }) {
                     </motion.p>
 
                     {/* Minimal progress bar */}
-                    <div className="w-32 h-0.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div className="w-32 h-0.5 bg-gray-200 dark:bg-charcoalMuted rounded-full overflow-hidden">
                         <motion.div
                             className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full"
                             initial={{ x: '-100%' }}

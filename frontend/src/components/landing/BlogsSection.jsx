@@ -82,7 +82,7 @@ export default function BlogsSection() {
   });
 
   return (
-    <section className="py-20 px-6 bg-gray-50 dark:bg-slate-900">
+    <section className="py-20 px-6 bg-gray-50 dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -105,7 +105,7 @@ export default function BlogsSection() {
               placeholder="Search guides..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-white/[0.08] text-gray-950 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-950 dark:focus:ring-white"
+              className="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-charcoalDark border border-gray-200 dark:border-white/[0.08] text-gray-950 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-950 dark:focus:ring-white"
             />
           </div>
 
@@ -143,7 +143,7 @@ export default function BlogsSection() {
             filteredBlogs.map((blog, idx) => (
                 <div
                   key={idx}
-                  className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/[0.08] rounded-2xl p-6 hover:border-gray-300 dark:hover:border-white/[0.12] transition-all duration-300 group cursor-pointer flex flex-col"
+                  className="bg-white dark:bg-charcoalDark border border-gray-200 dark:border-white/[0.08] rounded-2xl p-6 hover:border-gray-300 dark:hover:border-white/[0.12] transition-all duration-300 group cursor-pointer flex flex-col"
                 >
                   {/* Category Label */}
                   <div className="inline-flex w-fit px-3 py-1 rounded-lg bg-gray-100 dark:bg-white/[0.06] text-xs font-semibold text-gray-700 dark:text-gray-300 mb-4">

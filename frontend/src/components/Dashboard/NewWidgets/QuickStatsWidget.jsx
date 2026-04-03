@@ -9,7 +9,7 @@ const QuickStatsWidget = ({ tasks = [] }) => {
     return (
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             {/* Completed Pill */}
-            <div className="h-10 sm:h-12 px-3 sm:px-5 rounded-xl sm:rounded-2xl bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 flex items-center gap-2 sm:gap-3 hover:bg-gray-50 dark:hover:bg-[#2C2C2E] transition-all group shadow-sm">
+            <div className="h-10 sm:h-12 px-3 sm:px-5 rounded-xl sm:rounded-2xl bg-white dark:bg-charcoal border border-gray-200 dark:border-white/10 flex items-center gap-2 sm:gap-3 hover:bg-gray-50 dark:hover:bg-[#2C2C2E] transition-all group shadow-sm">
                 <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-[9px] sm:text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">✓</div>
                 <div className="flex items-baseline gap-1 sm:gap-1.5">
                     <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white tracking-tight">{totalCompleted}</span>
@@ -18,7 +18,7 @@ const QuickStatsWidget = ({ tasks = [] }) => {
             </div>
 
             {/* Pending Pill */}
-            <div className="h-10 sm:h-12 px-3 sm:px-5 rounded-xl sm:rounded-2xl bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 flex items-center gap-2 sm:gap-3 hover:bg-gray-50 dark:hover:bg-[#2C2C2E] transition-all group shadow-sm">
+            <div className="h-10 sm:h-12 px-3 sm:px-5 rounded-xl sm:rounded-2xl bg-white dark:bg-charcoal border border-gray-200 dark:border-white/10 flex items-center gap-2 sm:gap-3 hover:bg-gray-50 dark:hover:bg-[#2C2C2E] transition-all group shadow-sm">
                 <div className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></div>
                 <div className="flex items-baseline gap-1 sm:gap-1.5">
                     <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white tracking-tight">{totalPending}</span>
@@ -27,7 +27,7 @@ const QuickStatsWidget = ({ tasks = [] }) => {
             </div>
 
             {/* Roadmaps Pill */}
-            <div className="h-10 sm:h-12 px-3 sm:px-5 rounded-xl sm:rounded-2xl bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 flex items-center gap-2 sm:gap-3 hover:bg-gray-50 dark:hover:bg-[#2C2C2E] transition-all group shadow-sm">
+            <div className="h-10 sm:h-12 px-3 sm:px-5 rounded-xl sm:rounded-2xl bg-white dark:bg-charcoal border border-gray-200 dark:border-white/10 flex items-center gap-2 sm:gap-3 hover:bg-gray-50 dark:hover:bg-[#2C2C2E] transition-all group shadow-sm">
                 <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
                 <div className="flex items-baseline gap-1 sm:gap-1.5">
                     <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white tracking-tight">{uniqueRoadmaps}</span>

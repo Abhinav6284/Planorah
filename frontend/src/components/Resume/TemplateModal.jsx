@@ -21,18 +21,18 @@ export default function TemplateModal({ isOpen, onClose, currentTemplate, onSele
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
                     transition={{ type: "spring", duration: 0.3 }}
-                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[80vh] overflow-hidden"
+                    className="bg-white dark:bg-charcoal rounded-2xl shadow-2xl max-w-3xl w-full max-h-[80vh] overflow-hidden"
                     onClick={(e) => e.stopPropagation()}
                 >
                     {/* Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-charcoalMuted">
                         <div>
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white">Choose Template</h2>
                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Select a professional template for your resume</p>
                         </div>
                         <button
                             onClick={onClose}
-                            className="w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center text-gray-500 transition-colors"
+                            className="w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-charcoalMuted flex items-center justify-center text-gray-500 transition-colors"
                         >
                             ✕
                         </button>
@@ -50,11 +50,11 @@ export default function TemplateModal({ isOpen, onClose, currentTemplate, onSele
                                     }}
                                     className={`group relative p-4 rounded-xl border-2 transition-all hover:shadow-lg ${currentTemplate === template.id
                                             ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                                            : 'border-gray-200 dark:border-gray-700 hover:border-green-300'
+                                            : 'border-gray-200 dark:border-charcoalMuted hover:border-green-300'
                                         }`}
                                 >
                                     {/* Template Preview */}
-                                    <div className="aspect-[8.5/11] bg-gray-100 dark:bg-gray-700 rounded-lg mb-3 flex items-center justify-center text-4xl overflow-hidden">
+                                    <div className="aspect-[8.5/11] bg-gray-100 dark:bg-charcoalMuted rounded-lg mb-3 flex items-center justify-center text-4xl overflow-hidden">
                                         {template.id === 'professional' && (
                                             <div className="w-full h-full bg-white p-2 text-left">
                                                 <div className="text-center border-b border-gray-300 pb-1 mb-1">
@@ -124,7 +124,7 @@ export default function TemplateModal({ isOpen, onClose, currentTemplate, onSele
                     </div>
 
                     {/* Footer */}
-                    <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                    <div className="p-4 border-t border-gray-200 dark:border-charcoalMuted bg-gray-50 dark:bg-charcoal/50">
                         <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
                             All templates are ATS-friendly and optimized for professional use
                         </p>

@@ -164,7 +164,7 @@ export default function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-24 right-6 w-96 h-[500px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl shadow-indigo-500/10 border border-gray-200 dark:border-gray-700 flex flex-col z-50 overflow-hidden"
+            className="fixed bottom-24 right-6 w-96 h-[500px] bg-white dark:bg-charcoalDark rounded-2xl shadow-2xl shadow-indigo-500/10 border border-gray-200 dark:border-charcoalMuted flex flex-col z-50 overflow-hidden"
           >
             <div className="px-5 py-4 bg-gradient-to-r from-indigo-500 to-violet-600 text-white">
               <div className="flex items-center justify-between">
@@ -202,7 +202,7 @@ export default function ChatWidget() {
                 >
                   <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
                     ? 'bg-indigo-500 text-white rounded-br-md'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-bl-md'
+                    : 'bg-gray-100 dark:bg-charcoal text-gray-800 dark:text-gray-100 rounded-bl-md'
                     }`}
                   >
                     {msg.role === 'assistant' ? (
@@ -229,7 +229,7 @@ export default function ChatWidget() {
                               <button
                                 type="button"
                                 onClick={() => handleProposal(msg.id, proposal.proposal_id, false)}
-                                className="px-2.5 py-1 text-xs rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
+                                className="px-2.5 py-1 text-xs rounded bg-gray-200 dark:bg-charcoalMuted hover:bg-gray-300 dark:hover:bg-charcoalMuted"
                               >
                                 Cancel
                               </button>
@@ -244,7 +244,7 @@ export default function ChatWidget() {
 
               {loading && (
                 <div className="flex justify-start">
-                  <div className="bg-gray-100 dark:bg-gray-800 px-4 py-3 rounded-2xl rounded-bl-md">
+                  <div className="bg-gray-100 dark:bg-charcoal px-4 py-3 rounded-2xl rounded-bl-md">
                     <div className="flex gap-1">
                       <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                       <span className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -263,7 +263,7 @@ export default function ChatWidget() {
                     <button
                       key={i}
                       onClick={(event) => handleSend(event, q)}
-                      className="text-xs px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-full hover:bg-indigo-100 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                      className="text-xs px-3 py-1.5 bg-gray-100 dark:bg-charcoal text-gray-600 dark:text-gray-400 rounded-full hover:bg-indigo-100 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                     >
                       {q}
                     </button>
@@ -272,14 +272,14 @@ export default function ChatWidget() {
               </div>
             )}
 
-            <form onSubmit={handleSend} className="p-4 border-t border-gray-100 dark:border-gray-800">
+            <form onSubmit={handleSend} className="p-4 border-t border-gray-100 dark:border-charcoalMuted">
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask about your tasks..."
-                  className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-800 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="flex-1 px-4 py-3 bg-gray-100 dark:bg-charcoal rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   disabled={loading}
                 />
                 <button

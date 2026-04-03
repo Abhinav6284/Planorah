@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#F5F1E8] dark:bg-gray-950 border-t border-gray-300 dark:border-gray-800 py-16 px-6">
+    <footer className="bg-[#F5F1E8] dark:bg-charcoalDark border-t border-gray-300 dark:border-charcoalMuted py-16 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           <div>
@@ -35,7 +35,7 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-        <div className="border-t border-gray-300 dark:border-gray-800 pt-8 text-center text-sm text-gray-600 dark:text-gray-400">
+        <div className="border-t border-gray-300 dark:border-charcoalMuted pt-8 text-center text-sm text-gray-600 dark:text-gray-400">
           <p>© 2024 Planorah. All rights reserved.</p>
         </div>
       </div>

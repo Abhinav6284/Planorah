@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 export default function OnboardingLayout({ children, title, subtitle }) {
     return (
         <div className="onboarding-shell min-h-screen flex flex-col font-sans text-gray-900 dark:text-white transition-colors duration-300">
-            <header className="fixed top-0 left-0 w-full p-6 md:p-8 z-50 bg-white/45 dark:bg-slate-950/45 backdrop-blur-md border-b border-white/40 dark:border-slate-800/60">
+            <header className="fixed top-0 left-0 w-full p-6 md:p-8 z-50 bg-white/45 dark:bg-charcoal/45 backdrop-blur-md border-b border-white/40 dark:border-charcoalMuted/60">
                 <Link to="/" className="text-2xl font-serif font-bold tracking-tight text-slate-900 dark:text-slate-100">
                     Planorah<span className="text-slate-500 dark:text-slate-400">.</span>
                 </Link>
@@ -21,7 +21,7 @@ export default function OnboardingLayout({ children, title, subtitle }) {
                         <div className="mb-12">
                             {typeof title === 'object' && title.badge && (
                                 <div className="inline-block mb-6">
-                                    <span className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white text-xs font-semibold rounded-full uppercase tracking-wider border border-gray-200 dark:border-gray-700">
+                                    <span className="px-3 py-1 bg-gray-100 dark:bg-charcoal text-gray-900 dark:text-white text-xs font-semibold rounded-full uppercase tracking-wider border border-gray-200 dark:border-charcoalMuted">
                                         {title.badge}
                                     </span>
                                 </div>

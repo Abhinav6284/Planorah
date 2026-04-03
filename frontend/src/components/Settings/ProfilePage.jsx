@@ -269,17 +269,17 @@ export default function ProfilePage() {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
                             onClick={(e) => e.stopPropagation()}
-                            className="bg-white dark:bg-[#1C1C1E] rounded-2xl border border-gray-200 dark:border-gray-800 w-full max-w-3xl shadow-2xl overflow-hidden"
+                            className="bg-white dark:bg-charcoal rounded-2xl border border-gray-200 dark:border-charcoalMuted w-full max-w-3xl shadow-2xl overflow-hidden"
                         >
                             {/* Modal Header */}
-                            <div className="px-8 py-5 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+                            <div className="px-8 py-5 border-b border-gray-200 dark:border-charcoalMuted flex items-center justify-between">
                                 <div>
                                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Edit Profile</h2>
                                     <p className="text-sm text-gray-500 mt-1">Update your personal information</p>
                                 </div>
                                 <button
                                     onClick={() => setShowEditModal(false)}
-                                    className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 transition-colors text-xl"
+                                    className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-charcoalMuted text-gray-500 transition-colors text-xl"
                                 >
                                     ✕
                                 </button>
@@ -291,7 +291,7 @@ export default function ProfilePage() {
                                     {/* Left Side - Avatar */}
                                     <div className="flex-shrink-0">
                                         <div className="relative group">
-                                            <div className="w-40 h-40 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-900">
+                                            <div className="w-40 h-40 rounded-2xl overflow-hidden border border-gray-200 dark:border-charcoalMuted bg-gray-100 dark:bg-charcoalDark">
                                                 {editPreview ? (
                                                     <img src={editPreview} alt="Profile" className="w-full h-full object-cover" />
                                                 ) : (
@@ -319,7 +319,7 @@ export default function ProfilePage() {
                                                 name="name"
                                                 value={editForm.name || ''}
                                                 onChange={handleEditChange}
-                                                className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white"
+                                                className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-charcoalMuted focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white"
                                                 placeholder="Your display name"
                                             />
                                         </div>
@@ -331,7 +331,7 @@ export default function ProfilePage() {
                                                 name="username"
                                                 value={editForm.username || ''}
                                                 disabled
-                                                className="w-full px-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-500 cursor-not-allowed"
+                                                className="w-full px-4 py-3 rounded-xl bg-gray-100 dark:bg-charcoalDark border border-gray-200 dark:border-charcoalMuted text-gray-500 dark:text-gray-500 cursor-not-allowed"
                                             />
                                         </div>
 
@@ -342,7 +342,7 @@ export default function ProfilePage() {
                                                 name="email"
                                                 value={editForm.email || ''}
                                                 disabled
-                                                className="w-full px-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-500 cursor-not-allowed"
+                                                className="w-full px-4 py-3 rounded-xl bg-gray-100 dark:bg-charcoalDark border border-gray-200 dark:border-charcoalMuted text-gray-500 dark:text-gray-500 cursor-not-allowed"
                                             />
                                         </div>
 
@@ -353,7 +353,7 @@ export default function ProfilePage() {
                                                 name="role"
                                                 value={editForm.role || ''}
                                                 onChange={handleEditChange}
-                                                className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white"
+                                                className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-charcoalMuted focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white"
                                                 placeholder="e.g. CS Student"
                                             />
                                         </div>
@@ -364,7 +364,7 @@ export default function ProfilePage() {
                                                 name="gender"
                                                 value={editForm.gender || ''}
                                                 onChange={handleEditChange}
-                                                className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white"
+                                                className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-charcoalMuted focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white"
                                             >
                                                 <option value="">Select gender</option>
                                                 <option value="male">Male</option>
@@ -380,7 +380,7 @@ export default function ProfilePage() {
                                                 value={editForm.bio || ''}
                                                 onChange={handleEditChange}
                                                 rows={3}
-                                                className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white resize-none"
+                                                className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-charcoalMuted focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white resize-none"
                                                 placeholder="Tell us about yourself..."
                                             />
                                         </div>
@@ -396,10 +396,10 @@ export default function ProfilePage() {
                             </div>
 
                             {/* Modal Footer */}
-                            <div className="px-8 py-5 border-t border-gray-200 dark:border-gray-800 flex justify-end gap-3">
+                            <div className="px-8 py-5 border-t border-gray-200 dark:border-charcoalMuted flex justify-end gap-3">
                                 <button
                                     onClick={() => setShowEditModal(false)}
-                                    className="px-6 py-3 rounded-xl border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                                    className="px-6 py-3 rounded-xl border border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-charcoalDark transition-colors"
                                 >
                                     Cancel
                                 </button>
@@ -431,10 +431,10 @@ export default function ProfilePage() {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
                             onClick={(e) => e.stopPropagation()}
-                            className="bg-white dark:bg-[#1C1C1E] rounded-2xl border border-gray-200 dark:border-gray-800 w-full max-w-md shadow-2xl overflow-hidden"
+                            className="bg-white dark:bg-charcoal rounded-2xl border border-gray-200 dark:border-charcoalMuted w-full max-w-md shadow-2xl overflow-hidden"
                         >
                             {/* Modal Header */}
-                            <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+                            <div className="px-6 py-5 border-b border-gray-200 dark:border-charcoalMuted">
                                 <h2 className="text-xl font-bold text-red-600 dark:text-red-400 flex items-center gap-2">
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -474,7 +474,7 @@ export default function ProfilePage() {
                                         value={deletePassword}
                                         onChange={(e) => setDeletePassword(e.target.value)}
                                         placeholder={isOAuth ? "DELETE" : "••••••••"}
-                                        className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 focus:border-red-400 dark:focus:border-red-600 outline-none transition-all text-gray-900 dark:text-white"
+                                        className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-charcoalMuted focus:border-red-400 dark:focus:border-red-600 outline-none transition-all text-gray-900 dark:text-white"
                                     />
                                 </div>
 
@@ -486,10 +486,10 @@ export default function ProfilePage() {
                             </div>
 
                             {/* Modal Footer */}
-                            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800 flex justify-end gap-3">
+                            <div className="px-6 py-4 border-t border-gray-200 dark:border-charcoalMuted flex justify-end gap-3">
                                 <button
                                     onClick={() => { setShowDeleteModal(false); setDeletePassword(''); setDeleteError(''); }}
-                                    className="px-5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                                    className="px-5 py-2.5 rounded-xl border border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-charcoalDark transition-colors"
                                 >
                                     Cancel
                                 </button>
@@ -511,12 +511,12 @@ export default function ProfilePage() {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-8 mb-6"
+                    className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-8 mb-6"
                 >
                     <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
                         {/* Avatar */}
                         <div className="flex-shrink-0">
-                            <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-900">
+                            <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden border border-gray-200 dark:border-charcoalMuted bg-gray-100 dark:bg-charcoalDark">
                                 {preview ? (
                                     <img src={preview} alt="Profile" className="w-full h-full object-cover" />
                                 ) : (
@@ -532,13 +532,13 @@ export default function ProfilePage() {
                             <p className="text-sm text-gray-500 dark:text-gray-500 max-w-2xl mb-4">{user.bio}</p>
 
                             <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                                <span className="px-3 py-1.5 bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-lg text-sm border border-gray-200 dark:border-gray-800">
+                                <span className="px-3 py-1.5 bg-gray-100 dark:bg-charcoalDark text-gray-700 dark:text-gray-300 rounded-lg text-sm border border-gray-200 dark:border-charcoalMuted">
                                     📚 {user.field}
                                 </span>
-                                <span className="px-3 py-1.5 bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-lg text-sm border border-gray-200 dark:border-gray-800">
+                                <span className="px-3 py-1.5 bg-gray-100 dark:bg-charcoalDark text-gray-700 dark:text-gray-300 rounded-lg text-sm border border-gray-200 dark:border-charcoalMuted">
                                     ⭐ {user.level}
                                 </span>
-                                <span className="px-3 py-1.5 bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-lg text-sm border border-gray-200 dark:border-gray-800">
+                                <span className="px-3 py-1.5 bg-gray-100 dark:bg-charcoalDark text-gray-700 dark:text-gray-300 rounded-lg text-sm border border-gray-200 dark:border-charcoalMuted">
                                     🔥 {stats?.streak?.current || 0} Day Streak
                                 </span>
                             </div>
@@ -555,7 +555,7 @@ export default function ProfilePage() {
                                 </svg>
                                 Edit Profile
                             </button>
-                            <div className="flex gap-8 border-t border-gray-200 dark:border-gray-800 pt-4 mt-2">
+                            <div className="flex gap-8 border-t border-gray-200 dark:border-charcoalMuted pt-4 mt-2">
                                 <div className="text-center">
                                     <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats?.overview?.total_roadmaps || 0}</div>
                                     <div className="text-xs text-gray-500 dark:text-gray-500">Roadmaps</div>
@@ -586,7 +586,7 @@ export default function ProfilePage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.05 }}
-                            className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6"
+                            className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-6"
                         >
                             <div className="flex items-start justify-between">
                                 <div>
@@ -605,7 +605,7 @@ export default function ProfilePage() {
                     {/* Left Column */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Overall Progress */}
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6">
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-6">
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Overall Progress</h2>
                             <div className="flex flex-col md:flex-row items-center justify-around gap-6">
                                 <ProgressGauge percentage={stats?.overview?.completion_rate || 0} label="Completion Rate" size="lg" />
@@ -616,7 +616,7 @@ export default function ProfilePage() {
                                         { label: "Completed", value: stats?.overview?.completed_tasks || 0 },
                                         { label: "This Week", value: stats?.time_stats?.weekly_completed || 0 },
                                     ].map((item, i) => (
-                                        <div key={i} className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4">
+                                        <div key={i} className="bg-gray-50 dark:bg-charcoalDark border border-gray-200 dark:border-charcoalMuted rounded-xl p-4">
                                             <div className="text-xs text-gray-500 dark:text-gray-500 mb-1">{item.label}</div>
                                             <div className="text-2xl font-bold text-gray-900 dark:text-white">{item.value}</div>
                                         </div>
@@ -626,22 +626,22 @@ export default function ProfilePage() {
                         </motion.div>
 
                         {/* Roadmaps Progress */}
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6">
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-6">
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Active Roadmaps</h2>
                             <div className="space-y-4">
                                 {stats?.roadmaps?.length > 0 ? stats.roadmaps.map((roadmap, i) => (
-                                    <div key={roadmap.id} className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4">
+                                    <div key={roadmap.id} className="bg-gray-50 dark:bg-charcoalDark border border-gray-200 dark:border-charcoalMuted rounded-xl p-4">
                                         <div className="flex items-center justify-between mb-3">
                                             <div className="flex-1">
                                                 <h3 className="font-semibold text-gray-900 dark:text-white">{roadmap.title}</h3>
                                                 <div className="flex gap-2 mt-1">
-                                                    <span className="text-xs px-2 py-1 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded">{roadmap.category}</span>
-                                                    <span className="text-xs px-2 py-1 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded">{roadmap.difficulty}</span>
+                                                    <span className="text-xs px-2 py-1 bg-white dark:bg-black border border-gray-200 dark:border-charcoalMuted rounded">{roadmap.category}</span>
+                                                    <span className="text-xs px-2 py-1 bg-white dark:bg-black border border-gray-200 dark:border-charcoalMuted rounded">{roadmap.difficulty}</span>
                                                 </div>
                                             </div>
                                             <div className="text-2xl font-bold text-gray-900 dark:text-white ml-4">{roadmap.progress}%</div>
                                         </div>
-                                        <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+                                        <div className="w-full bg-gray-200 dark:bg-charcoal rounded-full h-2">
                                             <motion.div className="bg-gray-900 dark:bg-white h-2 rounded-full" initial={{ width: 0 }} animate={{ width: `${roadmap.progress}%` }} transition={{ duration: 1, delay: i * 0.1 }} />
                                         </div>
                                         <div className="text-xs text-gray-500 dark:text-gray-500 mt-2">{roadmap.completed_tasks} / {roadmap.total_tasks} tasks</div>
@@ -651,17 +651,17 @@ export default function ProfilePage() {
                         </motion.div>
 
                         {/* Recent Activity */}
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6">
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-6">
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Recent Activity</h2>
                             <div className="space-y-2">
                                 {stats?.recent_activity?.length > 0 ? stats.recent_activity.map((activity) => (
-                                    <div key={activity.id} className="flex items-start gap-4 p-3 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-lg transition-colors">
+                                    <div key={activity.id} className="flex items-start gap-4 p-3 hover:bg-gray-50 dark:hover:bg-charcoalDark rounded-lg transition-colors">
                                         <div className={`w-2 h-2 rounded-full mt-2 ${activity.status === 'completed' ? 'bg-green-500' : activity.status === 'in_progress' ? 'bg-yellow-500' : 'bg-gray-400'}`} />
                                         <div className="flex-1">
                                             <div className="font-medium text-gray-900 dark:text-white text-sm">{activity.title}</div>
                                             <div className="text-xs text-gray-500">{activity.roadmap} • {new Date(activity.updated_at).toLocaleDateString()}</div>
                                         </div>
-                                        <div className={`text-xs px-2 py-1 rounded ${activity.status === 'completed' ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
+                                        <div className={`text-xs px-2 py-1 rounded ${activity.status === 'completed' ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-charcoal text-gray-600 dark:text-gray-400'}`}>
                                             {activity.status.replace('_', ' ')}
                                         </div>
                                     </div>
@@ -673,14 +673,14 @@ export default function ProfilePage() {
                     {/* Right Column */}
                     <div className="space-y-6">
                         {/* Preferences */}
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6">
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-6">
                             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">⚙️ Preferences</h2>
                             <div className="flex items-center justify-between">
                                 <div>
                                     <h4 className="font-semibold text-gray-900 dark:text-white text-sm">Theme</h4>
                                     <p className="text-xs text-gray-500 mt-1">{theme === 'dark' ? 'Dark mode' : 'Light mode'}</p>
                                 </div>
-                                <div className="flex gap-2 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-1 rounded-lg">
+                                <div className="flex gap-2 bg-gray-100 dark:bg-charcoalDark border border-gray-200 dark:border-charcoalMuted p-1 rounded-lg">
                                     <button onClick={() => theme === 'dark' && toggleTheme()} className={`p-2 rounded-md transition-all ${theme === 'light' ? 'bg-white dark:bg-black' : ''}`}>☀️</button>
                                     <button onClick={() => theme === 'light' && toggleTheme()} className={`p-2 rounded-md transition-all ${theme === 'dark' ? 'bg-white dark:bg-black' : ''}`}>🌙</button>
                                 </div>
@@ -688,24 +688,24 @@ export default function ProfilePage() {
                         </motion.div>
 
                         {/* Skills */}
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6">
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-6">
                             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Skills</h2>
                             <div className="flex flex-wrap gap-2">
                                 {stats?.skills?.length > 0 ? stats.skills.map((skill, i) => (
-                                    <span key={i} className="px-3 py-1.5 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 rounded-lg text-sm">{skill}</span>
+                                    <span key={i} className="px-3 py-1.5 bg-gray-100 dark:bg-charcoalDark border border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 rounded-lg text-sm">{skill}</span>
                                 )) : <div className="text-sm text-gray-500">Start roadmaps to build skills!</div>}
                             </div>
                         </motion.div>
 
                         {/* Time Stats */}
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6">
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-6">
                             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">⏱️ Time Investment</h2>
                             <div className="space-y-4">
                                 <div>
                                     <div className="text-3xl font-bold text-gray-900 dark:text-white">{stats?.time_stats?.total_hours || 0}h</div>
                                     <div className="text-sm text-gray-500">Total Learning Time</div>
                                 </div>
-                                <div className="border-t border-gray-200 dark:border-gray-800 pt-4">
+                                <div className="border-t border-gray-200 dark:border-charcoalMuted pt-4">
                                     <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats?.time_stats?.avg_task_minutes || 0}m</div>
                                     <div className="text-sm text-gray-500">Average per Task</div>
                                 </div>
@@ -713,7 +713,7 @@ export default function ProfilePage() {
                         </motion.div>
 
                         {/* Logout & Delete Account */}
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6">
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-6">
                             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">🚪 Account</h2>
                             <div className="space-y-3">
                                 <button
@@ -722,7 +722,7 @@ export default function ProfilePage() {
                                         localStorage.removeItem('refresh_token');
                                         navigate('/login');
                                     }}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors flex items-center justify-center gap-2"
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-charcoalDark transition-colors flex items-center justify-center gap-2"
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

@@ -27,8 +27,8 @@ export default function TaskCard({ task, onUpdate, onComplete, onDelete, isHighl
     const displayTitle = getNormalizedTaskTitle(task?.title, task?.day);
 
     const statusColors = {
-        'not_started': 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400',
-        'in_progress': 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+        'not_started': 'bg-gray-100 dark:bg-charcoalMuted text-gray-600 dark:text-gray-400',
+        'in_progress': 'bg-blue-100 dark:bg-charcoal/30 text-blue-700 dark:text-blue-400',
         'completed': 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
         'needs_revision': 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
     };
@@ -69,7 +69,7 @@ export default function TaskCard({ task, onUpdate, onComplete, onDelete, isHighl
             <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-shadow ${isHighlighted ? 'ring-2 ring-indigo-500' : ''}`}
+                className={`bg-white dark:bg-charcoal rounded-xl p-5 border border-gray-100 dark:border-charcoalMuted hover:shadow-lg transition-shadow ${isHighlighted ? 'ring-2 ring-indigo-500' : ''}`}
             >
                 <div className="flex items-start gap-4">
                     {/* Checkbox */}
@@ -84,7 +84,7 @@ export default function TaskCard({ task, onUpdate, onComplete, onDelete, isHighl
                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                             </svg>
                         ) : (
-                            <div className="w-6 h-6 border-2 border-gray-300 dark:border-gray-600 rounded-full hover:border-green-500 transition-colors" />
+                            <div className="w-6 h-6 border-2 border-gray-300 dark:border-charcoalMuted rounded-full hover:border-green-500 transition-colors" />
                         )}
                     </button>
 
@@ -122,7 +122,7 @@ export default function TaskCard({ task, onUpdate, onComplete, onDelete, isHighl
                         {task.tags && task.tags.length > 0 && (
                             <div className="flex gap-2 mt-3">
                                 {task.tags.map((tag, idx) => (
-                                    <span key={idx} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-xs">
+                                    <span key={idx} className="px-2 py-1 bg-gray-100 dark:bg-charcoalMuted text-gray-600 dark:text-gray-400 rounded text-xs">
                                         {tag}
                                     </span>
                                 ))}
@@ -164,17 +164,17 @@ export default function TaskCard({ task, onUpdate, onComplete, onDelete, isHighl
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                                 onClick={(e) => e.stopPropagation()}
-                                className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto relative z-[101]"
+                                className="bg-white dark:bg-charcoalDark rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto relative z-[101]"
                             >
                                 {/* Header */}
-                                <div className="sticky top-0 bg-white dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+                                <div className="sticky top-0 bg-white dark:bg-charcoalDark px-6 py-4 border-b border-gray-200 dark:border-charcoalMuted flex items-center justify-between">
                                     <div>
                                         <h2 className="text-xl font-bold text-gray-900 dark:text-white">Task Guidance</h2>
                                         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{displayTitle}</p>
                                     </div>
                                     <button
                                         onClick={() => setShowGuidance(false)}
-                                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+                                        className="p-2 hover:bg-gray-100 dark:hover:bg-charcoalMuted rounded-full transition-colors"
                                     >
                                         <FaTimes className="text-gray-500" />
                                     </button>
@@ -205,8 +205,8 @@ export default function TaskCard({ task, onUpdate, onComplete, onDelete, isHighl
                                                     </h3>
                                                     <div className="grid gap-2">
                                                         {guidance.time_breakdown.map((item, idx) => (
-                                                            <div key={idx} className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
-                                                                <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded text-xs font-medium whitespace-nowrap">
+                                                            <div key={idx} className="flex items-center gap-3 bg-gray-50 dark:bg-charcoal rounded-lg p-3">
+                                                                <span className="px-2 py-1 bg-blue-100 dark:bg-charcoal/30 text-blue-700 dark:text-blue-400 rounded text-xs font-medium whitespace-nowrap">
                                                                     {item.duration}
                                                                 </span>
                                                                 <span className="text-sm text-gray-700 dark:text-gray-300">{item.activity}</span>
@@ -296,7 +296,7 @@ export default function TaskCard({ task, onUpdate, onComplete, onDelete, isHighl
                                 </div>
 
                                 {/* Footer */}
-                                <div className="sticky bottom-0 bg-white dark:bg-gray-900 px-6 py-4 border-t border-gray-200 dark:border-gray-800 flex justify-between">
+                                <div className="sticky bottom-0 bg-white dark:bg-charcoalDark px-6 py-4 border-t border-gray-200 dark:border-charcoalMuted flex justify-between">
                                     <button
                                         onClick={() => {
                                             setShowGuidance(false);
@@ -308,7 +308,7 @@ export default function TaskCard({ task, onUpdate, onComplete, onDelete, isHighl
                                     </button>
                                     <button
                                         onClick={() => setShowGuidance(false)}
-                                        className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                                        className="px-4 py-2 bg-gray-100 dark:bg-charcoal text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-charcoalMuted transition-colors"
                                     >
                                         Close
                                     </button>

@@ -19,10 +19,10 @@ const AccordionSection = ({
     order,
     children
 }) => (
-    <div className="border-b border-gray-200 dark:border-gray-700" style={{ order }}>
+    <div className="border-b border-gray-200 dark:border-charcoalMuted" style={{ order }}>
         <button
             onClick={() => onToggle(id)}
-            className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+            className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-charcoalMuted/50 transition-colors"
         >
             <div className="flex items-center gap-3">
                 <span className="text-lg">{icon}</span>
@@ -38,7 +38,7 @@ const AccordionSection = ({
                             onMoveUp(id);
                         }
                     }}
-                    className="h-6 w-6 rounded border border-gray-200 bg-white text-gray-500 transition-colors hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-30 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                    className="h-6 w-6 rounded border border-gray-200 bg-white text-gray-500 transition-colors hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-30 dark:border-charcoalMuted dark:bg-charcoalMuted dark:text-gray-300"
                     aria-label={`Move ${title} up`}
                 >
                     ↑
@@ -52,7 +52,7 @@ const AccordionSection = ({
                             onMoveDown(id);
                         }
                     }}
-                    className="h-6 w-6 rounded border border-gray-200 bg-white text-gray-500 transition-colors hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-30 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                    className="h-6 w-6 rounded border border-gray-200 bg-white text-gray-500 transition-colors hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-30 dark:border-charcoalMuted dark:bg-charcoalMuted dark:text-gray-300"
                     aria-label={`Move ${title} down`}
                 >
                     ↓
@@ -94,7 +94,7 @@ const InputField = ({ label, value, onChange, placeholder, type = "text", classN
             value={value || ""}
             onChange={onChange}
             placeholder={placeholder}
-            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all"
+            className="w-full px-3 py-2 bg-gray-50 dark:bg-charcoalMuted border border-gray-200 dark:border-charcoalMuted rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all"
         />
     </div>
 );
@@ -366,9 +366,9 @@ export default function ResumeBuilder() {
     }, [measurePreviewPages]);
 
     return (
-        <div className="flex flex-col md:flex-row min-h-[calc(100dvh-80px)] md:h-[calc(100vh-80px)] bg-gray-100 dark:bg-gray-900 overflow-hidden">
+        <div className="flex flex-col md:flex-row min-h-[calc(100dvh-80px)] md:h-[calc(100vh-80px)] bg-gray-100 dark:bg-charcoalDark overflow-hidden">
             {/* Mobile View Toggle - only visible on mobile */}
-            <div className="md:hidden flex bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+            <div className="md:hidden flex bg-white dark:bg-charcoal border-b border-gray-200 dark:border-charcoalMuted">
                 <button
                     onClick={() => setMobileView("editor")}
                     className={`flex-1 py-3 text-sm font-medium transition-colors ${mobileView === "editor"
@@ -390,9 +390,9 @@ export default function ResumeBuilder() {
             </div>
 
             {/* LEFT PANEL - Editor */}
-            <div className={`${mobileView === "editor" ? "flex" : "hidden"} md:flex w-full md:w-[400px] flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-col h-full`}>
+            <div className={`${mobileView === "editor" ? "flex" : "hidden"} md:flex w-full md:w-[400px] flex-shrink-0 bg-white dark:bg-charcoal border-r border-gray-200 dark:border-charcoalMuted flex-col h-full`}>
                 {/* Header */}
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                <div className="p-4 border-b border-gray-200 dark:border-charcoalMuted">
                     <div className="flex items-center gap-2">
                         <button onClick={() => navigate('/resume')} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                             ←
@@ -410,7 +410,7 @@ export default function ResumeBuilder() {
                 </div>
 
                 {/* Tabs */}
-                <div className="flex border-b border-gray-200 dark:border-gray-700">
+                <div className="flex border-b border-gray-200 dark:border-charcoalMuted">
                     {[{ id: 'details', label: 'Resume Details' }, { id: 'matcher', label: 'Resume Matcher' }].map(tab => (
                         <button
                             key={tab.id}
@@ -471,7 +471,7 @@ export default function ResumeBuilder() {
                                 onMoveDown={(sectionId) => moveSection(sectionId, "down")}
                             >
                                 {formData.education.map((edu, idx) => (
-                                    <div key={idx} className="bg-gray-50 dark:bg-gray-700/30 p-3 rounded-lg space-y-2 relative">
+                                    <div key={idx} className="bg-gray-50 dark:bg-charcoalMuted/30 p-3 rounded-lg space-y-2 relative">
                                         {formData.education.length > 1 && (
                                             <button onClick={() => removeItem("education", idx)} className="absolute top-2 right-2 text-red-400 hover:text-red-500 text-xs">✕</button>
                                         )}
@@ -496,7 +496,7 @@ export default function ResumeBuilder() {
                                                             handleArrayChange("education", idx, "cgpa", "");
                                                         }
                                                     }}
-                                                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all"
+                                                    className="w-full px-3 py-2 bg-gray-50 dark:bg-charcoalMuted border border-gray-200 dark:border-charcoalMuted rounded-lg text-sm text-gray-900 dark:text-white focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all"
                                                 >
                                                     <option value="percentage">Percentage</option>
                                                     <option value="cgpa">CGPA</option>
@@ -520,7 +520,7 @@ export default function ResumeBuilder() {
                                         )}
                                     </div>
                                 ))}
-                                <button onClick={() => addItem("education", createEmptyEducation())} className="w-full py-2 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-500 hover:border-green-500 hover:text-green-500 transition-colors">
+                                <button onClick={() => addItem("education", createEmptyEducation())} className="w-full py-2 border border-dashed border-gray-300 dark:border-charcoalMuted rounded-lg text-sm text-gray-500 hover:border-green-500 hover:text-green-500 transition-colors">
                                     + Add Education
                                 </button>
                             </AccordionSection>
@@ -539,7 +539,7 @@ export default function ResumeBuilder() {
                                 onMoveDown={(sectionId) => moveSection(sectionId, "down")}
                             >
                                 {formData.experience.map((exp, idx) => (
-                                    <div key={idx} className="bg-gray-50 dark:bg-gray-700/30 p-3 rounded-lg space-y-2 relative">
+                                    <div key={idx} className="bg-gray-50 dark:bg-charcoalMuted/30 p-3 rounded-lg space-y-2 relative">
                                         {formData.experience.length > 1 && (
                                             <button onClick={() => removeItem("experience", idx)} className="absolute top-2 right-2 text-red-400 hover:text-red-500 text-xs">✕</button>
                                         )}
@@ -558,13 +558,13 @@ export default function ResumeBuilder() {
                                                 value={exp.description || ""}
                                                 onChange={(e) => handleArrayChange("experience", idx, "description", e.target.value)}
                                                 rows={3}
-                                                className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all resize-none"
+                                                className="w-full px-3 py-2 bg-gray-50 dark:bg-charcoalMuted border border-gray-200 dark:border-charcoalMuted rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all resize-none"
                                                 placeholder="Developed web applications using React..."
                                             />
                                         </div>
                                     </div>
                                 ))}
-                                <button onClick={() => addItem("experience", {})} className="w-full py-2 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-500 hover:border-green-500 hover:text-green-500 transition-colors">
+                                <button onClick={() => addItem("experience", {})} className="w-full py-2 border border-dashed border-gray-300 dark:border-charcoalMuted rounded-lg text-sm text-gray-500 hover:border-green-500 hover:text-green-500 transition-colors">
                                     + Add Experience
                                 </button>
                             </AccordionSection>
@@ -583,7 +583,7 @@ export default function ResumeBuilder() {
                                 onMoveDown={(sectionId) => moveSection(sectionId, "down")}
                             >
                                 {formData.skills.map((skill, idx) => (
-                                    <div key={idx} className="bg-gray-50 dark:bg-gray-700/30 p-3 rounded-lg space-y-2 relative">
+                                    <div key={idx} className="bg-gray-50 dark:bg-charcoalMuted/30 p-3 rounded-lg space-y-2 relative">
                                         {formData.skills.length > 1 && (
                                             <button onClick={() => removeItem("skills", idx)} className="absolute top-2 right-2 text-red-400 hover:text-red-500 text-xs">✕</button>
                                         )}
@@ -591,7 +591,7 @@ export default function ResumeBuilder() {
                                         <InputField label="Skills (comma separated)" value={skill.items} onChange={(e) => handleArrayChange("skills", idx, "items", e.target.value)} placeholder="Python, Java, JavaScript" />
                                     </div>
                                 ))}
-                                <button onClick={() => addItem("skills", { category: "", items: "" })} className="w-full py-2 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-500 hover:border-green-500 hover:text-green-500 transition-colors">
+                                <button onClick={() => addItem("skills", { category: "", items: "" })} className="w-full py-2 border border-dashed border-gray-300 dark:border-charcoalMuted rounded-lg text-sm text-gray-500 hover:border-green-500 hover:text-green-500 transition-colors">
                                     + Add Skill Category
                                 </button>
                             </AccordionSection>
@@ -610,7 +610,7 @@ export default function ResumeBuilder() {
                                 onMoveDown={(sectionId) => moveSection(sectionId, "down")}
                             >
                                 {formData.projects.map((proj, idx) => (
-                                    <div key={idx} className="bg-gray-50 dark:bg-gray-700/30 p-3 rounded-lg space-y-2 relative">
+                                    <div key={idx} className="bg-gray-50 dark:bg-charcoalMuted/30 p-3 rounded-lg space-y-2 relative">
                                         {formData.projects.length > 1 && (
                                             <button onClick={() => removeItem("projects", idx)} className="absolute top-2 right-2 text-red-400 hover:text-red-500 text-xs">✕</button>
                                         )}
@@ -622,12 +622,12 @@ export default function ResumeBuilder() {
                                                 value={proj.description || ""}
                                                 onChange={(e) => handleArrayChange("projects", idx, "description", e.target.value)}
                                                 rows={2}
-                                                className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all resize-none"
+                                                className="w-full px-3 py-2 bg-gray-50 dark:bg-charcoalMuted border border-gray-200 dark:border-charcoalMuted rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all resize-none"
                                             />
                                         </div>
                                     </div>
                                 ))}
-                                <button onClick={() => addItem("projects", {})} className="w-full py-2 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-500 hover:border-green-500 hover:text-green-500 transition-colors">
+                                <button onClick={() => addItem("projects", {})} className="w-full py-2 border border-dashed border-gray-300 dark:border-charcoalMuted rounded-lg text-sm text-gray-500 hover:border-green-500 hover:text-green-500 transition-colors">
                                     + Add Project
                                 </button>
                             </AccordionSection>
@@ -651,7 +651,7 @@ export default function ResumeBuilder() {
                                             <select
                                                 value={link.type}
                                                 onChange={(e) => handleArrayChange("links", idx, "type", e.target.value)}
-                                                className="w-full px-2 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white"
+                                                className="w-full px-2 py-2 bg-gray-50 dark:bg-charcoalMuted border border-gray-200 dark:border-charcoalMuted rounded-lg text-sm text-gray-900 dark:text-white"
                                             >
                                                 <option>GitHub</option>
                                                 <option>LinkedIn</option>
@@ -666,7 +666,7 @@ export default function ResumeBuilder() {
                                         )}
                                     </div>
                                 ))}
-                                <button onClick={() => addItem("links", { type: "GitHub", url: "" })} className="w-full py-2 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-500 hover:border-green-500 hover:text-green-500 transition-colors">
+                                <button onClick={() => addItem("links", { type: "GitHub", url: "" })} className="w-full py-2 border border-dashed border-gray-300 dark:border-charcoalMuted rounded-lg text-sm text-gray-500 hover:border-green-500 hover:text-green-500 transition-colors">
                                     + Add Link
                                 </button>
                             </AccordionSection>
@@ -683,7 +683,7 @@ export default function ResumeBuilder() {
                 </div>
 
                 {/* Save Button */}
-                <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="p-4 border-t border-gray-200 dark:border-charcoalMuted">
                     <button
                         onClick={saveResume}
                         disabled={saving}
@@ -695,26 +695,26 @@ export default function ResumeBuilder() {
             </div>
 
             {/* RIGHT PANEL - Preview */}
-            <div className={`${mobileView === "preview" ? "flex" : "hidden"} md:flex flex-1 bg-gray-200 dark:bg-gray-900 flex-col`}>
+            <div className={`${mobileView === "preview" ? "flex" : "hidden"} md:flex flex-1 bg-gray-200 dark:bg-charcoalDark flex-col`}>
                 {/* Top Bar */}
-                <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 py-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <div className="bg-white dark:bg-charcoal border-b border-gray-200 dark:border-charcoalMuted px-4 md:px-6 py-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                     {/* Zoom Controls */}
-                    <div className="flex items-center gap-3 bg-gray-100 dark:bg-gray-700 rounded-lg px-3 py-1 justify-center sm:justify-start">
+                    <div className="flex items-center gap-3 bg-gray-100 dark:bg-charcoalMuted rounded-lg px-3 py-1 justify-center sm:justify-start">
                         <button onClick={() => setZoom(z => Math.max(25, z - 10))} className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-bold">−</button>
                         <span className="text-sm font-medium text-gray-700 dark:text-gray-300 w-12 text-center">{zoom}%</span>
                         <button onClick={() => setZoom(z => Math.min(150, z + 10))} className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-bold">+</button>
-                        <button onClick={() => setZoom(75)} className="text-xs text-gray-400 hover:text-gray-600 ml-2 px-2 py-1 bg-gray-200 dark:bg-gray-600 rounded">Reset</button>
+                        <button onClick={() => setZoom(75)} className="text-xs text-gray-400 hover:text-gray-600 ml-2 px-2 py-1 bg-gray-200 dark:bg-charcoalMuted rounded">Reset</button>
                     </div>
 
                     {/* Action Buttons */}
                     <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center sm:justify-end">
                         <button
                             onClick={() => setShowTemplateModal(true)}
-                            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                            className="px-3 py-2 border border-gray-300 dark:border-charcoalMuted rounded-lg text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoalMuted transition-colors"
                         >
                             Template
                         </button>
-                        <button className="hidden sm:block px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <button className="hidden sm:block px-3 py-2 border border-gray-300 dark:border-charcoalMuted rounded-lg text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoalMuted transition-colors">
                             AI Review
                         </button>
                         <button

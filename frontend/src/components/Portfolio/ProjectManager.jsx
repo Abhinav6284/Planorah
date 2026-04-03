@@ -223,13 +223,13 @@ export default function ProjectManager() {
                                 key={project.id}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 hover:border-gray-300 dark:hover:border-gray-700 transition-all"
+                                className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-6 hover:border-gray-300 dark:hover:border-gray-700 transition-all"
                             >
                                 <div className="flex justify-between items-start mb-4">
                                     <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                                         {project.title}
                                     </h3>
-                                    <span className={`px-2 py-1 text-xs rounded-full ${project.visibility === 'public' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'}`}>
+                                    <span className={`px-2 py-1 text-xs rounded-full ${project.visibility === 'public' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-700 dark:bg-charcoal dark:text-gray-400'}`}>
                                         {project.visibility}
                                     </span>
                                 </div>
@@ -241,12 +241,12 @@ export default function ProjectManager() {
                                 {project.tech_stack && project.tech_stack.length > 0 && (
                                     <div className="flex flex-wrap gap-2 mb-4">
                                         {project.tech_stack.slice(0, 3).map((tech, idx) => (
-                                            <span key={idx} className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-lg">
+                                            <span key={idx} className="px-2 py-1 text-xs bg-gray-100 dark:bg-charcoalDark text-gray-700 dark:text-gray-300 rounded-lg">
                                                 {tech}
                                             </span>
                                         ))}
                                         {project.tech_stack.length > 3 && (
-                                            <span className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-lg">
+                                            <span className="px-2 py-1 text-xs bg-gray-100 dark:bg-charcoalDark text-gray-700 dark:text-gray-300 rounded-lg">
                                                 +{project.tech_stack.length - 3} more
                                             </span>
                                         )}
@@ -259,7 +259,7 @@ export default function ProjectManager() {
                                             href={project.github_url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors text-center"
+                                            className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-charcoalMuted rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoalDark transition-colors text-center"
                                         >
                                             View on GitHub →
                                         </a>
@@ -267,23 +267,23 @@ export default function ProjectManager() {
                                         <button
                                             onClick={() => openGitHubModal(project)}
                                             disabled={!githubConnected}
-                                            className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors disabled:opacity-50"
+                                            className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-charcoalMuted rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoalDark transition-colors disabled:opacity-50"
                                         >
                                             Push to GitHub
                                         </button>
                                     )}
                                     <button
                                         onClick={() => handleAddToPortfolio(project)}
-                                        className="px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                                        className="px-3 py-2 text-sm border border-gray-200 dark:border-charcoalMuted rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoalDark transition-colors"
                                     >
                                         Add to Portfolio
                                     </button>
                                 </div>
 
-                                <div className="flex gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
+                                <div className="flex gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-charcoalMuted">
                                     <button
                                         onClick={() => openEditModal(project)}
-                                        className="flex-1 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-lg transition-colors"
+                                        className="flex-1 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-charcoalDark rounded-lg transition-colors"
                                     >
                                         Edit
                                     </button>
@@ -315,9 +315,9 @@ export default function ProjectManager() {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
                             onClick={(e) => e.stopPropagation()}
-                            className="bg-white dark:bg-[#1C1C1E] rounded-2xl border border-gray-200 dark:border-gray-800 w-full max-w-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+                            className="bg-white dark:bg-charcoal rounded-2xl border border-gray-200 dark:border-charcoalMuted w-full max-w-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
                         >
-                            <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+                            <div className="px-6 py-5 border-b border-gray-200 dark:border-charcoalMuted">
                                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                                     {selectedProject ? 'Edit Project' : 'New Project'}
                                 </h2>
@@ -333,7 +333,7 @@ export default function ProjectManager() {
                                         value={formData.title}
                                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                         required
-                                        className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white"
+                                        className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-charcoalMuted focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white"
                                         placeholder="My Awesome Project"
                                     />
                                 </div>
@@ -347,7 +347,7 @@ export default function ProjectManager() {
                                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                         required
                                         rows={4}
-                                        className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white resize-none"
+                                        className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-charcoalMuted focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white resize-none"
                                         placeholder="Describe your project..."
                                     />
                                 </div>
@@ -363,7 +363,7 @@ export default function ProjectManager() {
                                             ...formData, 
                                             tech_stack: e.target.value.split(',').map(s => s.trim()).filter(Boolean) 
                                         })}
-                                        className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white"
+                                        className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-charcoalMuted focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white"
                                         placeholder="React, Node.js, MongoDB"
                                     />
                                 </div>
@@ -376,7 +376,7 @@ export default function ProjectManager() {
                                         type="url"
                                         value={formData.live_demo_url}
                                         onChange={(e) => setFormData({ ...formData, live_demo_url: e.target.value })}
-                                        className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white"
+                                        className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-charcoalMuted focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white"
                                         placeholder="https://myproject.com"
                                     />
                                 </div>
@@ -388,7 +388,7 @@ export default function ProjectManager() {
                                     <select
                                         value={formData.visibility}
                                         onChange={(e) => setFormData({ ...formData, visibility: e.target.value })}
-                                        className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white"
+                                        className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-charcoalMuted focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white"
                                     >
                                         <option value="public">Public</option>
                                         <option value="private">Private</option>
@@ -399,7 +399,7 @@ export default function ProjectManager() {
                                     <button
                                         type="button"
                                         onClick={() => setShowModal(false)}
-                                        className="px-5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                                        className="px-5 py-2.5 rounded-xl border border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-charcoalDark transition-colors"
                                     >
                                         Cancel
                                     </button>
@@ -431,9 +431,9 @@ export default function ProjectManager() {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
                             onClick={(e) => e.stopPropagation()}
-                            className="bg-white dark:bg-[#1C1C1E] rounded-2xl border border-gray-200 dark:border-gray-800 w-full max-w-md shadow-2xl overflow-hidden"
+                            className="bg-white dark:bg-charcoal rounded-2xl border border-gray-200 dark:border-charcoalMuted w-full max-w-md shadow-2xl overflow-hidden"
                         >
-                            <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+                            <div className="px-6 py-5 border-b border-gray-200 dark:border-charcoalMuted">
                                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">Publish to GitHub</h2>
                                 <p className="text-sm text-gray-500 mt-1">Create a repository for {selectedProject?.title}</p>
                             </div>
@@ -447,7 +447,7 @@ export default function ProjectManager() {
                                         type="text"
                                         value={publishData.repo_name}
                                         onChange={(e) => setPublishData({ ...publishData, repo_name: e.target.value })}
-                                        className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white"
+                                        className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-charcoalMuted focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white"
                                         placeholder="my-project"
                                     />
                                 </div>
@@ -459,17 +459,17 @@ export default function ProjectManager() {
                                     </div>
                                     <button
                                         onClick={() => setPublishData({ ...publishData, is_private: !publishData.is_private })}
-                                        className={`w-12 h-6 rounded-full transition-colors ${publishData.is_private ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                        className={`w-12 h-6 rounded-full transition-colors ${publishData.is_private ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-charcoalMuted'}`}
                                     >
-                                        <div className={`w-5 h-5 bg-white dark:bg-gray-900 rounded-full transition-transform ${publishData.is_private ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                                        <div className={`w-5 h-5 bg-white dark:bg-charcoalDark rounded-full transition-transform ${publishData.is_private ? 'translate-x-6' : 'translate-x-0.5'}`} />
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800 flex justify-end gap-3">
+                            <div className="px-6 py-4 border-t border-gray-200 dark:border-charcoalMuted flex justify-end gap-3">
                                 <button
                                     onClick={() => setShowGitHubModal(false)}
-                                    className="px-5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                                    className="px-5 py-2.5 rounded-xl border border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-charcoalDark transition-colors"
                                 >
                                     Cancel
                                 </button>

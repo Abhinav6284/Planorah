@@ -37,7 +37,7 @@ const gradients = [
 
 export default function ProblemSection() {
   return (
-    <section className="py-24 lg:py-32 px-4 sm:px-6 lg:px-8 bg-white dark:bg-slate-950 border-y border-gray-100 dark:border-white/[0.06]">
+    <section className="py-24 lg:py-32 px-4 sm:px-6 lg:px-8 bg-white dark:bg-charcoal border-y border-gray-100 dark:border-white/[0.06]">
       <div className="max-w-7xl mx-auto w-full">
         {/* Section Header */}
         <motion.div
@@ -71,12 +71,12 @@ export default function ProblemSection() {
                 transition={{ duration: 0.6, delay: idx * 0.1 }}
                 className={`p-[1px] rounded-2xl bg-gradient-to-br ${gradients[idx]} group`}
               >
-                <div className="bg-white dark:bg-gray-900/80 rounded-2xl p-8 lg:p-10 h-full flex flex-col gap-6">
+                <div className="bg-white dark:bg-charcoalDark/80 rounded-2xl p-8 lg:p-10 h-full flex flex-col gap-6">
                   <div className="flex items-start justify-between">
                     <span className="text-6xl font-outfit font-bold text-gray-100 dark:text-white/[0.08]">
                       {step.number}
                     </span>
-                    <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-white/[0.08] flex items-center justify-center text-gray-950 dark:text-white group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-charcoal border border-gray-200 dark:border-white/[0.08] flex items-center justify-center text-gray-950 dark:text-white group-hover:scale-110 transition-transform duration-300">
                       <Icon className="w-6 h-6" />
                     </div>
                   </div>

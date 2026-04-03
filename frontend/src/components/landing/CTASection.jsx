@@ -11,7 +11,7 @@ export default function CTASection() {
   };
 
   return (
-    <section className="py-32 px-4 sm:px-6 lg:px-8 bg-white dark:bg-slate-950 border-y border-gray-200 dark:border-white/[0.06] overflow-hidden relative">
+    <section className="py-32 px-4 sm:px-6 lg:px-8 bg-white dark:bg-charcoal border-y border-gray-200 dark:border-white/[0.06] overflow-hidden relative">
       <div className="max-w-4xl mx-auto text-center relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -52,9 +52,9 @@ export default function CTASection() {
             className="flex flex-col sm:flex-row items-center justify-center gap-6 text-sm font-outfit text-gray-600 dark:text-gray-400 pt-8"
           >
             <span>✓ No credit card required</span>
-            <div className="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-700 hidden sm:block" />
+            <div className="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-charcoalMuted hidden sm:block" />
             <span>✓ Free forever plan available</span>
-            <div className="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-700 hidden sm:block" />
+            <div className="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-charcoalMuted hidden sm:block" />
             <span>✓ Cancel anytime</span>
           </motion.div>
         </motion.div>

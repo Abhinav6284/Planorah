@@ -29,7 +29,7 @@ const skillData = [
 
 export default function StatsWithCharts() {
   return (
-    <section className="py-20 px-6 bg-white dark:bg-slate-950">
+    <section className="py-20 px-6 bg-white dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -45,7 +45,7 @@ export default function StatsWithCharts() {
         {/* Charts Grid */}
         <div className="grid md:grid-cols-2 gap-8">
           {/* Weekly Performance */}
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/[0.08] rounded-3xl p-8">
+          <div className="bg-white dark:bg-charcoalDark border border-gray-200 dark:border-white/[0.08] rounded-3xl p-8">
             <h3 className="text-xl font-outfit font-semibold text-gray-950 dark:text-white mb-6">Weekly Performance</h3>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={weeklyData}>
@@ -77,7 +77,7 @@ export default function StatsWithCharts() {
           </div>
 
           {/* Task Distribution */}
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/[0.08] rounded-3xl p-8">
+          <div className="bg-white dark:bg-charcoalDark border border-gray-200 dark:border-white/[0.08] rounded-3xl p-8">
             <h3 className="text-xl font-outfit font-semibold text-gray-950 dark:text-white mb-6">Task Distribution</h3>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
@@ -118,7 +118,7 @@ export default function StatsWithCharts() {
           </div>
 
           {/* XP Growth */}
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/[0.08] rounded-3xl p-8 md:col-span-2">
+          <div className="bg-white dark:bg-charcoalDark border border-gray-200 dark:border-white/[0.08] rounded-3xl p-8 md:col-span-2">
             <h3 className="text-xl font-outfit font-semibold text-gray-950 dark:text-white mb-6">Your XP Growth</h3>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={skillData}>

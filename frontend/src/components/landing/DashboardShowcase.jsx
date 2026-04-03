@@ -2,7 +2,7 @@ import { Zap, Target, TrendingUp, Calendar } from "lucide-react";
 
 export default function DashboardShowcase() {
   return (
-    <section className="py-20 px-6 bg-gray-50 dark:bg-slate-900">
+    <section className="py-20 px-6 bg-gray-50 dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -18,8 +18,8 @@ export default function DashboardShowcase() {
         {/* Dashboard Grid */}
         <div className="grid md:grid-cols-2 gap-8">
           {/* Main Dashboard Mockup */}
-          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-white/[0.08] p-8 overflow-hidden">
-            <div className="bg-gradient-to-br from-gray-900 to-gray-950 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 text-white">
+          <div className="bg-white dark:bg-charcoalDark rounded-3xl border border-gray-200 dark:border-white/[0.08] p-8 overflow-hidden">
+            <div className="bg-gradient-to-br from-gray-900 to-gray-950 dark:from-charcoal dark:to-charcoalDark rounded-2xl p-6 text-white">
               {/* Header */}
               <div className="flex justify-between items-center mb-8">
                 <div>
@@ -75,7 +75,7 @@ export default function DashboardShowcase() {
           {/* Stats Cards */}
           <div className="space-y-6">
             {/* Streak Card */}
-            <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-white/[0.08] p-8">
+            <div className="bg-white dark:bg-charcoalDark rounded-3xl border border-gray-200 dark:border-white/[0.08] p-8">
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Current Streak</p>
@@ -90,7 +90,7 @@ export default function DashboardShowcase() {
             </div>
 
             {/* Productivity Card */}
-            <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-white/[0.08] p-8">
+            <div className="bg-white dark:bg-charcoalDark rounded-3xl border border-gray-200 dark:border-white/[0.08] p-8">
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Productivity Score</p>
@@ -111,7 +111,7 @@ export default function DashboardShowcase() {
             </div>
 
             {/* Goals Card */}
-            <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-white/[0.08] p-8">
+            <div className="bg-white dark:bg-charcoalDark rounded-3xl border border-gray-200 dark:border-white/[0.08] p-8">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Active Goals</p>

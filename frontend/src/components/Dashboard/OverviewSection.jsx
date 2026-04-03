@@ -26,7 +26,7 @@ const ElevenLabsVoiceButton = ({ onClick }) => {
         <motion.div
             layout
             onClick={onClick}
-            className="flex items-center h-[42px] px-[10px] rounded-[24px] cursor-pointer transition-colors shadow-[0_2px_8px_rgba(0,0,0,0.04)] border bg-[#fcfcfc] dark:bg-gray-900 border-gray-200/80 dark:border-gray-700 hover:bg-[#f3f4f6] dark:hover:bg-gray-800 gap-2.5"
+            className="flex items-center h-[42px] px-[10px] rounded-[24px] cursor-pointer transition-colors shadow-[0_2px_8px_rgba(0,0,0,0.04)] border bg-[#fcfcfc] dark:bg-charcoalDark border-gray-200/80 dark:border-charcoalMuted hover:bg-[#f3f4f6] dark:hover:bg-charcoalMuted gap-2.5"
         >
             {/* The Orb */}
             <motion.div layout className="relative w-[26px] h-[26px] rounded-full overflow-hidden shrink-0 shadow-[0_1px_3px_rgba(37,99,235,0.2)]">
@@ -221,7 +221,7 @@ export default function OverviewSection() {
                     <QuickStatsWidget tasks={tasks} />
 
                     {/* Focus Timer Pill */}
-                    <div className="h-10 sm:h-12 px-2 sm:px-3 rounded-xl sm:rounded-2xl bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 flex items-center gap-2 shadow-sm">
+                    <div className="h-10 sm:h-12 px-2 sm:px-3 rounded-xl sm:rounded-2xl bg-white dark:bg-charcoal border border-gray-200 dark:border-white/10 flex items-center gap-2 shadow-sm">
                         <div className="leading-tight min-w-0">
                             <div className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">Focus</div>
                             <div className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">{formatFocusTime(focusSecondsLeft)}</div>

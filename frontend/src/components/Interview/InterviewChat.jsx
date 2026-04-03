@@ -73,9 +73,9 @@ export default function InterviewChat() {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-80px)] bg-gray-50 dark:bg-gray-900 font-sans relative overflow-hidden">
+        <div className="flex flex-col h-[calc(100vh-80px)] bg-gray-50 dark:bg-charcoalDark font-sans relative overflow-hidden">
             {/* Header */}
-            <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 shadow-sm z-10 flex justify-between items-center">
+            <header className="bg-white dark:bg-charcoal border-b border-gray-200 dark:border-charcoalMuted p-4 shadow-sm z-10 flex justify-between items-center">
                 <div>
                     <h1 className="text-xl font-bold text-gray-900 dark:text-white">
                         {sessionData ? sessionData.job_role : "Interview"}
@@ -108,7 +108,7 @@ export default function InterviewChat() {
                         <div className={`max-w-[80%] md:max-w-[70%] space-y-2`}>
                             <div className={`p-5 rounded-2xl shadow-sm leading-relaxed ${msg.sender === 'user'
                                 ? 'bg-black dark:bg-white text-white dark:text-black rounded-tr-none'
-                                : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-100 dark:border-gray-700 rounded-tl-none'
+                                : 'bg-white dark:bg-charcoal text-gray-800 dark:text-gray-100 border border-gray-100 dark:border-charcoalMuted rounded-tl-none'
                                 }`}>
                                 {msg.content}
                             </div>
@@ -117,7 +117,7 @@ export default function InterviewChat() {
                                 <motion.div
                                     initial={{ opacity: 0, height: 0 }}
                                     animate={{ opacity: 1, height: 'auto' }}
-                                    className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl text-sm text-blue-800 dark:text-blue-200 border border-blue-100 dark:border-blue-800"
+                                    className="bg-blue-50 dark:bg-charcoal/20 p-4 rounded-xl text-sm text-blue-800 dark:text-blue-200 border border-blue-100 dark:border-blue-800"
                                 >
                                     <strong>💡 Feedback:</strong> {msg.feedback}
                                 </motion.div>
@@ -132,7 +132,7 @@ export default function InterviewChat() {
                         animate={{ opacity: 1 }}
                         className="flex justify-start"
                     >
-                        <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 dark:border-gray-700 flex gap-2">
+                        <div className="bg-white dark:bg-charcoal p-4 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 dark:border-charcoalMuted flex gap-2">
                             <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
                             <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75" />
                             <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150" />
@@ -143,14 +143,14 @@ export default function InterviewChat() {
             </div>
 
             {/* Input Area */}
-            <div className="bg-white dark:bg-gray-800 p-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="bg-white dark:bg-charcoal p-4 border-t border-gray-200 dark:border-charcoalMuted">
                 <form onSubmit={handleSend} className="max-w-4xl mx-auto relative flex gap-4">
                     <input
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Type your answer..."
-                        className="w-full px-6 py-4 rounded-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white pr-16"
+                        className="w-full px-6 py-4 rounded-full border border-gray-300 dark:border-charcoalMuted bg-gray-50 dark:bg-charcoalMuted text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white pr-16"
                         disabled={loading}
                     />
                     <button

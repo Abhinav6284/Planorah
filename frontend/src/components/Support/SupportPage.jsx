@@ -21,7 +21,7 @@ const helpCategories = [
 
 const colorMap = {
     emerald: { bg: 'bg-emerald-100 dark:bg-emerald-500/15', text: 'text-emerald-600 dark:text-emerald-400', ring: 'ring-emerald-200 dark:ring-emerald-500/30' },
-    blue: { bg: 'bg-blue-100 dark:bg-blue-500/15', text: 'text-blue-600 dark:text-blue-400', ring: 'ring-blue-200 dark:ring-blue-500/30' },
+    blue: { bg: 'bg-blue-100 dark:bg-charcoal/15', text: 'text-blue-600 dark:text-blue-400', ring: 'ring-blue-200 dark:ring-blue-500/30' },
     violet: { bg: 'bg-violet-100 dark:bg-violet-500/15', text: 'text-violet-600 dark:text-violet-400', ring: 'ring-violet-200 dark:ring-violet-500/30' },
     amber: { bg: 'bg-amber-100 dark:bg-amber-500/15', text: 'text-amber-600 dark:text-amber-400', ring: 'ring-amber-200 dark:ring-amber-500/30' },
     rose: { bg: 'bg-rose-100 dark:bg-rose-500/15', text: 'text-rose-600 dark:text-rose-400', ring: 'ring-rose-200 dark:ring-rose-500/30' },
@@ -64,7 +64,7 @@ function FAQItem({ faq, isOpen, onClick, searchQuery }) {
     };
 
     return (
-        <div className="border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden transition-colors hover:border-gray-300 dark:hover:border-gray-700">
+        <div className="border border-gray-200 dark:border-charcoalMuted rounded-2xl overflow-hidden transition-colors hover:border-gray-300 dark:hover:border-gray-700">
             <button
                 onClick={onClick}
                 className="w-full flex items-center justify-between gap-4 p-5 text-left group"
@@ -95,7 +95,7 @@ function FAQItem({ faq, isOpen, onClick, searchQuery }) {
                                 className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed"
                                 dangerouslySetInnerHTML={{ __html: highlight(faq.a) }}
                             />
-                            <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
+                            <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-100 dark:border-charcoalMuted">
                                 <span className="text-xs text-gray-400">Was this helpful?</span>
                                 <button className="p-1.5 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-gray-400 hover:text-emerald-500 transition-colors" aria-label="Yes, helpful">
                                     <ThumbsUp className="w-3.5 h-3.5" />
@@ -114,7 +114,7 @@ function FAQItem({ faq, isOpen, onClick, searchQuery }) {
 
 function StatusBar() {
     return (
-        <div className="flex items-center justify-between p-4 bg-white dark:bg-[#141414] rounded-2xl border border-gray-200 dark:border-gray-800">
+        <div className="flex items-center justify-between p-4 bg-white dark:bg-[#141414] rounded-2xl border border-gray-200 dark:border-charcoalMuted">
             <div className="flex items-center gap-3">
                 <div className="relative">
                     <div className="w-3 h-3 rounded-full bg-emerald-500" />
@@ -237,7 +237,7 @@ export default function SupportPage() {
                     >
                         <Link
                             to="/"
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-[#141414] border border-gray-200 dark:border-gray-800 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1A1A1A] transition-all"
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-[#141414] border border-gray-200 dark:border-charcoalMuted text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1A1A1A] transition-all"
                         >
                             <ArrowLeft className="w-4 h-4" />
                             Back to Home
@@ -277,10 +277,10 @@ export default function SupportPage() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search for answers..."
-                                className="w-full pl-12 pr-20 py-4 bg-white dark:bg-[#141414] border border-gray-200 dark:border-gray-800 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-400 dark:focus:border-violet-500 transition-all shadow-lg shadow-gray-200/50 dark:shadow-black/20 text-[15px]"
+                                className="w-full pl-12 pr-20 py-4 bg-white dark:bg-[#141414] border border-gray-200 dark:border-charcoalMuted rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-400 dark:focus:border-violet-500 transition-all shadow-lg shadow-gray-200/50 dark:shadow-black/20 text-[15px]"
                                 aria-label="Search help articles"
                             />
-                            <kbd className="absolute right-4 top-1/2 -translate-y-1/2 hidden sm:inline-flex px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-400 text-xs font-mono rounded-md border border-gray-200 dark:border-gray-700">
+                            <kbd className="absolute right-4 top-1/2 -translate-y-1/2 hidden sm:inline-flex px-2 py-0.5 bg-gray-100 dark:bg-charcoal text-gray-400 text-xs font-mono rounded-md border border-gray-200 dark:border-charcoalMuted">
                                 /
                             </kbd>
                         </div>
@@ -302,13 +302,13 @@ export default function SupportPage() {
                             { type: 'faq', icon: HelpCircle, label: 'Browse FAQs', desc: 'Find quick answers', color: 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' },
                             { type: 'bug', icon: Bug, label: 'Report Bug', desc: 'Something broke?', color: 'bg-rose-100 dark:bg-rose-500/15 text-rose-600 dark:text-rose-400' },
                             { type: 'feature', icon: Lightbulb, label: 'Request Feature', desc: 'Share your ideas', color: 'bg-amber-100 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400' },
-                            { type: 'email', icon: Mail, label: 'Email Us', desc: 'support@planorah.me', color: 'bg-blue-100 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400' },
+                            { type: 'email', icon: Mail, label: 'Email Us', desc: 'support@planorah.me', color: 'bg-blue-100 dark:bg-charcoal/15 text-blue-600 dark:text-blue-400' },
                         ].map((action) => (
                             <motion.button
                                 key={action.type}
                                 variants={fadeUp}
                                 onClick={() => handleQuickAction(action.type)}
-                                className="group p-5 bg-white dark:bg-[#141414] border border-gray-200 dark:border-gray-800 rounded-2xl text-left hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-md dark:hover:shadow-black/20 transition-all"
+                                className="group p-5 bg-white dark:bg-[#141414] border border-gray-200 dark:border-charcoalMuted rounded-2xl text-left hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-md dark:hover:shadow-black/20 transition-all"
                             >
                                 <div className={`w-10 h-10 rounded-xl ${action.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
                                     <action.icon className="w-5 h-5" />
@@ -340,7 +340,7 @@ export default function SupportPage() {
                                     }}
                                     className={`group p-4 rounded-2xl border text-left transition-all ${isActive
                                         ? `${c.bg} border-transparent ring-2 ${c.ring}`
-                                        : 'bg-white dark:bg-[#141414] border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'
+                                        : 'bg-white dark:bg-[#141414] border-gray-200 dark:border-charcoalMuted hover:border-gray-300 dark:hover:border-gray-700'
                                         }`}
                                 >
                                     <div className="flex items-center gap-3">
@@ -389,7 +389,7 @@ export default function SupportPage() {
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-12 bg-white dark:bg-[#141414] rounded-2xl border border-gray-200 dark:border-gray-800">
+                        <div className="text-center py-12 bg-white dark:bg-[#141414] rounded-2xl border border-gray-200 dark:border-charcoalMuted">
                             <Search className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
                             <p className="text-gray-500 dark:text-gray-400 font-medium">No results found</p>
                             <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Try different keywords or browse categories above</p>
@@ -404,7 +404,7 @@ export default function SupportPage() {
                         Send us a Message
                     </h2>
 
-                    <div className="bg-white dark:bg-[#141414] rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+                    <div className="bg-white dark:bg-[#141414] rounded-2xl border border-gray-200 dark:border-charcoalMuted overflow-hidden">
                         {formState === 'success' ? (
                             <motion.div
                                 initial={{ scale: 0.95, opacity: 0 }}
@@ -434,7 +434,7 @@ export default function SupportPage() {
                                 )}
 
                                 {/* Type Selector */}
-                                <div className="p-5 border-b border-gray-100 dark:border-gray-800">
+                                <div className="p-5 border-b border-gray-100 dark:border-charcoalMuted">
                                     <div className="flex flex-wrap gap-2">
                                         {feedbackTypes.map((type) => {
                                             const c = colorMap[type.color];
@@ -445,7 +445,7 @@ export default function SupportPage() {
                                                     onClick={() => setFormType(type.id)}
                                                     className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${isActive
                                                         ? `${c.bg} ${c.text} ring-1 ${c.ring}`
-                                                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                                                        : 'bg-gray-100 dark:bg-charcoal text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-charcoalMuted'
                                                         }`}
                                                 >
                                                     <type.icon className="w-4 h-4" />
@@ -465,7 +465,7 @@ export default function SupportPage() {
                                             value={formData.subject}
                                             onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                                             placeholder="Brief summary"
-                                            className="w-full px-4 py-3 bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-400 transition-all text-sm"
+                                            className="w-full px-4 py-3 bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-charcoalMuted rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-400 transition-all text-sm"
                                             required
                                         />
                                     </div>
@@ -477,7 +477,7 @@ export default function SupportPage() {
                                             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                                             placeholder="Describe your issue or idea in detail..."
                                             rows={4}
-                                            className="w-full px-4 py-3 bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-400 transition-all resize-none text-sm"
+                                            className="w-full px-4 py-3 bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-charcoalMuted rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-400 transition-all resize-none text-sm"
                                             required
                                         />
                                     </div>
@@ -497,7 +497,7 @@ export default function SupportPage() {
                                                                 : p === 'high'
                                                                     ? 'bg-orange-100 dark:bg-orange-500/15 text-orange-700 dark:text-orange-400 border-orange-300 dark:border-orange-500/40'
                                                                     : 'bg-violet-100 dark:bg-violet-500/15 text-violet-700 dark:text-violet-400 border-violet-300 dark:border-violet-500/40'
-                                                            : 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-transparent hover:border-gray-300 dark:hover:border-gray-700'
+                                                            : 'bg-gray-50 dark:bg-charcoal text-gray-500 dark:text-gray-400 border-transparent hover:border-gray-300 dark:hover:border-gray-700'
                                                             }`}
                                                     >
                                                         {p.charAt(0).toUpperCase() + p.slice(1)}
@@ -516,7 +516,7 @@ export default function SupportPage() {
                                             value={formData.email}
                                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                             placeholder="your@email.com"
-                                            className="w-full px-4 py-3 bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-400 transition-all text-sm"
+                                            className="w-full px-4 py-3 bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-charcoalMuted rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-400 transition-all text-sm"
                                         />
                                     </div>
 

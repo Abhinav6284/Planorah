@@ -61,17 +61,17 @@ export default function FocusMode() {
     };
 
     if (loading) {
-        return <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        return <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-charcoalDark">
             <p className="text-gray-400">Loading focus mode...</p>
         </div>;
     }
 
     return (
-        <div className="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex overflow-hidden">
+        <div className="fixed inset-0 bg-white dark:bg-charcoalDark z-50 flex overflow-hidden">
             {/* Exit Button */}
             <button
                 onClick={exitFocusMode}
-                className="absolute top-6 right-6 z-50 p-3 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                className="absolute top-6 right-6 z-50 p-3 rounded-full bg-gray-100 dark:bg-charcoal hover:bg-gray-200 dark:hover:bg-charcoalMuted transition-colors"
             >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -79,7 +79,7 @@ export default function FocusMode() {
             </button>
 
             {/* Left: Today's Tasks */}
-            <div className="w-80 border-r border-gray-100 dark:border-gray-800 p-6 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+            <div className="w-80 border-r border-gray-100 dark:border-charcoalMuted p-6 overflow-y-auto bg-gray-50 dark:bg-charcoalDark">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Today's Tasks</h2>
                 <div className="space-y-2">
                     {todayTasks.map(task => (
@@ -88,7 +88,7 @@ export default function FocusMode() {
                             onClick={() => setCurrentTask(task)}
                             className={`w-full text-left p-4 rounded-xl transition-all ${currentTask?.id === task.id
                                 ? 'bg-black dark:bg-white text-white dark:text-black shadow-lg'
-                                : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                : 'bg-white dark:bg-charcoal hover:bg-gray-100 dark:hover:bg-charcoalMuted'
                                 }`}
                         >
                             <div className="font-medium">{task.title}</div>
@@ -144,7 +144,7 @@ export default function FocusMode() {
             </div>
 
             {/* Right: Notes */}
-            <div className="w-96 border-l border-gray-100 dark:border-gray-800 p-6 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+            <div className="w-96 border-l border-gray-100 dark:border-charcoalMuted p-6 overflow-y-auto bg-gray-50 dark:bg-charcoalDark">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Notes</h2>
                 {currentTask ? (
                     <div data-color-mode="auto">

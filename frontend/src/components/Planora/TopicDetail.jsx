@@ -28,7 +28,7 @@ const NotesView = ({ content }) => {
     <div className="prose prose-sm dark:prose-invert max-w-none">
       {definition && (
         <Section title="Definition">
-          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white border-l-4 border-gray-900 dark:border-white">
+          <div className="bg-gray-50 dark:bg-charcoalMuted/50 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white border-l-4 border-gray-900 dark:border-white">
             {definition}
           </div>
         </Section>
@@ -54,7 +54,7 @@ const NotesView = ({ content }) => {
         <Section title="Examples">
           <div className="space-y-3">
             {examples.map((ex, i) => (
-              <div key={i} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-3">
+              <div key={i} className="bg-white dark:bg-charcoal rounded-xl border border-gray-200 dark:border-charcoalMuted px-4 py-3">
                 {ex.title && <p className="text-xs font-semibold text-gray-900 dark:text-white mb-1">{ex.title}</p>}
                 <p className="text-sm text-gray-700 dark:text-gray-300">{ex.content}</p>
               </div>
@@ -64,7 +64,7 @@ const NotesView = ({ content }) => {
       )}
       {formulas_or_diagrams && (
         <Section title="Formulas / Diagrams">
-          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl px-4 py-3 font-mono text-sm text-gray-800 dark:text-gray-200">
+          <div className="bg-gray-50 dark:bg-charcoalMuted/50 rounded-xl px-4 py-3 font-mono text-sm text-gray-800 dark:text-gray-200">
             {formulas_or_diagrams}
           </div>
         </Section>
@@ -104,7 +104,7 @@ const StudyGuideView = ({ content }) => {
   return (
     <div>
       {time_estimate && (
-        <div className="inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-full px-3 py-1 text-xs text-gray-700 dark:text-gray-300 mb-6">
+        <div className="inline-flex items-center gap-2 bg-gray-100 dark:bg-charcoalMuted rounded-full px-3 py-1 text-xs text-gray-700 dark:text-gray-300 mb-6">
           ⏱ Estimated time: <strong>{time_estimate}</strong>
         </div>
       )}
@@ -112,7 +112,7 @@ const StudyGuideView = ({ content }) => {
         <Section title="Order of Learning">
           <div className="space-y-2">
             {order_of_learning.map((step, i) => (
-              <div key={i} className="flex items-start gap-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-3">
+              <div key={i} className="flex items-start gap-3 bg-white dark:bg-charcoal rounded-xl border border-gray-200 dark:border-charcoalMuted px-4 py-3">
                 <div className="w-6 h-6 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
                   {step.step || i + 1}
                 </div>
@@ -151,7 +151,7 @@ const StudyGuideView = ({ content }) => {
         <Section title="Revision Strategy">
           <div className="space-y-2">
             {Object.entries(revision_strategy).map(([key, val]) => (
-              <div key={key} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-3">
+              <div key={key} className="bg-white dark:bg-charcoal rounded-xl border border-gray-200 dark:border-charcoalMuted px-4 py-3">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">{key.replace(/_/g, ' ')}</p>
                 <p className="text-sm text-gray-700 dark:text-gray-300">{val}</p>
               </div>
@@ -228,7 +228,7 @@ export default function TopicDetail() {
   const label = isGuide ? 'Study Guide' : 'Notes';
 
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-[#F5F5F7] dark:bg-gray-900 transition-colors">
+    <div className="min-h-[calc(100vh-80px)] bg-[#F5F5F7] dark:bg-charcoalDark transition-colors">
       <div className="max-w-3xl mx-auto px-4 py-10">
         {/* Back */}
         <button onClick={() => window.history.back()} className="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6 transition-colors">
@@ -236,7 +236,7 @@ export default function TopicDetail() {
         </button>
 
         {/* Header */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 mb-6">
+        <div className="bg-white dark:bg-charcoal rounded-2xl border border-gray-200 dark:border-charcoalMuted p-6 mb-6">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">
@@ -248,7 +248,7 @@ export default function TopicDetail() {
               {/* Toggle between notes and guide */}
               <Link
                 to={`/planora/topic/${topicId}/${isGuide ? 'notes' : 'guide'}`}
-                className="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="px-3 py-2 rounded-xl border border-gray-200 dark:border-charcoalMuted text-xs font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-charcoalMuted transition-colors"
               >
                 {isGuide ? 'View Notes' : 'View Guide'}
               </Link>
@@ -264,10 +264,10 @@ export default function TopicDetail() {
         </div>
 
         {/* Content */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-charcoal rounded-2xl border border-gray-200 dark:border-charcoalMuted p-6">
           {loading ? (
             <div className="flex flex-col gap-3 animate-pulse">
-              {[1, 2, 3, 4].map(i => <div key={i} className={`h-4 bg-gray-100 dark:bg-gray-700 rounded ${i === 2 ? 'w-3/4' : 'w-full'}`} />)}
+              {[1, 2, 3, 4].map(i => <div key={i} className={`h-4 bg-gray-100 dark:bg-charcoalMuted rounded ${i === 2 ? 'w-3/4' : 'w-full'}`} />)}
             </div>
           ) : error ? (
             <p className="text-sm text-red-600">{error}</p>
