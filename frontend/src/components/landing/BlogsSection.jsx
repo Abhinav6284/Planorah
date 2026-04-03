@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { ArrowRight, Search } from "lucide-react";
 
 const blogs = [
@@ -82,7 +83,7 @@ export default function BlogsSection() {
   });
 
   return (
-    <section className="py-20 px-6 bg-gray-50 dark:bg-charcoal">
+    <section className="py-20 px-6 bg-beigeSecondary dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -105,7 +106,7 @@ export default function BlogsSection() {
               placeholder="Search guides..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-charcoalDark border border-gray-200 dark:border-white/[0.08] text-gray-950 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-950 dark:focus:ring-white"
+              className="w-full pl-12 pr-4 py-3 rounded-xl bg-beigeSecondary dark:bg-charcoalDark border border-beigeMuted dark:border-white/[0.08] text-gray-950 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-950 dark:focus:ring-white"
             />
           </div>
 
@@ -115,8 +116,8 @@ export default function BlogsSection() {
               onClick={() => setSelectedTier(null)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
                 selectedTier === null
-                  ? "bg-gray-950 dark:bg-white text-white dark:text-gray-950"
-                  : "bg-gray-100 dark:bg-white/[0.06] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/[0.1]"
+                    ? "bg-terracotta text-white"
+                    : "bg-beigeMuted dark:bg-charcoalMuted/50 text-textPrimary dark:text-gray-300 hover:bg-beigeMuted dark:hover:bg-charcoalMuted"
               }`}
             >
               All Guides
@@ -127,8 +128,8 @@ export default function BlogsSection() {
                 onClick={() => setSelectedTier(idx + 1)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
                   selectedTier === idx + 1
-                    ? "bg-gray-950 dark:bg-white text-white dark:text-gray-950"
-                    : "bg-gray-100 dark:bg-white/[0.06] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/[0.1]"
+                    ? "bg-terracotta text-white"
+                    : "bg-beigeMuted dark:bg-charcoalMuted/50 text-textPrimary dark:text-gray-300 hover:bg-beigeMuted dark:hover:bg-charcoalMuted"
                 }`}
               >
                 {label}
@@ -141,17 +142,18 @@ export default function BlogsSection() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredBlogs.length > 0 ? (
             filteredBlogs.map((blog, idx) => (
-                <div
+                <Link
                   key={idx}
-                  className="bg-white dark:bg-charcoalDark border border-gray-200 dark:border-white/[0.08] rounded-2xl p-6 hover:border-gray-300 dark:hover:border-white/[0.12] transition-all duration-300 group cursor-pointer flex flex-col"
+                  to={`/blogs?article=${blog.slug}`}
+                  className="bg-white dark:bg-charcoal border border-beigeMuted dark:border-charcoalMuted rounded-2xl p-6 hover:border-terracotta/40 dark:hover:border-terracotta/30 hover:shadow-soft transition-all duration-300 group flex flex-col"
                 >
                   {/* Category Label */}
-                  <div className="inline-flex w-fit px-3 py-1 rounded-lg bg-gray-100 dark:bg-white/[0.06] text-xs font-semibold text-gray-700 dark:text-gray-300 mb-4">
+                  <div className="inline-flex w-fit px-3 py-1 rounded-lg bg-terracotta/10 text-terracotta dark:bg-terracotta/20 dark:text-orange-300 text-xs font-semibold mb-4 border border-terracotta/20">
                     {getTierLabel(blog.tier)}
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-xl font-outfit font-bold text-gray-950 dark:text-white mb-3 group-hover:text-gray-700 dark:group-hover:text-gray-100 transition line-clamp-3">
+                  <h3 className="text-xl font-outfit font-bold text-textPrimary dark:text-beigePrimary mb-3 group-hover:text-terracotta dark:group-hover:text-terracotta transition-colors line-clamp-3">
                     {blog.title}
                   </h3>
 
@@ -161,11 +163,11 @@ export default function BlogsSection() {
                   </p>
 
                   {/* Meta */}
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-white/[0.08]">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">{blog.words}</span>
-                    <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-950 dark:group-hover:text-white group-hover:translate-x-1 transition-all" />
+                  <div className="flex items-center justify-between pt-4 border-t border-beigeMuted dark:border-charcoalMuted">
+                    <span className="text-xs text-textSecondary dark:text-gray-400">{blog.words}</span>
+                    <ArrowRight className="w-4 h-4 text-textSecondary group-hover:text-terracotta dark:group-hover:text-terracotta group-hover:translate-x-1 transition-all" />
                   </div>
-                </div>
+                </Link>
             ))
           ) : (
             <div className="col-span-full text-center py-12">
@@ -177,9 +179,9 @@ export default function BlogsSection() {
         {/* CTA */}
         <div className="text-center mt-12">
           <p className="text-gray-600 dark:text-gray-400 mb-4">Want to read all {blogs.length} guides?</p>
-          <button className="px-8 py-3 rounded-full bg-gray-950 dark:bg-white text-white dark:text-gray-950 font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition">
+          <Link to="/blogs" className="inline-block px-8 py-3 rounded-full bg-terracotta text-white font-outfit font-medium hover:bg-terracottaHover transition">
             Browse All Guides
-          </button>
+          </Link>
         </div>
       </div>
     </section>

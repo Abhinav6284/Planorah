@@ -2,7 +2,7 @@ import { Zap, Target, TrendingUp, Calendar } from "lucide-react";
 
 export default function DashboardShowcase() {
   return (
-    <section className="py-20 px-6 bg-gray-50 dark:bg-charcoal">
+    <section className="py-20 px-6 bg-beigeSecondary dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -18,7 +18,7 @@ export default function DashboardShowcase() {
         {/* Dashboard Grid */}
         <div className="grid md:grid-cols-2 gap-8">
           {/* Main Dashboard Mockup */}
-          <div className="bg-white dark:bg-charcoalDark rounded-3xl border border-gray-200 dark:border-white/[0.08] p-8 overflow-hidden">
+          <div className="bg-white dark:bg-charcoalDark rounded-3xl border border-beigeMuted dark:border-white/[0.08] p-8 overflow-hidden">
             <div className="bg-gradient-to-br from-gray-900 to-gray-950 dark:from-charcoal dark:to-charcoalDark rounded-2xl p-6 text-white">
               {/* Header */}
               <div className="flex justify-between items-center mb-8">
@@ -75,7 +75,7 @@ export default function DashboardShowcase() {
           {/* Stats Cards */}
           <div className="space-y-6">
             {/* Streak Card */}
-            <div className="bg-white dark:bg-charcoalDark rounded-3xl border border-gray-200 dark:border-white/[0.08] p-8">
+            <div className="bg-white dark:bg-charcoalDark rounded-3xl border border-beigeMuted dark:border-white/[0.08] p-8">
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Current Streak</p>
@@ -84,13 +84,13 @@ export default function DashboardShowcase() {
                 </div>
                 <div className="text-5xl">🔥</div>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-white/[0.08] rounded-full h-2">
+              <div className="w-full bg-[#E5DFCC] dark:bg-white/[0.08] rounded-full h-2">
                 <div className="bg-gradient-to-r from-orange-400 to-red-400 h-2 rounded-full w-5/6" />
               </div>
             </div>
 
             {/* Productivity Card */}
-            <div className="bg-white dark:bg-charcoalDark rounded-3xl border border-gray-200 dark:border-white/[0.08] p-8">
+            <div className="bg-white dark:bg-charcoalDark rounded-3xl border border-beigeMuted dark:border-white/[0.08] p-8">
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Productivity Score</p>
@@ -104,14 +104,14 @@ export default function DashboardShowcase() {
                   <span className="text-gray-600 dark:text-gray-400">Completion Rate</span>
                   <span className="font-semibold text-gray-950 dark:text-white">87%</span>
                 </div>
-                <div className="w-full bg-gray-200 dark:bg-white/[0.08] rounded-full h-2">
+                <div className="w-full bg-[#E5DFCC] dark:bg-white/[0.08] rounded-full h-2">
                   <div className="bg-gradient-to-r from-emerald-400 to-teal-400 h-2 rounded-full w-87" style={{ width: "87%" }} />
                 </div>
               </div>
             </div>
 
             {/* Goals Card */}
-            <div className="bg-white dark:bg-charcoalDark rounded-3xl border border-gray-200 dark:border-white/[0.08] p-8">
+            <div className="bg-white dark:bg-charcoalDark rounded-3xl border border-beigeMuted dark:border-white/[0.08] p-8">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Active Goals</p>

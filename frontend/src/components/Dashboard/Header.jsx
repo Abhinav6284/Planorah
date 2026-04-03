@@ -90,8 +90,11 @@ const Header = () => {
         <header className={`sticky top-0 z-50 flex items-center justify-between px-4 py-2.5 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] md:px-6 md:py-3 ${isScrolled ? 'bg-transparent pointer-events-none' : 'bg-transparent'}`}>
             {/* Logo - hides on scroll */}
             <div className={`flex items-center gap-2 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isScrolled ? 'opacity-0 -translate-x-8 pointer-events-none' : 'opacity-100 translate-x-0'}`}>
-                <Link to="/dashboard" className="whitespace-nowrap text-xl font-serif font-bold tracking-tight text-gray-900 dark:text-white md:text-[1.7rem]">
-                    Planorah<span className="text-gray-400">.</span>
+                <Link to="/dashboard" className="flex items-center gap-2.5 group">
+                    <div className="w-8 h-8 rounded-full bg-white dark:bg-white overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-200">
+                        <img src="/planorah_logo.png" alt="Planorah" className="w-full h-full object-contain" />
+                    </div>
+                    <span className="whitespace-nowrap text-xl font-cormorant font-bold tracking-tight text-gray-900 dark:text-white">Planorah</span>
                 </Link>
             </div>
 
@@ -276,8 +279,11 @@ const Header = () => {
                         >
                             {/* Drawer Header */}
                             <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-charcoalMuted">
-                                <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className="text-xl font-serif font-bold text-gray-900 dark:text-white">
-                                    Planorah<span className="text-gray-400">.</span>
+                                <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5 group">
+                                    <div className="w-7 h-7 rounded-full bg-white overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                                        <img src="/planorah_logo.png" alt="Planorah" className="w-full h-full object-contain" />
+                                    </div>
+                                    <span className="text-xl font-cormorant font-bold text-gray-900 dark:text-white">Planorah</span>
                                 </Link>
                                 <button
                                     onClick={() => setMobileMenuOpen(false)}

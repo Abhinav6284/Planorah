@@ -11,7 +11,7 @@ export default function CTASection() {
   };
 
   return (
-    <section className="py-32 px-4 sm:px-6 lg:px-8 bg-white dark:bg-charcoal border-y border-gray-200 dark:border-white/[0.06] overflow-hidden relative">
+    <section className="py-32 px-4 sm:px-6 lg:px-8 bg-beigeSecondary dark:bg-charcoal border-y border-beigeMuted dark:border-white/[0.06] overflow-hidden relative">
       <div className="max-w-4xl mx-auto text-center relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -31,14 +31,14 @@ export default function CTASection() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
             <Link
               to="/register"
-              className="inline-flex items-center justify-center gap-2 h-14 px-8 rounded-full bg-gray-950 dark:bg-white text-white dark:text-gray-950 font-outfit font-medium hover:bg-gray-800 dark:hover:bg-gray-100 shadow-sm hover:shadow-md transition-all duration-300 group"
+              className="inline-flex items-center justify-center gap-2 h-14 px-8 rounded-full bg-gray-950 dark:bg-white text-white dark:text-gray-950 font-outfit font-medium hover:bg-gray-800 dark:hover:bg-[#EBE6DA] shadow-sm hover:shadow-md transition-all duration-300 group"
             >
               Start for Free
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <button
               onClick={handlePricingClick}
-              className="inline-flex items-center justify-center h-14 px-8 rounded-full border border-gray-200 dark:border-white/[0.08] text-gray-950 dark:text-white font-outfit font-medium hover:bg-gray-50 dark:hover:bg-white/[0.06] transition-all duration-300"
+              className="inline-flex items-center justify-center h-14 px-8 rounded-full border border-beigeMuted dark:border-white/[0.08] text-gray-950 dark:text-white font-outfit font-medium hover:bg-beigeSecondary dark:hover:bg-white/[0.06] transition-all duration-300"
             >
               View Pricing
             </button>

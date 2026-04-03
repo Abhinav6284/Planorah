@@ -6,7 +6,8 @@ import reportWebVitals from './reportWebVitals';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import env from './config/env';
 
-const GOOGLE_CLIENT_ID = env.GOOGLE_CLIENT_ID;
+// Fallback to a placeholder client ID if it's missing from env to prevent runtime crashes
+const GOOGLE_CLIENT_ID = env.GOOGLE_CLIENT_ID || "PLACEHOLDER_CLIENT_ID.apps.googleusercontent.com";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

@@ -74,7 +74,7 @@ export default function FeaturesCarousel() {
   const Icon = feature.icon;
 
   return (
-    <section className="py-20 px-6 bg-gray-50 dark:bg-charcoal">
+    <section className="py-20 px-6 bg-beigePrimary dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -89,7 +89,7 @@ export default function FeaturesCarousel() {
           {/* Left: Feature Info */}
           <div className="space-y-8">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.08]">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#EBE6DA] dark:bg-white/[0.06] border border-beigeMuted dark:border-white/[0.08]">
               <Icon className="w-4 h-4 text-gray-950 dark:text-white" />
               <span className="text-sm font-semibold text-gray-950 dark:text-white">{feature.subtitle}</span>
             </div>
@@ -107,7 +107,7 @@ export default function FeaturesCarousel() {
             {/* Stats */}
             <div className="grid grid-cols-2 gap-4">
               {feature.stats.map((stat, idx) => (
-                <div key={idx} className="bg-white dark:bg-charcoalDark border border-gray-200 dark:border-white/[0.08] rounded-xl p-4">
+                <div key={idx} className="bg-white dark:bg-charcoalDark border border-beigeMuted dark:border-white/[0.08] rounded-xl p-4">
                   <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">{stat.label}</p>
                   <p className="text-lg font-bold text-gray-950 dark:text-white">{stat.value}</p>
                 </div>
@@ -118,7 +118,7 @@ export default function FeaturesCarousel() {
             <div className="flex items-center gap-4">
               <button
                 onClick={prev}
-                className="p-3 rounded-full bg-gray-100 dark:bg-white/[0.06] hover:bg-gray-200 dark:hover:bg-white/[0.12] transition"
+                className="p-3 rounded-full bg-[#EBE6DA] dark:bg-white/[0.06] hover:bg-[#EBE6DA]/80 dark:hover:bg-white/[0.12] transition"
               >
                 <ChevronLeft className="w-5 h-5 text-gray-950 dark:text-white" />
               </button>
@@ -137,7 +137,7 @@ export default function FeaturesCarousel() {
 
               <button
                 onClick={next}
-                className="p-3 rounded-full bg-gray-100 dark:bg-white/[0.06] hover:bg-gray-200 dark:hover:bg-white/[0.12] transition"
+                className="p-3 rounded-full bg-[#EBE6DA] dark:bg-white/[0.06] hover:bg-[#EBE6DA]/80 dark:hover:bg-white/[0.12] transition"
               >
                 <ChevronRight className="w-5 h-5 text-gray-950 dark:text-white" />
               </button>

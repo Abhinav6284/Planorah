@@ -37,7 +37,7 @@ const gradients = [
 
 export default function ProblemSection() {
   return (
-    <section className="py-24 lg:py-32 px-4 sm:px-6 lg:px-8 bg-white dark:bg-charcoal border-y border-gray-100 dark:border-white/[0.06]">
+    <section className="py-24 lg:py-32 px-4 sm:px-6 lg:px-8 bg-beigePrimary dark:bg-charcoal border-y border-beigeMuted dark:border-white/[0.06]">
       <div className="max-w-7xl mx-auto w-full">
         {/* Section Header */}
         <motion.div
@@ -47,7 +47,7 @@ export default function ProblemSection() {
           transition={{ duration: 0.6 }}
           className="text-center max-w-2xl mx-auto mb-16 space-y-4"
         >
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.08] text-xs font-semibold text-[#D96C4A] uppercase tracking-widest">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EBE6DA] dark:bg-white/[0.06] border border-beigeMuted dark:border-white/[0.08] text-xs font-semibold text-[#D96C4A] uppercase tracking-widest">
             Process
           </span>
           <h2 className="text-5xl lg:text-6xl font-outfit font-bold text-gray-950 dark:text-white">
@@ -76,7 +76,7 @@ export default function ProblemSection() {
                     <span className="text-6xl font-outfit font-bold text-gray-100 dark:text-white/[0.08]">
                       {step.number}
                     </span>
-                    <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-charcoal border border-gray-200 dark:border-white/[0.08] flex items-center justify-center text-gray-950 dark:text-white group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-12 h-12 rounded-xl bg-[#EBE6DA] dark:bg-charcoal border border-beigeMuted dark:border-white/[0.08] flex items-center justify-center text-gray-950 dark:text-white group-hover:scale-110 transition-transform duration-300">
                       <Icon className="w-6 h-6" />
                     </div>
                   </div>

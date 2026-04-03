@@ -29,7 +29,7 @@ const steps = [
 
 export default function ProcessSection() {
   return (
-    <section className="py-20 px-6 bg-gray-50 dark:bg-charcoal">
+    <section className="py-20 px-6 bg-beigeSecondary dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -50,11 +50,11 @@ export default function ProcessSection() {
               <div key={idx} className="relative">
                 {/* Connector Line */}
                 {idx < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-20 -right-3 w-6 h-[2px] bg-gray-200 dark:bg-white/[0.1]" />
+                  <div className="hidden lg:block absolute top-20 -right-3 w-6 h-[2px] bg-[#E5DFCC] dark:bg-white/[0.1]" />
                 )}
 
                 {/* Card */}
-                <div className="h-full bg-white dark:bg-charcoalDark border border-gray-200 dark:border-white/[0.08] rounded-2xl p-8">
+                <div className="h-full bg-white dark:bg-charcoalDark border border-beigeMuted dark:border-white/[0.08] rounded-2xl p-8">
                   {/* Step Number */}
                   <div className="text-5xl font-outfit font-bold text-gray-200 dark:text-white/[0.08] mb-4">
                     {item.step}

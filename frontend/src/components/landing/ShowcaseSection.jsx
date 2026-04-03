@@ -145,7 +145,7 @@ function ShowcaseItem({ item, index }) {
 
 export default function ShowcaseSection() {
   return (
-    <section id="showcase" className="relative scroll-mt-36 py-32 overflow-hidden bg-white dark:bg-charcoal border-y border-beigeMuted dark:border-charcoalMuted">
+    <section id="showcase" className="relative scroll-mt-36 py-32 overflow-hidden bg-beigePrimary dark:bg-charcoal border-y border-beigeMuted dark:border-charcoalMuted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-32">
           <motion.p

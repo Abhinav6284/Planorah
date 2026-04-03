@@ -46,7 +46,7 @@ export default function TestimonialsCarousel() {
   const prev = () => setCurrent((current - 1 + testimonials.length) % testimonials.length);
 
   return (
-    <section className="py-20 px-6 bg-white dark:bg-charcoal">
+    <section className="py-20 px-6 bg-beigePrimary dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -59,7 +59,7 @@ export default function TestimonialsCarousel() {
         {/* Carousel */}
         <div className="relative max-w-3xl mx-auto">
           {/* Testimonial Card */}
-          <div className="bg-white dark:bg-charcoalDark border border-gray-200 dark:border-white/[0.08] rounded-3xl p-8 md:p-12 min-h-96 flex flex-col justify-between">
+          <div className="bg-white dark:bg-charcoalDark border border-beigeMuted dark:border-white/[0.08] rounded-3xl p-8 md:p-12 min-h-96 flex flex-col justify-between">
             {/* Stars */}
             <div className="flex gap-1 mb-6">
               {[...Array(5)].map((_, i) => (
@@ -92,7 +92,7 @@ export default function TestimonialsCarousel() {
           <div className="flex items-center justify-center gap-4 mt-8">
             <button
               onClick={prev}
-              className="p-2 rounded-full bg-gray-100 dark:bg-white/[0.06] hover:bg-gray-200 dark:hover:bg-white/[0.12] transition"
+              className="p-2 rounded-full bg-[#EBE6DA] dark:bg-white/[0.06] hover:bg-[#EBE6DA]/80 dark:hover:bg-white/[0.12] transition"
             >
               <ChevronLeft className="w-6 h-6 text-gray-950 dark:text-white" />
             </button>
@@ -112,7 +112,7 @@ export default function TestimonialsCarousel() {
 
             <button
               onClick={next}
-              className="p-2 rounded-full bg-gray-100 dark:bg-white/[0.06] hover:bg-gray-200 dark:hover:bg-white/[0.12] transition"
+              className="p-2 rounded-full bg-[#EBE6DA] dark:bg-white/[0.06] hover:bg-[#EBE6DA]/80 dark:hover:bg-white/[0.12] transition"
             >
               <ChevronRight className="w-6 h-6 text-gray-950 dark:text-white" />
             </button>

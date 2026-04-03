@@ -65,6 +65,7 @@
     ]
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.19",
     "autoprefixer": "^10.4.21",
     "eslint": "^8.57.1",
     "postcss": "^8.5.6",

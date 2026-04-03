@@ -39,8 +39,8 @@ export default function Navbar() {
             to="/"
             className="text-2xl font-bold font-cormorant text-charcoal dark:text-beigePrimary whitespace-nowrap tracking-wide flex items-center gap-2 group"
           >
-            <div className="w-8 h-8 rounded-full bg-charcoal dark:bg-beigePrimary text-beigePrimary dark:text-charcoal flex items-center justify-center text-sm font-outfit shadow-sm group-hover:scale-105 transition-transform duration-300">
-              P.
+            <div className="w-8 h-8 rounded-full bg-white overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-300">
+              <img src="/planorah_logo.png" alt="Planorah" className="w-full h-full object-contain" />
             </div>
             Planorah
           </Link>
