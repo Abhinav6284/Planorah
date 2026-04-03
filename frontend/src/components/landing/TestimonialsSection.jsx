@@ -1,86 +1,93 @@
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
-import { Quote } from "lucide-react";
+import { Star } from "lucide-react";
 
 const testimonials = [
   {
-    quote: "Planorah transformed how I approach learning. I went from juggling 10 tabs of tutorials to effortlessly completing daily assignments.",
-    name: "Alex Rivera",
-    role: "Computer Science Student",
-    initials: "AR",
-  },
-  {
-    quote: "I've tried many platforms, but the AI roadmap is unparalleled. It grasped my complex goals and dissolved the overwhelming anxiety behind them.",
     name: "Sarah Chen",
-    role: "Self-taught Developer",
-    initials: "SC",
+    role: "Product Designer at Google",
+    content: "Planorah transformed how I approach goals. Went from chaotic notes to structured roadmaps. 20x more productive.",
+    avatar: "SC",
   },
   {
-    quote: "The quiet accountability mechanism works beautifully. I wake up, see my path, and execute. Currently on a 47-day streak.",
-    name: "Michael Torres",
-    role: "Bootcamp Graduate",
-    initials: "MT",
+    name: "Marcus Johnson",
+    role: "CS Student at Stanford",
+    content: "The Locked In Mode is insane. I actually focus now. Streaks are my drug. First app that doesn't waste my time.",
+    avatar: "MJ",
+  },
+  {
+    name: "Emma Rodriguez",
+    role: "Startup Founder",
+    content: "Reality Check feature keeps me honest. I see exactly what I'm avoiding. Game changer for accountability.",
+    avatar: "ER",
+  },
+  {
+    name: "Arun Patel",
+    role: "Medical Student",
+    content: "Prep Zone + Brain Dump combo is perfect. Handles my exam chaos. My study time is actually optimized now.",
+    avatar: "AP",
+  },
+  {
+    name: "Lisa Wang",
+    role: "Software Engineer",
+    content: "Next Move feature removes decision fatigue. Just execute what it suggests. Best productivity hack ever.",
+    avatar: "LW",
+  },
+  {
+    name: "Jordan Keys",
+    role: "High School Senior",
+    content: "This app gets me. Future You section made college prep actually exciting. Not just another to-do list.",
+    avatar: "JK",
   },
 ];
 
 export default function TestimonialsSection() {
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"]
-  });
-
-  const y1 = useTransform(scrollYProgress, [0, 1], [100, -100]);
-  const y2 = useTransform(scrollYProgress, [0, 1], [150, -150]);
-  const y3 = useTransform(scrollYProgress, [0, 1], [200, -200]);
-
-  const transforms = [y1, y2, y3];
-
   return (
-    <section ref={containerRef} className="py-32 overflow-hidden px-4 sm:px-6 lg:px-8 bg-beigeSecondary dark:bg-charcoal border-y border-beigeMuted dark:border-charcoalMuted">
+    <section className="py-20 px-6 bg-white dark:bg-slate-950">
       <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8 }}
-          className="mb-24 text-center"
-        >
-          <h2 className="text-[44px] md:text-[56px] font-cormorant font-medium text-charcoal dark:text-beigePrimary mb-4">
-            Curated Feedback
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Social Proof</p>
+          <h2 className="text-5xl lg:text-6xl font-outfit font-bold text-gray-950 dark:text-white mb-6 leading-tight">
+            Loved by 10,000+ users
           </h2>
-          <p className="text-[18px] text-textSecondary dark:text-gray-400 font-outfit max-w-2xl mx-auto">
-            See how others are taking back control of their time and discovering absolute focus.
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            From students to founders. From chaos to clarity.
           </p>
-        </motion.div>
+        </div>
 
-        <div className="grid md:grid-cols-3 gap-8 items-start h-[500px]">
+        {/* Testimonials Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {testimonials.map((testimonial, idx) => (
-            <motion.div
+            <div
               key={idx}
-              style={{ y: transforms[idx] }}
-              className="p-10 bg-white dark:bg-charcoalDark rounded-3xl border border-beigeMuted dark:border-charcoalMuted shadow-soft dark:shadow-darkSoft relative group hover:shadow-warmHover dark:hover:shadow-darkHover transition-all duration-500"
+              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/[0.08] rounded-2xl p-6 hover:border-gray-300 dark:hover:border-white/[0.12] transition-all duration-300"
             >
-              <Quote className="absolute top-8 right-8 w-10 h-10 text-beigePrimary dark:text-charcoalMuted opacity-50 group-hover:text-terracotta/20 dark:group-hover:text-terracotta/20 transition-colors duration-500" />
-              
-              <p className="text-[17px] text-charcoal dark:text-gray-300 font-outfit italic leading-relaxed h-[140px] relative z-10 pt-4">
-                "{testimonial.quote}"
+              {/* Stars */}
+              <div className="flex gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-gray-950 dark:fill-white text-gray-950 dark:text-white" />
+                ))}
+              </div>
+
+              {/* Quote */}
+              <p className="text-sm text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
+                "{testimonial.content}"
               </p>
 
-              <div className="flex items-center gap-5 mt-6 pt-6 border-t border-beigeMuted dark:border-charcoalMuted relative z-10">
-                <div className="w-12 h-12 rounded-full bg-charcoal dark:bg-beigePrimary text-beigePrimary dark:text-charcoal flex items-center justify-center font-bold font-outfit text-[14px] shadow-sm">
-                  {testimonial.initials}
+              {/* Author */}
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gray-950 dark:bg-white text-white dark:text-gray-950 flex items-center justify-center text-xs font-semibold">
+                  {testimonial.avatar}
                 </div>
                 <div>
-                  <p className="font-outfit font-semibold text-charcoal dark:text-beigePrimary text-[16px]">
+                  <p className="text-sm font-semibold text-gray-950 dark:text-white">
                     {testimonial.name}
                   </p>
-                  <p className="font-outfit text-[13px] text-textSecondary dark:text-gray-500 mt-0.5">
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
                     {testimonial.role}
                   </p>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

@@ -1,85 +1,137 @@
-import { motion } from "framer-motion";
-import { ListChecks, Route, BarChart2, Flame, Sparkles, Users } from "lucide-react";
+import { Brain, Map, Zap, BarChart3, Target, Zap as ZapIcon, Briefcase, Users, BookOpen, RotateCw, Award, Eye } from "lucide-react";
+
+const features = [
+  {
+    id: 1,
+    title: "Brain Dump",
+    description: "What's inside your head rn? Dump raw thoughts, goals, and confusion. AI converts messy ideas into clear direction.",
+    icon: Brain,
+  },
+  {
+    id: 2,
+    title: "Life Map",
+    description: "Your life, but structured. Build roadmaps for career, study, skills. Visual paths with milestones like a game.",
+    icon: Map,
+  },
+  {
+    id: 3,
+    title: "Locked In Mode",
+    description: "No distractions. Just execution. Timer, focus, streaks with dopamine UI. Where users become addicted.",
+    icon: Zap,
+  },
+  {
+    id: 4,
+    title: "Reality Check",
+    description: "Are you actually doing something? Analytics show progress, missed days, weekly performance. Brutally honest.",
+    icon: BarChart3,
+  },
+  {
+    id: 5,
+    title: "Next Move",
+    description: "Don't think. Just do this. AI suggests your next step, removes decision fatigue. Daily mission style.",
+    icon: Target,
+  },
+  {
+    id: 6,
+    title: "Build Yourself",
+    description: "Upgrade your character. Skills tracker, XP system, levels from Beginner → Pro → Elite. Gamified AF.",
+    icon: ZapIcon,
+  },
+  {
+    id: 7,
+    title: "Future You",
+    description: "The version you're chasing. Resume builder, portfolio, job prep. Emotional + aspirational.",
+    icon: Briefcase,
+  },
+  {
+    id: 8,
+    title: "Inner Circle",
+    description: "You're not alone. Friends, accountability, shared streaks. Social = retention multiplier.",
+    icon: Users,
+  },
+  {
+    id: 9,
+    title: "Prep Zone",
+    description: "Exam mode activated. Study plans, revision tracking, mock tests. Built for students.",
+    icon: BookOpen,
+  },
+  {
+    id: 10,
+    title: "Reset Room",
+    description: "You messed up. It's fine. Break mode, mental reset, soft motivational UI. Underrated but powerful.",
+    icon: RotateCw,
+  },
+  {
+    id: 11,
+    title: "Proof of Work",
+    description: "Show what you've done. Projects, certificates, achievements timeline. Connects to hiring + portfolio.",
+    icon: Award,
+  },
+  {
+    id: 12,
+    title: "Mirror",
+    description: "Who are you becoming? Weekly reflection, AI behavior patterns. Deep, slightly scary, memorable.",
+    icon: Eye,
+  }
+];
 
 export default function FeaturesSection() {
-  const features = [
-    {
-      title: "AI Semantic Roadmap",
-      desc: "Turn vague, ambitious goals into beautifully structured, actionable chronological steps instantly.",
-      icon: Route,
-    },
-    {
-      title: "Calm Daily Pace",
-      desc: "Daily and weekly tasks tailored automatically to your specific rhythm. Progress without the burn out.",
-      icon: ListChecks,
-    },
-    {
-      title: "Clarity Analytics",
-      desc: "Monitor your completion rates through soft, elegant charts that unlock deep behavioral insights.",
-      icon: BarChart2,
-    },
-    {
-      title: "Organic Streaks",
-      desc: "Utilize built-in behavioral psychology to never miss a day, framed through positive reinforcement.",
-      icon: Flame,
-    },
-    {
-      title: "Dynamic Adaptation",
-      desc: "Our engine subtly adjusts task difficulty and volume as you naturally learn and grow over time.",
-      icon: Sparkles,
-    },
-    {
-      title: "Quiet Accountability",
-      desc: "Share milestones with a curated circle of peers. Celebrate wins in a sophisticated, focused environment.",
-      icon: Users,
-    },
-  ];
-
   return (
-    <section id="features" className="py-32 px-4 sm:px-6 lg:px-8 bg-beigeSecondary dark:bg-charcoalDark border-y border-transparent dark:border-charcoalMuted">
+    <section className="py-20 px-6 bg-white dark:bg-slate-950">
       <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-20 space-y-4"
-        >
-          <h2 className="text-[44px] md:text-[56px] font-cormorant font-medium text-charcoal dark:text-beigePrimary">
-            Elegance in Execution
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Superpowers</p>
+          <h2 className="text-5xl lg:text-6xl font-outfit font-bold text-gray-950 dark:text-white mb-6 leading-tight">
+            Everything you need to level up
           </h2>
-          <p className="text-[18px] text-textSecondary dark:text-gray-400 font-outfit max-w-2xl mx-auto">
-            Our tool suite strips away the clutter, providing a seamless, calming path from intent to mastery.
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            From brain dumps to life maps. Gamified progression to accountability. We built the features that actually matter.
           </p>
-        </motion.div>
+        </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((item, idx) => {
-            const Icon = item.icon;
+        {/* Features Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {features.map((feature, idx) => {
+            const Icon = feature.icon;
             return (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ type: "spring", stiffness: 60, delay: idx * 0.1 }}
-                className="group relative bg-white dark:bg-charcoal rounded-3xl p-8 border border-white dark:border-charcoal hover:border-beigeMuted dark:hover:border-charcoalMuted hover:-translate-y-2 shadow-sm dark:shadow-darkSoft hover:shadow-warmHover dark:hover:shadow-darkHover transition-all duration-500 overflow-hidden"
+              <div
+                key={feature.id}
+                className="group h-full"
               >
-                {/* Very soft hover gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-terracotta/[0.02] dark:from-terracotta/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                
-                <div className="w-14 h-14 rounded-2xl bg-beigePrimary dark:bg-charcoalDark mb-8 flex items-center justify-center transform group-hover:scale-110 transition-transform duration-500 shadow-sm dark:shadow-black/50">
-                  <Icon className="w-6 h-6 text-charcoal dark:text-beigePrimary" strokeWidth={1.5} />
+                <div className="h-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/[0.08] rounded-2xl p-6 hover:border-gray-300 dark:hover:border-white/[0.12] transition-all duration-300">
+                  {/* Icon */}
+                  <div className="mb-4 inline-flex p-3 rounded-lg bg-gray-100 dark:bg-white/[0.06]">
+                    <Icon className="w-6 h-6 text-gray-950 dark:text-white" />
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-xl font-outfit font-semibold text-gray-950 dark:text-white mb-3">
+                    {feature.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                    {feature.description}
+                  </p>
                 </div>
-                
-                <h3 className="text-[20px] font-cormorant font-bold text-charcoal dark:text-beigePrimary mb-3 tracking-wide">
-                  {item.title}
-                </h3>
-                <p className="text-[15px] text-textSecondary dark:text-gray-400 font-outfit leading-relaxed">
-                  {item.desc}
-                </p>
-              </motion.div>
+              </div>
             );
           })}
+        </div>
+
+        {/* MVP Highlight */}
+        <div className="mt-16 pt-12 border-t border-gray-200 dark:border-white/[0.08]">
+          <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-6">
+            Core MVP (The Clean Stack)
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            {['Brain Dump', 'Life Map', 'Locked In Mode', 'Next Move', 'Reality Check'].map((item) => (
+              <div key={item} className="px-4 py-2 rounded-full bg-gray-100 dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.08] text-sm text-gray-700 dark:text-gray-300">
+                {item}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

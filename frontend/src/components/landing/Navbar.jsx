@@ -45,15 +45,15 @@ export default function Navbar() {
 
   return (
     <>
-      <header className={`fixed top-0 inset-x-0 z-50 flex justify-center px-4 sm:px-6 transition-all duration-500 ${scrolled ? "pt-4" : "pt-6"}`}>
+      <header className="fixed top-0 inset-x-0 z-50 flex justify-center px-4 sm:px-6 pt-6">
         <motion.nav
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: "spring", stiffness: 100, damping: 20 }}
-          className={`flex items-center justify-between rounded-full transition-all duration-500 w-full ${
+          className={`flex items-center justify-between gap-8 px-8 py-3.5 rounded-full transition-all duration-300 max-w-6xl w-full ${
             scrolled
-              ? "max-w-4xl py-2 px-5 gap-5 bg-white/70 dark:bg-charcoalDark/70 backdrop-blur-xl border border-beigeMuted dark:border-charcoal shadow-md"
-              : "max-w-6xl py-4 px-8 gap-8 bg-beigePrimary/40 dark:bg-charcoalDark/40 backdrop-blur-md border border-transparent shadow-none"
+              ? "bg-white/70 dark:bg-charcoalDark/70 backdrop-blur-xl border border-beigeMuted dark:border-charcoal shadow-sm"
+              : "bg-beigePrimary/40 dark:bg-charcoalDark/40 backdrop-blur-md border border-transparent"
           }`}
         >
           {/* Logo */}

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 
 function AnimatedCounter({ end, duration = 2, suffix = "" }) {
@@ -74,7 +74,7 @@ export default function StatsSection() {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-block px-4 py-1.5 rounded-full bg-violet-50 dark:bg-violet-950/50 border border-violet-100 dark:border-violet-800/50 text-violet-700 dark:text-violet-300 text-sm font-medium mb-4"
+            className="inline-block px-3 py-1 rounded-full bg-gray-100 dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.08] text-[#D96C4A] text-xs font-semibold uppercase tracking-widest mb-4"
           >
             Trusted worldwide
           </motion.span>
@@ -85,10 +85,7 @@ export default function StatsSection() {
             transition={{ delay: 0.1 }}
             className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-5 tracking-tight"
           >
-            Builders{" "}
-            <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
-              love it
-            </span>
+            Builders <span className="text-[#D96C4A]">love it</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}

@@ -24,6 +24,8 @@ module.exports = {
         outfit: ['"Outfit"', "sans-serif"],
         cormorant: ['"Cormorant Garamond"', "serif"],
         space: ['"Space Mono"', "monospace"],
+        playfair: ['"Playfair Display"', "serif"],
+        poppins: ['"Poppins"', "sans-serif"],
       },
       boxShadow: {
         soft: "0 20px 40px -15px rgba(180, 170, 150, 0.15)",

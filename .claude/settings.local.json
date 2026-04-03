@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs grep:*)",
+      "Bash(npm run:*)",
+      "Read(//p//**)",
+      "Read(//p/.claude/**)",
+      "Bash(grep -c \"^{$\" p:/Planora/.claude/worktrees/musing-dewdney/frontend/planorah_blogs.html)"
+    ]
+  }
+}
