@@ -70,7 +70,7 @@ const ExecutionFeed = ({ tasks, focusOpen, todayTask, streak, recentActivity }) 
         }
 
         return items;
-    }, [tasks, focusOpen, todayTask, streak, recentCompletions]);
+    }, [focusOpen, todayTask, streak, recentCompletions]);
 
     return (
         <div className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1a1a] p-6 shadow-soft dark:shadow-none transition-colors duration-300">
