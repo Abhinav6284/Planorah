@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Play, Sparkles, ArrowRight } from 'lucide-react';
 
-const TodayExecution = ({
+const TodayExecution = React.memo(({
     user,
     todayTask,
     tasks,
@@ -76,6 +76,6 @@ const TodayExecution = ({
             )}
         </section>
     );
-};
+});
 
 export default TodayExecution;

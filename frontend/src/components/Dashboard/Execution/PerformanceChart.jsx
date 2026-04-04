@@ -1,6 +1,25 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ChevronDown } from 'lucide-react';
+
+// Extract CustomTooltip to module scope to prevent unmount/remount on every render
+const ChartTooltip = ({ active, payload, isApiData }) => {
+  if (!active || !payload?.length) return null;
+  const entry = payload[0]?.payload;
+  return (
+    <div className="bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/20 rounded-xl p-3 shadow-xl backdrop-blur-sm">
+      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{entry?.day}</p>
+      <p className="text-sm font-bold text-terracotta mt-1">
+        {payload[0]?.value} tasks
+      </p>
+      {payload[1] && (
+        <p className="text-xs text-blue-500 dark:text-blue-400 mt-0.5">
+          {payload[1]?.value} {isApiData ? 'min active' : 'total'}
+        </p>
+      )}
+    </div>
+  );
+};
 
 const PerformanceChart = ({ tasks = [], chartData: apiChartData = null }) => {
   // Build 7-day data — prefer real API data over task derivation
@@ -46,24 +65,6 @@ const PerformanceChart = ({ tasks = [], chartData: apiChartData = null }) => {
     return `${fmt(data[0].fullDate)} – ${fmt(data[data.length - 1].fullDate)}`;
   }, [data]);
 
-  const CustomTooltip = ({ active, payload }) => {
-    if (!active || !payload?.length) return null;
-    const entry = payload[0]?.payload;
-    return (
-      <div className="bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/20 rounded-xl p-3 shadow-xl backdrop-blur-sm">
-        <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{entry?.day}</p>
-        <p className="text-sm font-bold text-terracotta mt-1">
-          {payload[0]?.value} tasks
-        </p>
-        {payload[1] && (
-          <p className="text-xs text-blue-500 dark:text-blue-400 mt-0.5">
-            {payload[1]?.value} {apiChartData ? 'min active' : 'total'}
-          </p>
-        )}
-      </div>
-    );
-  };
-
   return (
     <div className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1a1a] p-6 shadow-soft dark:shadow-none transition-colors duration-300">
       {/* Header */}
@@ -108,7 +109,7 @@ const PerformanceChart = ({ tasks = [], chartData: apiChartData = null }) => {
               tickLine={false}
               width={30}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<ChartTooltip isApiData={!!apiChartData} />} />
             <Area
               type="monotone"
               dataKey="completed"
@@ -150,4 +151,4 @@ const PerformanceChart = ({ tasks = [], chartData: apiChartData = null }) => {
   );
 };
 
-export default PerformanceChart;
+export default React.memo(PerformanceChart);

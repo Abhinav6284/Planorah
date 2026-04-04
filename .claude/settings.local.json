@@ -18,7 +18,8 @@
       "Bash(grep -v \":0$\")",
       "Bash(chmod +x /tmp/verify_report.sh)",
       "Bash(bash /tmp/verify_report.sh)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(git commit -m ':*)"
     ]
   }
 }

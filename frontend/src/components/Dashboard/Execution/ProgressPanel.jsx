@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 const XP_LEVELS = [
     { level: 'Beginner', min: 0, max: 499 },
@@ -6,7 +6,7 @@ const XP_LEVELS = [
     { level: 'Elite', min: 1500, max: 999999 },
 ];
 
-const ProgressPanel = ({ tasks, stats, activityHeatmap }) => {
+const ProgressPanel = React.memo(({ tasks, stats, activityHeatmap }) => {
     const xpPoints = stats?.xp_points || 0;
 
     const xpData = useMemo(() => {
@@ -126,6 +126,6 @@ const ProgressPanel = ({ tasks, stats, activityHeatmap }) => {
             </div>
         </div>
     );
-};
+});
 
 export default ProgressPanel;

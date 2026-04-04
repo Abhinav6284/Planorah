@@ -11,6 +11,8 @@ const defaultCoach = {
     alternatives: [],
 };
 
+const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+
 const readExecutionCache = () => {
     if (typeof window === 'undefined') {
         return null;
@@ -28,25 +30,32 @@ const readExecutionCache = () => {
     }
 };
 
+const isCacheFresh = (cache) => {
+    if (!cache?.cached_at) return false;
+    return Date.now() - new Date(cache.cached_at).getTime() < CACHE_TTL_MS;
+};
+
+let memoryCache = readExecutionCache() || {};
+
 const writeExecutionCache = (partial) => {
     if (typeof window === 'undefined') {
         return;
     }
 
+    memoryCache = {
+        ...memoryCache,
+        ...partial,
+        cached_at: new Date().toISOString(),
+    };
+
     try {
-        const current = readExecutionCache() || {};
-        const next = {
-            ...current,
-            ...partial,
-            cached_at: new Date().toISOString(),
-        };
-        window.localStorage.setItem(EXECUTION_CACHE_KEY, JSON.stringify(next));
+        window.localStorage.setItem(EXECUTION_CACHE_KEY, JSON.stringify(memoryCache));
     } catch (_error) {
         // Ignore cache failures to avoid impacting dashboard UX.
     }
 };
 
-const initialCache = readExecutionCache() || {};
+const initialCache = isCacheFresh(memoryCache) ? memoryCache : {};
 
 export const useExecutionStore = create((set, get) => ({
     mode: initialCache.mode || 'learning',
@@ -100,50 +109,43 @@ export const useExecutionStore = create((set, get) => ({
             }));
 
             const requests = [
-                executionService.getTodayTask()
-                    .then((todayTask) => {
-                        set({ todayTask });
-                        writeExecutionCache({ todayTask });
-                    })
-                    .catch(() => null),
-                executionService.getAICoach()
-                    .then((coach) => {
-                        const nextCoach = coach || defaultCoach;
-                        set({ coach: nextCoach });
-                        writeExecutionCache({ coach: nextCoach });
-                    })
-                    .catch(() => null),
-                executionService.getExecutionTasks('learning')
-                    .then((tasks) => {
-                        const nextTasks = Array.isArray(tasks) ? tasks : [];
-                        set({ tasks: nextTasks });
-                        writeExecutionCache({ tasks: nextTasks });
-                    })
-                    .catch(() => null),
-                executionService.getExecutionTasks('exam')
-                    .then((examTasks) => {
-                        const nextExamTasks = Array.isArray(examTasks) ? examTasks : [];
-                        set({ examTasks: nextExamTasks });
-                        writeExecutionCache({ examTasks: nextExamTasks });
-                    })
-                    .catch(() => null),
-                executionService.getProgress()
-                    .then((progress) => {
-                        const mode = progress?.mode || get().mode || 'learning';
-                        set({
-                            progress,
-                            activeExamPlan: progress?.active_exam_plan || null,
-                            mode,
-                        });
-                        writeExecutionCache({
-                            progress,
-                            mode,
-                        });
-                    })
-                    .catch(() => null),
+                executionService.getTodayTask().catch(() => null),
+                executionService.getAICoach().catch(() => null),
+                executionService.getExecutionTasks('learning').catch(() => null),
+                executionService.getExecutionTasks('exam').catch(() => null),
+                executionService.getProgress().catch(() => null),
             ];
 
-            await Promise.allSettled(requests);
+            const [todayTaskResult, coachResult, tasksResult, examTasksResult, progressResult] =
+                await Promise.allSettled(requests);
+
+            // Extract successful results with fallbacks
+            const nextTodayTask = todayTaskResult.status === 'fulfilled' ? todayTaskResult.value : get().todayTask;
+            const nextCoach = coachResult.status === 'fulfilled' ? (coachResult.value || defaultCoach) : get().coach;
+            const nextTasks = tasksResult.status === 'fulfilled' ? (Array.isArray(tasksResult.value) ? tasksResult.value : []) : get().tasks;
+            const nextExamTasks = examTasksResult.status === 'fulfilled' ? (Array.isArray(examTasksResult.value) ? examTasksResult.value : []) : get().examTasks;
+            const nextProgress = progressResult.status === 'fulfilled' ? progressResult.value : get().progress;
+            const nextMode = nextProgress?.mode || get().mode || 'learning';
+
+            // Single set() call — React 18 batches this automatically, one re-render wave
+            set({
+                todayTask: nextTodayTask,
+                coach: nextCoach,
+                tasks: nextTasks,
+                examTasks: nextExamTasks,
+                progress: nextProgress,
+                activeExamPlan: nextProgress?.active_exam_plan || null,
+                mode: nextMode,
+            });
+
+            writeExecutionCache({
+                todayTask: nextTodayTask,
+                coach: nextCoach,
+                tasks: nextTasks,
+                examTasks: nextExamTasks,
+                progress: nextProgress,
+                mode: nextMode,
+            });
         } finally {
             set((state) => ({ loading: { ...state.loading, bootstrap: false } }));
         }
@@ -165,7 +167,13 @@ export const useExecutionStore = create((set, get) => ({
     },
 
     updateTaskStatus: async (taskId, status) => {
-        const updated = await executionService.updateExecutionTask({ id: taskId, status });
+        // Fetch both in parallel
+        const [updated, progress] = await Promise.all([
+            executionService.updateExecutionTask({ id: taskId, status }),
+            executionService.getProgress(),
+        ]);
+
+        // Single set() call with all updates
         set((state) => {
             const updateList = (list) => list.map((item) => (item.id === taskId ? { ...item, ...updated } : item));
             const nextTasks = updateList(state.tasks);
@@ -176,18 +184,17 @@ export const useExecutionStore = create((set, get) => ({
                 tasks: nextTasks,
                 examTasks: nextExamTasks,
                 todayTask: nextTodayTask,
+                progress,
             });
 
             return {
                 tasks: nextTasks,
                 examTasks: nextExamTasks,
                 todayTask: nextTodayTask,
+                progress,
+                activeExamPlan: progress?.active_exam_plan || null,
             };
         });
-
-        const progress = await executionService.getProgress();
-        set({ progress, activeExamPlan: progress?.active_exam_plan || null });
-        writeExecutionCache({ progress });
     },
 
     createFocusSession: async (payload) => executionService.createFocusSession(payload),
@@ -196,8 +203,10 @@ export const useExecutionStore = create((set, get) => ({
     applyRewards: async (taskId) => {
         set((state) => ({ loading: { ...state.loading, rewards: true } }));
         try {
-            const reward = await executionService.applyRewards({ task_id: taskId });
-            const progress = await executionService.getProgress();
+            const [reward, progress] = await Promise.all([
+                executionService.applyRewards({ task_id: taskId }),
+                executionService.getProgress(),
+            ]);
             set({ progress, activeExamPlan: progress?.active_exam_plan || null });
             writeExecutionCache({ progress });
             return reward;

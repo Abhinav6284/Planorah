@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { CheckCircle2, Flame, Timer, Target } from 'lucide-react';
 
-const ExecutionFeed = ({ tasks, focusOpen, todayTask, streak, recentActivity }) => {
+const ExecutionFeed = React.memo(({ tasks, focusOpen, todayTask, streak, recentActivity }) => {
     // Extract recent completions from API data or fallback to tasks
     const recentCompletions = useMemo(() => {
         if (Array.isArray(recentActivity) && recentActivity.length) {
@@ -107,6 +107,6 @@ const ExecutionFeed = ({ tasks, focusOpen, todayTask, streak, recentActivity }) 
             </div>
         </div>
     );
-};
+});
 
 export default ExecutionFeed;

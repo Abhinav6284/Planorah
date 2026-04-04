@@ -22,4 +22,4 @@ const ModeSwitch = ({ mode, onChange }) => {
     );
 };
 
-export default ModeSwitch;
+export default React.memo(ModeSwitch);

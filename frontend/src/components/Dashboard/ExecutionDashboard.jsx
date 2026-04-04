@@ -23,6 +23,8 @@ import api from '../../api/axios';
 
 const shellCardClass = 'rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1a1a] p-6 shadow-soft dark:shadow-none transition-colors duration-300 ring-1 ring-inset ring-black/5 dark:ring-white/5 hover:border-terracotta/20 dark:hover:border-terracotta/20';
 
+const TODAY_LABEL = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
 const buildDateKey = (dateValue) => {
     if (!dateValue) {
         return null;
@@ -113,13 +115,20 @@ const ExecutionDashboard = () => {
 
     useEffect(() => {
         bootstrap();
-        userService.getProfile().then(setProfile).catch(() => null);
-        userService.getStatistics().then(setUserStats).catch(() => null);
-        api.get('analytics/activity_chart/', { params: { days: 7 } })
-            .then((res) => setChartData(res.data))
-            .catch(() => null);
-        roadmapService.getUserRoadmaps().then((data) => setRoadmaps(Array.isArray(data) ? data : [])).catch(() => null);
-        planoraService.getSubjects().then((data) => setSubjects(Array.isArray(data) ? data : [])).catch(() => null);
+        // Batch all 5 API calls in parallel — React 18 batches the setState calls automatically
+        Promise.all([
+            userService.getProfile(),
+            userService.getStatistics(),
+            api.get('analytics/activity_chart/', { params: { days: 7 } }),
+            roadmapService.getUserRoadmaps(),
+            planoraService.getSubjects(),
+        ]).then(([profileData, statsData, chartRes, roadmapsData, subjectsData]) => {
+            setProfile(profileData);
+            setUserStats(statsData);
+            setChartData(chartRes?.data ?? null);
+            setRoadmaps(Array.isArray(roadmapsData) ? roadmapsData : []);
+            setSubjects(Array.isArray(subjectsData) ? subjectsData : []);
+        }).catch(() => null);
     }, [bootstrap]);
 
     // Use Mission Flow Hook for logic
@@ -132,7 +141,7 @@ const ExecutionDashboard = () => {
         refreshTodayTask
     });
 
-    const onStartFocus = async (taskOverride = null) => {
+    const onStartFocus = useCallback(async (taskOverride = null) => {
         const focusTask = taskOverride
             ? {
                 ...taskOverride,
@@ -147,25 +156,28 @@ const ExecutionDashboard = () => {
 
         setExecutionState('IN_PROGRESS');
         await handleStartFocus(focusTask);
-    };
+    }, [todayTask, setTodayTask, setExecutionState, handleStartFocus]);
 
-    const onComplete = async (minutes) => {
+    const onComplete = useCallback(async (minutes) => {
         await originalComplete(minutes);
         setExecutionState('COMPLETED');
         setTimeout(() => setExecutionState('NOT_STARTED'), 5000);
-        // Refresh stats after completion
+        // Refresh dashboard stats after completion (bootstrap already refreshes store)
         setTimeout(() => {
-            userService.getStatistics().then(setUserStats).catch(() => null);
-            api.get('analytics/activity_chart/', { params: { days: 7 } })
-                .then((res) => setChartData(res.data))
-                .catch(() => null);
+            Promise.all([
+                userService.getStatistics(),
+                api.get('analytics/activity_chart/', { params: { days: 7 } }),
+            ]).then(([statsData, chartRes]) => {
+                setUserStats(statsData);
+                setChartData(chartRes?.data ?? null);
+            }).catch(() => null);
             bootstrap();
         }, 1000);
-    };
+    }, [originalComplete, setExecutionState, bootstrap]);
 
-    const onCloseFocus = () => {
+    const onCloseFocus = useCallback(() => {
         setExecutionState('NOT_STARTED');
-    };
+    }, [setExecutionState]);
 
     const handleChangeTask = useCallback(async () => {
         const next = await regenerateCoach();
@@ -185,6 +197,9 @@ const ExecutionDashboard = () => {
     const handleCloseTaskGuide = useCallback(() => {
         setIsTaskGuideOpen(false);
     }, []);
+
+    const openVoicePanel = useCallback(() => setVoicePanelOpen(true), []);
+    const closeVoicePanel = useCallback(() => setVoicePanelOpen(false), []);
 
     const activeTasks = useMemo(() => mode === 'exam' ? examTasks : tasks, [mode, examTasks, tasks]);
     const streak = userStats?.streak?.current || profile?.profile?.streak_count || progress?.stats?.current_streak || 0;
@@ -410,7 +425,7 @@ const ExecutionDashboard = () => {
                                 </span>
                             </div>
                             <button
-                                onClick={() => setVoicePanelOpen(true)}
+                                onClick={openVoicePanel}
                                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-terracotta/15 hover:bg-terracotta/25 border border-terracotta/30 text-terracotta font-semibold text-sm transition-all dark:bg-terracotta/10 dark:hover:bg-terracotta/20"
                             >
                                 <Sparkles className="h-4 w-4" />
@@ -588,7 +603,7 @@ const ExecutionDashboard = () => {
                                 {coach?.reason || "Consistency is your superpower. One focused session today beats zero."}
                             </p>
                             <button
-                                onClick={() => setVoicePanelOpen(true)}
+                                onClick={openVoicePanel}
                                 className="mt-4 w-full rounded-lg bg-terracotta/15 dark:bg-terracotta/10 py-2.5 px-4 text-sm font-semibold text-terracotta hover:bg-terracotta/25 dark:hover:bg-terracotta/20 transition-colors"
                             >
                                 Get Strategy
@@ -600,7 +615,7 @@ const ExecutionDashboard = () => {
 
             <AIVoicePanel
                 isOpen={voicePanelOpen}
-                onClose={() => setVoicePanelOpen(false)}
+                onClose={closeVoicePanel}
                 contextSource="dashboard"
             />
 
