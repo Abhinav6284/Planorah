@@ -19,13 +19,13 @@ const TodayExecution = ({
     }, [tasks, todayTask, completedCount]);
 
     return (
-        <section className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1a1a] p-6 shadow-soft dark:shadow-none">
+        <section className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1a1a] p-6 shadow-soft dark:shadow-none transition-colors duration-300 ring-1 ring-inset ring-black/5 dark:ring-white/5">
             {/* Mission Card */}
             {todayTask ? (
                 <>
                     <div className="mb-5">
-                        <p className="text-xs font-bold text-terracotta/80 uppercase tracking-wider mb-2">⚡ Today's Mission</p>
-                        <h2 className="text-xl font-bold text-gray-950 dark:text-white mb-2">
+                        <p className="text-xs font-bold uppercase tracking-widest text-terracotta/80 mb-2">⚡ Today's Mission</p>
+                        <h2 className="text-2xl font-black text-gray-950 dark:text-white mb-2">
                             {todayTask.title}
                         </h2>
                         {todayTask.reason && (
@@ -55,7 +55,7 @@ const TodayExecution = ({
                         <button
                             onClick={onStartFocus}
                             disabled={!todayTask || loading}
-                            className="flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-terracotta to-orange-500 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-terracotta/50 disabled:opacity-50 transition-all text-sm"
+                            className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-terracotta to-orange-500 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-terracotta/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-200 text-sm"
                         >
                             <Play className="h-4 w-4 fill-current" />
                             Start Focus

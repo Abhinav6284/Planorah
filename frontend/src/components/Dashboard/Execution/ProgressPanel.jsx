@@ -6,7 +6,7 @@ const XP_LEVELS = [
     { level: 'Elite', min: 1500, max: 999999 },
 ];
 
-const ProgressPanel = ({ tasks, stats }) => {
+const ProgressPanel = ({ tasks, stats, activityHeatmap }) => {
     const xpPoints = stats?.xp_points || 0;
 
     const xpData = useMemo(() => {
@@ -42,27 +42,32 @@ const ProgressPanel = ({ tasks, stats }) => {
             const d = new Date(now);
             d.setDate(now.getDate() - i);
             const iso = d.toISOString().slice(0, 10);
-            const count = (tasks || []).filter(t =>
-                t.status === 'completed' &&
-                String(t.completed_at || t.updated_at || '').slice(0, 10) === iso
-            ).length;
+
+            // Prefer server-provided activity_heatmap object
+            const count = (activityHeatmap && !Array.isArray(activityHeatmap))
+                ? (activityHeatmap[iso] ?? 0)
+                : (tasks || []).filter(t =>
+                    t.status === 'completed' &&
+                    String(t.completed_at || t.updated_at || '').slice(0, 10) === iso
+                ).length;
 
             days.push({
                 label: d.toLocaleDateString('en-US', { weekday: 'narrow' }),
+                iso,
                 count
             });
         }
         return days;
-    }, [tasks]);
+    }, [tasks, activityHeatmap]);
 
     return (
         <div className="space-y-5">
             {/* Level Card */}
-            <div className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1a1a] p-6 shadow-soft dark:shadow-none">
+            <div className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1a1a] p-6 shadow-soft dark:shadow-none transition-colors duration-300">
                 <div className="flex items-start justify-between mb-6">
                     <div>
-                        <p className="text-xs font-bold text-terracotta/80 uppercase tracking-wider mb-2">⚡ Your Level</p>
-                        <p className="text-4xl font-bold text-gray-950 dark:text-white">{xpData.current.level}</p>
+                        <p className="text-xs font-bold uppercase tracking-widest text-terracotta/80 mb-2">⚡ Your Level</p>
+                        <p className="text-5xl font-black text-gray-950 dark:text-white">{xpData.current.level}</p>
                     </div>
                     <div className="text-right">
                         <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Total XP</p>
@@ -78,7 +83,7 @@ const ProgressPanel = ({ tasks, stats }) => {
                             <span>Progress to {xpData.next.level}</span>
                             <span className="text-terracotta">{xpData.remaining} XP left</span>
                         </div>
-                        <div className="h-2.5 bg-borderMuted dark:bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-2.5 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-gradient-to-r from-terracotta to-orange-400 transition-all duration-500"
                                 style={{ width: `${xpData.percent}%` }}
@@ -89,10 +94,10 @@ const ProgressPanel = ({ tasks, stats }) => {
             </div>
 
             {/* Today's Focus */}
-            <div className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1a1a] p-6 shadow-soft dark:shadow-none">
-                <p className="text-xs font-bold text-terracotta/80 uppercase tracking-wider mb-5">📊 Today's Focus</p>
+            <div className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1a1a] p-6 shadow-soft dark:shadow-none transition-colors duration-300">
+                <p className="text-xs font-bold uppercase tracking-widest text-terracotta/80 mb-5">📊 Today's Focus</p>
                 <div className="text-center">
-                    <p className="text-6xl font-bold bg-gradient-to-r from-terracotta to-orange-400 bg-clip-text text-transparent mb-2">
+                    <p className="text-6xl font-black bg-gradient-to-r from-terracotta to-orange-400 bg-clip-text text-transparent mb-2">
                         {todayData.percent}%
                     </p>
                     <p className="text-gray-600 dark:text-gray-400 text-sm">
@@ -102,15 +107,16 @@ const ProgressPanel = ({ tasks, stats }) => {
             </div>
 
             {/* Weekly Heatmap */}
-            <div className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1a1a] p-6 shadow-soft dark:shadow-none">
-                <p className="text-xs font-bold text-terracotta/80 uppercase tracking-wider mb-5">🔥 Weekly Consistency</p>
+            <div className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1a1a] p-6 shadow-soft dark:shadow-none transition-colors duration-300">
+                <p className="text-xs font-bold uppercase tracking-widest text-terracotta/80 mb-5">🔥 Weekly Consistency</p>
                 <div className="flex justify-between gap-2.5">
                     {heatmap.map((day, i) => (
                         <div key={i} className="flex-1 flex flex-col items-center gap-2.5">
                             <div
+                                title={`${day.count} task${day.count !== 1 ? 's' : ''} on ${day.iso}`}
                                 className={`w-full h-10 rounded-lg transition-all ${day.count > 0
                                         ? `bg-gradient-to-br from-terracotta to-orange-500 ${day.count > 2 ? 'opacity-100 shadow-lg shadow-terracotta/30' : 'opacity-70'}`
-                                        : 'bg-borderMuted dark:bg-white/10'
+                                        : 'bg-gray-200 dark:bg-white/10'
                                     }`}
                             />
                             <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">{day.label}</span>

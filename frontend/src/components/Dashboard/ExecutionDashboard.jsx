@@ -19,8 +19,9 @@ import { userService } from '../../api/userService';
 import { roadmapService } from '../../api/roadmapService';
 import { planoraService } from '../../api/planoraService';
 import { useMissionFlow } from '../../hooks/useMissionFlow';
+import api from '../../api/axios';
 
-const shellCardClass = 'rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1a1a] p-6 shadow-soft dark:shadow-none';
+const shellCardClass = 'rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1a1a] p-6 shadow-soft dark:shadow-none transition-colors duration-300 ring-1 ring-inset ring-black/5 dark:ring-white/5 hover:border-terracotta/20 dark:hover:border-terracotta/20';
 
 const buildDateKey = (dateValue) => {
     if (!dateValue) {
@@ -106,6 +107,7 @@ const ExecutionDashboard = () => {
     const [roadmaps, setRoadmaps] = useState([]);
     const [subjects, setSubjects] = useState([]);
     const [userStats, setUserStats] = useState(null);
+    const [chartData, setChartData] = useState(null);
     const [isTaskGuideOpen, setIsTaskGuideOpen] = useState(false);
     const [selectedGuideTask, setSelectedGuideTask] = useState(null);
 
@@ -113,6 +115,9 @@ const ExecutionDashboard = () => {
         bootstrap();
         userService.getProfile().then(setProfile).catch(() => null);
         userService.getStatistics().then(setUserStats).catch(() => null);
+        api.get('analytics/activity_chart/', { params: { days: 7 } })
+            .then((res) => setChartData(res.data))
+            .catch(() => null);
         roadmapService.getUserRoadmaps().then((data) => setRoadmaps(Array.isArray(data) ? data : [])).catch(() => null);
         planoraService.getSubjects().then((data) => setSubjects(Array.isArray(data) ? data : [])).catch(() => null);
     }, [bootstrap]);
@@ -151,6 +156,9 @@ const ExecutionDashboard = () => {
         // Refresh stats after completion
         setTimeout(() => {
             userService.getStatistics().then(setUserStats).catch(() => null);
+            api.get('analytics/activity_chart/', { params: { days: 7 } })
+                .then((res) => setChartData(res.data))
+                .catch(() => null);
             bootstrap();
         }, 1000);
     };
@@ -310,31 +318,34 @@ const ExecutionDashboard = () => {
 
                 {/* GREETING BAR */}
                 <div className="mb-8">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-950 dark:text-white">
-                                Hello, <span className="text-terracotta">{profile?.user?.first_name || profile?.profile?.first_name || 'there'}</span>
+                            <h1 className="text-4xl md:text-5xl font-black text-gray-950 dark:text-white leading-tight">
+                                Hello,{' '}
+                                <span className="bg-gradient-to-r from-terracotta to-orange-400 bg-clip-text text-transparent">
+                                    {profile?.user?.first_name || profile?.profile?.first_name || 'there'}
+                                </span>
                             </h1>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                Track your progress. Keep your streak going!
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 font-medium">
+                                Track your progress. Keep your streak going.
                             </p>
                         </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <span className="self-start sm:self-auto inline-flex items-center gap-1.5 bg-gray-100 dark:bg-white/10 px-3 py-1.5 rounded-full text-xs font-semibold text-gray-600 dark:text-gray-300 transition-colors duration-300">
+                            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M6 2a1 1 0 000 2h8a1 1 0 100-2H6zM4 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" />
                             </svg>
-                            <span className="font-medium">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                        </div>
+                            {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
                     </div>
 
                     {/* STATS ROW */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
                         {/* Finished */}
-                        <div className={shellCardClass}>
+                        <div className={`${shellCardClass} border-l-4 border-emerald-500`}>
                             <div className="flex items-start justify-between">
                                 <div>
-                                    <p className="text-xs text-gray-600 dark:text-gray-400 font-medium uppercase tracking-wide">Finished</p>
-                                    <p className="text-3xl font-bold text-gray-950 dark:text-white mt-2">{mergedStats.tasks_completed}</p>
+                                    <p className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Finished</p>
+                                    <p className="text-5xl font-black text-gray-950 dark:text-white mt-2">{mergedStats.tasks_completed}</p>
                                     <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-2">+8 tasks</p>
                                 </div>
                                 <div className="p-2.5 bg-emerald-500/15 rounded-lg">
@@ -344,11 +355,11 @@ const ExecutionDashboard = () => {
                         </div>
 
                         {/* Tracked */}
-                        <div className={shellCardClass}>
+                        <div className={`${shellCardClass} border-l-4 border-blue-500`}>
                             <div className="flex items-start justify-between">
                                 <div>
-                                    <p className="text-xs text-gray-600 dark:text-gray-400 font-medium uppercase tracking-wide">Tracked</p>
-                                    <p className="text-3xl font-bold text-gray-950 dark:text-white mt-2">{Math.round((mergedStats.focus_minutes || 0) / 60)}h</p>
+                                    <p className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Tracked</p>
+                                    <p className="text-5xl font-black text-gray-950 dark:text-white mt-2">{Math.round((mergedStats.focus_minutes || 0) / 60)}h</p>
                                     <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-2">-6 hours</p>
                                 </div>
                                 <div className="p-2.5 bg-blue-500/15 rounded-lg">
@@ -358,11 +369,11 @@ const ExecutionDashboard = () => {
                         </div>
 
                         {/* Efficiency */}
-                        <div className={shellCardClass}>
+                        <div className={`${shellCardClass} border-l-4 border-amber-500`}>
                             <div className="flex items-start justify-between">
                                 <div>
-                                    <p className="text-xs text-gray-600 dark:text-gray-400 font-medium uppercase tracking-wide">Efficiency</p>
-                                    <p className="text-3xl font-bold text-gray-950 dark:text-white mt-2">{Math.min(100, Math.round(((mergedStats.tasks_completed || 0) / Math.max(activeTasks?.length || 1, 1)) * 100))}%</p>
+                                    <p className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Efficiency</p>
+                                    <p className="text-5xl font-black text-gray-950 dark:text-white mt-2">{Math.min(100, Math.round(((mergedStats.tasks_completed || 0) / Math.max(activeTasks?.length || 1, 1)) * 100))}%</p>
                                     <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold mt-2">+12%</p>
                                 </div>
                                 <div className="p-2.5 bg-amber-500/15 rounded-lg">
@@ -408,7 +419,7 @@ const ExecutionDashboard = () => {
                         </div>
 
                         {/* Performance Chart */}
-                        <PerformanceChart tasks={activeTasks} />
+                        <PerformanceChart tasks={activeTasks} chartData={chartData} />
 
                         {/* Schedule Section */}
                         <div className={shellCardClass}>
@@ -561,10 +572,11 @@ const ExecutionDashboard = () => {
                             focusOpen={currentState === 'IN_PROGRESS'}
                             todayTask={todayTask}
                             streak={streak}
+                            recentActivity={userStats?.recent_activity}
                         />
 
                         {/* 5. PROGRESS PANEL */}
-                        <ProgressPanel tasks={activeTasks} stats={mergedStats} />
+                        <ProgressPanel tasks={activeTasks} stats={mergedStats} activityHeatmap={userStats?.activity_heatmap} />
 
                         {/* AI Insight Card */}
                         <div className="rounded-2xl border border-terracotta/30 bg-white dark:bg-gradient-to-br dark:from-terracotta/5 dark:via-transparent dark:to-transparent p-5 shadow-soft dark:shadow-none dark:border-terracotta/20">
