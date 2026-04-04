@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { BrainCircuit, Sparkles } from 'lucide-react';
+import { BrainCircuit, Sparkles, ThumbsUp, Timer, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import AIVoicePanel from '../Mentoring/AIVoicePanel';
@@ -12,6 +12,7 @@ import FocusMode from './Execution/FocusMode';
 import ExecutionFeed from './Execution/ExecutionFeed';
 import ProgressPanel from './Execution/ProgressPanel';
 import TaskDetailModal from './Execution/TaskDetailModal';
+import PerformanceChart from './Execution/PerformanceChart';
 
 import { useExecutionStore } from '../../store/useExecutionStore';
 import { userService } from '../../api/userService';
@@ -19,7 +20,7 @@ import { roadmapService } from '../../api/roadmapService';
 import { planoraService } from '../../api/planoraService';
 import { useMissionFlow } from '../../hooks/useMissionFlow';
 
-const shellCardClass = 'rounded-2xl border border-white/20 bg-[#1a2540] p-6';
+const shellCardClass = 'rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1a1a] p-6 shadow-soft dark:shadow-none';
 
 const buildDateKey = (dateValue) => {
     if (!dateValue) {
@@ -286,7 +287,7 @@ const ExecutionDashboard = () => {
     }, [subjects]);
 
     return (
-        <div className={`min-h-screen text-slate-800 transition-colors duration-500 dark:text-slate-100 ${currentState === 'IN_PROGRESS' ? 'bg-[#050505]' : 'bg-transparent dark:bg-[#0b0b0b]'}`}>
+        <div className={`min-h-screen text-gray-950 transition-colors duration-500 dark:text-white ${currentState === 'IN_PROGRESS' ? 'bg-[#050505]' : 'bg-[#F5F1E8] dark:bg-charcoalDark'}`}>
 
             {/* Focus Mode Overlay */}
             <AnimatePresence>
@@ -307,23 +308,90 @@ const ExecutionDashboard = () => {
 
             <div className={`mx-auto max-w-[1320px] px-4 py-6 transition-all duration-500 lg:px-6 lg:py-8 ${currentState === 'IN_PROGRESS' ? 'opacity-20 blur-sm pointer-events-none' : 'opacity-100'}`}>
 
-                {/* 1. HERO SECTION */}
-                <TodayExecution
-                    user={profile}
-                    todayTask={todayTask}
-                    tasks={activeTasks}
-                    streak={streak}
-                    onStartFocus={onStartFocus}
-                    onChangeTask={handleChangeTask}
-                    loading={loading.bootstrap}
-                />
+                {/* GREETING BAR */}
+                <div className="mb-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-950 dark:text-white">
+                                Hello, <span className="text-terracotta">{profile?.user?.first_name || profile?.profile?.first_name || 'there'}</span>
+                            </h1>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                Track your progress. Keep your streak going!
+                            </p>
+                        </div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M6 2a1 1 0 000 2h8a1 1 0 100-2H6zM4 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" />
+                            </svg>
+                            <span className="font-medium">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                        </div>
+                    </div>
+
+                    {/* STATS ROW */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+                        {/* Finished */}
+                        <div className={shellCardClass}>
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400 font-medium uppercase tracking-wide">Finished</p>
+                                    <p className="text-3xl font-bold text-gray-950 dark:text-white mt-2">{mergedStats.tasks_completed}</p>
+                                    <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-2">+8 tasks</p>
+                                </div>
+                                <div className="p-2.5 bg-emerald-500/15 rounded-lg">
+                                    <ThumbsUp className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Tracked */}
+                        <div className={shellCardClass}>
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400 font-medium uppercase tracking-wide">Tracked</p>
+                                    <p className="text-3xl font-bold text-gray-950 dark:text-white mt-2">{Math.round((mergedStats.focus_minutes || 0) / 60)}h</p>
+                                    <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-2">-6 hours</p>
+                                </div>
+                                <div className="p-2.5 bg-blue-500/15 rounded-lg">
+                                    <Timer className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Efficiency */}
+                        <div className={shellCardClass}>
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400 font-medium uppercase tracking-wide">Efficiency</p>
+                                    <p className="text-3xl font-bold text-gray-950 dark:text-white mt-2">{Math.min(100, Math.round(((mergedStats.tasks_completed || 0) / Math.max(activeTasks?.length || 1, 1)) * 100))}%</p>
+                                    <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold mt-2">+12%</p>
+                                </div>
+                                <div className="p-2.5 bg-amber-500/15 rounded-lg">
+                                    <TrendingUp className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 1. MISSION CARD */}
+                <div className="mb-8">
+                    <TodayExecution
+                        user={profile}
+                        todayTask={todayTask}
+                        tasks={activeTasks}
+                        streak={streak}
+                        onStartFocus={onStartFocus}
+                        onChangeTask={handleChangeTask}
+                        loading={loading.bootstrap}
+                    />
+                </div>
 
                 <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-12">
 
                     {/* LEFT COLUMN: Main Activities */}
                     <div className="space-y-6 lg:col-span-8">
                         {/* Mode Switcher Block */}
-                        <div className="rounded-2xl border border-white/20 bg-[#1a2540] p-5 flex items-center justify-between gap-4">
+                        <div className={`${shellCardClass} flex items-center justify-between gap-4`}>
                             <div className="flex items-center gap-3">
                                 <ModeSwitch mode={mode} onChange={setMode} />
                                 <span className="text-sm text-gray-400 hidden sm:inline font-medium">
@@ -332,22 +400,25 @@ const ExecutionDashboard = () => {
                             </div>
                             <button
                                 onClick={() => setVoicePanelOpen(true)}
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-terracotta/20 to-orange-500/20 hover:from-terracotta/30 hover:to-orange-500/30 border border-terracotta/30 text-terracotta font-semibold text-sm transition-all"
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-terracotta/15 hover:bg-terracotta/25 border border-terracotta/30 text-terracotta font-semibold text-sm transition-all dark:bg-terracotta/10 dark:hover:bg-terracotta/20"
                             >
                                 <Sparkles className="h-4 w-4" />
                                 <span className="hidden sm:inline">AI Coach</span>
                             </button>
                         </div>
 
+                        {/* Performance Chart */}
+                        <PerformanceChart tasks={activeTasks} />
+
                         {/* Schedule Section */}
                         <div className={shellCardClass}>
                             <div className="mb-4 flex items-center justify-between pb-2">
-                                <h3 className="text-lg font-bold text-textPrimary dark:text-white">Schedule</h3>
-                                <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">Days</span>
+                                <h3 className="text-lg font-bold text-gray-950 dark:text-white">Schedule</h3>
+                                <span className="text-xs font-semibold text-textSecondary dark:text-gray-500">Days</span>
                             </div>
 
                             {pendingTaskData.orderedDates.length === 0 && (
-                                <p className="mb-4 text-sm text-textSecondary dark:text-slate-400">No pending tasks. You're all caught up!</p>
+                                <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">No pending tasks. You're all caught up!</p>
                             )}
 
                             <div className="space-y-4">
@@ -359,7 +430,7 @@ const ExecutionDashboard = () => {
                                             onClick={() => setSelectedDateKey(day.key)}
                                             className={`flex h-14 w-11 flex-shrink-0 flex-col items-center justify-center gap-0.5 rounded-xl font-semibold transition-all border ${day.isSelected
                                                 ? 'bg-terracotta text-white border-terracotta'
-                                                : 'bg-white/5 border-white/20 text-gray-300 hover:bg-white/10'
+                                                : 'bg-white/80 dark:bg-white/5 border-gray-200 dark:border-white/20 text-textPrimary dark:text-gray-300 hover:bg-white/90 dark:hover:bg-white/10'
                                                 }`}
                                         >
                                             <span className="text-sm font-bold">{day.dayNumber}</span>
@@ -369,17 +440,17 @@ const ExecutionDashboard = () => {
                                 </div>
 
                                 <div className="flex items-center justify-between">
-                                    <p className="text-sm font-bold text-textPrimary dark:text-slate-200">Tasks ({selectedTasks.length})</p>
+                                    <p className="text-sm font-bold text-gray-950 dark:text-white">Tasks ({selectedTasks.length})</p>
                                     <div className="flex items-center gap-3">
-                                        <div className="h-1.5 w-24 overflow-hidden rounded-full bg-beigeMuted dark:bg-white/10">
-                                            <div className="h-full rounded-full bg-terracotta/60 transition-all dark:bg-terracotta/60" style={{ width: `${selectedTaskProgress}%` }} />
+                                        <div className="h-1.5 w-24 overflow-hidden rounded-full bg-borderMuted dark:bg-white/10">
+                                            <div className="h-full rounded-full bg-terracotta transition-all" style={{ width: `${selectedTaskProgress}%` }} />
                                         </div>
-                                        <span className="text-xs font-semibold text-textSecondary dark:text-slate-400">{selectedTaskProgress}%</span>
+                                        <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">{selectedTaskProgress}%</span>
                                     </div>
                                 </div>
 
                                 {selectedTasks.length === 0 ? (
-                                    <p className="text-sm text-textSecondary dark:text-slate-400">No tasks scheduled for {formatDateLabel(selectedDateKey)}.</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">No tasks scheduled for {formatDateLabel(selectedDateKey)}.</p>
                                 ) : (
                                     <div className="space-y-3">
                                         {selectedTasks.map((card, index) => (
@@ -394,25 +465,25 @@ const ExecutionDashboard = () => {
                                                         handleOpenTaskGuide(card);
                                                     }
                                                 }}
-                                                className="relative flex cursor-pointer items-center gap-4 p-4 bg-white/5 border border-white/20 rounded-xl hover:bg-white/10 transition-all group"
+                                                className="relative flex cursor-pointer items-center gap-4 p-4 bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/20 rounded-xl hover:bg-white/90 dark:hover:bg-white/10 transition-all group"
                                             >
                                                 {/* Number Badge */}
-                                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-terracotta/20 to-orange-500/20 border border-terracotta/30 text-sm font-bold text-terracotta">
+                                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-terracotta/15 border border-terracotta/30 text-sm font-bold text-terracotta">
                                                     {index + 1}
                                                 </div>
 
                                                 {/* Info */}
                                                 <div className="min-w-0 flex-1">
-                                                    <h4 className="truncate text-sm font-semibold text-white group-hover:text-terracotta transition-colors">
+                                                    <h4 className="truncate text-sm font-semibold text-gray-950 dark:text-white group-hover:text-terracotta transition-colors">
                                                         {card.title}
                                                     </h4>
-                                                    <p className="text-xs text-gray-400 mt-1">
+                                                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                                                         ⏱ {card.estimatedMinutes} min
                                                     </p>
                                                 </div>
 
                                                 {/* Status */}
-                                                <span className="text-xs px-3 py-1.5 rounded-lg bg-white/10 text-gray-300 border border-white/10">
+                                                <span className="text-xs px-3 py-1.5 rounded-lg bg-white/80 dark:bg-white/10 border border-gray-200 dark:border-white/10 text-textSecondary dark:text-gray-300">
                                                     {getTaskStatusLabel(card.status)}
                                                 </span>
                                             </div>
@@ -426,25 +497,25 @@ const ExecutionDashboard = () => {
                         {mode === 'learning' ? (
                             <div className={shellCardClass}>
                                 <div className="mb-4 flex items-center justify-between pb-2">
-                                    <h3 className="text-lg font-bold text-textPrimary dark:text-white">Learning Path Roadmaps</h3>
-                                    <Link to="/roadmap/list" className="text-xs font-semibold text-terracotta hover:text-terracottaHover dark:text-terracotta/80 dark:hover:text-terracotta">
+                                    <h3 className="text-lg font-bold text-gray-950 dark:text-white">Learning Path Roadmaps</h3>
+                                    <Link to="/roadmap/list" className="text-xs font-semibold text-terracotta hover:text-terracottaHover">
                                         View all
                                     </Link>
                                 </div>
 
                                 {roadmapCards.length === 0 ? (
-                                    <p className="text-sm text-textSecondary dark:text-slate-400">No roadmaps found. Create one to link tasks with your learning path.</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">No roadmaps found. Create one to link tasks with your learning path.</p>
                                 ) : (
                                     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                                         {roadmapCards.map((roadmap) => (
                                             <Link
                                                 key={roadmap.key}
                                                 to={roadmap.ctaTo}
-                                                className="rounded-xl border border-borderMuted bg-beigeMuted/30 p-3 transition hover:bg-white/80 hover:shadow-sm dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
+                                                className="rounded-xl border border-gray-200/50 dark:border-white/10 bg-white/50 dark:bg-white/5 p-3 transition hover:bg-white/70 dark:hover:bg-white/10"
                                             >
-                                                <p className="truncate text-sm font-semibold text-textPrimary dark:text-slate-100">{roadmap.title}</p>
-                                                <p className="mt-1 line-clamp-2 text-xs text-textSecondary dark:text-slate-400">{roadmap.subtitle}</p>
-                                                <p className="mt-2 text-[11px] font-semibold text-terracotta dark:text-terracotta/80">Open roadmap →</p>
+                                                <p className="truncate text-sm font-semibold text-gray-950 dark:text-white">{roadmap.title}</p>
+                                                <p className="mt-1 line-clamp-2 text-xs text-gray-600 dark:text-gray-400">{roadmap.subtitle}</p>
+                                                <p className="mt-2 text-[11px] font-semibold text-terracotta">Open roadmap →</p>
                                             </Link>
                                         ))}
                                     </div>
@@ -453,25 +524,25 @@ const ExecutionDashboard = () => {
                         ) : (
                             <div className={shellCardClass}>
                                 <div className="mb-4 flex items-center justify-between pb-2">
-                                    <h3 className="text-lg font-bold text-textPrimary dark:text-white">Exam Subjects & Topics</h3>
-                                    <Link to="/planora" className="text-xs font-semibold text-terracotta hover:text-terracottaHover dark:text-terracotta/80 dark:hover:text-terracotta">
+                                    <h3 className="text-lg font-bold text-gray-950 dark:text-white">Exam Subjects & Topics</h3>
+                                    <Link to="/planora" className="text-xs font-semibold text-terracotta hover:text-terracottaHover">
                                         Open study platform
                                     </Link>
                                 </div>
 
                                 {subjectCards.length === 0 ? (
-                                    <p className="text-sm text-textSecondary dark:text-slate-400">No exam subjects found. Create subjects and generate topics in the study platform.</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">No exam subjects found. Create subjects and generate topics in the study platform.</p>
                                 ) : (
                                     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                                         {subjectCards.map((subject) => (
                                             <Link
                                                 key={subject.key}
                                                 to={subject.ctaTo}
-                                                className="rounded-xl border border-borderMuted bg-beigeMuted/30 p-3 transition hover:bg-white/80 hover:shadow-sm dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
+                                                className="rounded-xl border border-gray-200/50 dark:border-white/10 bg-white/50 dark:bg-white/5 p-3 transition hover:bg-white/70 dark:hover:bg-white/10"
                                             >
-                                                <p className="truncate text-sm font-semibold text-textPrimary dark:text-slate-100">{subject.title}</p>
-                                                <p className="mt-1 text-xs text-textSecondary dark:text-slate-400">{subject.topicCount} topics</p>
-                                                <p className="mt-2 text-[11px] text-textSecondary dark:text-slate-400">
+                                                <p className="truncate text-sm font-semibold text-gray-950 dark:text-white">{subject.title}</p>
+                                                <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">{subject.topicCount} topics</p>
+                                                <p className="mt-2 text-[11px] text-gray-600 dark:text-gray-400">
                                                     {subject.strong} strong • {subject.weak} weak • {subject.notStarted} not started
                                                 </p>
                                             </Link>
@@ -496,17 +567,17 @@ const ExecutionDashboard = () => {
                         <ProgressPanel tasks={activeTasks} stats={mergedStats} />
 
                         {/* AI Insight Card */}
-                        <div className="rounded-2xl border border-terracotta/30 bg-gradient-to-br from-terracotta/10 via-transparent to-beigePrimary/30 p-5 shadow-soft backdrop-blur-sm dark:border-terracotta/20 dark:from-terracotta/5 dark:to-transparent dark:shadow-darkSoft">
-                            <div className="flex items-center gap-2 text-terracotta dark:text-terracotta/80">
+                        <div className="rounded-2xl border border-terracotta/30 bg-white dark:bg-gradient-to-br dark:from-terracotta/5 dark:via-transparent dark:to-transparent p-5 shadow-soft dark:shadow-none dark:border-terracotta/20">
+                            <div className="flex items-center gap-2 text-terracotta">
                                 <BrainCircuit className="h-4 w-4" />
                                 <span className="text-[11px] font-bold uppercase tracking-wider">AI Insight</span>
                             </div>
-                            <p className="mt-2.5 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                            <p className="mt-2.5 text-sm leading-relaxed text-textPrimary dark:text-gray-300">
                                 {coach?.reason || "Consistency is your superpower. One focused session today beats zero."}
                             </p>
                             <button
                                 onClick={() => setVoicePanelOpen(true)}
-                                className="mt-4 w-full rounded-lg bg-terracotta/10 py-2.5 px-4 text-sm font-semibold text-terracotta hover:bg-terracotta/20 dark:bg-terracotta/10 dark:text-terracotta dark:hover:bg-terracotta/20 transition-colors"
+                                className="mt-4 w-full rounded-lg bg-terracotta/15 dark:bg-terracotta/10 py-2.5 px-4 text-sm font-semibold text-terracotta hover:bg-terracotta/25 dark:hover:bg-terracotta/20 transition-colors"
                             >
                                 Get Strategy
                             </button>
