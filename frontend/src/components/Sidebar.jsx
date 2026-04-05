@@ -1,70 +1,71 @@
-import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
-  Briefcase,
-  CheckSquare,
-  BookOpen,
-  CreditCard,
   Settings,
   LogOut,
-  ChevronDown,
   Sun,
   Moon,
-  X
+  X,
+  Beaker,
+  MapPin,
+  FolderOpen,
+  BookOpen,
+  FileText,
+  Files,
+  Search,
+  Briefcase,
+  MessageSquare,
+  Globe,
+  CheckSquare,
+  Calendar,
+  CreditCard,
+  Tag,
+  Receipt
 } from 'lucide-react';
 import { getUserAvatar } from '../utils/avatar';
 
-const navGroups = [
+const navSections = [
   {
-    label: 'Dashboard',
+    type: 'standalone',
     path: '/dashboard',
-    type: 'link',
-    icon: LayoutDashboard
+    label: 'Dashboard',
+    icon: LayoutDashboard,
   },
   {
-    label: 'Career',
-    type: 'dropdown',
-    icon: Briefcase,
+    section: 'LEARN',
     items: [
-      { path: '/resume', label: 'Resume Builder' },
-      { path: '/resume/compiled', label: 'Compiled Resumes' },
-      { path: '/ats', label: 'Find Your Fit' },
-      { path: '/jobs', label: 'Job Finder' },
-      { path: '/interview', label: 'Mock Interview' },
-      { path: '/portfolio/edit', label: 'Portfolio' },
+      { path: '/lab', label: 'Virtual Lab', icon: Beaker },
+      { path: '/roadmap/list', label: 'Learning Path', icon: MapPin },
+      { path: '/roadmap/projects', label: 'My Projects', icon: FolderOpen },
+      { path: '/planora', label: 'Study Platform', icon: BookOpen },
     ]
   },
   {
-    label: 'Productivity',
-    type: 'dropdown',
-    icon: CheckSquare,
+    section: 'CAREER',
     items: [
-      { path: '/tasks', label: 'Tasks' },
-      { path: '/scheduler', label: 'Calendar' },
+      { path: '/resume', label: 'Resume Builder', icon: FileText },
+      { path: '/resume/compiled', label: 'Compiled Resumes', icon: Files },
+      { path: '/ats', label: 'Find Your Fit', icon: Search },
+      { path: '/jobs', label: 'Job Finder', icon: Briefcase },
+      { path: '/interview', label: 'Mock Interview', icon: MessageSquare },
+      { path: '/portfolio/edit', label: 'Portfolio', icon: Globe },
     ]
   },
   {
-    label: 'Learning',
-    type: 'dropdown',
-    icon: BookOpen,
+    section: 'TOOLS',
     items: [
-      { path: '/lab', label: 'Virtual Lab' },
-      { path: '/roadmap/list', label: 'Learning Path' },
-      { path: '/roadmap/projects', label: 'My Projects' },
-      { path: '/planora', label: 'Study Platform' },
+      { path: '/tasks', label: 'Tasks', icon: CheckSquare },
+      { path: '/scheduler', label: 'Calendar', icon: Calendar },
     ]
   },
   {
-    label: 'Account',
-    type: 'dropdown',
-    icon: CreditCard,
+    section: 'ACCOUNT',
     items: [
-      { path: '/subscription', label: 'Subscription' },
-      { path: '/pricing', label: 'Pricing' },
-      { path: '/billing/history', label: 'Billing History' },
+      { path: '/subscription', label: 'Subscription', icon: CreditCard },
+      { path: '/pricing', label: 'Pricing', icon: Tag },
+      { path: '/billing/history', label: 'Billing History', icon: Receipt },
     ]
   },
 ];
@@ -72,20 +73,6 @@ const navGroups = [
 const SidebarContent = ({ onNavClick = () => {}, user = null }) => {
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
-  const [expandedGroup, setExpandedGroup] = useState(null);
-
-  // Auto-expand group containing active route
-  useEffect(() => {
-    const activeGroup = navGroups.find(group => {
-      if (group.type === 'link') {
-        return location.pathname === group.path;
-      }
-      return group.items?.some(item => location.pathname.startsWith(item.path));
-    });
-    if (activeGroup && activeGroup.type === 'dropdown') {
-      setExpandedGroup(activeGroup.label);
-    }
-  }, [location.pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
@@ -119,140 +106,135 @@ const SidebarContent = ({ onNavClick = () => {}, user = null }) => {
   return (
     <>
       {/* Logo */}
-      <div className="px-4 py-4 border-b border-white/10">
-        <Link to="/dashboard" className="text-xl font-bold tracking-tight text-white font-serif">
+      <div className="px-5 py-6 border-b border-gray-200 dark:border-white/10 bg-white dark:bg-charcoalDark">
+        <Link to="/dashboard" className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white font-serif hover:text-terracotta transition-colors">
           Planora<span className="text-terracotta">.</span>
         </Link>
       </div>
 
       {/* User Profile Section */}
-      <div className="px-4 py-5 border-b border-white/10 bg-white/5">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="relative flex-shrink-0">
-            <img
-              src={userAvatar}
-              alt="Profile"
-              className="h-12 w-12 rounded-lg object-cover border-2 border-terracotta"
-            />
-          </div>
+      <div className="px-5 py-5 border-b border-gray-200 dark:border-white/10 bg-white dark:bg-charcoalDark">
+        <div className="flex items-center gap-3">
+          <img
+            src={userAvatar}
+            alt="Profile"
+            className="h-12 w-12 rounded-full object-cover flex-shrink-0"
+          />
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-white text-sm truncate">
+            <p className="font-semibold text-gray-900 dark:text-white text-sm truncate">
               {getUserName()}
             </p>
-            <p className="text-xs text-gray-400">
-              {getUserRole()}
-            </p>
+            <div className="flex items-center gap-1.5 mt-1">
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                {getUserRole()}
+              </p>
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-terracotta/20 dark:bg-terracotta/20 text-terracotta font-semibold">
+                {getUserLevel()}
+              </span>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-600 dark:text-gray-400">Level</span>
-          <span className="font-semibold text-terracotta bg-terracotta/10 px-2 py-1 rounded">
-            {getUserLevel()}
-          </span>
         </div>
       </div>
 
-      {/* Navigation Groups */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-        {navGroups.map((group) => {
-          const isGroupActive = group.type === 'link'
-            ? location.pathname === group.path
-            : group.items?.some(item => location.pathname.startsWith(item.path));
+      {/* Navigation Sections */}
+      <nav className="flex-1 overflow-y-auto py-4 px-3 bg-white dark:bg-charcoalDark space-y-6">
+        {/* Dashboard Link */}
+        <motion.div
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Link
+            to="/dashboard"
+            onClick={onNavClick}
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
+              location.pathname === '/dashboard'
+                ? 'bg-terracotta/15 dark:bg-terracotta/15 text-terracotta dark:text-terracotta shadow-sm'
+                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5'
+            }`}
+          >
+            <LayoutDashboard className="h-5 w-5 flex-shrink-0" />
+            <span>Dashboard</span>
+          </Link>
+        </motion.div>
 
-          if (group.type === 'link') {
-            return (
-              <Link
-                key={group.label}
-                to={group.path}
-                onClick={onNavClick}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isGroupActive
-                    ? 'bg-terracotta text-white'
-                    : 'text-gray-300 hover:bg-white/10'
-                }`}
-              >
-                <group.icon className="h-4 w-4 flex-shrink-0" />
-                {group.label}
-              </Link>
-            );
-          }
-
-          const isOpen = expandedGroup === group.label;
-          return (
-            <div key={group.label}>
-              <button
-                onClick={() => setExpandedGroup(isOpen ? null : group.label)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isGroupActive
-                    ? 'text-terracotta bg-terracotta/10'
-                    : 'text-gray-300 hover:bg-white/10'
-                }`}
-              >
-                <group.icon className="h-4 w-4 flex-shrink-0" />
-                <span className="flex-1 text-left">{group.label}</span>
-                <ChevronDown className={`h-4 w-4 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              <AnimatePresence>
-                {isOpen && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="ml-5 mt-0.5 space-y-0.5">
-                      {group.items.map((item) => {
-                        const itemActive = location.pathname.startsWith(item.path);
-                        return (
-                          <Link
-                            key={item.path}
-                            to={item.path}
-                            onClick={onNavClick}
-                            className={`block px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                              itemActive
-                                ? 'text-terracotta bg-terracotta/10 font-semibold'
-                                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
-                            }`}
-                          >
-                            {item.label}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+        {/* Section Groups */}
+        {navSections.slice(1).map((section, sectionIdx) => (
+          <motion.div
+            key={section.section}
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: (sectionIdx + 1) * 0.05 }}
+          >
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-500 px-4 pb-3">
+                {section.section}
+              </h3>
+              <div className="space-y-1.5">
+                {section.items.map((item, itemIdx) => {
+                  const itemActive = location.pathname.startsWith(item.path);
+                  const IconComponent = item.icon;
+                  return (
+                    <motion.div
+                      key={item.path}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.2, delay: (sectionIdx + 1) * 0.05 + itemIdx * 0.03 }}
+                      whileHover={{ x: 4 }}
+                    >
+                      <Link
+                        to={item.path}
+                        onClick={onNavClick}
+                        className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
+                          itemActive
+                            ? 'bg-terracotta/15 dark:bg-terracotta/15 text-terracotta dark:text-terracotta shadow-sm'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5'
+                        }`}
+                      >
+                        <IconComponent className="h-5 w-5 flex-shrink-0" />
+                        <span>{item.label}</span>
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+              </div>
             </div>
-          );
-        })}
+          </motion.div>
+        ))}
       </nav>
 
       {/* Bottom Actions */}
-      <div className="px-3 py-4 border-t border-gray-200 dark:border-white/10 space-y-1">
-        <button
+      <div className="px-3 py-4 border-t border-gray-200 dark:border-white/10 bg-white dark:bg-charcoalDark space-y-2">
+        <motion.button
           onClick={toggleTheme}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+          whileHover={{ x: 2 }}
+          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-200 font-medium"
         >
-          {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-          <span className="text-sm">{theme === 'light' ? 'Dark' : 'Light'}</span>
-        </button>
-        <Link
-          to="/profile"
-          onClick={onNavClick}
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+          {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+          <span>{theme === 'light' ? 'Dark' : 'Light'}</span>
+        </motion.button>
+
+        <motion.div
+          whileHover={{ x: 2 }}
         >
-          <Settings className="h-4 w-4" />
-          Settings
-        </Link>
-        <button
+          <Link
+            to="/profile"
+            onClick={onNavClick}
+            className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-200 font-medium"
+          >
+            <Settings className="h-5 w-5" />
+            <span>Settings</span>
+          </Link>
+        </motion.div>
+
+        <motion.button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+          whileHover={{ x: 2 }}
+          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/10 transition-all duration-200 font-medium"
         >
-          <LogOut className="h-4 w-4" />
-          Logout
-        </button>
+          <LogOut className="h-5 w-5" />
+          <span>Logout</span>
+        </motion.button>
       </div>
     </>
   );
@@ -262,7 +244,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose = () => {}, user = null }) 
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="w-64 flex-shrink-0 hidden lg:flex flex-col h-screen sticky top-0 bg-[#0f1419] border-r border-white/10 overflow-y-auto">
+      <aside className="w-64 flex-shrink-0 hidden lg:flex flex-col h-screen sticky top-0 bg-white dark:bg-charcoalDark border-r border-gray-200 dark:border-white/10 shadow-sm dark:shadow-lg overflow-y-auto">
         <SidebarContent onNavClick={() => {}} user={user} />
       </aside>
 
@@ -274,24 +256,26 @@ const Sidebar = ({ mobileOpen = false, onMobileClose = () => {}, user = null }) 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
               onClick={onMobileClose}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
             />
             <motion.div
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed top-0 left-0 bottom-0 w-72 z-50 lg:hidden flex flex-col bg-[#0f1419] border-r border-white/10 overflow-y-auto shadow-2xl"
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="fixed top-0 left-0 bottom-0 w-72 z-50 lg:hidden flex flex-col bg-white dark:bg-charcoalDark border-r border-gray-200 dark:border-white/10 overflow-y-auto shadow-xl"
             >
               <div className="absolute top-4 right-4">
-                <button
+                <motion.button
                   onClick={onMobileClose}
-                  className="flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
-                  aria-label="Close navigation"
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-300 dark:border-white/10 bg-gray-100 dark:bg-white/5 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/10 transition-all"
                 >
                   <X className="h-5 w-5" />
-                </button>
+                </motion.button>
               </div>
               <div className="pt-12">
                 <SidebarContent onNavClick={onMobileClose} user={user} />

@@ -258,6 +258,40 @@ class OTPVerification(models.Model):
         return f"{self.email} - {self.otp}"
 
 
+class PasswordResetToken(models.Model):
+    """
+    Secure, single-use tokens for password reset.
+    Created ONLY after OTP verification.
+    Must be provided to complete password reset.
+    """
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reset_tokens')
+    token = models.CharField(max_length=64, unique=True)
+    email = models.EmailField()  # Store email for audit trail
+    created_at = models.DateTimeField(auto_now_add=True)
+    used_at = models.DateTimeField(null=True, blank=True)  # When token was used
+    is_used = models.BooleanField(default=False)
+
+    def is_expired(self):
+        """Token valid for 15 minutes."""
+        return timezone.now() > self.created_at + timedelta(minutes=15)
+
+    def is_valid(self):
+        """Token must not be expired or already used."""
+        return not self.is_used and not self.is_expired()
+
+    def mark_used(self):
+        """Mark token as used."""
+        self.is_used = True
+        self.used_at = timezone.now()
+        self.save()
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Reset token for {self.email} (used={self.is_used})"
+
+
 class DeletedUser(models.Model):
     """
     Track deleted user emails to prevent them from re-registering via OAuth.

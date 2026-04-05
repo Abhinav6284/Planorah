@@ -20,7 +20,7 @@ from backend.email_service import send_otp_email, send_password_reset_email, sen
 # AI onboarding call
 from ai_calls.service import trigger_onboarding_call
 
-from .models import CustomUser, OTPVerification, UserProfile
+from .models import CustomUser, OTPVerification, UserProfile, PasswordResetToken
 from .serializers import UserSerializer, UserProfileSerializer
 from .statistics import get_user_statistics
 
@@ -501,12 +501,14 @@ def request_password_reset(request):
     return Response({"message": "Password reset OTP sent to your email."}, status=200)
 
 
-# 2️⃣ Verify reset OTP
+# 2️⃣ Verify reset OTP and generate reset token
 @api_view(["POST"])
 @permission_classes([AllowAny])
 @throttle_classes([ScopedRateThrottle])
 @throttle_scope('otp')
 def verify_reset_otp(request):
+    import secrets
+
     email = request.data.get("email")
     otp = request.data.get("otp")
 
@@ -525,35 +527,78 @@ def verify_reset_otp(request):
         record.delete()
         return Response({"message": "OTP expired. Please request a new one."}, status=400)
 
-    record.is_used = True
-    record.save()
-
-    return Response({"message": "OTP verified successfully."}, status=200)
-
-
-# 3️⃣ Reset password
-@api_view(["POST"])
-@permission_classes([AllowAny])
-@throttle_classes([ScopedRateThrottle])
-@throttle_scope('otp')
-def reset_password(request):
-    email = request.data.get("email")
-    new_password = request.data.get("new_password")
-
-    if not email or not new_password:
-        return Response({"message": "Email and new password required."}, status=400)
-
-    email = email.strip().lower()
-
+    # Get user
     try:
         user = CustomUser.objects.get(email__iexact=email)
     except CustomUser.DoesNotExist:
         return Response({"message": "User not found."}, status=404)
 
+    # Mark OTP as used
+    record.is_used = True
+    record.save()
+
+    # Generate secure reset token (valid for 15 minutes, single-use)
+    reset_token = secrets.token_urlsafe(48)
+    PasswordResetToken.objects.create(
+        user=user,
+        token=reset_token,
+        email=email
+    )
+
+    return Response({
+        "message": "OTP verified successfully.",
+        "reset_token": reset_token
+    }, status=200)
+
+
+# 3️⃣ Reset password (requires verified reset token)
+@api_view(["POST"])
+@permission_classes([AllowAny])
+@throttle_classes([ScopedRateThrottle])
+@throttle_scope('otp')
+def reset_password(request):
+    reset_token = request.data.get("reset_token")
+    new_password = request.data.get("new_password")
+
+    if not reset_token or not new_password:
+        return Response({
+            "message": "Reset token and new password required."
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    # Validate reset token
+    try:
+        token_record = PasswordResetToken.objects.get(token=reset_token)
+    except PasswordResetToken.DoesNotExist:
+        logger.warning("Invalid reset token attempted")
+        return Response({
+            "message": "Invalid or expired reset token. Please request a new password reset."
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    # Check token validity
+    if not token_record.is_valid():
+        logger.warning(f"Reset token invalid (expired or used) for user {token_record.user.id}")
+        return Response({
+            "message": "Reset token has expired or been used. Please request a new password reset."
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    # Update password
+    user = token_record.user
     user.set_password(new_password)
     user.save()
 
-    return Response({"message": "Password reset successfully."}, status=200)
+    # Mark token as used
+    token_record.mark_used()
+
+    # Clean up expired reset tokens for this user
+    PasswordResetToken.objects.filter(user=user, is_used=False).filter(
+        created_at__lt=timezone.now() - timedelta(minutes=15)
+    ).delete()
+
+    logger.info(f"Password reset completed for user {user.id} ({user.email})")
+
+    return Response({
+        "message": "Password reset successfully. You can now log in with your new password."
+    }, status=status.HTTP_200_OK)
 
 
 # ---------------- GET CURRENT USER (for frontend) ----------------

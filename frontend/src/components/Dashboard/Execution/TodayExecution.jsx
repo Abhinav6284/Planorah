@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Play, Sparkles, ArrowRight } from 'lucide-react';
+import { Play, RefreshCw } from 'lucide-react';
 
 const TodayExecution = React.memo(({
     user,
@@ -18,60 +18,102 @@ const TodayExecution = React.memo(({
         return Math.max((tasks || []).length, completedCount + (todayTask ? 1 : 0));
     }, [tasks, todayTask, completedCount]);
 
+    const pct = Math.round((completedCount / Math.max(totalCount, 1)) * 100);
+
     return (
-        <section className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1a1a] p-6 shadow-soft dark:shadow-none transition-colors duration-300 ring-1 ring-inset ring-black/5 dark:ring-white/5">
+        <section className="bg-gradient-to-br from-white to-gray-50/80 dark:from-[#1a1a1a] dark:to-[#151515] rounded-2xl border-0 p-6 transition-all duration-300 shadow-[0_10px_24px_rgba(0,0,0,0.06)] dark:shadow-[0_10px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_0_0_1px_rgba(217,108,74,0.2)]">
             {/* Mission Card */}
             {todayTask ? (
-                <>
-                    <div className="mb-5">
-                        <p className="text-xs font-bold uppercase tracking-widest text-terracotta/80 mb-2">⚡ Today's Mission</p>
-                        <h2 className="text-2xl font-black text-gray-950 dark:text-white mb-2">
+                <div className="flex flex-col lg:flex-row lg:items-start gap-8">
+                    {/* Left: Task Content */}
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-3">
+                            <span className="w-1.5 h-1.5 bg-terracotta rounded-full" />
+                            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Focus Task</p>
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-950 dark:text-white leading-tight mb-2">
                             {todayTask.title}
                         </h2>
                         {todayTask.reason && (
-                            <p className="text-gray-600 dark:text-gray-300 flex items-start gap-2 text-sm">
-                                <Sparkles className="h-4 w-4 text-yellow-400 flex-shrink-0 mt-0.5" />
+                            <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-6">
                                 {todayTask.reason}
                             </p>
                         )}
+
+                        {/* Progress bar */}
+                        <div className="mb-6">
+                            <div className="flex justify-between mb-2 text-xs text-gray-400 dark:text-gray-500">
+                                <span>Progress</span>
+                                <span>{completedCount}/{totalCount}</span>
+                            </div>
+                            <div className="h-1 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
+                                <div
+                                    className="h-full bg-terracotta rounded-full transition-all duration-500"
+                                    style={{ width: `${pct}%` }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* CTA Buttons */}
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={onStartFocus}
+                                disabled={!todayTask || loading}
+                                className="flex items-center gap-2 px-6 py-3 bg-terracotta text-white text-sm font-semibold rounded-xl hover:bg-terracottaHover hover:shadow-lg hover:shadow-terracotta/25 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-150"
+                            >
+                                <Play className="w-4 h-4 fill-current" />
+                                Start Session
+                            </button>
+                            <button
+                                onClick={onChangeTask}
+                                className="flex items-center gap-2 px-5 py-3 text-sm text-gray-600 dark:text-gray-400 font-medium border border-gray-200 dark:border-white/10 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition-all duration-150"
+                            >
+                                <RefreshCw className="w-3.5 h-3.5" />
+                                Swap Task
+                            </button>
+                        </div>
                     </div>
 
-                    {/* Progress Bar */}
-                    <div className="mb-5 space-y-2">
-                        <div className="flex justify-between text-xs text-textSecondary dark:text-gray-400">
-                            <span>Progress</span>
-                            <span>{Math.round((completedCount / Math.max(totalCount, 1)) * 100)}%</span>
+                    {/* Right: Circular Progress Ring — hidden on mobile */}
+                    <div className="hidden lg:flex flex-col items-center gap-3 pt-2 min-w-[180px]">
+                        <div className="relative w-32 h-32">
+                            <svg className={`w-32 h-32 -rotate-90 ${pct > 0 ? 'filter drop-shadow-[0_0_12px_rgba(217,108,74,0.3)]' : ''}`} viewBox="0 0 128 128">
+                                <circle
+                                    cx="64"
+                                    cy="64"
+                                    r="52"
+                                    stroke="currentColor"
+                                    strokeWidth="6"
+                                    fill="none"
+                                    className="text-gray-100 dark:text-white/10"
+                                />
+                                <circle
+                                    cx="64"
+                                    cy="64"
+                                    r="52"
+                                    stroke="#D96C4A"
+                                    strokeWidth="6"
+                                    fill="none"
+                                    strokeLinecap="round"
+                                    strokeDasharray={`${(2 * Math.PI * 52).toFixed(2)}`}
+                                    strokeDashoffset={`${(2 * Math.PI * 52 * (1 - pct / 100)).toFixed(2)}`}
+                                    className="transition-all duration-700"
+                                />
+                            </svg>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                <span className="text-2xl font-bold text-gray-950 dark:text-white">{pct}%</span>
+                                <span className="text-xs text-gray-400 dark:text-gray-500">done</span>
+                            </div>
                         </div>
-                        <div className="h-2 bg-borderMuted dark:bg-white/10 rounded-full overflow-hidden">
-                            <div
-                                className="h-full bg-gradient-to-r from-terracotta to-orange-500 transition-all duration-500"
-                                style={{ width: `${(completedCount / Math.max(totalCount, 1)) * 100}%` }}
-                            />
-                        </div>
+                        {todayTask.estimated_time && (
+                            <p className="text-xs text-gray-400 dark:text-gray-500 text-center">{todayTask.estimated_time}</p>
+                        )}
                     </div>
-
-                    {/* Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-3">
-                        <button
-                            onClick={onStartFocus}
-                            disabled={!todayTask || loading}
-                            className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-terracotta to-orange-500 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-terracotta/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-200 text-sm"
-                        >
-                            <Play className="h-4 w-4 fill-current" />
-                            Start Focus
-                            <ArrowRight className="h-3.5 w-3.5" />
-                        </button>
-                        <button
-                            onClick={onChangeTask}
-                            className="px-6 py-2.5 border border-borderMuted dark:border-white/20 text-gray-950 dark:text-white font-semibold rounded-lg hover:bg-white/80 dark:hover:bg-white/10 transition-colors text-sm"
-                        >
-                            Change Task
-                        </button>
-                    </div>
-                </>
+                </div>
             ) : (
-                <div className="text-center py-8">
-                    <p className="text-textSecondary dark:text-gray-400 text-sm">No task scheduled for today. Create one to get started!</p>
+                <div className="text-center py-12">
+                    <p className="text-sm text-gray-400 dark:text-gray-500">No task scheduled for today.</p>
+                    <p className="text-xs text-gray-300 dark:text-gray-600 mt-1">Create one to get started.</p>
                 </div>
             )}
         </section>

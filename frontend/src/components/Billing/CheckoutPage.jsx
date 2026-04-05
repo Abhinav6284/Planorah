@@ -108,7 +108,7 @@ export default function CheckoutPage() {
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-6 mb-6"
+                    className="bg-white dark:bg-[#1a1a1a] border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] rounded-2xl p-6 mb-6"
                 >
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Order Summary</h3>
                     
@@ -150,7 +150,7 @@ export default function CheckoutPage() {
                                     value={couponCode}
                                     onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                                     placeholder="Enter coupon code"
-                                    className="flex-1 px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border border-gray-200 dark:border-charcoalMuted focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white font-mono uppercase"
+                                    className="flex-1 px-4 py-3 rounded-xl bg-gray-50 dark:bg-black border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] focus:border-gray-400 dark:focus:border-gray-600 outline-none transition-all text-gray-900 dark:text-white font-mono uppercase"
                                 />
                                 <button
                                     onClick={handleApplyCoupon}
@@ -197,7 +197,7 @@ export default function CheckoutPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-6 mb-6"
+                    className="bg-white dark:bg-[#1a1a1a] border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] rounded-2xl p-6 mb-6"
                 >
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">What You'll Get</h3>
                     <div className="space-y-3">

@@ -81,7 +81,7 @@ const CategoryBar = ({ label, score, feedback, icon, delay = 0 }) => {
                     {score}%
                 </span>
             </div>
-            <div className="h-3 bg-gray-200 dark:bg-charcoalMuted rounded-full overflow-hidden">
+            <div className="h-3 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
                 <motion.div
                     className={`h-full ${getColor(score)} rounded-full`}
                     initial={{ width: 0 }}
@@ -219,7 +219,7 @@ export default function ATSScanner() {
                         className="space-y-6"
                     >
                         {/* Upload Card */}
-                        <div className="bg-white dark:bg-charcoal rounded-2xl shadow-lg p-6">
+                        <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] transition-all duration-300 p-6">
                             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                                 📄 Upload Resume
                             </h2>
@@ -234,7 +234,7 @@ export default function ATSScanner() {
                                     ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
                                     : file
                                         ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                                        : 'border-gray-300 dark:border-charcoalMuted hover:border-green-400 hover:bg-gray-50 dark:hover:bg-charcoalMuted/50'
+                                        : 'border-gray-300 dark:border-white/10 hover:border-green-400 hover:bg-gray-50 dark:hover:bg-white/5'
                                     }`}
                             >
                                 <input
@@ -282,7 +282,7 @@ export default function ATSScanner() {
                         </div>
 
                         {/* Job Description Card */}
-                        <div className="bg-white dark:bg-charcoal rounded-2xl shadow-lg p-6">
+                        <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] transition-all duration-300 p-6">
                             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                                 💼 Job Description <span className="text-xs font-normal text-gray-400">(optional)</span>
                             </h2>
@@ -291,7 +291,7 @@ export default function ATSScanner() {
                                 onChange={(e) => setJobDescription(e.target.value)}
                                 placeholder="Paste the job description here for better keyword matching..."
                                 rows={6}
-                                className="w-full px-4 py-3 bg-gray-50 dark:bg-charcoalMuted border border-gray-200 dark:border-charcoalMuted rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 outline-none transition-all resize-none"
+                                className="w-full px-4 py-3 bg-gray-50 dark:bg-[#1a1a1a]Muted border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-terracotta focus:ring-2 focus:ring-terracotta/20 outline-none transition-all resize-none"
                             />
                             <p className="text-xs text-gray-400 mt-2">
                                 Adding a job description helps identify missing keywords and improve matching score
@@ -332,7 +332,7 @@ export default function ATSScanner() {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
-                                    className="bg-white dark:bg-charcoal rounded-2xl shadow-lg p-8 text-center h-full flex flex-col items-center justify-center min-h-[500px]"
+                                    className="bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-lg p-8 text-center h-full flex flex-col items-center justify-center min-h-[500px]"
                                 >
                                     <div className="text-6xl mb-4 opacity-30">📊</div>
                                     <h3 className="text-xl font-semibold text-gray-400 dark:text-gray-500 mb-2">
@@ -350,7 +350,7 @@ export default function ATSScanner() {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
-                                    className="bg-white dark:bg-charcoal rounded-2xl shadow-lg p-8 text-center h-full flex flex-col items-center justify-center min-h-[500px]"
+                                    className="bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-lg p-8 text-center h-full flex flex-col items-center justify-center min-h-[500px]"
                                 >
                                     <div className="relative mb-6">
                                         <div className="w-24 h-24 border-4 border-green-200 border-t-green-600 rounded-full animate-spin" />
@@ -390,7 +390,7 @@ export default function ATSScanner() {
                                     className="space-y-6"
                                 >
                                     {/* Overall Score Card */}
-                                    <div className="bg-white dark:bg-charcoal rounded-2xl shadow-lg p-6">
+                                    <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-lg p-6">
                                         <div className="flex items-start justify-between">
                                             <div>
                                                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
@@ -405,7 +405,7 @@ export default function ATSScanner() {
                                     </div>
 
                                     {/* Category Breakdown */}
-                                    <div className="bg-white dark:bg-charcoal rounded-2xl shadow-lg p-6">
+                                    <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-lg p-6">
                                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
                                             Category Breakdown
                                         </h2>
@@ -425,7 +425,7 @@ export default function ATSScanner() {
 
                                     {/* Suggestions */}
                                     {result.suggestions?.length > 0 && (
-                                        <div className="bg-white dark:bg-charcoal rounded-2xl shadow-lg p-6">
+                                        <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-lg p-6">
                                             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                                                 💡 Improvement Suggestions
                                             </h2>
@@ -450,7 +450,7 @@ export default function ATSScanner() {
 
                                     {/* Missing Keywords */}
                                     {result.missing_keywords?.length > 0 && (
-                                        <div className="bg-white dark:bg-charcoal rounded-2xl shadow-lg p-6">
+                                        <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-lg p-6">
                                             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                                                 🔍 Keywords to Add
                                             </h2>
@@ -473,7 +473,7 @@ export default function ATSScanner() {
                                     {/* Scan Again Button */}
                                     <button
                                         onClick={resetScanner}
-                                        className="w-full py-3 bg-gray-100 dark:bg-charcoalMuted hover:bg-gray-200 dark:hover:bg-charcoalMuted text-gray-700 dark:text-gray-300 rounded-xl font-medium transition-colors"
+                                        className="w-full py-3 bg-gray-100 dark:bg-[#1a1a1a]Muted hover:bg-gray-200 dark:hover:bg-charcoalMuted text-gray-700 dark:text-gray-300 rounded-xl font-medium transition-colors"
                                     >
                                         🔄 Scan Another Resume
                                     </button>
@@ -498,7 +498,7 @@ export default function ATSScanner() {
                     ].map((feature, idx) => (
                         <div
                             key={idx}
-                            className="bg-white/50 dark:bg-charcoal/50 backdrop-blur-sm rounded-xl p-4 text-center"
+                            className="bg-white/50 dark:bg-[#1a1a1a]/50 backdrop-blur-sm rounded-xl p-4 text-center"
                         >
                             <div className="text-2xl mb-2">{feature.icon}</div>
                             <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{feature.title}</h3>

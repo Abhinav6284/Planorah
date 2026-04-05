@@ -207,10 +207,60 @@ class CouponUsage(models.Model):
         on_delete=models.CASCADE,
         related_name='coupon_usage'
     )
-    
+
     used_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['coupon', 'payment'], name='unique_coupon_payment')
         ]
+
+
+class PaymentWebhookEvent(models.Model):
+    """
+    Log of all webhook events from payment gateways.
+    Used for audit trail and replay protection.
+    """
+    EVENT_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('processed', 'Processed'),
+        ('failed', 'Failed'),
+        ('duplicate', 'Duplicate'),
+    ]
+
+    # Event identification
+    gateway = models.CharField(max_length=50)  # 'razorpay', 'stripe'
+    event_id = models.CharField(max_length=255, unique=True)  # Webhook event ID from gateway
+    event_type = models.CharField(max_length=100)  # 'payment.authorized', 'charge.succeeded', etc.
+
+    # Payload
+    payload = models.JSONField()  # Full webhook payload
+    signature = models.CharField(max_length=500, blank=True)  # Webhook signature
+
+    # Processing
+    status = models.CharField(max_length=20, choices=EVENT_STATUS_CHOICES, default='pending')
+    error_message = models.TextField(blank=True)
+
+    # Related payment (if found)
+    payment = models.ForeignKey(
+        Payment,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='webhook_events'
+    )
+
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['gateway', 'event_id']),
+            models.Index(fields=['status', 'created_at']),
+            models.Index(fields=['payment']),
+        ]
+
+    def __str__(self):
+        return f"{self.gateway} {self.event_type} ({self.status})"

@@ -52,7 +52,7 @@ export default function JobFinder() {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-gray-50 dark:bg-charcoal rounded-3xl p-8 mb-12"
+                    className="bg-gray-50 dark:bg-[#1a1a1a] rounded-3xl p-8 mb-12 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] transition-all duration-300"
                 >
                     <div className="flex flex-col md:flex-row gap-4">
                         <div className="flex-1">
@@ -61,7 +61,7 @@ export default function JobFinder() {
                                 type="text"
                                 value={role}
                                 onChange={(e) => setRole(e.target.value)}
-                                className="w-full px-5 py-4 bg-white dark:bg-charcoalMuted border-0 rounded-2xl text-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-green-500 outline-none shadow-sm"
+                                className="w-full px-5 py-4 bg-white dark:bg-white/10 border-0 rounded-2xl text-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-terracotta outline-none shadow-sm"
                                 placeholder="Frontend Developer"
                             />
                         </div>
@@ -71,7 +71,7 @@ export default function JobFinder() {
                                 type="text"
                                 value={location}
                                 onChange={(e) => setLocation(e.target.value)}
-                                className="w-full px-5 py-4 bg-white dark:bg-charcoalMuted border-0 rounded-2xl text-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-green-500 outline-none shadow-sm"
+                                className="w-full px-5 py-4 bg-white dark:bg-white/10 border-0 rounded-2xl text-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-terracotta outline-none shadow-sm"
                                 placeholder="Remote"
                             />
                         </div>
@@ -94,9 +94,9 @@ export default function JobFinder() {
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.03 }}
                             onClick={(e) => !role && e.preventDefault()}
-                            className={`flex items-center justify-between p-5 rounded-2xl border transition-all duration-200 group ${role
-                                ? 'border-gray-200 dark:border-charcoalMuted hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md cursor-pointer bg-white dark:bg-charcoal'
-                                : 'border-gray-100 dark:border-charcoalMuted opacity-50 cursor-not-allowed bg-gray-50 dark:bg-charcoal/50'
+                            className={`flex items-center justify-between p-5 rounded-2xl border-0 transition-all duration-200 group ${role
+                                ? 'shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_12px_20px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_12px_28px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.1)] cursor-pointer bg-white dark:bg-[#1a1a1a]'
+                                : 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-[#1a1a1a]/50 shadow-[0_8px_16px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.05)]'
                                 }`}
                         >
                             <div className="flex items-center gap-4">
@@ -116,8 +116,8 @@ export default function JobFinder() {
 
                             {/* Arrow */}
                             <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${role
-                                ? 'bg-gray-100 dark:bg-charcoalMuted group-hover:bg-green-500 group-hover:text-white text-gray-400'
-                                : 'bg-gray-100 dark:bg-charcoalMuted text-gray-300'
+                                ? 'bg-gray-100 dark:bg-white/10 group-hover:bg-terracotta group-hover:text-white text-gray-400'
+                                : 'bg-gray-100 dark:bg-white/10 text-gray-300'
                                 }`}>
                                 →
                             </div>

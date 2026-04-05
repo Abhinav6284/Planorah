@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { BrainCircuit, Sparkles, ThumbsUp, Timer, TrendingUp } from 'lucide-react';
+import { BrainCircuit, Flame, Sparkles, CheckCircle2, Clock, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import AIVoicePanel from '../Mentoring/AIVoicePanel';
@@ -21,9 +21,14 @@ import { planoraService } from '../../api/planoraService';
 import { useMissionFlow } from '../../hooks/useMissionFlow';
 import api from '../../api/axios';
 
-const shellCardClass = 'rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1a1a] p-6 shadow-soft dark:shadow-none transition-colors duration-300 ring-1 ring-inset ring-black/5 dark:ring-white/5 hover:border-terracotta/20 dark:hover:border-terracotta/20';
+const shellCardClass = 'rounded-2xl border-0 bg-white dark:bg-[#1a1a1a] p-6 transition-all duration-300 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)]';
 
-const TODAY_LABEL = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+const getTimeBasedGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+};
 
 const buildDateKey = (dateValue) => {
     if (!dateValue) {
@@ -331,75 +336,44 @@ const ExecutionDashboard = () => {
 
             <div className={`mx-auto max-w-[1320px] px-4 py-6 transition-all duration-500 lg:px-6 lg:py-8 ${currentState === 'IN_PROGRESS' ? 'opacity-20 blur-sm pointer-events-none' : 'opacity-100'}`}>
 
-                {/* GREETING BAR */}
+                {/* HEADER */}
                 <div className="mb-8">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex items-start justify-between mb-4">
                         <div>
-                            <h1 className="text-4xl md:text-5xl font-black text-gray-950 dark:text-white leading-tight">
-                                Hello,{' '}
-                                <span className="bg-gradient-to-r from-terracotta to-orange-400 bg-clip-text text-transparent">
-                                    {profile?.user?.first_name || profile?.profile?.first_name || 'there'}
-                                </span>
+                            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">Dashboard</p>
+                            <h1 className="text-2xl font-semibold text-gray-950 dark:text-white">
+                                {getTimeBasedGreeting()}, {profile?.user?.first_name || profile?.profile?.first_name || 'there'}
                             </h1>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 font-medium">
-                                Track your progress. Keep your streak going.
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                             </p>
                         </div>
-                        <span className="self-start sm:self-auto inline-flex items-center gap-1.5 bg-gray-100 dark:bg-white/10 px-3 py-1.5 rounded-full text-xs font-semibold text-gray-600 dark:text-gray-300 transition-colors duration-300">
-                            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M6 2a1 1 0 000 2h8a1 1 0 100-2H6zM4 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" />
-                            </svg>
-                            {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </span>
                     </div>
 
-                    {/* STATS ROW */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
-                        {/* Finished */}
-                        <div className={`${shellCardClass} border-l-4 border-emerald-500`}>
-                            <div className="flex items-start justify-between">
-                                <div>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Finished</p>
-                                    <p className="text-5xl font-black text-gray-950 dark:text-white mt-2">{mergedStats.tasks_completed}</p>
-                                    <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-2">+8 tasks</p>
-                                </div>
-                                <div className="p-2.5 bg-emerald-500/15 rounded-lg">
-                                    <ThumbsUp className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                                </div>
-                            </div>
+                    {/* Inline Stats Pills */}
+                    <div className="flex flex-wrap items-center gap-3">
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 dark:border-white/10 bg-white/50 dark:bg-white/5 text-sm font-medium text-gray-600 dark:text-gray-300">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-terracotta" />
+                            <span>{mergedStats.tasks_completed} done</span>
                         </div>
-
-                        {/* Tracked */}
-                        <div className={`${shellCardClass} border-l-4 border-blue-500`}>
-                            <div className="flex items-start justify-between">
-                                <div>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Tracked</p>
-                                    <p className="text-5xl font-black text-gray-950 dark:text-white mt-2">{Math.round((mergedStats.focus_minutes || 0) / 60)}h</p>
-                                    <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-2">-6 hours</p>
-                                </div>
-                                <div className="p-2.5 bg-blue-500/15 rounded-lg">
-                                    <Timer className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                                </div>
-                            </div>
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 dark:border-white/10 bg-white/50 dark:bg-white/5 text-sm font-medium text-gray-600 dark:text-gray-300">
+                            <Clock className="w-3.5 h-3.5 text-blue-500" />
+                            <span>{Math.round((mergedStats.focus_minutes || 0) / 60)}h tracked</span>
                         </div>
-
-                        {/* Efficiency */}
-                        <div className={`${shellCardClass} border-l-4 border-amber-500`}>
-                            <div className="flex items-start justify-between">
-                                <div>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Efficiency</p>
-                                    <p className="text-5xl font-black text-gray-950 dark:text-white mt-2">{Math.min(100, Math.round(((mergedStats.tasks_completed || 0) / Math.max(activeTasks?.length || 1, 1)) * 100))}%</p>
-                                    <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold mt-2">+12%</p>
-                                </div>
-                                <div className="p-2.5 bg-amber-500/15 rounded-lg">
-                                    <TrendingUp className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                                </div>
-                            </div>
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 dark:border-white/10 bg-white/50 dark:bg-white/5 text-sm font-medium text-gray-600 dark:text-gray-300">
+                            <Zap className="w-3.5 h-3.5 text-emerald-500" />
+                            <span>{Math.min(100, Math.round(((mergedStats.tasks_completed || 0) / Math.max(activeTasks?.length || 1, 1)) * 100))}% efficiency</span>
                         </div>
+                        {streak > 0 && (
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-terracotta/30 bg-terracotta/10 text-sm font-medium text-terracotta">
+                                <Flame className="w-3.5 h-3.5" />
+                                <span>{streak}d streak</span>
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                {/* 1. MISSION CARD */}
+                {/* HERO: TODAY'S MISSION */}
                 <div className="mb-8">
                     <TodayExecution
                         user={profile}
@@ -412,29 +386,26 @@ const ExecutionDashboard = () => {
                     />
                 </div>
 
-                <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-12">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
 
                     {/* LEFT COLUMN: Main Activities */}
                     <div className="space-y-6 lg:col-span-8">
-                        {/* Mode Switcher Block */}
-                        <div className={`${shellCardClass} flex items-center justify-between gap-4`}>
+                        {/* Mode Switcher — compact */}
+                        <div className="flex items-center justify-between gap-4 px-4 py-3 rounded-lg bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
                             <div className="flex items-center gap-3">
                                 <ModeSwitch mode={mode} onChange={setMode} />
-                                <span className="text-sm text-gray-400 hidden sm:inline font-medium">
+                                <span className="text-xs text-gray-600 dark:text-gray-400 font-semibold hidden sm:inline">
                                     {mode === 'learning' ? 'Learning' : 'Exam'} Mode
                                 </span>
                             </div>
                             <button
                                 onClick={openVoicePanel}
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-terracotta/15 hover:bg-terracotta/25 border border-terracotta/30 text-terracotta font-semibold text-sm transition-all dark:bg-terracotta/10 dark:hover:bg-terracotta/20"
+                                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-terracotta hover:bg-terracottaHover text-white font-semibold text-xs sm:text-sm transition-all active:scale-95"
                             >
-                                <Sparkles className="h-4 w-4" />
+                                <Sparkles className="h-3.5 w-3.5" />
                                 <span className="hidden sm:inline">AI Coach</span>
                             </button>
                         </div>
-
-                        {/* Performance Chart */}
-                        <PerformanceChart tasks={activeTasks} chartData={chartData} />
 
                         {/* Schedule Section */}
                         <div className={shellCardClass}>
@@ -478,8 +449,8 @@ const ExecutionDashboard = () => {
                                 {selectedTasks.length === 0 ? (
                                     <p className="text-sm text-gray-600 dark:text-gray-400">No tasks scheduled for {formatDateLabel(selectedDateKey)}.</p>
                                 ) : (
-                                    <div className="space-y-3">
-                                        {selectedTasks.map((card, index) => (
+                                    <div className="space-y-2">
+                                        {selectedTasks.map((card) => (
                                             <div
                                                 key={card.key}
                                                 role="button"
@@ -491,25 +462,25 @@ const ExecutionDashboard = () => {
                                                         handleOpenTaskGuide(card);
                                                     }
                                                 }}
-                                                className="relative flex cursor-pointer items-center gap-4 p-4 bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/20 rounded-xl hover:bg-white/90 dark:hover:bg-white/10 transition-all group"
+                                                className="relative flex cursor-pointer items-center gap-3 p-3 bg-white/80 dark:bg-white/5 border-l-4 border-r border-t border-b border-gray-200 dark:border-white/20 rounded-lg hover:bg-white/90 dark:hover:bg-white/10 transition-all group"
+                                                style={{borderLeftColor: card.status === 'completed' ? '#10b981' : card.status === 'in_progress' ? '#d96c4a' : '#d1d5db'}}
                                             >
-                                                {/* Number Badge */}
-                                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-terracotta/15 border border-terracotta/30 text-sm font-bold text-terracotta">
-                                                    {index + 1}
-                                                </div>
-
                                                 {/* Info */}
                                                 <div className="min-w-0 flex-1">
                                                     <h4 className="truncate text-sm font-semibold text-gray-950 dark:text-white group-hover:text-terracotta transition-colors">
                                                         {card.title}
                                                     </h4>
-                                                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                                                        ⏱ {card.estimatedMinutes} min
+                                                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                                                        {card.estimatedMinutes} min
                                                     </p>
                                                 </div>
 
-                                                {/* Status */}
-                                                <span className="text-xs px-3 py-1.5 rounded-lg bg-white/80 dark:bg-white/10 border border-gray-200 dark:border-white/10 text-textSecondary dark:text-gray-300">
+                                                {/* Status Pill */}
+                                                <span className={`text-xs px-2.5 py-1 rounded-md font-semibold whitespace-nowrap ${
+                                                    card.status === 'completed' ? 'bg-emerald-100/50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300' :
+                                                    card.status === 'in_progress' ? 'bg-terracotta/15 text-terracotta' :
+                                                    'bg-gray-100/50 dark:bg-white/10 text-gray-600 dark:text-gray-400'
+                                                }`}>
                                                     {getTaskStatusLabel(card.status)}
                                                 </span>
                                             </div>
@@ -577,6 +548,9 @@ const ExecutionDashboard = () => {
                                 )}
                             </div>
                         )}
+
+                        {/* Performance Chart — below the fold */}
+                        <PerformanceChart tasks={activeTasks} chartData={chartData} />
                     </div>
 
                     {/* RIGHT COLUMN: Feed, Progress & AI */}

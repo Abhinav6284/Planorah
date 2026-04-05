@@ -53,7 +53,7 @@ const PlanCard = ({ plan, currentPlan, onSelect, isPopular }) => {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`relative bg-white dark:bg-[#0a0a0a] border ${isPopular ? 'border-gray-900 dark:border-white' : 'border-gray-200 dark:border-charcoalMuted'} rounded-2xl p-6 ${isPopular ? 'ring-2 ring-gray-900 dark:ring-white' : ''}`}
+            className={`relative bg-white dark:bg-[#1a1a1a] border ${isPopular ? 'border-gray-900 dark:border-white' : 'border-gray-200 dark:border-charcoalMuted'} rounded-2xl p-6 ${isPopular ? 'ring-2 ring-gray-900 dark:ring-white' : ''}`}
         >
             {isPopular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-semibold rounded-full">
@@ -96,7 +96,7 @@ const PlanCard = ({ plan, currentPlan, onSelect, isPopular }) => {
                         ? 'bg-gray-100 dark:bg-charcoal text-gray-400 cursor-not-allowed'
                         : isPopular
                             ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:opacity-90'
-                            : 'border border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoalDark'
+                            : 'border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoalDark'
                 }`}
             >
                 {isCurrentPlan ? 'Current Plan' : 'Select Plan'}
@@ -165,7 +165,7 @@ export default function PricingPage() {
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="mb-8 p-4 bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl"
+                        className="mb-8 p-4 bg-white dark:bg-[#1a1a1a] border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] rounded-2xl"
                     >
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <div>
@@ -181,7 +181,7 @@ export default function PricingPage() {
                             </div>
                             <button
                                 onClick={() => navigate('/subscription')}
-                                className="px-4 py-2 text-sm border border-gray-200 dark:border-charcoalMuted rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoalDark transition-colors"
+                                className="px-4 py-2 text-sm border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoalDark transition-colors"
                             >
                                 View Details
                             </button>
@@ -207,7 +207,7 @@ export default function PricingPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="mt-12 bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-charcoalMuted rounded-2xl p-6"
+                    className="mt-12 bg-white dark:bg-[#1a1a1a] border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] rounded-2xl p-6"
                 >
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 text-center">
                         All Plans Include

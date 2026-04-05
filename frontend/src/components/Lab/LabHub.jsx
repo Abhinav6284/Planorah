@@ -10,7 +10,7 @@ export default function LabHub() {
             title: 'CodeSpace IDE',
             description: 'A full VS Code-like IDE experience with file explorer, terminal, extensions marketplace, Git source control, and multi-language code execution.',
             icon: <VscVscode className="w-12 h-12" />,
-            color: 'bg-blue-50 text-blue-600 dark:bg-charcoal/30 dark:text-blue-400',
+            color: 'bg-blue-50 text-blue-600 dark:bg-white/10 dark:text-blue-400',
             link: '/lab/codespace',
             badge: 'VS Code'
         },
@@ -54,10 +54,10 @@ export default function LabHub() {
                         <Link key={lab.id} to={lab.link} className="group">
                             <motion.div
                                 whileHover={{ y: -5 }}
-                                className="bg-white dark:bg-charcoal p-8 rounded-3xl border border-gray-100 dark:border-charcoalMuted shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col relative overflow-hidden"
+                                className="bg-white dark:bg-[#1a1a1a] p-8 rounded-3xl border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_12px_20px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_12px_28px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.1)] transition-all duration-300 h-full flex flex-col relative overflow-hidden"
                             >
                                 {lab.badge && (
-                                    <span className="absolute top-4 right-4 px-2 py-1 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs font-bold rounded-full">
+                                    <span className="absolute top-4 right-4 px-2 py-1 bg-gradient-to-r from-terracotta to-orange-400 text-white text-xs font-bold rounded-full">
                                         {lab.badge}
                                     </span>
                                 )}

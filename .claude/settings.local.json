@@ -19,7 +19,12 @@
       "Bash(chmod +x /tmp/verify_report.sh)",
       "Bash(bash /tmp/verify_report.sh)",
       "Bash(npm install:*)",
-      "Bash(git commit -m ':*)"
+      "Bash(git commit -m ':*)",
+      "Bash(npx eslint:*)",
+      "Bash(python manage.py makemigrations scheduler github_integration)",
+      "Bash(python manage.py makemigrations scheduler github_integration --noinput)",
+      "Bash(python -c \"from scheduler.models import GoogleCredential, SpotifyCredential; from github_integration.models import GitHubCredential; print\\('✓ Models import successfully'\\)\")",
+      "Bash(python manage.py check)"
     ]
   }
 }

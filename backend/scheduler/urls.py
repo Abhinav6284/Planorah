@@ -10,11 +10,13 @@ urlpatterns = [
     path('google/auth-url/', views.google_auth_url, name='google_auth_url'),
     path('google/callback/', views.google_callback, name='google_callback'),
     path('google/sync/', views.sync_calendar, name='sync_calendar'),
-    
+    path('google/status/', views.google_status, name='google_status'),
+
     # Spotify
     path('spotify/auth-url/', views.spotify_auth_url, name='spotify_auth_url'),
     path('spotify/callback/', views.spotify_callback, name='spotify_callback'),
     path('spotify/current/', views.get_current_song, name='get_current_song'),
     path('spotify/control/', views.spotify_control, name='spotify_control'),
     path('spotify/queue/', views.get_queue, name='spotify_queue'),
+    path('spotify/status/', views.spotify_status, name='spotify_status'),
 ]
