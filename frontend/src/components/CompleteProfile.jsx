@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { getAccessToken } from "../utils/auth";
 
 export default function CompleteProfile() {
     const navigate = useNavigate();
@@ -15,7 +16,7 @@ export default function CompleteProfile() {
     const [loading, setLoading] = useState(false);
 
     const getAuthHeaders = () => {
-        const token = localStorage.getItem("access_token");
+        const token = getAccessToken();
         return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
     };
 
@@ -29,7 +30,7 @@ export default function CompleteProfile() {
         setMessage("");
 
         try {
-            if (!localStorage.getItem("access_token")) {
+            if (!getAccessToken()) {
                 setMessage("Session expired. Please login again.");
                 setTimeout(() => navigate('/login'), 2000);
                 return;

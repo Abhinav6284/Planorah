@@ -168,15 +168,19 @@ export default function AITalkPanel({
           <div className="mx-auto w-full max-w-3xl flex flex-col gap-8 flex-1">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500 via-indigo-500 to-sky-400 shadow-[0_10px_30px_rgba(139,92,246,0.3)] flex items-center justify-center text-white">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {/* AI Orb icon */}
+                <div className="w-11 h-11 rounded-2xl overflow-hidden relative shadow-[0_10px_30px_rgba(139,92,246,0.3)] flex-shrink-0">
+                  <div className="absolute inset-0 bg-[#4f46e5]" />
+                  <div className="absolute inset-0 bg-[conic-gradient(from_0deg_at_50%_50%,transparent_0deg,rgba(167,139,250,0.9)_120deg,rgba(196,181,253,0.95)_180deg,transparent_240deg)] animate-[spin_4s_linear_infinite]" />
+                  <div className="absolute inset-[1px] rounded-xl bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.5)_0%,transparent_50%)] mix-blend-overlay" />
+                  <svg className="relative z-10 m-auto mt-2.5 text-white" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                   </svg>
                 </div>
                 <div>
-                  <p className="text-[11px] uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">Planora Text</p>
+                  <p className="text-[11px] uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">AI Mentor</p>
                   <p className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white">
-                    Mentor Studio {pipelineEnabled ? 'Pipeline' : 'Legacy'}
+                    Text Chat
                   </p>
                 </div>
               </div>
