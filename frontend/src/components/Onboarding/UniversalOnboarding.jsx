@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../../api/axios";
 
-// Temporary hard stop: keep onboarding navigation-only while submit flow is rebuilt.
-const DISABLE_ONBOARDING_SUBMIT = true;
+const DISABLE_ONBOARDING_SUBMIT = false;
 
 // ─── Quicky Mascot ─────────────────────────────────────────────────────────────
 function QuickyMessage({ stepId, fd }) {
@@ -57,7 +56,7 @@ function QuickyMessage({ stepId, fd }) {
                 transition={{ type: "spring", stiffness: 200, damping: 15 }}
                 className="flex items-end gap-3 mb-8"
             >
-                <div className="w-14 h-14 shrink-0 relative flex items-center justify-center bg-blue-100 rounded-full border-2 border-blue-200 shadow-[0_4px_0_0_rgba(191,219,254,1)]">
+                <div className="w-14 h-14 shrink-0 relative flex items-center justify-center bg-terracotta/10 rounded-full border-2 border-terracotta/30 shadow-[0_4px_0_0_rgba(217,108,74,0.2)]">
                     <motion.div
                         animate={{ y: [0, -4, 0] }}
                         transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
@@ -66,8 +65,8 @@ function QuickyMessage({ stepId, fd }) {
                         🦉
                     </motion.div>
                 </div>
-                <div className="bg-white border-2 border-gray-200 rounded-2xl rounded-bl-sm px-4 py-3 shadow-[0_4px_0_0_rgba(229,231,235,1)] relative flex-1">
-                    <p className="text-[15px] font-bold text-gray-800 leading-snug">{message}</p>
+                <div className="bg-white dark:bg-charcoal border-2 border-borderMuted dark:border-white/10 rounded-2xl rounded-bl-sm px-4 py-3 shadow-[0_4px_0_0_rgba(234,230,219,1)] dark:shadow-none relative flex-1">
+                    <p className="text-[15px] font-bold text-textPrimary dark:text-white leading-snug font-outfit">{message}</p>
                 </div>
             </motion.div>
         </AnimatePresence>
@@ -82,23 +81,23 @@ function OptionCard({ emoji, iconText, label, sublabel, selected, onClick }) {
             whileTap={{ scale: 0.98, y: 2 }}
             onClick={onClick}
             className={`w-full p-4 rounded-2xl border-2 border-b-4 text-left transition-colors duration-200 focus:outline-none flex items-center gap-4 ${selected
-                ? "border-blue-500 bg-blue-50/50 text-blue-900 border-b-blue-600"
-                : "border-gray-200 bg-white text-gray-800 hover:border-blue-300 border-b-gray-300 hover:bg-gray-50"
+                ? "border-terracotta bg-terracotta/5 border-b-terracottaHover"
+                : "border-borderMuted dark:border-white/10 bg-white dark:bg-charcoal hover:border-terracotta/40 border-b-beigeMuted dark:border-b-charcoalMuted hover:bg-beigeSecondary dark:hover:bg-charcoalMuted"
                 }`}
         >
             {(emoji || iconText) && (
-                <div className={`w-12 h-12 shrink-0 rounded-xl flex items-center justify-center text-2xl bg-white shadow-sm border ${selected ? "border-blue-200" : "border-gray-100"}`}>
+                <div className={`w-12 h-12 shrink-0 rounded-xl flex items-center justify-center text-2xl bg-beigePrimary dark:bg-charcoalDark shadow-sm border ${selected ? "border-terracotta/30" : "border-borderMuted dark:border-white/10"}`}>
                     {iconText ? (
-                        <span className={`font-black text-xl ${selected ? "text-blue-600" : "text-gray-400"}`}>{iconText}</span>
+                        <span className={`font-black text-xl ${selected ? "text-terracotta" : "text-textSecondary dark:text-gray-400"}`}>{iconText}</span>
                     ) : (
                         emoji
                     )}
                 </div>
             )}
             <div>
-                <div className="font-bold text-[17px] leading-tight text-gray-900">{label}</div>
+                <div className="font-bold text-[17px] leading-tight text-textPrimary dark:text-white">{label}</div>
                 {sublabel && (
-                    <div className={`text-sm mt-1 font-medium ${selected ? "text-blue-700/80" : "text-gray-500"}`}>
+                    <div className={`text-sm mt-1 font-medium ${selected ? "text-terracotta/80" : "text-textSecondary dark:text-gray-400"}`}>
                         {sublabel}
                     </div>
                 )}
@@ -643,14 +642,14 @@ export default function UniversalOnboarding() {
         || (currentStepId === "commitment_lock" ? "Your Personalised Plan is Ready!" : "Almost there — a few last details");
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
-            {/* Duolingo Style Progress Header */}
-            <div className="px-5 py-6 flex items-center justify-between mx-auto w-full max-w-xl">
+        <div className="min-h-screen bg-beigePrimary dark:bg-charcoalDark flex flex-col font-outfit">
+            {/* Progress Header */}
+            <div className="px-5 py-5 flex items-center justify-between mx-auto w-full max-w-xl">
                 <button
                     type="button"
                     onClick={handleBack}
                     disabled={stepIndex === 0}
-                    className={`shrink-0 w-10 h-10 flex items-center justify-center rounded-full transition ${stepIndex === 0 ? "text-gray-300 cursor-not-allowed" : "text-gray-500 hover:bg-gray-200 active:scale-90"
+                    className={`shrink-0 w-10 h-10 flex items-center justify-center rounded-full transition ${stepIndex === 0 ? "text-borderMuted dark:text-charcoalMuted cursor-not-allowed" : "text-textSecondary dark:text-gray-400 hover:bg-beigeMuted dark:hover:bg-charcoalMuted active:scale-90"
                         }`}
                 >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -658,16 +657,16 @@ export default function UniversalOnboarding() {
                     </svg>
                 </button>
                 <div className="flex-1 px-4">
-                    <div className="bg-gray-200 h-3.5 w-full rounded-full overflow-hidden">
+                    <div className="bg-beigeMuted dark:bg-charcoalMuted h-3 w-full rounded-full overflow-hidden">
                         <motion.div
-                            className="bg-[#58cc02] h-full rounded-full"
+                            className="bg-terracotta h-full rounded-full"
                             animate={{ width: `${progress}%` }}
                             transition={{ type: "spring", stiffness: 60, damping: 14 }}
                         />
                     </div>
                 </div>
                 <div className="w-10 flex items-center justify-end">
-                    <span className="text-sm font-bold text-gray-400">{stepIndex + 1}/{totalSteps}</span>
+                    <span className="text-sm font-semibold text-textSecondary dark:text-gray-400">{stepIndex + 1}/{totalSteps}</span>
                 </div>
             </div>
 
@@ -684,7 +683,7 @@ export default function UniversalOnboarding() {
                         transition={{ type: "spring", stiffness: 220, damping: 20 }}
                     >
                         {/* Question Title */}
-                        <h2 className="text-[26px] font-extrabold text-gray-900 mb-6 leading-tight">
+                        <h2 className="text-[26px] font-bold text-textPrimary dark:text-white mb-6 leading-tight font-cormorant">
                             {questionText}
                         </h2>
 
@@ -694,30 +693,30 @@ export default function UniversalOnboarding() {
                 </AnimatePresence>
             </div>
 
-            {/* Bottom CTA for Manual Steps */}
+            {/* Bottom CTA */}
             {isManualStep && (
-                <div className="border-t-2 border-gray-200 bg-white p-5 sticky bottom-0 z-10 w-full">
+                <div className="border-t border-borderMuted dark:border-white/10 bg-beigePrimary/95 dark:bg-charcoalDark/95 backdrop-blur-sm p-5 sticky bottom-0 z-10 w-full">
                     <div className="max-w-xl mx-auto">
                         {isLastStep ? (
                             <button
                                 type="button"
                                 onClick={handleContinue}
                                 disabled={!canProceed() || loading}
-                                className={`w-full py-4 rounded-2xl font-bold text-[16px] uppercase tracking-wide transition-all ${canProceed() && !loading
-                                    ? "bg-[#58cc02] text-white hover:bg-[#46a302] border-b-4 border-[#46a302] active:border-b-0 active:translate-y-1"
-                                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                className={`w-full py-4 rounded-2xl font-bold text-[16px] tracking-wide transition-all ${canProceed() && !loading
+                                    ? "bg-terracotta text-white hover:bg-terracottaHover shadow-md shadow-terracotta/20 active:scale-[0.98]"
+                                    : "bg-beigeMuted dark:bg-charcoalMuted text-textSecondary dark:text-gray-500 cursor-not-allowed"
                                     }`}
                             >
-                                {loading ? "Setting up..." : "Start Journey"}
+                                {loading ? "Setting up..." : "Start Journey →"}
                             </button>
                         ) : (
                             <button
                                 type="button"
                                 onClick={handleContinue}
                                 disabled={!canProceed() || loading}
-                                className={`w-full py-4 rounded-2xl font-bold text-[16px] uppercase tracking-wide transition-all ${canProceed()
-                                    ? "bg-blue-500 text-white hover:bg-blue-600 border-b-4 border-blue-600 active:border-b-0 active:translate-y-1"
-                                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                className={`w-full py-4 rounded-2xl font-bold text-[16px] tracking-wide transition-all ${canProceed()
+                                    ? "bg-terracotta text-white hover:bg-terracottaHover shadow-md shadow-terracotta/20 active:scale-[0.98]"
+                                    : "bg-beigeMuted dark:bg-charcoalMuted text-textSecondary dark:text-gray-500 cursor-not-allowed"
                                     }`}
                             >
                                 Continue

@@ -62,7 +62,7 @@ export default function SubscriptionStatus() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center">
+            <div className="flex items-center justify-center">
                 <div className="text-gray-500 dark:text-gray-400">Loading subscription...</div>
             </div>
         );
@@ -70,7 +70,7 @@ export default function SubscriptionStatus() {
 
     if (!subscription) {
         return (
-            <div className="min-h-screen bg-gray-50 dark:bg-black transition-colors duration-300 font-sans pb-20">
+            <div className="font-sans pb-20">
                 <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-12">
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
@@ -97,7 +97,7 @@ export default function SubscriptionStatus() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-black transition-colors duration-300 font-sans pb-20">
+        <div className="font-sans pb-20">
             <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-12">
                 {/* Header */}
                 <motion.div 
