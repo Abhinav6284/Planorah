@@ -4,51 +4,21 @@ import { Link } from "react-router-dom";
 
 export default function MockInterviewComingSoon() {
     return (
-        <div className="min-h-[calc(100vh-80px)] bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 dark:from-charcoalDark dark:via-charcoal dark:to-charcoalDark flex items-center justify-center p-6 overflow-hidden relative">
+        <div className="min-h-[calc(100vh-80px)] flex items-center justify-center p-6 overflow-hidden relative">
             {/* Animated Background Elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 {/* Floating Orbs */}
                 <motion.div
-                    className="absolute w-96 h-96 rounded-full bg-gradient-to-r from-violet-500/20 to-purple-500/20 blur-3xl"
+                    className="absolute w-96 h-96 rounded-full bg-terracotta/10 blur-3xl"
                     style={{ top: '10%', left: '5%' }}
-                    animate={{
-                        x: [0, 50, 0],
-                        y: [0, 30, 0],
-                        scale: [1, 1.1, 1],
-                    }}
-                    transition={{
-                        duration: 8,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                    }}
+                    animate={{ x: [0, 50, 0], y: [0, 30, 0], scale: [1, 1.1, 1] }}
+                    transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
                 />
                 <motion.div
-                    className="absolute w-80 h-80 rounded-full bg-gradient-to-r from-blue-500/20 to-cyan-500/20 blur-3xl"
+                    className="absolute w-80 h-80 rounded-full bg-terracotta/8 blur-3xl"
                     style={{ bottom: '10%', right: '10%' }}
-                    animate={{
-                        x: [0, -40, 0],
-                        y: [0, -20, 0],
-                        scale: [1, 1.15, 1],
-                    }}
-                    transition={{
-                        duration: 10,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                    }}
-                />
-                <motion.div
-                    className="absolute w-64 h-64 rounded-full bg-gradient-to-r from-emerald-500/15 to-teal-500/15 blur-3xl"
-                    style={{ top: '50%', right: '30%' }}
-                    animate={{
-                        x: [0, 30, 0],
-                        y: [0, -40, 0],
-                        scale: [1, 1.2, 1],
-                    }}
-                    transition={{
-                        duration: 12,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                    }}
+                    animate={{ x: [0, -40, 0], y: [0, -20, 0], scale: [1, 1.15, 1] }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
                 />
 
                 {/* Grid Pattern */}
@@ -72,13 +42,13 @@ export default function MockInterviewComingSoon() {
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.2, duration: 0.5 }}
-                    className="inline-flex items-center gap-2 bg-white/80 dark:bg-charcoal/80 backdrop-blur-xl px-5 py-2.5 rounded-full shadow-lg border border-gray-200/50 dark:border-charcoalMuted/50 mb-8"
+                    className="inline-flex items-center gap-2 bg-white/80 dark:bg-charcoal/80 backdrop-blur-xl px-5 py-2.5 rounded-full shadow-sm border border-borderMuted dark:border-white/10 mb-8"
                 >
                     <span className="relative flex h-3 w-3">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-violet-500"></span>
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-terracotta opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-terracotta"></span>
                     </span>
-                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 tracking-wide uppercase">
+                    <span className="text-sm font-semibold text-textSecondary dark:text-gray-300 tracking-wide uppercase font-outfit">
                         In Development
                     </span>
                 </motion.div>
@@ -90,7 +60,7 @@ export default function MockInterviewComingSoon() {
                     transition={{ delay: 0.3, duration: 0.6, type: "spring" }}
                     className="mb-8"
                 >
-                    <div className="inline-flex items-center justify-center w-28 h-28 rounded-3xl bg-gradient-to-br from-violet-500 via-purple-500 to-indigo-600 shadow-2xl shadow-purple-500/30">
+                    <div className="inline-flex items-center justify-center w-28 h-28 rounded-3xl bg-terracotta shadow-xl shadow-terracotta/25">
                         <svg className="w-14 h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                         </svg>
@@ -102,7 +72,7 @@ export default function MockInterviewComingSoon() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4, duration: 0.6 }}
-                    className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-gray-900 dark:text-white mb-6 tracking-tight"
+                    className="text-5xl md:text-6xl lg:text-7xl font-cormorant font-bold text-textPrimary dark:text-white mb-6 tracking-tight"
                 >
                     Mock Interview
                 </motion.h1>
@@ -112,10 +82,10 @@ export default function MockInterviewComingSoon() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5, duration: 0.6 }}
-                    className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 mb-8 leading-relaxed font-light"
+                    className="text-xl md:text-2xl text-textSecondary dark:text-gray-400 mb-8 leading-relaxed font-light font-outfit"
                 >
                     Practice makes perfect. Our AI-powered interview simulator is{" "}
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-purple-600 dark:from-violet-400 dark:to-purple-400 font-medium">
+                    <span className="text-terracotta font-semibold">
                         coming soon
                     </span>
                     .
@@ -139,7 +109,7 @@ export default function MockInterviewComingSoon() {
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.7 + index * 0.1, duration: 0.4 }}
-                            className="flex items-center gap-2 bg-white/60 dark:bg-charcoal/60 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200/50 dark:border-charcoalMuted/50 text-sm text-gray-700 dark:text-gray-300"
+                            className="flex items-center gap-2 bg-white/70 dark:bg-charcoal/70 backdrop-blur-sm px-4 py-2 rounded-full border border-borderMuted dark:border-white/10 text-sm text-textPrimary dark:text-gray-300 font-outfit"
                         >
                             <span>{feature.icon}</span>
                             <span>{feature.text}</span>
@@ -152,9 +122,9 @@ export default function MockInterviewComingSoon() {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8, duration: 0.6 }}
-                    className="bg-white/70 dark:bg-charcoal/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-gray-200/50 dark:border-charcoalMuted/50 mb-10"
+                    className="bg-white/60 dark:bg-charcoal/60 backdrop-blur-xl rounded-2xl p-8 shadow-soft border border-borderMuted dark:border-white/10 mb-10"
                 >
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-lg">
+                    <p className="text-textSecondary dark:text-gray-400 leading-relaxed text-lg font-outfit">
                         Get ready to ace your next interview! Our intelligent mock interview system will simulate real interview scenarios,
                         provide instant feedback on your responses, and help you build confidence for the big day.
                     </p>
@@ -169,18 +139,17 @@ export default function MockInterviewComingSoon() {
                 >
                     <Link
                         to="/dashboard"
-                        className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-gray-900 to-gray-800 dark:from-white dark:to-charcoalMuted text-white dark:text-gray-900 rounded-2xl font-semibold shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] overflow-hidden"
+                        className="group inline-flex items-center gap-3 px-8 py-4 bg-terracotta hover:bg-terracottaHover text-white rounded-xl font-semibold shadow-md shadow-terracotta/20 transition-all duration-200 hover:scale-[1.02] font-outfit"
                     >
-                        <span className="relative z-10">Back to Dashboard</span>
-                        <svg className="w-5 h-5 relative z-10 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <span>Back to Dashboard</span>
+                        <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>
-                        <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </Link>
 
                     <button
                         onClick={() => window.open('mailto:support@planorah.me?subject=Notify%20me%20about%20Mock%20Interview', '_blank')}
-                        className="inline-flex items-center gap-2 px-8 py-4 bg-white/80 dark:bg-charcoal/80 backdrop-blur-sm text-gray-700 dark:text-gray-300 rounded-2xl font-semibold border border-gray-200 dark:border-charcoalMuted hover:bg-white dark:hover:bg-charcoalMuted transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+                        className="inline-flex items-center gap-2 px-8 py-4 bg-white/80 dark:bg-charcoal/80 text-textPrimary dark:text-gray-300 rounded-xl font-semibold border border-borderMuted dark:border-white/10 hover:bg-white dark:hover:bg-charcoalMuted transition-all duration-200 hover:scale-[1.02] font-outfit"
                     >
                         <span>🔔</span>
                         <span>Notify Me</span>
@@ -194,16 +163,16 @@ export default function MockInterviewComingSoon() {
                     transition={{ delay: 1.1, duration: 0.6 }}
                     className="mt-16"
                 >
-                    <p className="text-sm text-gray-500 dark:text-gray-500 mb-3 font-medium">Development Progress</p>
-                    <div className="w-64 mx-auto h-2 bg-gray-200 dark:bg-charcoalMuted rounded-full overflow-hidden">
+                    <p className="text-sm text-textSecondary dark:text-gray-500 mb-3 font-medium font-outfit">Development Progress</p>
+                    <div className="w-64 mx-auto h-2 bg-beigeMuted dark:bg-charcoalMuted rounded-full overflow-hidden">
                         <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: "65%" }}
                             transition={{ delay: 1.3, duration: 1.5, ease: "easeOut" }}
-                            className="h-full bg-gradient-to-r from-violet-500 to-purple-500 rounded-full"
+                            className="h-full bg-terracotta rounded-full"
                         />
                     </div>
-                    <p className="text-xs text-gray-400 dark:text-gray-600 mt-2">65% Complete</p>
+                    <p className="text-xs text-textSecondary dark:text-gray-500 mt-2 font-outfit">65% Complete</p>
                 </motion.div>
             </motion.div>
         </div>

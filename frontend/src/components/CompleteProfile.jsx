@@ -14,7 +14,6 @@ export default function CompleteProfile() {
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
 
-    // Helper to retrieve token (assuming user is logged in after OTP)
     const getAuthHeaders = () => {
         const token = localStorage.getItem("access_token");
         return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
@@ -43,7 +42,6 @@ export default function CompleteProfile() {
             );
 
             setMessage("success:Profile updated successfully!");
-            // Proceed to the original intended destination (Onboarding or Dashboard)
             setTimeout(() => navigate("/onboarding"), 1500);
 
         } catch (err) {
@@ -55,125 +53,130 @@ export default function CompleteProfile() {
         }
     };
 
+    const inputClass = "w-full px-5 py-3.5 rounded-xl bg-white dark:bg-charcoalMuted border border-borderMuted dark:border-white/10 text-textPrimary dark:text-white placeholder-textSecondary dark:placeholder-gray-500 text-[15px] font-outfit focus:outline-none focus:border-terracotta dark:focus:border-terracotta focus:ring-2 focus:ring-terracotta/10 transition-all";
+    const labelClass = "block text-[13px] font-semibold text-textSecondary dark:text-gray-400 uppercase tracking-wider mb-2 font-outfit";
+
     return (
-        <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-yellow-100 flex flex-col justify-center items-center p-6">
+        <div className="min-h-screen bg-beigePrimary dark:bg-charcoalDark font-outfit flex flex-col">
 
-            {/* Header / Nav simulation */}
-            <div className="absolute top-8 left-8">
-                <span className="text-2xl font-bold tracking-tight">Planorah.</span>
-            </div>
+            {/* Header */}
+            <header className="fixed top-0 left-0 w-full px-8 py-5 z-50 bg-beigePrimary/80 dark:bg-charcoalDark/80 backdrop-blur-md border-b border-borderMuted dark:border-white/5">
+                <span className="text-xl font-bold font-cormorant tracking-tight text-textPrimary dark:text-white">
+                    Planorah<span className="text-terracotta">.</span>
+                </span>
+            </header>
 
-            <main className="w-full max-w-2xl">
-                <div className="text-center mb-12 relative">
-                    <span className="inline-block py-1 px-3 rounded-full bg-green-50 text-xs font-medium text-green-700 mb-6 border border-green-100">
-                        One last step
-                    </span>
-                    <h1 className="text-5xl md:text-6xl font-serif leading-tight relative z-10">
-                        Complete Your <br />
-                        <span className="relative inline-block">
-                            Profile
-                            <motion.svg
-                                initial={{ pathLength: 0 }}
-                                animate={{ pathLength: 1 }}
-                                transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
-                                className="absolute -bottom-2 left-0 w-full h-4 text-yellow-300 -z-10"
-                                viewBox="0 0 100 10"
-                                preserveAspectRatio="none"
-                            >
-                                <path d="M0 5 Q 50 10 100 5" fill="none" stroke="currentColor" strokeWidth="8" />
-                            </motion.svg>
-                        </span>
-                    </h1>
-                    <p className="mt-6 text-lg text-gray-500 max-w-lg mx-auto">
-                        Help us personalize your experience by providing a few more details.
-                    </p>
-                </div>
-
+            {/* Main */}
+            <main className="flex-1 flex flex-col items-center justify-center pt-28 pb-16 px-6">
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 24 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="w-full bg-white p-8 md:p-12"
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    className="w-full max-w-lg"
                 >
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Badge */}
+                    <div className="flex justify-center mb-6">
+                        <span className="px-3 py-1 rounded-full bg-terracotta/10 text-terracotta text-xs font-semibold uppercase tracking-widest border border-terracotta/20">
+                            One last step
+                        </span>
+                    </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="col-span-1 md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-2 ml-1">Full Name</label>
+                    {/* Title */}
+                    <div className="text-center mb-10">
+                        <h1 className="text-4xl md:text-5xl font-cormorant font-bold text-textPrimary dark:text-white leading-tight mb-3">
+                            Complete Your Profile
+                        </h1>
+                        <p className="text-textSecondary dark:text-gray-400 text-base font-outfit">
+                            Help us personalise your experience with a few more details.
+                        </p>
+                    </div>
+
+                    {/* Form card */}
+                    <div className="bg-beigeSecondary dark:bg-charcoal border border-borderMuted dark:border-white/5 rounded-2xl p-8 shadow-soft dark:shadow-darkDepth">
+                        <form onSubmit={handleSubmit} className="space-y-5">
+
+                            <div>
+                                <label className={labelClass}>Full Name</label>
                                 <input
                                     type="text"
                                     name="name"
                                     value={formData.name}
                                     onChange={handleChange}
                                     placeholder="e.g. John Doe"
-                                    className="w-full px-6 py-4 rounded-full bg-gray-50 border-2 border-transparent focus:bg-white focus:border-black outline-none transition-all placeholder-gray-400 text-lg"
+                                    className={inputClass}
                                     required
                                 />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className={labelClass}>Date of Birth</label>
+                                    <input
+                                        type="date"
+                                        name="date_of_birth"
+                                        value={formData.date_of_birth}
+                                        onChange={handleChange}
+                                        className={inputClass}
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className={labelClass}>Phone Number</label>
+                                    <input
+                                        type="tel"
+                                        name="phone_number"
+                                        value={formData.phone_number}
+                                        onChange={handleChange}
+                                        placeholder="+91 98765 43210"
+                                        className={inputClass}
+                                        required
+                                    />
+                                </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2 ml-1">Date of Birth</label>
-                                <input
-                                    type="date"
-                                    name="date_of_birth"
-                                    value={formData.date_of_birth}
-                                    onChange={handleChange}
-                                    className="w-full px-6 py-4 rounded-full bg-gray-50 border-2 border-transparent focus:bg-white focus:border-black outline-none transition-all text-gray-700 text-lg"
-                                    required
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2 ml-1">Phone Number</label>
-                                <input
-                                    type="tel"
-                                    name="phone_number"
-                                    value={formData.phone_number}
-                                    onChange={handleChange}
-                                    placeholder="+1 (555) 000-0000"
-                                    className="w-full px-6 py-4 rounded-full bg-gray-50 border-2 border-transparent focus:bg-white focus:border-black outline-none transition-all placeholder-gray-400 text-lg"
-                                    required
-                                />
-                            </div>
-
-                            <div className="col-span-1 md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-2 ml-1">Gender</label>
+                                <label className={labelClass}>Gender</label>
                                 <select
                                     name="gender"
                                     value={formData.gender}
                                     onChange={handleChange}
-                                    className="w-full px-6 py-4 rounded-full bg-gray-50 border-2 border-transparent focus:bg-white focus:border-black outline-none transition-all text-lg text-gray-700"
+                                    className={inputClass}
                                     required
                                 >
                                     <option value="">Select gender</option>
                                     <option value="male">Male</option>
                                     <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                    <option value="prefer_not_to_say">Prefer not to say</option>
                                 </select>
                             </div>
-                        </div>
 
-                        {message && (
-                            <div className={`text-center p-4 rounded-2xl ${message.startsWith("success:") ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
-                                {message.replace("success:", "")}
-                            </div>
-                        )}
-
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full py-5 bg-black text-white rounded-full font-bold text-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group disabled:opacity-70 mt-4 shadow-lg shadow-black/10"
-                        >
-                            <span>{loading ? "Saving Profile..." : "Complete Setup"}</span>
-                            {!loading && (
-                                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                </svg>
+                            {message && (
+                                <div className={`text-center px-4 py-3 rounded-xl text-sm font-medium ${
+                                    message.startsWith("success:")
+                                        ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-800/30"
+                                        : "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-800/30"
+                                }`}>
+                                    {message.replace("success:", "")}
+                                </div>
                             )}
-                        </button>
-                    </form>
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full mt-2 py-4 bg-terracotta hover:bg-terracottaHover disabled:opacity-60 text-white rounded-xl font-semibold text-base tracking-wide transition-all duration-200 flex items-center justify-center gap-2 group shadow-md shadow-terracotta/20"
+                            >
+                                <span>{loading ? "Saving..." : "Complete Setup"}</span>
+                                {!loading && (
+                                    <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
+                                )}
+                            </button>
+                        </form>
+                    </div>
                 </motion.div>
             </main>
         </div>
     );
 }
-
