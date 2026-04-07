@@ -1133,7 +1133,7 @@ def delete_account(request):
         }, status=status.HTTP_200_OK)
 
     except Exception as e:
-        logger.error(f"Error deleting account: {e}")
+        logger.error(f"Error deleting account: {e}", exc_info=True)
         return Response({
             "error": "Account deletion failed",
             "details": str(e)
