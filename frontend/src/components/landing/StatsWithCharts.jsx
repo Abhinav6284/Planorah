@@ -47,7 +47,7 @@ export default function StatsWithCharts() {
           {/* Weekly Performance */}
           <div className="bg-white dark:bg-charcoalDark border border-beigeMuted dark:border-white/[0.08] rounded-3xl p-8">
             <h3 className="text-xl font-outfit font-semibold text-gray-950 dark:text-white mb-6">Weekly Performance</h3>
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={250} minWidth={0} minHeight={0}>
               <BarChart data={weeklyData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis dataKey="day" stroke="#9ca3af" />
@@ -79,7 +79,7 @@ export default function StatsWithCharts() {
           {/* Task Distribution */}
           <div className="bg-white dark:bg-charcoalDark border border-beigeMuted dark:border-white/[0.08] rounded-3xl p-8">
             <h3 className="text-xl font-outfit font-semibold text-gray-950 dark:text-white mb-6">Task Distribution</h3>
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={250} minWidth={0} minHeight={0}>
               <PieChart>
                 <Pie
                   data={productivityData}
@@ -120,7 +120,7 @@ export default function StatsWithCharts() {
           {/* XP Growth */}
           <div className="bg-white dark:bg-charcoalDark border border-beigeMuted dark:border-white/[0.08] rounded-3xl p-8 md:col-span-2">
             <h3 className="text-xl font-outfit font-semibold text-gray-950 dark:text-white mb-6">Your XP Growth</h3>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={300} minWidth={0} minHeight={0}>
               <LineChart data={skillData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis dataKey="month" stroke="#9ca3af" />
