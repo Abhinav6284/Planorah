@@ -3,7 +3,7 @@ from unittest.mock import patch
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-from users.models import CustomUser, OTPVerification
+from users.models import CustomUser, DeletedUser, OTPVerification
 
 
 class AuthLifecycleFlowTests(TestCase):
@@ -173,3 +173,60 @@ class AuthLifecycleFlowTests(TestCase):
             response.data.get('message'),
             'Please verify your email before resetting password.',
         )
+
+
+class DeleteAccountTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+    def _create_active_user(self, email, username, password):
+        user = CustomUser.objects.create(
+            email=email,
+            username=username,
+            status=CustomUser.STATUS_ACTIVE,
+            is_active=True,
+            is_verified=True,
+        )
+        user.set_password(password)
+        user.save(update_fields=['password', 'updated_at'])
+        return user
+
+    @patch('users.views.send_account_deleted_email', return_value=True)
+    def test_delete_account_with_password_success(self, _mock_send_deleted_email):
+        user = self._create_active_user(
+            email='delete-me@example.com',
+            username='delete_me',
+            password='DeletePass@123',
+        )
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post(
+            '/api/users/delete-account/',
+            {'password': 'DeletePass@123'},
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data.get('message'), 'Account deleted successfully')
+        self.assertFalse(CustomUser.objects.filter(email='delete-me@example.com').exists())
+        self.assertTrue(DeletedUser.objects.filter(email='delete-me@example.com').exists())
+
+    @patch('users.views.send_account_deleted_email', return_value=True)
+    @patch('users.signals.DeletedUser.objects.get_or_create', side_effect=Exception('tracking failure'))
+    def test_delete_account_succeeds_even_when_deleted_user_tracking_fails(self, _mock_track_deleted, _mock_send_deleted_email):
+        user = self._create_active_user(
+            email='delete-failure@example.com',
+            username='delete_failure',
+            password='DeletePass@123',
+        )
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post(
+            '/api/users/delete-account/',
+            {'password': 'DeletePass@123'},
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data.get('message'), 'Account deleted successfully')
+        self.assertFalse(CustomUser.objects.filter(email='delete-failure@example.com').exists())

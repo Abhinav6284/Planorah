@@ -108,7 +108,7 @@ const SidebarContent = ({ onNavClick = () => {}, user = null }) => {
       {/* Logo */}
       <div className="px-5 py-6 border-b border-gray-200 dark:border-white/10 bg-white dark:bg-charcoalDark">
         <Link to="/dashboard" className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white font-serif hover:text-terracotta transition-colors">
-          Planora<span className="text-terracotta">.</span>
+          Planorah<span className="text-terracotta">.</span>
         </Link>
       </div>
 

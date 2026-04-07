@@ -90,7 +90,7 @@ const Layout = () => {
                         <Menu className="h-5 w-5" />
                     </button>
                     <Link to="/dashboard" className="text-lg font-serif font-bold text-textPrimary dark:text-white">
-                        Planora<span className="text-terracotta">.</span>
+                        Planorah<span className="text-terracotta">.</span>
                     </Link>
                     <Link to="/profile" className="w-9 h-9 rounded-full overflow-hidden border border-borderMuted hover:border-terracotta transition-colors">
                         <img src={userAvatar} alt={userName} className="w-full h-full object-cover" />
