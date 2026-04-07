@@ -193,16 +193,8 @@ export default function StepForm() {
         } catch (error) {
             console.error("Error updating profile:", error);
 
-            // Handle Auth Errors
-            if (error.response?.status === 401 || error.response?.data?.code === "token_not_valid") {
-                alert("Your session has expired. Please login again.");
-                localStorage.removeItem("access_token");
-                localStorage.removeItem("refresh_token");
-                sessionStorage.removeItem("access_token");
-                sessionStorage.removeItem("refresh_token");
-                navigate("/login");
-                return;
-            }
+            // 401 is handled by the axios interceptor (token refresh + retry);
+            // if it propagates here the interceptor already redirected to /login.
 
             if (error.response) {
                 console.error("Response data:", error.response.data);

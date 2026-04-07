@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <footer className="bg-[#F5F1E8] dark:bg-charcoalDark border-t border-gray-300 dark:border-charcoalMuted py-16 px-6">
       <div className="max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-4 gap-12 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-12">
           <div>
             <Link to="/" className="flex items-center gap-2.5 mb-4 group">
               <div className="w-8 h-8 rounded-full bg-white overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-300">

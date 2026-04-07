@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, useLocation, Link } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import AITalkPanel from './Mentoring/AITalkPanel';
@@ -70,8 +70,8 @@ const Layout = () => {
             .catch(() => setUser(null));
     }, []);
 
-    const userAvatar = user ? getUserAvatar(user?.user?.profile_picture || user?.profile?.profile_picture || '') : '';
-    const userName = user?.user?.first_name || user?.profile?.first_name || 'User';
+    const userAvatar = user ? getUserAvatar(user) : '';
+    const userName = user?.first_name || user?.profile?.first_name || 'User';
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-beigePrimary via-beigeSecondary to-beigeMuted dark:bg-charcoalDark transition-colors duration-200 font-sans flex">

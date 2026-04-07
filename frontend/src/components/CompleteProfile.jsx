@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { getAccessToken } from "../utils/auth";
 
 export default function CompleteProfile() {
     const navigate = useNavigate();
@@ -14,11 +15,6 @@ export default function CompleteProfile() {
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const getAuthHeaders = () => {
-        const token = localStorage.getItem("access_token");
-        return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-    };
-
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -29,7 +25,7 @@ export default function CompleteProfile() {
         setMessage("");
 
         try {
-            if (!localStorage.getItem("access_token")) {
+            if (!getAccessToken()) {
                 setMessage("Session expired. Please login again.");
                 setTimeout(() => navigate('/login'), 2000);
                 return;
@@ -37,8 +33,7 @@ export default function CompleteProfile() {
 
             await axios.patch(
                 `/users/update-profile/`,
-                formData,
-                getAuthHeaders()
+                formData
             );
 
             setMessage("success:Profile updated successfully!");

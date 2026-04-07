@@ -96,7 +96,7 @@ def generate_resume(request):
             return Response({"error": "API Key missing"}, status=500)
 
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-2.0-flash')
+        model = genai.GenerativeModel('gemini-2.5-flash')
 
         response = model.generate_content(prompt)
         content = response.text.replace("```html", "").replace("```", "")
@@ -239,7 +239,7 @@ def import_resume(request):
 
     # Use Gemini to parse the resume text into structured data
     genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-    model = genai.GenerativeModel("gemini-2.0-flash")
+    model = genai.GenerativeModel("gemini-2.5-flash")
 
     parse_prompt = f"""
     Parse the following resume text and extract structured data.
@@ -416,7 +416,7 @@ def analyze_ats(request):
 
                 # Use Gemini Vision to extract text from image
                 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-                vision_model = genai.GenerativeModel("gemini-2.0-flash")
+                vision_model = genai.GenerativeModel("gemini-2.5-flash")
 
                 ocr_prompt = """
                 Extract ALL text from this resume image. 
@@ -445,7 +445,7 @@ def analyze_ats(request):
 
     # Use Gemini for ATS analysis
     genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-    model = genai.GenerativeModel("gemini-2.0-flash")
+    model = genai.GenerativeModel("gemini-2.5-flash")
 
     ats_prompt = f"""
     You are an ATS (Applicant Tracking System) expert. Analyze this resume and provide:

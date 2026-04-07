@@ -57,7 +57,7 @@ export default function PricingSection() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Pricing</p>
-          <h2 className="text-5xl lg:text-6xl font-playfair font-bold text-gray-950 dark:text-white mb-6 leading-tight">
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-playfair font-bold text-gray-950 dark:text-white mb-6 leading-tight">
             Simple, transparent pricing
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
@@ -71,7 +71,7 @@ export default function PricingSection() {
             <div
               key={idx}
               className={`relative rounded-2xl transition-all duration-300 ${plan.highlighted
-                  ? "md:scale-105 bg-gray-950 dark:bg-white text-white dark:text-gray-950"
+                  ? "md:scale-[1.04] bg-gray-950 dark:bg-white text-white dark:text-gray-950"
                   : "bg-white dark:bg-charcoalDark border border-beigeMuted dark:border-white/[0.08] hover:border-terracotta/30 dark:hover:border-white/[0.12]"
                 }`}
             >

@@ -126,14 +126,20 @@ export default function ProfilePage() {
                 role: profile.target_role || "Student",
                 bio: profile.bio || "Passionate about learning and building the future. 🚀",
                 email: profileData.email,
-                avatar: profile.avatar,
+                // Use the top-level `avatar` from UserSerializer which is a fully resolved absolute URL.
+                // profile.avatar is just the raw ImageField path (no /media/ prefix) and breaks resolveAvatarUrl.
+                avatar: profileData.avatar || profile.avatar,
                 gender: profile.gender || '',
                 field: profile.field_of_study || 'Technology',
                 level: profile.experience_level || 'Intermediate',
             };
             setUser(userData);
 
-            if (profile.avatar) {
+            // profileData.avatar is the full absolute URL built by the serializer (preferred).
+            // Fall back to resolving the raw relative path from the nested profile object.
+            if (profileData.avatar) {
+                setPreview(profileData.avatar);
+            } else if (profile.avatar) {
                 setPreview(resolveAvatarUrl(profile.avatar));
             }
 

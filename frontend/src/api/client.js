@@ -109,14 +109,17 @@ const refreshAccessToken = async () => {
     )
       .then((response) => {
         const nextAccessToken = response.data?.access;
+        const nextRefreshToken = response.data?.refresh;
         if (!nextAccessToken) {
           throw new Error('Token refresh response did not include an access token');
         }
 
         if (localStorage.getItem('access_token')) {
           localStorage.setItem('access_token', nextAccessToken);
+          if (nextRefreshToken) localStorage.setItem('refresh_token', nextRefreshToken);
         } else {
           sessionStorage.setItem('access_token', nextAccessToken);
+          if (nextRefreshToken) sessionStorage.setItem('refresh_token', nextRefreshToken);
         }
 
         return nextAccessToken;

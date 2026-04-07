@@ -15,7 +15,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-[#F5F1E8] dark:bg-charcoalDark text-gray-950 dark:text-white font-outfit transition-colors duration-500">
       <div className="relative z-10">
         <Navbar />
-        <main className="pt-28 sm:pt-32 lg:pt-36">
+        <main className="pt-24 sm:pt-32 lg:pt-36">
           <HeroSection />
           <FeaturesCarousel />
           <DashboardShowcase />
