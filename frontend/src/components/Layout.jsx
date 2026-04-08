@@ -4,7 +4,7 @@ import Sidebar from './Sidebar';
 import AITalkPanel from './Mentoring/AITalkPanel';
 import AIVoicePanel from './Mentoring/AIVoicePanel';
 import WelcomeCoach from './Onboarding/WelcomeCoach';
-import { FaBrain, FaMicrophone } from 'react-icons/fa';
+import { FaMicrophone } from 'react-icons/fa';
 import { Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { userService } from '../api/userService';
@@ -130,28 +130,39 @@ const Layout = () => {
                                 onClick={() => { setChatOpen(true); setFabExpanded(false); }}
                                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium shadow-lg shadow-indigo-500/25 transition-colors"
                             >
-                                <FaBrain className="text-xs" />
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                </svg>
                                 AI Chat
                             </motion.button>
                         </>
                     )}
                 </AnimatePresence>
 
-                {/* Main FAB */}
+                {/* Main FAB — AI Orb */}
                 <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setFabExpanded(!fabExpanded)}
-                    className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-200
-                        ${fabExpanded
-                            ? 'bg-gray-700 hover:bg-gray-800 rotate-45'
-                            : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/30'
-                        } text-white`}
+                    className="w-14 h-14 rounded-full flex items-center justify-center shadow-2xl shadow-indigo-500/30 overflow-hidden relative transition-all duration-200"
                 >
                     {fabExpanded ? (
-                        <span className="text-xl font-light">+</span>
+                        <div className="absolute inset-0 bg-gray-700 hover:bg-gray-800 flex items-center justify-center">
+                            <span className="text-xl font-light text-white">✕</span>
+                        </div>
                     ) : (
-                        <FaBrain className="text-lg" />
+                        <>
+                            {/* Orb base */}
+                            <div className="absolute inset-0 bg-[#005be4]" />
+                            {/* Spinning conic highlight */}
+                            <div className="absolute inset-0 bg-[conic-gradient(from_0deg_at_50%_50%,transparent_0deg,rgba(0,242,254,0.85)_120deg,rgba(79,172,254,0.95)_180deg,transparent_240deg)] animate-[spin_3s_linear_infinite]" />
+                            {/* 3D sphere inner glow */}
+                            <div className="absolute inset-[2px] rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.6)_0%,transparent_50%,rgba(0,0,0,0.15)_100%)] mix-blend-overlay" />
+                            {/* Chat icon */}
+                            <svg className="relative z-10 text-white drop-shadow-sm" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                            </svg>
+                        </>
                     )}
                 </motion.button>
             </div>
