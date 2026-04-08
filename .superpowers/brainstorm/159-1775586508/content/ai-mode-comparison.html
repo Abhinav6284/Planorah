@@ -1,0 +1,85 @@
+<h2>Current AI Mode vs Proposed Design</h2>
+<p class="subtitle">Visual comparison of how the AI assistant will work</p>
+
+<div class="split" style="gap: 20px;">
+  <!-- Current State -->
+  <div class="mockup">
+    <div class="mockup-header">Current: Full-Screen Modal (Heavy, Blocking)</div>
+    <div class="mockup-body" style="min-height: 400px; display: flex; flex-direction: column;">
+      <!-- Backdrop blur (simulated) -->
+      <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(139, 92, 246, 0.05); filter: blur(3px); border-radius: 8px;"></div>
+
+      <div style="flex: 1; display: flex; flex-direction: column; padding: 24px; background: white; border-radius: 8px; position: relative; z-index: 1; box-shadow: 0 20px 60px rgba(0,0,0,0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid #eee; padding-bottom: 16px;">
+          <div>
+            <div style="font-size: 11px; color: #888; font-weight: 600; letter-spacing: 0.1em;">Planorah Text</div>
+            <div style="font-size: 20px; font-weight: 600; color: #333; margin-top: 4px;">Mentor Studio</div>
+          </div>
+          <button style="width: 44px; height: 44px; border: 1px solid #ddd; border-radius: 50%; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <h3 style="font-size: 28px; color: #333; margin: 0 0 8px 0;">Write it out, get clarity.</h3>
+          <p style="color: #666; margin: 0;">Share your goals, blockers, or questions...</p>
+        </div>
+
+        <textarea style="width: 100%; min-height: 100px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 12px; font-family: inherit;" placeholder="What are you working on?"></textarea>
+
+        <button style="width: 100%; padding: 12px; background: #333; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Talk to Mentor</button>
+      </div>
+    </div>
+    <div style="margin-top: 16px; padding: 12px; background: #fef2f2; border: 1px solid #fed7d7; border-radius: 6px; font-size: 12px; color: #c53030;">⚠️ Takes over entire screen • Heavy animations • Blocks workflow</div>
+  </div>
+
+  <!-- Proposed State -->
+  <div class="mockup">
+    <div class="mockup-header">Proposed: Minimized Floating Panel (Smart, Non-Blocking)</div>
+    <div class="mockup-body" style="min-height: 400px; background: #f5f5f5; padding: 24px; position: relative;">
+      <!-- Dashboard content behind -->
+      <div style="background: white; padding: 16px; border-radius: 6px; margin-bottom: 16px; border: 1px solid #eee;">
+        <div style="height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 4px;"></div>
+        <div style="margin-top: 12px; height: 40px; background: #eee; border-radius: 4px;"></div>
+        <div style="margin-top: 8px; height: 40px; background: #eee; border-radius: 4px;"></div>
+      </div>
+
+      <!-- Floating AI Panel -->
+      <div style="position: absolute; bottom: 24px; right: 24px; width: 320px; background: white; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.15); overflow: hidden; border: 1px solid #e5e7eb;">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-size: 13px; font-weight: 600;">💬 AI Assistant</div>
+          <button style="background: none; border: none; color: white; cursor: pointer; font-size: 18px;">_</button>
+        </div>
+
+        <!-- Messages -->
+        <div style="height: 120px; padding: 12px 16px; overflow-y: auto; background: #fafafa; border-bottom: 1px solid #eee; font-size: 13px;">
+          <div style="background: #e0e7ff; padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; max-width: 90%;">What are you working on?</div>
+          <div style="background: white; padding: 8px 12px; border-radius: 6px; max-width: 90%; border: 1px solid #ddd;">Let me help with that...</div>
+        </div>
+
+        <!-- Input -->
+        <div style="padding: 12px 16px; border-top: 1px solid #eee; display: flex; gap: 8px;">
+          <input style="flex: 1; border: 1px solid #ddd; border-radius: 4px; padding: 8px 12px; font-size: 12px;" placeholder="Ask anything...">
+          <button style="padding: 8px 12px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">→</button>
+        </div>
+
+        <!-- Bottom actions -->
+        <div style="padding: 8px 16px; border-top: 1px solid #eee; display: flex; gap: 8px; font-size: 11px;">
+          <button style="flex: 1; padding: 6px; background: #f3f4f6; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">🎤 Voice</button>
+          <button style="flex: 1; padding: 6px; background: #f3f4f6; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">→ Expand</button>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: 16px; padding: 12px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; font-size: 12px; color: #166534;">✓ Floats over work • Lightweight • Can minimize • Supports voice & text</div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 32px; padding: 20px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #667eea;">
+  <h3 style="margin-top: 0;">Key Improvements</h3>
+  <ul style="margin: 12px 0; padding-left: 20px;">
+    <li><strong>Non-blocking:</strong> Chat sits in corner, you keep working on your dashboard/tasks</li>
+    <li><strong>Lightweight:</strong> Smaller component, minimal animations, fast load</li>
+    <li><strong>Flexible:</strong> Minimize, expand, or switch between text/voice without full reload</li>
+    <li><strong>Smart:</strong> Voice and text modes in one unified panel</li>
+    <li><strong>Responsive:</strong> Scales from mobile (bottom panel) to desktop (floating widget)</li>
+  </ul>
+</div>
