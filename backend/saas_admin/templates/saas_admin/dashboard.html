@@ -1,0 +1,268 @@
+{% extends "saas_admin/base.html" %}
+{% block content %}
+
+<!-- ── METRIC CARDS ─────────────────────────────────────────────────── -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+  <!-- Total Users -->
+  <div class="metric-card">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Users</span>
+      <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center">
+        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/>
+        </svg>
+      </div>
+    </div>
+    <p class="text-3xl font-bold text-slate-900">{{ metrics.total_users|default:0 }}</p>
+    <p class="text-xs text-slate-500 mt-1">
+      <span class="text-emerald-600 font-medium">+{{ metrics.new_users_month }}</span> this month
+    </p>
+  </div>
+
+  <!-- Active Users -->
+  <div class="metric-card">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active (7d)</span>
+      <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
+        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+      </div>
+    </div>
+    <p class="text-3xl font-bold text-slate-900">{{ metrics.active_users|default:0 }}</p>
+    <p class="text-xs text-slate-500 mt-1">Users with activity streak</p>
+  </div>
+
+  <!-- Active Subscriptions -->
+  <div class="metric-card">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Subscriptions</span>
+      <div class="w-8 h-8 bg-violet-50 rounded-lg flex items-center justify-center">
+        <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+        </svg>
+      </div>
+    </div>
+    <p class="text-3xl font-bold text-slate-900">{{ metrics.active_subscriptions|default:0 }}</p>
+    <p class="text-xs text-slate-500 mt-1">Currently active</p>
+  </div>
+
+  <!-- MRR -->
+  <div class="metric-card border-l-4 border-l-brand-500">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">MRR</span>
+      <div class="w-8 h-8 bg-brand-50 rounded-lg flex items-center justify-center">
+        <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+        </svg>
+      </div>
+    </div>
+    <p class="text-3xl font-bold text-slate-900">₹{{ metrics.mrr|floatformat:0 }}</p>
+    <p class="text-xs text-slate-500 mt-1">Monthly Recurring Revenue</p>
+  </div>
+
+  <!-- Total Roadmaps -->
+  <div class="metric-card">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Roadmaps</span>
+      <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+        <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+        </svg>
+      </div>
+    </div>
+    <p class="text-3xl font-bold text-slate-900">{{ metrics.total_roadmaps|default:0 }}</p>
+    <p class="text-xs text-slate-500 mt-1">Total created</p>
+  </div>
+
+  <!-- Tasks Completed -->
+  <div class="metric-card">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Tasks Done</span>
+      <div class="w-8 h-8 bg-teal-50 rounded-lg flex items-center justify-center">
+        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+    </div>
+    <p class="text-3xl font-bold text-slate-900">{{ metrics.tasks_completed|default:0 }}</p>
+    <p class="text-xs text-slate-500 mt-1">Execution tasks completed</p>
+  </div>
+
+  <!-- Total Revenue -->
+  <div class="metric-card col-span-2">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Revenue</span>
+      <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
+        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+      </div>
+    </div>
+    <p class="text-3xl font-bold text-slate-900">₹{{ metrics.total_revenue|floatformat:0 }}</p>
+    <p class="text-xs text-slate-500 mt-1">All-time completed payments</p>
+  </div>
+</div>
+
+<!-- ── CHARTS ──────────────────────────────────────────────────────── -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
+  <!-- User Signups Chart -->
+  <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h3 class="text-sm font-semibold text-slate-900">User Signups</h3>
+        <p class="text-xs text-slate-500">Last 30 days</p>
+      </div>
+    </div>
+    <div class="h-48">
+      <canvas id="signupChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Revenue Chart -->
+  <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h3 class="text-sm font-semibold text-slate-900">Monthly Revenue</h3>
+        <p class="text-xs text-slate-500">Last 12 months (₹)</p>
+      </div>
+    </div>
+    <div class="h-48">
+      <canvas id="revenueChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ── RECENT TABLES ──────────────────────────────────────────────── -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+  <!-- Recent Users -->
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-slate-900">Recent Signups</h3>
+      <a href="{% url 'saas_admin:users_list' %}" class="text-xs text-brand-600 hover:text-brand-700 font-medium">View all →</a>
+    </div>
+    <table class="w-full data-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Plan</th>
+          <th>Joined</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in recent_users %}
+        <tr>
+          <td>
+            <a href="{% url 'saas_admin:user_detail' user.id %}" class="font-medium text-slate-900 hover:text-brand-600">
+              {{ user.first_name|default:user.username }}
+            </a>
+            <p class="text-xs text-slate-400">{{ user.email }}</p>
+          </td>
+          <td>
+            {% if user.current_plan == 'Free' %}
+              <span class="badge badge-gray">Free</span>
+            {% else %}
+              <span class="badge badge-blue">{{ user.current_plan }}</span>
+            {% endif %}
+          </td>
+          <td class="text-slate-500">{{ user.created_at|date:"M d" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" class="text-center text-slate-400 py-6">No users yet</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Recent Payments -->
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-slate-900">Recent Payments</h3>
+      <a href="{% url 'saas_admin:revenue' %}" class="text-xs text-brand-600 hover:text-brand-700 font-medium">View all →</a>
+    </div>
+    <table class="w-full data-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Plan</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for payment in recent_payments %}
+        <tr>
+          <td>
+            <p class="font-medium text-slate-900">{{ payment.user.first_name|default:payment.user.username }}</p>
+            <p class="text-xs text-slate-400">{{ payment.created_at|date:"M d, H:i" }}</p>
+          </td>
+          <td><span class="badge badge-blue">{{ payment.plan.display_name }}</span></td>
+          <td class="font-semibold text-emerald-600">₹{{ payment.amount|floatformat:0 }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" class="text-center text-slate-400 py-6">No payments yet</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const signupData = {{ signup_chart|safe }};
+  const revenueData = {{ revenue_chart|safe }};
+
+  const chartDefaults = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#94a3b8' } },
+      y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 }, color: '#94a3b8' } }
+    }
+  };
+
+  new Chart(document.getElementById('signupChart'), {
+    type: 'line',
+    data: {
+      labels: signupData.labels,
+      datasets: [{
+        data: signupData.values,
+        borderColor: '#6366f1',
+        backgroundColor: 'rgba(99,102,241,0.08)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+      }]
+    },
+    options: chartDefaults
+  });
+
+  new Chart(document.getElementById('revenueChart'), {
+    type: 'bar',
+    data: {
+      labels: revenueData.labels,
+      datasets: [{
+        data: revenueData.values,
+        backgroundColor: '#6366f1',
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: { ...chartDefaults, scales: { ...chartDefaults.scales, x: { ...chartDefaults.scales.x, ticks: { ...chartDefaults.scales.x.ticks, maxRotation: 45 } } } }
+  });
+</script>
+{% endblock %}
