@@ -1,0 +1,164 @@
+{% extends "saas_admin/base.html" %}
+{% block content %}
+
+<!-- Status Summary Cards -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  {% for status_key, label, color in "active,Active,green|grace,Grace Period,yellow|expired,Expired,gray|cancelled,Cancelled,red"|split:"|" %}
+  {% endfor %}
+
+  <a href="?status=active" class="metric-card border-l-4 {% if status_filter == 'active' %}border-l-emerald-500{% else %}border-l-transparent hover:border-l-emerald-300{% endif %} transition-all">
+    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Active</p>
+    <p class="text-3xl font-bold text-slate-900">{{ counts.active }}</p>
+    <span class="badge badge-green mt-2">Live</span>
+  </a>
+
+  <a href="?status=grace" class="metric-card border-l-4 {% if status_filter == 'grace' %}border-l-amber-500{% else %}border-l-transparent hover:border-l-amber-300{% endif %} transition-all">
+    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Grace Period</p>
+    <p class="text-3xl font-bold text-slate-900">{{ counts.grace }}</p>
+    <span class="badge badge-yellow mt-2">Expiring</span>
+  </a>
+
+  <a href="?status=expired" class="metric-card border-l-4 {% if status_filter == 'expired' %}border-l-slate-500{% else %}border-l-transparent hover:border-l-slate-300{% endif %} transition-all">
+    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Expired</p>
+    <p class="text-3xl font-bold text-slate-900">{{ counts.expired }}</p>
+    <span class="badge badge-gray mt-2">Lapsed</span>
+  </a>
+
+  <a href="?status=cancelled" class="metric-card border-l-4 {% if status_filter == 'cancelled' %}border-l-red-500{% else %}border-l-transparent hover:border-l-red-300{% endif %} transition-all">
+    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Cancelled</p>
+    <p class="text-3xl font-bold text-slate-900">{{ counts.cancelled }}</p>
+    <span class="badge badge-red mt-2">Churned</span>
+  </a>
+</div>
+
+<!-- Filters -->
+<div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm mb-6">
+  <form method="get" class="flex flex-wrap gap-3 items-end">
+    <div class="flex-1 min-w-48">
+      <label class="block text-xs font-medium text-slate-600 mb-1">Search User</label>
+      <input type="text" name="q" value="{{ search }}" placeholder="Email or username…"
+             class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500" />
+    </div>
+    <div>
+      <label class="block text-xs font-medium text-slate-600 mb-1">Status</label>
+      <select name="status" class="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500">
+        <option value="">All</option>
+        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+        <option value="grace" {% if status_filter == 'grace' %}selected{% endif %}>Grace Period</option>
+        <option value="expired" {% if status_filter == 'expired' %}selected{% endif %}>Expired</option>
+        <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-xs font-medium text-slate-600 mb-1">Plan</label>
+      <select name="plan" class="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500">
+        <option value="">All Plans</option>
+        {% for plan in plans %}
+        <option value="{{ plan.name }}" {% if plan_filter == plan.name %}selected{% endif %}>{{ plan.display_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn-primary">Filter</button>
+    {% if search or status_filter or plan_filter %}
+    <a href="{% url 'saas_admin:subscriptions_list' %}" class="btn-ghost">Clear</a>
+    {% endif %}
+  </form>
+</div>
+
+<!-- Table -->
+<div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+  <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+    <h3 class="text-sm font-semibold text-slate-900">
+      Subscriptions
+      <span class="ml-2 badge badge-gray">{{ total_count }}</span>
+    </h3>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full data-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>User</th>
+          <th>Plan</th>
+          <th>Status</th>
+          <th>Start</th>
+          <th>Expires</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sub in page_obj %}
+        <tr x-data="{ showExtend: false }">
+          <td class="text-slate-400 font-mono text-xs">{{ sub.id }}</td>
+          <td>
+            <a href="{% url 'saas_admin:user_detail' sub.user.id %}"
+               class="font-medium text-slate-900 hover:text-brand-600 transition-colors">
+              {{ sub.user.first_name|default:sub.user.username }}
+            </a>
+            <p class="text-xs text-slate-400">{{ sub.user.email }}</p>
+          </td>
+          <td><span class="badge badge-blue">{{ sub.plan.display_name }}</span></td>
+          <td>
+            {% if sub.status == 'active' %}<span class="badge badge-green">Active</span>
+            {% elif sub.status == 'grace' %}<span class="badge badge-yellow">Grace</span>
+            {% elif sub.status == 'expired' %}<span class="badge badge-gray">Expired</span>
+            {% else %}<span class="badge badge-red">Cancelled</span>{% endif %}
+          </td>
+          <td class="text-xs text-slate-500">{{ sub.start_date|date:"M d, Y" }}</td>
+          <td class="text-xs text-slate-500">{{ sub.end_date|date:"M d, Y" }}</td>
+          <td>
+            <div class="flex items-center gap-3">
+              {% if sub.status in 'active,grace' %}
+              <form method="post" action="{% url 'saas_admin:subscription_action' sub.id %}"
+                    onsubmit="return confirm('Cancel this subscription?')">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="cancel" />
+                <button type="submit" class="text-xs text-red-600 hover:text-red-800 font-medium">Cancel</button>
+              </form>
+              {% endif %}
+              <button @click="showExtend = !showExtend" class="text-xs text-brand-600 hover:text-brand-800 font-medium">Extend</button>
+
+              <!-- Inline Extend Form -->
+              <div x-show="showExtend" x-cloak>
+                <form method="post" action="{% url 'saas_admin:subscription_action' sub.id %}"
+                      class="flex items-center gap-1">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="extend" />
+                  <input type="number" name="days" value="30" min="1" max="365"
+                         class="w-16 px-2 py-1 text-xs border border-slate-200 rounded-md text-center" />
+                  <span class="text-xs text-slate-400">days</span>
+                  <button type="submit" class="text-xs text-emerald-600 hover:text-emerald-800 font-medium">✓</button>
+                  <button type="button" @click="showExtend = false" class="text-xs text-slate-400">✕</button>
+                </form>
+              </div>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="text-center text-slate-400 py-12">No subscriptions found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if page_obj.has_other_pages %}
+  <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
+    <p class="text-xs text-slate-500">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
+    <div class="flex gap-2">
+      {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}&plan={{ plan_filter }}&q={{ search }}"
+         class="btn-ghost text-xs py-1.5 px-3">← Prev</a>
+      {% endif %}
+      {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}&plan={{ plan_filter }}&q={{ search }}"
+         class="btn-ghost text-xs py-1.5 px-3">Next →</a>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

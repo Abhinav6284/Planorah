@@ -24,7 +24,8 @@
       "Bash(python manage.py makemigrations scheduler github_integration)",
       "Bash(python manage.py makemigrations scheduler github_integration --noinput)",
       "Bash(python -c \"from scheduler.models import GoogleCredential, SpotifyCredential; from github_integration.models import GitHubCredential; print\\('✓ Models import successfully'\\)\")",
-      "Bash(python manage.py check)"
+      "Bash(python manage.py check)",
+      "Bash(grep -E \"\\\\.\\(jsx?|ts\\)$\")"
     ]
   }
 }

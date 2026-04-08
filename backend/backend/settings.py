@@ -101,6 +101,7 @@ INSTALLED_APPS = [
     'codespace',  # Real terminal / IDE backend
     'ai_calls',   # AI outbound call system (onboarding guide)
     'ai_mentoring',  # Reusable AI Mentoring Engine
+    'saas_admin',    # SaaS Admin Panel
 ]
 
 # WSGI Application (using WSGI for development instead of ASGI due to Python 3.13 compatibility)
@@ -144,12 +145,13 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',  # Must be before CommonMiddleware
-    # 'whitenoise.middleware.WhiteNoiseMiddleware',  # Only needed for production
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Serves static files (admin CSS/JS)
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'saas_admin.middleware.StaffOnlyMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -169,6 +171,8 @@ CORS_ALLOWED_ORIGINS = [
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
     "https://api.planorah.me",
     "https://planorah.me",
     "https://www.planorah.me",
