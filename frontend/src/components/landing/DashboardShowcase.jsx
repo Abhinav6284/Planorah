@@ -7,7 +7,7 @@ export default function DashboardShowcase() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Platform</p>
-          <h2 className="text-5xl lg:text-6xl font-playfair font-bold text-gray-950 dark:text-white mb-6 leading-tight">
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-playfair font-bold text-gray-950 dark:text-white mb-6 leading-tight">
             Your complete productivity dashboard
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">

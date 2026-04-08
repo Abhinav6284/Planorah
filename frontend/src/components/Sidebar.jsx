@@ -101,7 +101,7 @@ const SidebarContent = ({ onNavClick = () => {}, user = null }) => {
     return 'Beginner';
   };
 
-  const userAvatar = getUserAvatar(user?.user?.profile_picture || user?.profile?.profile_picture || '');
+  const userAvatar = getUserAvatar(user);
 
   return (
     <>

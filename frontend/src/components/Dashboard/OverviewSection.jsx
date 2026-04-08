@@ -149,6 +149,8 @@ export default function OverviewSection() {
                     first_name: profileData?.first_name,
                     last_name: profileData?.last_name,
                     username: profileData?.username,
+                    avatar: profileData?.avatar,                                              // top-level full URL from UserSerializer
+                    profile: profileData?.profile,                                           // nested profile (includes .avatar relative path)
                     gender: profileData?.profile?.gender || statsData?.profile?.gender || '',
                     field_of_study: profileData?.profile?.field_of_study || profileData?.field_of_study || '',
                     xp: profileData?.xp_points || 0 // Map backend xp_points to xp prop

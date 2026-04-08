@@ -96,8 +96,8 @@ class VapiProvider(AICallProvider):
                 "assistant": {
                     "firstMessage": first_message,
                     "model": {
-                        "provider": "openai",
-                        "model": "gpt-4o-mini",
+                        "provider": "google",
+                        "model": "gemini-2.5-flash",
                         "systemPrompt": system_prompt,
                     },
                     "voice": {

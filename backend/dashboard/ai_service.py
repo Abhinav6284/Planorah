@@ -6,12 +6,8 @@ import requests
 from django.conf import settings
 
 
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY') or getattr(
-    settings, 'OPENAI_API_KEY', None)
-OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY') or getattr(
-    settings, 'GEMINI_API_KEY', None)
-GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-2.5-flash')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY') or getattr(settings, 'GEMINI_API_KEY', None)
+GEMINI_MODEL = os.getenv('GEMINI_LLM_MODEL', 'gemini-2.5-flash')
 
 
 def _safe_json_from_text(text: str) -> Dict:
@@ -36,36 +32,6 @@ def _normalize_coach_payload(payload: Dict) -> Dict:
         'estimated_time': str(payload.get('estimated_time') or '25 min').strip() or '25 min',
         'alternatives': [str(item).strip() for item in payload.get('alternatives', []) if str(item).strip()][:4],
     }
-
-
-def _openai_structured_call(system_prompt: str, user_payload: Dict) -> Dict:
-    if not OPENAI_API_KEY:
-        raise ValueError('OPENAI_API_KEY missing')
-
-    response = requests.post(
-        'https://api.openai.com/v1/chat/completions',
-        headers={
-            'Authorization': f'Bearer {OPENAI_API_KEY}',
-            'Content-Type': 'application/json',
-        },
-        json={
-            'model': OPENAI_MODEL,
-            'temperature': 0.4,
-            'response_format': {'type': 'json_object'},
-            'messages': [
-                {'role': 'system', 'content': system_prompt},
-                {'role': 'user', 'content': json.dumps(user_payload)},
-            ],
-        },
-        timeout=30,
-    )
-    response.raise_for_status()
-    content = response.json().get('choices', [{}])[0].get(
-        'message', {}).get('content', '{}')
-    parsed = _safe_json_from_text(content)
-    if not parsed:
-        raise ValueError('OpenAI empty or invalid JSON')
-    return parsed
 
 
 def _gemini_structured_call(system_prompt: str, user_payload: Dict) -> Dict:
@@ -118,21 +84,18 @@ def generate_coach_recommendation(payload: Dict) -> Dict:
     )
 
     try:
-        data = _openai_structured_call(system_prompt, payload)
+        data = _gemini_structured_call(system_prompt, payload)
     except Exception:
-        try:
-            data = _gemini_structured_call(system_prompt, payload)
-        except Exception:
-            data = {
-                'task': 'Start one 25-minute deep work sprint on your most important pending task',
-                'reason': 'A short start reduces friction and builds daily consistency.',
-                'difficulty': 'medium',
-                'estimated_time': '25 min',
-                'alternatives': [
-                    'Revise one weak topic for 30 minutes',
-                    'Solve 10 focused practice questions',
-                ],
-            }
+        data = {
+            'task': 'Start one 25-minute deep work sprint on your most important pending task',
+            'reason': 'A short start reduces friction and builds daily consistency.',
+            'difficulty': 'medium',
+            'estimated_time': '25 min',
+            'alternatives': [
+                'Revise one weak topic for 30 minutes',
+                'Solve 10 focused practice questions',
+            ],
+        }
 
     return _normalize_coach_payload(data)
 
@@ -147,26 +110,20 @@ def generate_exam_plan(payload: Dict) -> Dict:
     )
 
     try:
-        data = _openai_structured_call(system_prompt, payload)
+        data = _gemini_structured_call(system_prompt, payload)
     except Exception:
-        try:
-            data = _gemini_structured_call(system_prompt, payload)
-        except Exception:
-            data = {
-                'topics': [
-                    {'topic': 'Core Concepts',
-                        'priority': 'high', 'status': 'pending'},
-                    {'topic': 'Problem Solving',
-                        'priority': 'high', 'status': 'pending'},
-                    {'topic': 'Revision & Mock Tests',
-                        'priority': 'medium', 'status': 'pending'},
-                ],
-                'revision_schedule': [
-                    {'day': 'Day 1', 'focus': 'Core Concepts', 'duration': '90 min'},
-                    {'day': 'Day 2', 'focus': 'Problem Solving', 'duration': '90 min'},
-                    {'day': 'Day 3', 'focus': 'Mixed Revision', 'duration': '60 min'},
-                ],
-            }
+        data = {
+            'topics': [
+                {'topic': 'Core Concepts', 'priority': 'high', 'status': 'pending'},
+                {'topic': 'Problem Solving', 'priority': 'high', 'status': 'pending'},
+                {'topic': 'Revision & Mock Tests', 'priority': 'medium', 'status': 'pending'},
+            ],
+            'revision_schedule': [
+                {'day': 'Day 1', 'focus': 'Core Concepts', 'duration': '90 min'},
+                {'day': 'Day 2', 'focus': 'Problem Solving', 'duration': '90 min'},
+                {'day': 'Day 3', 'focus': 'Mixed Revision', 'duration': '60 min'},
+            ],
+        }
 
     topics: List[Dict] = []
     for item in data.get('topics', []):
@@ -188,16 +145,13 @@ def generate_exam_plan(payload: Dict) -> Dict:
         focus = str(item.get('focus') or '').strip()
         duration = str(item.get('duration') or '60 min').strip() or '60 min'
         if day and focus:
-            revision_schedule.append(
-                {'day': day, 'focus': focus, 'duration': duration})
+            revision_schedule.append({'day': day, 'focus': focus, 'duration': duration})
 
     if not topics:
-        topics = [{'topic': 'Core Topics',
-                   'priority': 'high', 'status': 'pending'}]
+        topics = [{'topic': 'Core Topics', 'priority': 'high', 'status': 'pending'}]
 
     if not revision_schedule:
-        revision_schedule = [
-            {'day': 'Day 1', 'focus': topics[0]['topic'], 'duration': '60 min'}]
+        revision_schedule = [{'day': 'Day 1', 'focus': topics[0]['topic'], 'duration': '60 min'}]
 
     return {
         'topics': topics,

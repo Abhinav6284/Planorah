@@ -114,7 +114,7 @@ const ProfileCard = ({ user, streak, variant = 'default', summaryItems = [], cur
                             )}
                         </h3>
                         <p className={`text-sm font-medium ${isExecution ? 'text-cyan-100/70' : 'text-gray-500 dark:text-gray-400'}`}>
-                            {user?.role || "Planora Learner"}
+                            {user?.role || "Planorah Learner"}
                         </p>
                     </div>
                 </div>

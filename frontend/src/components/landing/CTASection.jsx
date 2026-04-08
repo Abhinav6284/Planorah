@@ -20,7 +20,7 @@ export default function CTASection() {
           transition={{ duration: 0.6 }}
           className="space-y-8"
         >
-          <h2 className="text-5xl lg:text-7xl font-playfair font-bold text-gray-950 dark:text-white leading-tight tracking-tight">
+          <h2 className="text-3xl sm:text-5xl lg:text-7xl font-playfair font-bold text-gray-950 dark:text-white leading-tight tracking-tight">
             Ready to transform your future?
           </h2>
 
