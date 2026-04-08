@@ -10,6 +10,8 @@ from dashboard import views as dashboard_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('saas-admin/', include('saas_admin.urls')),
+    path('api/admin/', include('saas_admin.api_urls')),
     path('api/', include('api.urls')),
     path('api/users/', include('users.urls')),
     path('api/resume/', include('resume.urls')),

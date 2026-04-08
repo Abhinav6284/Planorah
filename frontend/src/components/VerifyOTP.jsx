@@ -113,9 +113,10 @@ export default function VerifyOTP() {
             setTimeout(() => navigate("/onboarding"), 1500);
           }
         } else {
-          // Email registration OTP verification
-          setMessage({ text: "Verified! Setting up profile...", type: "success" });
-          setTimeout(() => navigate("/complete-profile"), 1500);
+          // Email registration OTP verification — go directly to Quicky onboarding
+          // (Quicky bot collects name/DOB/phone in its 'personal' step)
+          setMessage({ text: "Verified! Let's get you set up...", type: "success" });
+          setTimeout(() => navigate("/onboarding"), 1500);
         }
       }
     } catch (error) {

@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { Play, RefreshCw } from 'lucide-react';
+import { Play, RefreshCw, Plus } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const TodayExecution = React.memo(({
     user,
@@ -20,10 +21,52 @@ const TodayExecution = React.memo(({
 
     const pct = Math.round((completedCount / Math.max(totalCount, 1)) * 100);
 
+    // No tasks at all — new user empty state
+    const isNewUser = !loading && (!tasks || tasks.length === 0);
+
     return (
         <section className="bg-gradient-to-br from-white to-gray-50/80 dark:from-[#1a1a1a] dark:to-[#151515] rounded-2xl border-0 p-6 transition-all duration-300 shadow-[0_10px_24px_rgba(0,0,0,0.06)] dark:shadow-[0_10px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_0_0_1px_rgba(217,108,74,0.2)]">
+            {/* New user empty state */}
+            {isNewUser ? (
+                <div className="flex flex-col lg:flex-row lg:items-center gap-8 py-2">
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-3">
+                            <span className="w-1.5 h-1.5 bg-terracotta rounded-full" />
+                            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Getting Started</p>
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-950 dark:text-white leading-tight mb-2">
+                            Create your first task
+                        </h2>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-6">
+                            Add a task or generate a learning roadmap to get your personalized plan.
+                        </p>
+                        <div className="flex items-center gap-3">
+                            <Link
+                                to="/tasks"
+                                className="flex items-center gap-2 px-6 py-3 bg-terracotta text-white text-sm font-semibold rounded-xl hover:bg-terracottaHover hover:shadow-lg hover:shadow-terracotta/25 hover:scale-[1.02] active:scale-[0.98] transition-all duration-150"
+                            >
+                                <Plus className="w-4 h-4" />
+                                Add a Task
+                            </Link>
+                            <Link
+                                to="/roadmap/generate"
+                                className="flex items-center gap-2 px-5 py-3 text-sm text-gray-600 dark:text-gray-400 font-medium border border-gray-200 dark:border-white/10 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition-all duration-150"
+                            >
+                                Generate Roadmap
+                            </Link>
+                        </div>
+                    </div>
+                    <div className="hidden lg:flex flex-col items-center gap-3 pt-2 min-w-[180px]">
+                        <div className="w-32 h-32 rounded-full border-4 border-dashed border-gray-200 dark:border-white/10 flex items-center justify-center">
+                            <Plus className="w-10 h-10 text-gray-300 dark:text-gray-600" />
+                        </div>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 text-center">No tasks yet</p>
+                    </div>
+                </div>
+            ) : null}
+
             {/* Mission Card */}
-            {todayTask ? (
+            {!isNewUser && todayTask ? (
                 <div className="flex flex-col lg:flex-row lg:items-start gap-8">
                     {/* Left: Task Content */}
                     <div className="flex-1">
@@ -110,10 +153,13 @@ const TodayExecution = React.memo(({
                         )}
                     </div>
                 </div>
-            ) : (
+            ) : null}
+
+            {/* Fallback: has tasks but no today task yet */}
+            {!isNewUser && !todayTask && (
                 <div className="text-center py-12">
                     <p className="text-sm text-gray-400 dark:text-gray-500">No task scheduled for today.</p>
-                    <p className="text-xs text-gray-300 dark:text-gray-600 mt-1">Create one to get started.</p>
+                    <Link to="/tasks" className="text-xs text-terracotta hover:underline mt-1 inline-block">+ Add a task</Link>
                 </div>
             )}
         </section>
