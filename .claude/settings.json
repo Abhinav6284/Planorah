@@ -15,7 +15,8 @@
       "Bash(pkill -f \"npm test\")",
       "Bash(wait)",
       "Bash(CI=true npm test -- CompactWidget.test.jsx --testPathPattern=\"CompactWidget\")",
-      "Bash(tee /tmp/test_output.txt)"
+      "Bash(tee /tmp/test_output.txt)",
+      "Bash(python -m py_compile backend/urls.py)"
     ],
     "additionalDirectories": [
       "\\tmp"
