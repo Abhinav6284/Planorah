@@ -178,7 +178,7 @@ export default function AITalkPanel({
                   </svg>
                 </div>
                 <div>
-                  <p className="text-[11px] uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">AI Mentor</p>
+                  <p className="text-[11px] uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">Planorah Text</p>
                   <p className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white">
                     Text Chat
                   </p>

@@ -33,7 +33,7 @@ def start_interview(request):
         api_key = os.environ.get("GEMINI_API_KEY")
         if api_key:
             genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-2.0-flash')
+            model = genai.GenerativeModel('gemini-2.5-flash')
             prompt = f"Generate an opening interview question for a {job_role} candidate. Keep it professional and concise."
             response = model.generate_content(prompt)
             initial_question = response.text.strip()
@@ -70,7 +70,7 @@ def send_message(request, session_id):
         api_key = os.environ.get("GEMINI_API_KEY")
         if api_key:
             genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-2.0-flash')
+            model = genai.GenerativeModel('gemini-2.5-flash')
             
             # Context building (simple: last few messages)
             history = session.messages.order_by('-created_at')[:5]

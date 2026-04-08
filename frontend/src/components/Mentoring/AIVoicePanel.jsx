@@ -230,7 +230,7 @@ export default function AIVoicePanel({
                                         </svg>
                                     </div>
                                     <div>
-                                        <p className="text-[11px] uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">Planora Voice</p>
+                                        <p className="text-[11px] uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">Planorah Voice</p>
                                         <p className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white">Mentor Studio</p>
                                     </div>
                                 </div>

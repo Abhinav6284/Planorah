@@ -385,6 +385,11 @@ def login_user(request):
     from .activity import record_activity
     record_activity(user, "login")
 
+    # Check onboarding status
+    onboarding_complete = False
+    if hasattr(user, 'profile'):
+        onboarding_complete = user.profile.onboarding_complete  # type: ignore
+
     return Response(
         {
             "refresh": refresh_token,
@@ -395,8 +400,7 @@ def login_user(request):
                 "username": user.username,
                 "email": user.email,
             },
-            # type: ignore
-            "onboarding_complete": getattr(user.profile if hasattr(user, 'profile') else None, 'onboarding_complete', False)
+            "onboarding_complete": onboarding_complete
         },
         status=status.HTTP_200_OK,
     )

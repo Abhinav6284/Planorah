@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Zap, TrendingUp, CheckCircle2 } from "lucide-react";
@@ -11,9 +11,24 @@ import {
   MeshTransmissionMaterial,
 } from "@react-three/drei";
 
+// ── Mobile detection ──────────────────────────────────────────────────────────
+// Disable WebGL on screens narrower than 1024 px (phones + tablets).
+// Checked once on mount, then kept in sync on resize.
+function useIsSmallScreen() {
+  const [isSmall, setIsSmall] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth < 1024 : false
+  );
+  useEffect(() => {
+    const update = () => setIsSmall(window.innerWidth < 1024);
+    window.addEventListener("resize", update, { passive: true });
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  return isSmall;
+}
+
+// ── 3-D scene (desktop only) ──────────────────────────────────────────────────
 function PlanoraSphere() {
   const groupRef = useRef();
-
   useFrame((state) => {
     if (groupRef.current) {
       groupRef.current.rotation.y = state.clock.elapsedTime * 0.18;
@@ -59,24 +74,83 @@ function PlanoraSphere() {
   );
 }
 
-export default function HeroSection() {
+// ── CSS-only orb fallback (mobile / tablet) ───────────────────────────────────
+// Mimics the terracotta torus + icosahedron without any GPU/WebGL usage.
+function MobileOrbFallback() {
   return (
-    <section className="relative py-10 px-6 bg-[#F5F1E8] dark:bg-charcoalDark overflow-hidden">
+    <div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none">
+      {/* Ambient glow */}
+      <div className="absolute w-80 h-80 rounded-full bg-terracotta/10 blur-3xl" />
+
+      {/* Outer dashed torus ring */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 16, repeat: Infinity, ease: "linear" }}
+        className="absolute w-64 h-64 rounded-full"
+        style={{ border: "2.5px dashed rgba(217,108,74,0.30)" }}
+      />
+
+      {/* Mid ring */}
+      <motion.div
+        animate={{ rotate: -360 }}
+        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+        className="absolute w-44 h-44 rounded-full"
+        style={{ border: "1.5px solid rgba(217,108,74,0.50)" }}
+      />
+
+      {/* Inner ring */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+        className="absolute w-28 h-28 rounded-full"
+        style={{ border: "1px solid rgba(217,108,74,0.40)" }}
+      />
+
+      {/* Core glowing sphere */}
+      <motion.div
+        animate={{ scale: [1, 1.07, 1], opacity: [0.88, 1, 0.88] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        className="w-20 h-20 rounded-full"
+        style={{
+          background:
+            "radial-gradient(circle at 35% 35%, #E8956A, #D96C4A, #B85030)",
+          boxShadow:
+            "0 0 55px rgba(217,108,74,0.55), 0 0 110px rgba(217,108,74,0.18)",
+        }}
+      />
+
+      {/* Charcoal diamond accent (icosahedron stand-in) */}
+      <motion.div
+        animate={{ rotate: [0, 360] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+        className="absolute w-8 h-8 bg-[#1A1A1A]/80"
+        style={{ clipPath: "polygon(50% 0%,100% 50%,50% 100%,0% 50%)" }}
+      />
+    </div>
+  );
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
+export default function HeroSection() {
+  const isMobile = useIsSmallScreen();
+
+  return (
+    <section className="relative py-10 px-4 sm:px-6 bg-[#F5F1E8] dark:bg-charcoalDark overflow-hidden">
       {/* Ambient blobs */}
       <div className="absolute top-0 right-0 w-[45vw] h-[45vw] bg-terracotta/8 blur-[140px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[35vw] h-[35vw] bg-charcoal/5 dark:bg-white/3 blur-[140px] rounded-full pointer-events-none" />
 
       <div className="max-w-7xl mx-auto">
         {/* Hero Card */}
-        <div className="mb-20 rounded-3xl border border-white/10 bg-charcoal dark:bg-charcoalMuted p-10 shadow-darkSoft lg:p-14">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="mb-12 sm:mb-20 rounded-2xl sm:rounded-3xl border border-white/10 bg-charcoal dark:bg-charcoalMuted p-6 sm:p-10 shadow-darkSoft lg:p-14">
+          <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
 
             {/* ── Left Column ── */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="flex flex-col gap-6"
+              className="flex flex-col gap-5 sm:gap-6"
             >
               {/* Badge */}
               <motion.div
@@ -92,7 +166,7 @@ export default function HeroSection() {
 
               {/* Headline */}
               <motion.h1
-                className="text-5xl sm:text-6xl lg:text-7xl font-playfair font-bold text-white leading-[1.05] tracking-tight"
+                className="text-4xl sm:text-5xl lg:text-7xl font-playfair font-bold text-white leading-[1.05] tracking-tight"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -105,7 +179,7 @@ export default function HeroSection() {
 
               {/* Sub-heading */}
               <motion.p
-                className="text-lg text-gray-300 max-w-lg leading-relaxed font-outfit"
+                className="text-base sm:text-lg text-gray-300 max-w-lg leading-relaxed font-outfit"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.8 }}
@@ -116,26 +190,26 @@ export default function HeroSection() {
 
               {/* CTA Buttons */}
               <motion.div
-                className="flex flex-col sm:flex-row gap-4 mt-2"
+                className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-1 sm:mt-2"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.8 }}
               >
-                <Link to="/register">
+                <Link to="/register" className="w-full sm:w-auto">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full sm:w-auto px-9 py-4 text-[15px] font-semibold bg-white text-charcoal rounded-full shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-2 group font-outfit"
+                    className="w-full px-9 py-4 text-[15px] font-semibold bg-white text-charcoal rounded-full shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-2 group font-outfit"
                   >
                     Start for Free
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </motion.button>
                 </Link>
-                <a href="#pricing">
+                <a href="#pricing" className="w-full sm:w-auto">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full sm:w-auto px-9 py-4 text-[15px] font-semibold text-white border border-white/20 rounded-full hover:bg-white/10 transition-all flex items-center justify-center gap-2 font-outfit"
+                    className="w-full px-9 py-4 text-[15px] font-semibold text-white border border-white/20 rounded-full hover:bg-white/10 transition-all flex items-center justify-center gap-2 font-outfit"
                   >
                     View Pricing →
                   </motion.button>
@@ -144,102 +218,113 @@ export default function HeroSection() {
 
               {/* Stats Row */}
               <motion.div
-                className="flex gap-8 pt-2 text-sm font-outfit"
+                className="flex gap-6 sm:gap-8 pt-2 text-sm font-outfit"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7, duration: 0.8 }}
               >
                 <div>
-                  <div className="text-2xl font-bold text-white">5.0 ★</div>
-                  <div className="text-gray-400">Avg Rating</div>
+                  <div className="text-xl sm:text-2xl font-bold text-white">5.0 ★</div>
+                  <div className="text-gray-400 text-xs sm:text-sm">Avg Rating</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-white">10,000+</div>
-                  <div className="text-gray-400">Active Users</div>
+                  <div className="text-xl sm:text-2xl font-bold text-white">10,000+</div>
+                  <div className="text-gray-400 text-xs sm:text-sm">Active Users</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-white">42%</div>
-                  <div className="text-gray-400">Productivity Boost</div>
+                  <div className="text-xl sm:text-2xl font-bold text-white">42%</div>
+                  <div className="text-gray-400 text-xs sm:text-sm">Productivity Boost</div>
                 </div>
               </motion.div>
             </motion.div>
 
-            {/* ── Right Column — 3D Canvas ── */}
+            {/* ── Right Column — 3-D Canvas (desktop) / CSS orb (mobile) ── */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-              className="relative h-[440px] lg:h-[580px] w-full"
+              className="relative h-[320px] sm:h-[400px] lg:h-[580px] w-full"
             >
-              {/* 3D Canvas */}
-              <div className="absolute inset-0 cursor-grab active:cursor-grabbing z-10">
-                <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
-                  <Environment preset="city" />
-                  <PresentationControls
-                    global
-                    rotation={[0, 0.3, 0]}
-                    polar={[-0.4, 0.2]}
-                    azimuth={[-1, 0.75]}
-                    config={{ mass: 2, tension: 400 }}
-                    snap={{ mass: 4, tension: 400 }}
-                  >
-                    <Float rotationIntensity={0.6} floatIntensity={1} speed={1.4}>
-                      <PlanoraSphere />
-                    </Float>
-                  </PresentationControls>
-                  <ContactShadows
-                    position={[0, -3.5, 0]}
-                    opacity={0.3}
-                    scale={20}
-                    blur={2}
-                    far={4}
-                  />
-                </Canvas>
-              </div>
+              {isMobile ? (
+                /* ── Mobile/tablet: lightweight CSS orb, no WebGL ── */
+                <MobileOrbFallback />
+              ) : (
+                /* ── Desktop: full 3-D scene ── */
+                <div className="absolute inset-0 cursor-grab active:cursor-grabbing z-10">
+                  <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
+                    <Environment preset="city" />
+                    <PresentationControls
+                      global
+                      rotation={[0, 0.3, 0]}
+                      polar={[-0.4, 0.2]}
+                      azimuth={[-1, 0.75]}
+                      config={{ mass: 2, tension: 400 }}
+                      snap={{ mass: 4, tension: 400 }}
+                    >
+                      <Float rotationIntensity={0.6} floatIntensity={1} speed={1.4}>
+                        <PlanoraSphere />
+                      </Float>
+                    </PresentationControls>
+                    <ContactShadows
+                      position={[0, -3.5, 0]}
+                      opacity={0.3}
+                      scale={20}
+                      blur={2}
+                      far={4}
+                    />
+                  </Canvas>
+                </div>
+              )}
 
               {/* Floating Card 1 — Goals */}
               <motion.div
-                animate={{ y: [-8, 8, -8] }}
+                animate={{ y: [-6, 6, -6] }}
                 transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-                className="absolute left-0 top-10 z-20 bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-2xl shadow-2xl"
+                className="absolute left-0 top-6 sm:top-10 z-20 bg-white/10 backdrop-blur-xl border border-white/20 p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-2xl"
               >
-                <div className="flex gap-3 items-center">
-                  <div className="w-10 h-10 bg-gradient-to-br from-terracotta to-[#E8956A] rounded-full flex items-center justify-center shadow-inner flex-shrink-0">
-                    <CheckCircle2 className="w-5 h-5 text-white" />
+                <div className="flex gap-2 sm:gap-3 items-center">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-terracotta to-[#E8956A] rounded-full flex items-center justify-center shadow-inner flex-shrink-0">
+                    <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </div>
                   <div>
-                    <div className="text-xs font-semibold text-white/90 font-outfit">Goals Achieved</div>
-                    <div className="text-[11px] text-terracotta mt-0.5 font-outfit">12 this week 🔥</div>
+                    <div className="text-[11px] sm:text-xs font-semibold text-white/90 font-outfit">Goals Achieved</div>
+                    <div className="text-[10px] sm:text-[11px] text-terracotta mt-0.5 font-outfit">12 this week 🔥</div>
                   </div>
                 </div>
               </motion.div>
 
               {/* Floating Card 2 — Roadmap */}
               <motion.div
-                animate={{ y: [8, -8, 8] }}
+                animate={{ y: [6, -6, 6] }}
                 transition={{ repeat: Infinity, duration: 7, ease: "easeInOut", delay: 1 }}
-                className="absolute right-0 bottom-16 z-20 bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-2xl shadow-2xl"
+                className="absolute right-0 bottom-10 sm:bottom-16 z-20 bg-white/10 backdrop-blur-xl border border-white/20 p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-2xl"
               >
-                <div className="flex gap-3 items-center">
-                  <div className="w-10 h-10 bg-gradient-to-br from-sage to-[#a3b99a] rounded-full flex items-center justify-center shadow-inner flex-shrink-0">
-                    <TrendingUp className="w-5 h-5 text-white" />
+                <div className="flex gap-2 sm:gap-3 items-center">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-sage to-[#a3b99a] rounded-full flex items-center justify-center shadow-inner flex-shrink-0">
+                    <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </div>
                   <div>
-                    <div className="text-xs font-semibold text-white/90 font-outfit">AI Roadmap Ready</div>
-                    <div className="text-[11px] text-sage mt-0.5 font-outfit">On track for June ✨</div>
+                    <div className="text-[11px] sm:text-xs font-semibold text-white/90 font-outfit">AI Roadmap Ready</div>
+                    <div className="text-[10px] sm:text-[11px] text-sage mt-0.5 font-outfit">On track for June ✨</div>
                   </div>
                 </div>
               </motion.div>
             </motion.div>
+
           </div>
         </div>
 
         {/* Trusted by */}
-        <div className="text-center space-y-6">
-          <div className="text-sm text-gray-500 dark:text-gray-400 font-outfit">Trusted by ambitious people at</div>
-          <div className="flex flex-wrap items-center justify-center gap-10 lg:gap-16">
+        <div className="text-center space-y-4 sm:space-y-6">
+          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-outfit">
+            Trusted by ambitious people at
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 lg:gap-16">
             {["Google", "Microsoft", "Apple", "Amazon", "Meta"].map((company) => (
-              <div key={company} className="text-gray-500 dark:text-gray-400 font-bold text-base font-outfit">
+              <div
+                key={company}
+                className="text-gray-500 dark:text-gray-400 font-bold text-sm sm:text-base font-outfit"
+              >
                 {company}
               </div>
             ))}
