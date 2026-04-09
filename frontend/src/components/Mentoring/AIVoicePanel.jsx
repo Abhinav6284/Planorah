@@ -767,7 +767,6 @@ export default function AIVoicePanel({
   const [voiceConfig, setVoiceConfig] = useState(null);
   const [selectedVoice, setSelectedVoice] = useState("Aoede");
   const [sessionDuration, setSessionDuration] = useState(0);
-  const [switchingToText, setSwitchingToText] = useState(false);
   const autoStartTriggeredRef = useRef(false);
 
   const realtimeSession = useVoiceSession();
@@ -873,11 +872,9 @@ export default function AIVoicePanel({
   const handleExpand   = useCallback(() => setPanelState("expanded"), []);
 
   const handleSwitchToText = useCallback(() => {
-    setSwitchingToText(true);
     setTimeout(() => {
       disconnect?.();
       setPanelState("closed");
-      setSwitchingToText(false);
       onSwitchToText?.();
     }, 300);
   }, [disconnect, onSwitchToText]);
