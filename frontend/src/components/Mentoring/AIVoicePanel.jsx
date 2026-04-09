@@ -1,543 +1,916 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaTimes } from "react-icons/fa";
-// import { Canvas } from "@react-three/fiber"; // Removed 3D Canvas
-// import VoiceAvatar3D from "./VoiceAvatar3D"; // Removed 3D Avatar
-import AudioVisualizer from "./AudioVisualizer"; // New Visualizer
 import { mentoringService } from "../../api/mentoringService";
 import { assistantPipelineService } from "../../api/assistantPipelineService";
+import { getContextSourceFromPath } from "../../utils/assistantContext";
 import env from "../../config/env";
 import { useVoiceSession } from "../../hooks/useVoiceSession";
 import { useVoicePipelineSession } from "../../hooks/useVoicePipelineSession";
 
-/**
- * AIVoicePanel — Apple/ElevenLabs-style premium full-screen voice experience.
- *
- * Visuals:
- * - Fluid, deeply blurred glassmorphic overlay over the Dashboard.
- * - Centerpiece: A multi-layered, organic mesh orb that breathes with `audioLevel`.
- * - Clean, ultra-minimalist typography.
- *
- * Props: isOpen, onClose, contextSource, studentGoal
- */
-export default function AIVoicePanel({
-    isOpen = false,
-    onClose,
-    onSwitchToText,
-    contextSource = "general",
-    studentGoal = "",
-    autoStart = false,
-    onAutoStartHandled,
-}) {
-    // 'closed' | 'open' | 'minimized'
-    const [panelState, setPanelState] = useState("closed");
-    const [voiceConfig, setVoiceConfig] = useState(null);
-    const [selectedVoice, setSelectedVoice] = useState("Aoede");
-    const [sessionDuration, setSessionDuration] = useState(0);
-    const [switchingToText, setSwitchingToText] = useState(false);
-    const autoStartTriggeredRef = useRef(false);
+/* ─── Font injection ──────────────────────────────────────────────────────── */
+const FONT_URL =
+  "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,500;12..96,700&family=Instrument+Serif:ital@0;1&display=swap";
 
-    const realtimeSession = useVoiceSession();
-    const pipelineSession = useVoicePipelineSession();
-    const pipelineEnabled = env.AI_PIPELINE_ENABLED && env.AI_PIPELINE_CHANNELS.includes("voice");
-    const session = pipelineEnabled ? pipelineSession : realtimeSession;
+function injectFont() {
+  if (document.getElementById("planorah-voice-fonts")) return;
+  const l = document.createElement("link");
+  l.id = "planorah-voice-fonts";
+  l.rel = "stylesheet";
+  l.href = FONT_URL;
+  document.head.appendChild(l);
+}
 
-    const {
-        status,
-        error,
-        transcript,
-        isSpeaking,
-        audioLevel,
-        isCapturing,
-        actionProposals = [],
-        latestResult = null,
-        startTurn = () => { },
-        stopTurn = () => { },
-        confirmProposal = async () => null,
-        connect,
-        disconnect,
-    } = session;
+/* ─── Context meta ────────────────────────────────────────────────────────── */
+const CTX = {
+  roadmap:   { icon: "🗺️", label: "Roadmap",   color: "#818CF8" },
+  dashboard: { icon: "⚡",  label: "Dashboard", color: "#FBBF24" },
+  tasks:     { icon: "✅",  label: "Tasks",     color: "#34D399" },
+  resume:    { icon: "📄",  label: "Resume",    color: "#60A5FA" },
+  ats:       { icon: "🎯",  label: "ATS Scan",  color: "#F472B6" },
+  interview: { icon: "🎤",  label: "Interview", color: "#A78BFA" },
+  portfolio: { icon: "🌐",  label: "Portfolio", color: "#2DD4BF" },
+  projects:  { icon: "⚙️",  label: "Projects",  color: "#FB923C" },
+  planora:   { icon: "📚",  label: "Planora",   color: "#22D3EE" },
+  scheduler: { icon: "📅",  label: "Scheduler", color: "#86EFAC" },
+  general:   { icon: "🤖",  label: "General",   color: "#94A3B8" },
+};
 
-    // Sync isOpen prop â†’ panelState
-    useEffect(() => {
-        if (isOpen && panelState === "closed") setPanelState("open");
-        else if (!isOpen && panelState !== "closed") {
-            disconnect();
-            setPanelState("closed");
+/* ─── Liquid-metal orb ───────────────────────────────────────────────────── */
+function Orb({ size = 108, audioLevel = 0, isSpeaking = false, isActive = false, status = "idle" }) {
+  const glow = isActive ? 0.35 + audioLevel * 0.35 : 0.12;
+  const isConnecting = status === "connecting";
+
+  return (
+    <div style={{ position: "relative", width: size, height: size, flexShrink: 0 }}>
+      {/* Ambient glow rings */}
+      <AnimatePresence>
+        {(isActive || isConnecting) &&
+          [0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              initial={{ scale: 1, opacity: 0.5 }}
+              animate={{ scale: 2.2 + i * 0.5, opacity: 0 }}
+              transition={{
+                duration: 2.2 + i * 0.5,
+                repeat: Infinity,
+                delay: i * 0.65,
+                ease: "easeOut",
+              }}
+              style={{
+                position: "absolute",
+                inset: 0,
+                borderRadius: "50%",
+                background: isSpeaking
+                  ? "rgba(251,191,36,0.18)"
+                  : "rgba(45,212,191,0.18)",
+                transformOrigin: "center",
+              }}
+            />
+          ))}
+      </AnimatePresence>
+
+      {/* Sphere */}
+      <motion.div
+        animate={{
+          scale: isActive ? 1 + audioLevel * 0.12 : isConnecting ? [1, 1.04, 1] : 1,
+          filter: `brightness(${isActive ? 1 + audioLevel * 0.25 : 1})`,
+        }}
+        transition={
+          isConnecting
+            ? { duration: 1.6, repeat: Infinity, ease: "easeInOut" }
+            : { type: "spring", stiffness: 280, damping: 22 }
         }
-    }, [isOpen, panelState, disconnect]);
-
-    // Fetch voice config when panel opens
-    useEffect(() => {
-        if (panelState === "open" && !voiceConfig) {
-            const loadConfig = async () => {
-                try {
-                    if (pipelineEnabled) {
-                        const cfg = await assistantPipelineService.getConfig();
-                        setVoiceConfig({
-                            ws_url: "",
-                            session_memory: [],
-                            onboarding_context: {},
-                            auto_intro_prompt: "",
-                            available_voices: cfg?.available_voices || [],
-                        });
-                    } else {
-                        const cfg = await mentoringService.getVoiceConfig();
-                        setVoiceConfig(cfg);
-                    }
-                } catch (err) {
-                    console.error("Voice config error:", err);
-                }
-            };
-            loadConfig();
-        }
-    }, [panelState, voiceConfig, pipelineEnabled]);
-
-    const isActive = status === "active";
-
-    useEffect(() => {
-        let interval;
-        if (isActive) {
-            interval = setInterval(() => setSessionDuration(s => s + 1), 1000);
-        } else {
-            setSessionDuration(0);
-        }
-        return () => clearInterval(interval);
-    }, [isActive]);
-
-    const formatTime = (s) => {
-        const mins = Math.floor(s / 60).toString().padStart(2, '0');
-        const secs = (s % 60).toString().padStart(2, '0');
-        return `${mins}:${secs}`;
-    };
-
-    const handleStart = useCallback((triggeredByAutoStart = false) => {
-        if (!voiceConfig) return;
-        connect({
-            wsUrl: voiceConfig.ws_url,
-            contextSource,
-            studentGoal,
-            sessionMemory: voiceConfig.session_memory,
-            voiceName: selectedVoice,
-            onboardingContext: voiceConfig.onboarding_context || {},
-            initialPrompt: triggeredByAutoStart ? (voiceConfig.auto_intro_prompt || "") : "",
-            languagePreference: "hinglish",
-        });
-    }, [voiceConfig, connect, contextSource, studentGoal, selectedVoice]);
-
-    useEffect(() => {
-        if (!isOpen) {
-            autoStartTriggeredRef.current = false;
-            return;
-        }
-
-        if (
-            autoStart &&
-            panelState === "open" &&
-            voiceConfig &&
-            status === "idle" &&
-            !autoStartTriggeredRef.current
-        ) {
-            autoStartTriggeredRef.current = true;
-            handleStart(true);
-            onAutoStartHandled?.();
-        }
-    }, [isOpen, autoStart, panelState, voiceConfig, status, handleStart, onAutoStartHandled]);
-
-    const handleClose = useCallback(() => {
-        disconnect();
-        setPanelState("closed");
-        onClose?.();
-    }, [disconnect, onClose]);
-
-    const handleSwitchToText = useCallback(() => {
-        setSwitchingToText(true);
-        // Brief delay lets the exit animation play before text panel mounts
-        setTimeout(() => {
-            disconnect();
-            setPanelState("closed");
-            setSwitchingToText(false);
-            onSwitchToText?.();
-        }, 320);
-    }, [disconnect, onSwitchToText]);
-
-    // Calculate dynamic orb scale and glow based on audio level
-    // Siri/ElevenLabs style organic breathing
-    const baseScale = isActive ? 1.05 : 1;
-    const dynamicScale = baseScale + (audioLevel * 0.4);
-    const isIdle = status === "idle";
-    const isConnecting = status === "connecting";
-    const statusLabel = isConnecting
-        ? "Connecting"
-        : isActive
-            ? (isSpeaking ? "Speaking" : (pipelineEnabled ? (isCapturing ? "Recording" : "Ready to record") : "Listening"))
-            : "Ready";
-    const endLabel = isConnecting ? "Cancel" : "End Session";
-    const voiceLabel = selectedVoice.substring(0, 2).toLowerCase() === "ao"
-        ? "US"
-        : selectedVoice.substring(0, 2).toUpperCase();
-
-    return (
+        style={{
+          position: "relative",
+          width: size,
+          height: size,
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle at 40% 33%, #A7F3D0 0%, #2DD4BF 18%, #0D9488 50%, #042F2E 80%, #010B0B 100%)",
+          boxShadow: `
+            inset 0 -8px 24px rgba(0,0,0,0.65),
+            inset 0 8px 20px rgba(167,243,208,0.22),
+            0 0 ${Math.round(size * glow * 2.2)}px rgba(45,212,191,${glow.toFixed(2)}),
+            0 ${Math.round(size * 0.18)}px ${Math.round(size * 0.55)}px rgba(0,0,0,0.55)
+          `,
+          overflow: "hidden",
+        }}
+      >
+        {/* Rotating iridescent shimmer */}
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: isActive ? 3 : 6, repeat: Infinity, ease: "linear" }}
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(167,243,208,0.55) 55deg, rgba(56,189,248,0.65) 110deg, rgba(45,212,191,0.45) 170deg, transparent 220deg, transparent 360deg)",
+            mixBlendMode: "overlay",
+          }}
+        />
+        {/* Specular highlight — top-left */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "radial-gradient(ellipse at 30% 26%, rgba(255,255,255,0.68) 0%, rgba(255,255,255,0.12) 38%, transparent 55%)",
+            mixBlendMode: "overlay",
+          }}
+        />
+        {/* Diffuse warm rim — bottom-right */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "radial-gradient(circle at 72% 78%, rgba(45,212,191,0.4) 0%, transparent 58%)",
+            mixBlendMode: "screen",
+          }}
+        />
+        {/* Speaking amber tint */}
         <AnimatePresence>
-            {/* ─── Premium Full-Screen Modal ─── */}
-            {panelState === "open" && (
-                <motion.div
-                    key="voice-fullscreen"
-                    data-voice-overlay="true"
-                    // Elegant scale-and-fade, like Apple iOS controls over backgrounds
-                    initial={{ opacity: 0, scale: 0.96, filter: "blur(10px)" }}
-                    animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                    exit={switchingToText
-                        ? { opacity: 0, x: "-6%", filter: "blur(8px)", transition: { duration: 0.32, ease: [0.4, 0, 0.2, 1] } }
-                        : { opacity: 0, scale: 0.96, filter: "blur(10px)" }
-                    }
-                    transition={{ type: "spring", damping: 25, stiffness: 120 }}
-                    className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden
-                               bg-[#f7f4ef] dark:bg-[#0b0f14] text-slate-900 dark:text-slate-100"
-                    style={{ fontFamily: '"Space Grotesk", "Inter", sans-serif' }}
-                >
-                    {/* Atmospheric Ambient Gradients */}
-                    <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                        <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 38, repeat: Infinity, ease: "linear" }}
-                            className="absolute -top-[35%] -left-[15%] w-[90vw] h-[90vw] max-w-[900px] max-h-[900px]
-                                       rounded-full bg-teal-300/20 dark:bg-teal-400/10 blur-[140px]"
-                        />
-                        <motion.div
-                            animate={{ rotate: -360 }}
-                            transition={{ duration: 46, repeat: Infinity, ease: "linear" }}
-                            className="absolute -bottom-[35%] -right-[10%] w-[95vw] h-[95vw] max-w-[980px] max-h-[980px]
-                                       rounded-full bg-orange-300/20 dark:bg-orange-500/10 blur-[160px]"
-                        />
-                        <div className="absolute inset-0 opacity-[0.22] dark:opacity-[0.12]
-                                        [background-image:radial-gradient(rgba(15,23,42,0.16)_1px,transparent_1px)]
-                                        [background-size:18px_18px]" />
-                        <div className="absolute inset-0 opacity-40 dark:opacity-20 mix-blend-soft-light
-                                        [background-image:linear-gradient(120deg,rgba(255,255,255,0.55)_0%,rgba(255,255,255,0)_35%),linear-gradient(0deg,rgba(255,255,255,0.5)_0%,rgba(255,255,255,0)_60%)]" />
-                    </div>
-
-                    <div className="relative z-10 w-full px-6 sm:px-10">
-                        <div className="mx-auto w-full max-w-6xl">
-                            {/* Top Bar */}
-                            <div className="flex flex-wrap items-center justify-between gap-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-teal-400 via-sky-400 to-amber-300 shadow-[0_10px_30px_rgba(16,185,129,0.25)] flex items-center justify-center text-white">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                            <path d="M12 1v22"></path>
-                                            <path d="M8 5a4 4 0 0 1 8 0v6a4 4 0 0 1-8 0z"></path>
-                                            <path d="M5 11a7 7 0 0 0 14 0"></path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <p className="text-[11px] uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">Planorah Voice</p>
-                                        <p className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white">Mentor Studio</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                    {/* Mode toggle pill */}
-                                    <div className="flex items-center rounded-full bg-white/50 dark:bg-white/8 border border-white/70 dark:border-white/10 p-1 shadow-sm backdrop-blur-sm">
-                                        {/* Voice — active pill */}
-                                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[12px] font-semibold select-none">
-                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                                                <path d="M12 1v22" /><path d="M8 5a4 4 0 0 1 8 0v6a4 4 0 0 1-8 0z" /><path d="M5 11a7 7 0 0 0 14 0" />
-                                            </svg>
-                                            Voice
-                                        </div>
-                                        {/* Text — inactive pill */}
-                                        <motion.button
-                                            onClick={handleSwitchToText}
-                                            whileHover={{ backgroundColor: "rgba(255,255,255,0.55)" }}
-                                            whileTap={{ scale: 0.95 }}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-slate-500 dark:text-slate-400 text-[12px] font-semibold transition-colors"
-                                        >
-                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                                            </svg>
-                                            Text
-                                        </motion.button>
-                                    </div>
-                                    <button
-                                        onClick={handleClose}
-                                        className="w-11 h-11 flex items-center justify-center rounded-full bg-white/60 dark:bg-white/10 hover:bg-white/80 dark:hover:bg-white/20 border border-white/70 dark:border-white/10 text-slate-700 dark:text-white/90 transition-all shadow-sm"
-                                    >
-                                        <FaTimes size={18} />
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Main Content */}
-                            <div className="mt-10 grid gap-8 lg:grid-cols-[1.45fr_0.9fr] items-start">
-                                <div className="relative">
-                                    <div className="rounded-[32px] border border-white/70 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-2xl p-6 sm:p-8 shadow-[0_30px_80px_rgba(15,23,42,0.16)]">
-                                        <div className="flex flex-wrap items-center justify-between gap-3">
-                                            <p className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Live Waveform</p>
-                                            <div className="flex items-center gap-2 text-[12px] font-semibold text-slate-600 dark:text-slate-300">
-                                                <span className={`h-2.5 w-2.5 rounded-full ${isActive ? "bg-emerald-400" : isConnecting ? "bg-amber-400" : "bg-slate-400"}`} />
-                                                {statusLabel}
-                                            </div>
-                                        </div>
-
-                                        <motion.div
-                                            initial={{ opacity: 0, scale: 0.96 }}
-                                            animate={{ opacity: 1, scale: dynamicScale }}
-                                            transition={{ type: "spring", stiffness: 160, damping: 22 }}
-                                            className="mt-6 h-[220px] sm:h-[250px] rounded-3xl overflow-hidden bg-gradient-to-br from-white/60 via-white/30 to-white/10 dark:from-white/10 dark:via-white/5 dark:to-transparent border border-white/50 dark:border-white/5"
-                                        >
-                                            <AudioVisualizer
-                                                isSpeaking={isSpeaking}
-                                                audioLevel={audioLevel}
-                                            />
-                                        </motion.div>
-
-                                        <div className="mt-6 flex items-center justify-between text-sm text-slate-600 dark:text-slate-300">
-                                            <div className="flex items-center gap-2">
-                                                <span className="uppercase tracking-[0.28em] text-[10px] text-slate-400 dark:text-slate-500">Session</span>
-                                                <span className="font-semibold">{formatTime(sessionDuration)}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2 text-[12px]">
-                                                <span className={`px-3 py-1 rounded-full border ${isActive ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300" : "border-slate-200 bg-white/70 text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"}`}>
-                                                    {isActive ? "Live feedback" : "Ready when you are"}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <AnimatePresence>
-                                        {transcript && (
-                                            <motion.div
-                                                initial={{ opacity: 0, y: 12 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: 12 }}
-                                                className="mt-5"
-                                            >
-                                                <div className="bg-white/70 dark:bg-black/40 backdrop-blur-2xl border border-white/60 dark:border-white/10 rounded-3xl px-6 py-5 shadow-[0_20px_40px_rgba(0,0,0,0.08)]">
-                                                    <p className="text-slate-400 dark:text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">
-                                                        Live Transcript
-                                                    </p>
-                                                    <p className="text-slate-800 dark:text-white/80 text-[15px] leading-relaxed font-medium">
-                                                        {transcript}
-                                                    </p>
-                                                </div>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </div>
-
-                                <div className="flex flex-col gap-6">
-                                    <div className="rounded-[28px] border border-white/70 dark:border-white/10 bg-white/80 dark:bg-white/5 backdrop-blur-2xl p-6 sm:p-8 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
-                                        <h2
-                                            className="text-3xl sm:text-[34px] leading-tight text-slate-900 dark:text-white"
-                                            style={{ fontFamily: '"Fraunces", "Playfair Display", serif' }}
-                                        >
-                                            Brilliant conversation, instantly.
-                                        </h2>
-                                        <p className="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-300">
-                                            Speak naturally, get real-time coaching, and finish with crisp, actionable feedback.
-                                        </p>
-
-                                        {isIdle && (
-                                            <motion.button
-                                                onClick={handleStart}
-                                                disabled={!voiceConfig}
-                                                whileHover={{ scale: voiceConfig ? 1.03 : 1 }}
-                                                whileTap={{ scale: voiceConfig ? 0.98 : 1 }}
-                                                className="mt-6 w-full px-6 py-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white text-[15px] font-semibold tracking-wide shadow-[0_18px_40px_rgba(15,23,42,0.35)] transition-all disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-3"
-                                            >
-                                                <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10">
-                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-                                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                                    </svg>
-                                                </span>
-                                                {voiceConfig ? "Start Conversation" : "Initializing..."}
-                                            </motion.button>
-                                        )}
-
-                                        {!isIdle && (
-                                            <motion.button
-                                                onClick={handleClose}
-                                                whileHover={{ scale: 1.02 }}
-                                                whileTap={{ scale: 0.98 }}
-                                                className="mt-6 w-full px-6 py-4 rounded-2xl bg-red-500 hover:bg-red-600 text-white text-[15px] font-semibold tracking-wide shadow-[0_16px_30px_rgba(239,68,68,0.35)] transition-all flex items-center justify-center gap-3"
-                                            >
-                                                <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/20">
-                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                                        <path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path>
-                                                        <line x1="23" y1="1" x2="1" y2="23"></line>
-                                                    </svg>
-                                                </span>
-                                                {endLabel}
-                                            </motion.button>
-                                        )}
-
-                                        {pipelineEnabled && isActive && (
-                                            <div className="mt-4">
-                                                <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-2">
-                                                    Push To Talk
-                                                </p>
-                                                <button
-                                                    type="button"
-                                                    onMouseDown={startTurn}
-                                                    onMouseUp={stopTurn}
-                                                    onMouseLeave={() => { if (isCapturing) stopTurn(); }}
-                                                    onTouchStart={startTurn}
-                                                    onTouchEnd={stopTurn}
-                                                    className={`w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${isCapturing
-                                                        ? "bg-emerald-600 text-white"
-                                                        : "bg-slate-200 dark:bg-white/10 text-slate-800 dark:text-slate-100 hover:bg-slate-300 dark:hover:bg-white/20"
-                                                        }`}
-                                                >
-                                                    {isCapturing ? "Release to send turn" : "Hold to speak"}
-                                                </button>
-                                            </div>
-                                        )}
-
-                                        {voiceConfig && (
-                                            <div className="mt-6">
-                                                <div className="flex items-center justify-between text-[12px] font-semibold text-slate-500 dark:text-slate-400">
-                                                    <span className="uppercase tracking-[0.3em]">Voice</span>
-                                                    <span className="text-slate-700 dark:text-slate-200">{voiceLabel}</span>
-                                                </div>
-                                                <div className="mt-3 grid grid-cols-2 gap-2">
-                                                    {voiceConfig.available_voices.map((v) => (
-                                                        <button
-                                                            key={v.id}
-                                                            onClick={() => setSelectedVoice(v.id)}
-                                                            className={`px-3 py-2.5 rounded-2xl text-[13px] font-semibold transition-colors border ${selectedVoice === v.id
-                                                                ? "bg-slate-900 text-white border-slate-900 shadow-[0_10px_25px_rgba(15,23,42,0.25)]"
-                                                                : "bg-white/70 dark:bg-white/5 text-slate-600 dark:text-slate-300 border-white/70 dark:border-white/10 hover:bg-white"
-                                                                }`}
-                                                        >
-                                                            {v.name}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="rounded-[24px] border border-white/70 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-2xl px-5 py-4 text-sm text-slate-600 dark:text-slate-300">
-                                        <p className="font-semibold text-slate-800 dark:text-white">Session flow</p>
-                                        <p className="mt-2">
-                                            {pipelineEnabled
-                                                ? "Use push-to-talk turns for fast STT → LLM → TTS responses."
-                                                : "Introduce your goal, talk for a minute, then ask for targeted feedback."}
-                                        </p>
-                                    </div>
-
-                                    {pipelineEnabled && latestResult?.assistant_text && (
-                                        <div className="rounded-[24px] border border-violet-200/70 dark:border-violet-800/40 bg-violet-50/70 dark:bg-violet-900/20 backdrop-blur-2xl px-5 py-4 text-sm text-slate-700 dark:text-slate-200">
-                                            <p className="font-semibold text-violet-700 dark:text-violet-300 mb-1">Latest Response</p>
-                                            <p>{latestResult.assistant_text}</p>
-                                        </div>
-                                    )}
-
-                                    {pipelineEnabled && Array.isArray(actionProposals) && actionProposals.length > 0 && (
-                                        <div className="rounded-[24px] border border-emerald-200/70 dark:border-emerald-800/40 bg-emerald-50/70 dark:bg-emerald-900/20 backdrop-blur-2xl px-5 py-4 text-sm text-slate-700 dark:text-slate-200 space-y-3">
-                                            <p className="font-semibold text-emerald-700 dark:text-emerald-300">Confirm Actions</p>
-                                            {actionProposals.map((proposal) => (
-                                                <div key={proposal.proposal_id} className="rounded-xl border border-emerald-200 dark:border-emerald-800 p-3">
-                                                    <p className="text-xs font-semibold mb-2">{proposal.summary}</p>
-                                                    <div className="flex gap-2">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => confirmProposal(proposal.proposal_id, true)}
-                                                            className="px-3 py-1.5 text-xs rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
-                                                        >
-                                                            Confirm
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => confirmProposal(proposal.proposal_id, false)}
-                                                            className="px-3 py-1.5 text-xs rounded-lg bg-gray-200 dark:bg-charcoalMuted text-gray-800 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-charcoalMuted"
-                                                        >
-                                                            Cancel
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    {error && (
-                                        <p className="text-red-600 font-semibold bg-white/90 px-4 py-3 rounded-xl text-sm text-center border border-red-200">
-                                            {error}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </motion.div>
-            )}
-
-            {/* ─── Minimized floating orb (Unchanged logic, refined look) ─── */}
-            {panelState === "minimized" && (
-                <motion.div
-                    key="voice-minimized"
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0, opacity: 0 }}
-                    transition={{ type: "spring", stiffness: 320, damping: 26 }}
-                    className="fixed bottom-6 right-6 z-50"
-                    data-voice-overlay="true"
-                >
-                    <button
-                        onClick={() => setPanelState("open")}
-                        className={`flex items-center h-[42px] px-[10px] rounded-[24px] cursor-pointer transition-colors shadow-[0_2px_8px_rgba(0,0,0,0.08)] border backdrop-blur-xl
-                            ${isActive
-                                ? 'bg-white/80 dark:bg-[#1c1c1e]/80 border-gray-200 dark:border-white/10 gap-3'
-                                : 'bg-white/80 dark:bg-[#1c1c1e]/80 border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-[#2c2c2e]/90 gap-2.5'
-                            }`}
-                    >
-                        {/* The Orb */}
-                        <motion.div className="relative w-[26px] h-[26px] rounded-full overflow-hidden shrink-0 shadow-[0_1px_3px_rgba(37,99,235,0.2)]">
-                            <div className="absolute inset-0 bg-[#0f766e]" />
-                            <div className="absolute inset-0 bg-[conic-gradient(from_0deg_at_50%_50%,transparent_0deg,rgba(45,212,191,0.9)_120deg,rgba(56,189,248,0.9)_180deg,transparent_240deg)] animate-[spin_3s_linear_infinite]" />
-                            <div className="absolute inset-[1px] rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.7)_0%,transparent_50%,rgba(0,0,0,0.2)_100%)] mix-blend-overlay border-[0.5px] border-white/20" />
-
-                            {isActive && (
-                                <motion.div
-                                    className={`absolute inset-0 rounded-full ${isSpeaking ? "bg-amber-300/30" : "bg-teal-400/30"}`}
-                                    animate={{
-                                        scale: [1, 1.4 + audioLevel * 0.4, 1],
-                                        opacity: [0.6, 0, 0.6],
-                                    }}
-                                    transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut" }}
-                                />
-                            )}
-                        </motion.div>
-
-                        <div className="overflow-hidden flex items-center pr-1">
-                            {!isActive ? (
-                                <span className="text-[15px] font-bold text-gray-800 dark:text-gray-200 whitespace-nowrap">
-                                    Voice chat
-                                </span>
-                            ) : (
-                                <div className="flex items-center gap-3 whitespace-nowrap">
-                                    <span className="text-[15px] font-bold text-gray-700 dark:text-gray-200 w-[42px] text-center tracking-tight">
-                                        {formatTime(sessionDuration)}
-                                    </span>
-                                    <div
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleClose();
-                                        }}
-                                        className="w-[28px] h-[28px] flex items-center justify-center rounded-full bg-red-100 hover:bg-red-200 dark:bg-red-500/20 dark:hover:bg-red-500/40 transition-colors text-red-600 dark:text-red-400 ml-1"
-                                        title="End Session"
-                                    >
-                                        <svg stroke="currentColor" fill="none" strokeWidth="2.5" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="14" width="14">
-                                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                                        </svg>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </button>
-                </motion.div>
-            )}
+          {isSpeaking && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: "radial-gradient(circle at 50% 50%, rgba(251,191,36,0.28) 0%, transparent 70%)",
+                mixBlendMode: "screen",
+              }}
+            />
+          )}
         </AnimatePresence>
-    );
+      </motion.div>
+    </div>
+  );
+}
+
+/* ─── Mini-pill (collapsed state) ───────────────────────────────────────── */
+function MiniPill({ isActive, isSpeaking, audioLevel, sessionDuration, formatTime, onExpand, onEnd }) {
+  return (
+    <motion.div
+      initial={{ scale: 0.7, opacity: 0, y: 12 }}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
+      exit={{ scale: 0.7, opacity: 0, y: 12 }}
+      transition={{ type: "spring", stiffness: 380, damping: 28 }}
+      style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999 }}
+    >
+      <button
+        onClick={onExpand}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          height: 44,
+          paddingLeft: 8,
+          paddingRight: isActive ? 6 : 14,
+          borderRadius: 100,
+          background: "rgba(12,14,20,0.85)",
+          backdropFilter: "blur(20px) saturate(1.8)",
+          WebkitBackdropFilter: "blur(20px) saturate(1.8)",
+          border: "1px solid rgba(45,212,191,0.18)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.04)",
+          cursor: "pointer",
+          outline: "none",
+        }}
+      >
+        <Orb size={28} isActive={isActive} isSpeaking={isSpeaking} audioLevel={audioLevel} />
+
+        {!isActive ? (
+          <span
+            style={{
+              fontFamily: "'Bricolage Grotesque', sans-serif",
+              fontWeight: 500,
+              fontSize: 14,
+              color: "rgba(255,255,255,0.88)",
+              letterSpacing: "-0.01em",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Voice chat
+          </span>
+        ) : (
+          <span
+            style={{
+              fontFamily: "'Bricolage Grotesque', sans-serif",
+              fontWeight: 700,
+              fontSize: 14,
+              color: "rgba(255,255,255,0.9)",
+              letterSpacing: "0.02em",
+              minWidth: 42,
+              textAlign: "center",
+            }}
+          >
+            {formatTime(sessionDuration)}
+          </span>
+        )}
+
+        {isActive ? (
+          <button
+            onClick={(e) => { e.stopPropagation(); onEnd(); }}
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: "50%",
+              background: "rgba(239,68,68,0.15)",
+              border: "1px solid rgba(239,68,68,0.25)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              color: "#F87171",
+              outline: "none",
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        ) : (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 3 21 3 21 9" />
+            <polyline points="9 21 3 21 3 15" />
+            <line x1="21" y1="3" x2="14" y2="10" />
+            <line x1="3" y1="21" x2="10" y2="14" />
+          </svg>
+        )}
+      </button>
+    </motion.div>
+  );
+}
+
+/* ─── Expanded panel ─────────────────────────────────────────────────────── */
+function ExpandedPanel({
+  status, isSpeaking, audioLevel, sessionDuration, formatTime,
+  contextSource, studentGoal,
+  voiceConfig, selectedVoice, setSelectedVoice,
+  transcript, error,
+  pipelineEnabled, isCapturing,
+  latestResult, actionProposals, confirmProposal,
+  startTurn, stopTurn,
+  onMinimize, onClose, onStart, onEnd, onSwitchToText,
+}) {
+  const ctx = CTX[contextSource] || CTX.general;
+  const isIdle = status === "idle";
+  const isActive = status === "active";
+  const isConnecting = status === "connecting";
+
+  const statusLabel = isConnecting
+    ? "Connecting…"
+    : isActive
+    ? isSpeaking
+      ? "Speaking"
+      : pipelineEnabled
+      ? isCapturing ? "Recording…" : "Ready to speak"
+      : "Listening…"
+    : "Ready to start";
+
+  const statusDot = isConnecting ? "#FBBF24" : isActive ? "#34D399" : "rgba(255,255,255,0.25)";
+
+  /* Page-derived extra chips (if goal is set) */
+  const goalChip = studentGoal ? studentGoal.slice(0, 32) + (studentGoal.length > 32 ? "…" : "") : null;
+
+  return (
+    <motion.div
+      key="expanded"
+      initial={{ scale: 0.88, opacity: 0, y: 24, originX: 1, originY: 1 }}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
+      exit={{ scale: 0.88, opacity: 0, y: 24 }}
+      transition={{ type: "spring", stiffness: 340, damping: 28 }}
+      style={{
+        position: "fixed",
+        bottom: 24,
+        right: 24,
+        width: 364,
+        zIndex: 9999,
+        fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
+        transformOrigin: "bottom right",
+      }}
+    >
+      {/* Card */}
+      <div
+        style={{
+          background: "rgba(10,12,18,0.96)",
+          backdropFilter: "blur(28px) saturate(1.8)",
+          WebkitBackdropFilter: "blur(28px) saturate(1.8)",
+          borderRadius: 24,
+          border: "1px solid rgba(255,255,255,0.07)",
+          boxShadow:
+            "0 32px 80px rgba(0,0,0,0.65), 0 0 0 1px rgba(45,212,191,0.06), inset 0 1px 0 rgba(255,255,255,0.05)",
+          overflow: "hidden",
+        }}
+      >
+        {/* ── Top bar ── */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "14px 16px 12px",
+            borderBottom: "1px solid rgba(255,255,255,0.05)",
+          }}
+        >
+          {/* Context chips */}
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+            <motion.div
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.08 }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                padding: "3px 10px 3px 7px",
+                borderRadius: 100,
+                background: `${ctx.color}14`,
+                border: `1px solid ${ctx.color}30`,
+                fontSize: 11,
+                fontWeight: 600,
+                color: ctx.color,
+                letterSpacing: "0.01em",
+              }}
+            >
+              <span style={{ fontSize: 12 }}>{ctx.icon}</span>
+              {ctx.label}
+            </motion.div>
+            {goalChip && (
+              <motion.div
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.14 }}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  padding: "3px 10px",
+                  borderRadius: 100,
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  fontSize: 11,
+                  fontWeight: 500,
+                  color: "rgba(255,255,255,0.45)",
+                }}
+              >
+                🎯 {goalChip}
+              </motion.div>
+            )}
+          </div>
+
+          {/* Controls */}
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+            <IconBtn onClick={onMinimize} title="Minimise">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                <polyline points="4 14 10 14 10 20" />
+                <polyline points="20 10 14 10 14 4" />
+                <line x1="10" y1="14" x2="3" y2="21" />
+                <line x1="21" y1="3" x2="14" y2="10" />
+              </svg>
+            </IconBtn>
+            <IconBtn onClick={onClose} title="Close" danger>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </IconBtn>
+          </div>
+        </div>
+
+        {/* ── Orb section ── */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 14,
+            padding: "28px 20px 20px",
+          }}
+        >
+          <Orb size={108} isActive={isActive} isSpeaking={isSpeaking} audioLevel={audioLevel} status={status} />
+
+          {/* Status + timer */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+              <motion.div
+                animate={{ opacity: [1, 0.4, 1] }}
+                transition={{ duration: isActive ? 1.4 : 3, repeat: Infinity }}
+                style={{ width: 7, height: 7, borderRadius: "50%", background: statusDot }}
+              />
+              <span style={{ fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.6)", letterSpacing: "0.01em" }}>
+                {statusLabel}
+              </span>
+            </div>
+            {isActive && (
+              <span
+                style={{
+                  fontSize: 24,
+                  fontWeight: 700,
+                  color: "rgba(255,255,255,0.9)",
+                  letterSpacing: "0.04em",
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
+                {formatTime(sessionDuration)}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* ── Live transcript ── */}
+        <AnimatePresence>
+          {transcript && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              style={{ overflow: "hidden" }}
+            >
+              <div
+                style={{
+                  margin: "0 16px 12px",
+                  padding: "12px 14px",
+                  borderRadius: 14,
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.07)",
+                  maxHeight: 80,
+                  overflowY: "auto",
+                }}
+              >
+                <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(45,212,191,0.7)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 5 }}>
+                  Live
+                </p>
+                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.72)", lineHeight: 1.5, margin: 0 }}>{transcript}</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── Latest pipeline response ── */}
+        <AnimatePresence>
+          {pipelineEnabled && latestResult?.assistant_text && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              style={{ overflow: "hidden" }}
+            >
+              <div
+                style={{
+                  margin: "0 16px 12px",
+                  padding: "12px 14px",
+                  borderRadius: 14,
+                  background: "rgba(129,140,248,0.08)",
+                  border: "1px solid rgba(129,140,248,0.18)",
+                }}
+              >
+                <p style={{ fontSize: 11, fontWeight: 600, color: "#818CF8", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 5 }}>
+                  Mentor
+                </p>
+                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.72)", lineHeight: 1.5, margin: 0 }}>{latestResult.assistant_text}</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── Action proposals ── */}
+        <AnimatePresence>
+          {pipelineEnabled && Array.isArray(actionProposals) && actionProposals.length > 0 && (
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
+              <div style={{ margin: "0 16px 12px" }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: "#34D399", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
+                  Confirm Actions
+                </p>
+                {actionProposals.map((p) => (
+                  <div key={p.proposal_id} style={{ padding: "10px 12px", borderRadius: 12, background: "rgba(52,211,153,0.07)", border: "1px solid rgba(52,211,153,0.18)", marginBottom: 6 }}>
+                    <p style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", marginBottom: 8 }}>{p.summary}</p>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button onClick={() => confirmProposal(p.proposal_id, true)}
+                        style={{ padding: "5px 14px", borderRadius: 8, background: "#059669", color: "#fff", fontSize: 12, fontWeight: 600, border: "none", cursor: "pointer" }}>
+                        Confirm
+                      </button>
+                      <button onClick={() => confirmProposal(p.proposal_id, false)}
+                        style={{ padding: "5px 14px", borderRadius: 8, background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600, border: "none", cursor: "pointer" }}>
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── Push-to-talk ── */}
+        {pipelineEnabled && isActive && (
+          <div style={{ padding: "0 16px 12px" }}>
+            <button
+              onMouseDown={startTurn}
+              onMouseUp={stopTurn}
+              onMouseLeave={() => { if (isCapturing) stopTurn(); }}
+              onTouchStart={startTurn}
+              onTouchEnd={stopTurn}
+              style={{
+                width: "100%",
+                padding: "11px",
+                borderRadius: 14,
+                background: isCapturing ? "rgba(52,211,153,0.18)" : "rgba(255,255,255,0.06)",
+                border: `1px solid ${isCapturing ? "rgba(52,211,153,0.4)" : "rgba(255,255,255,0.1)"}`,
+                color: isCapturing ? "#34D399" : "rgba(255,255,255,0.55)",
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all 0.15s",
+                fontFamily: "inherit",
+                letterSpacing: "0.01em",
+              }}
+            >
+              {isCapturing ? "Release to send" : "Hold to speak"}
+            </button>
+          </div>
+        )}
+
+        {/* ── Voice selection ── */}
+        {voiceConfig?.available_voices?.length > 0 && (
+          <div style={{ padding: "0 16px 12px" }}>
+            <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>
+              Voice
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {voiceConfig.available_voices.map((v) => (
+                <button
+                  key={v.id}
+                  onClick={() => setSelectedVoice(v.id)}
+                  style={{
+                    padding: "6px 14px",
+                    borderRadius: 100,
+                    background: selectedVoice === v.id ? "rgba(45,212,191,0.18)" : "rgba(255,255,255,0.05)",
+                    border: `1px solid ${selectedVoice === v.id ? "rgba(45,212,191,0.4)" : "rgba(255,255,255,0.08)"}`,
+                    color: selectedVoice === v.id ? "#2DD4BF" : "rgba(255,255,255,0.45)",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    transition: "all 0.15s",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  {v.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Error ── */}
+        {error && (
+          <div style={{ margin: "0 16px 12px", padding: "10px 14px", borderRadius: 12, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.22)" }}>
+            <p style={{ fontSize: 12, color: "#F87171", margin: 0 }}>{error}</p>
+          </div>
+        )}
+
+        {/* ── Primary action ── */}
+        <div style={{ padding: "4px 16px 16px" }}>
+          {isIdle && (
+            <motion.button
+              onClick={onStart}
+              disabled={!voiceConfig}
+              whileHover={voiceConfig ? { scale: 1.02 } : {}}
+              whileTap={voiceConfig ? { scale: 0.98 } : {}}
+              style={{
+                width: "100%",
+                padding: "13px",
+                borderRadius: 16,
+                background: voiceConfig
+                  ? "linear-gradient(135deg, #0D9488 0%, #2DD4BF 50%, #0D9488 100%)"
+                  : "rgba(255,255,255,0.06)",
+                border: "none",
+                color: voiceConfig ? "#000D0B" : "rgba(255,255,255,0.25)",
+                fontSize: 14,
+                fontWeight: 700,
+                cursor: voiceConfig ? "pointer" : "not-allowed",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 9,
+                fontFamily: "inherit",
+                letterSpacing: "0.01em",
+                boxShadow: voiceConfig ? "0 8px 28px rgba(13,148,136,0.35)" : "none",
+              }}
+            >
+              {!voiceConfig ? (
+                <>
+                  <SpinIcon />
+                  Initialising…
+                </>
+              ) : (
+                <>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    <line x1="12" y1="19" x2="12" y2="23" />
+                    <line x1="8" y1="23" x2="16" y2="23" />
+                  </svg>
+                  Start Conversation
+                </>
+              )}
+            </motion.button>
+          )}
+
+          {!isIdle && (
+            <motion.button
+              onClick={onEnd}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              style={{
+                width: "100%",
+                padding: "13px",
+                borderRadius: 16,
+                background: "rgba(239,68,68,0.15)",
+                border: "1px solid rgba(239,68,68,0.3)",
+                color: "#F87171",
+                fontSize: 14,
+                fontWeight: 700,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 9,
+                fontFamily: "inherit",
+                letterSpacing: "0.01em",
+              }}
+            >
+              {isConnecting ? "Cancel" : "End Session"}
+            </motion.button>
+          )}
+        </div>
+
+        {/* ── Bottom mode toggle ── */}
+        <div
+          style={{
+            padding: "10px 16px 14px",
+            borderTop: "1px solid rgba(255,255,255,0.05)",
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+          }}
+        >
+          {/* Voice — active */}
+          <div
+            style={{
+              flex: 1,
+              padding: "7px",
+              borderRadius: 10,
+              background: "rgba(45,212,191,0.1)",
+              border: "1px solid rgba(45,212,191,0.2)",
+              textAlign: "center",
+              fontSize: 12,
+              fontWeight: 700,
+              color: "#2DD4BF",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 5,
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+            </svg>
+            Voice
+          </div>
+          {/* Text — switch */}
+          <button
+            onClick={onSwitchToText}
+            style={{
+              flex: 1,
+              padding: "7px",
+              borderRadius: 10,
+              background: "transparent",
+              border: "1px solid rgba(255,255,255,0.07)",
+              textAlign: "center",
+              fontSize: 12,
+              fontWeight: 600,
+              color: "rgba(255,255,255,0.35)",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 5,
+              fontFamily: "inherit",
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            Text
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ─── Icon button ─────────────────────────────────────────────────────────── */
+function IconBtn({ onClick, children, title, danger }) {
+  return (
+    <button
+      onClick={onClick}
+      title={title}
+      style={{
+        width: 30,
+        height: 30,
+        borderRadius: 8,
+        background: danger ? "rgba(239,68,68,0.1)" : "rgba(255,255,255,0.06)",
+        border: danger ? "1px solid rgba(239,68,68,0.2)" : "1px solid rgba(255,255,255,0.08)",
+        color: danger ? "#F87171" : "rgba(255,255,255,0.45)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
+        outline: "none",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function SpinIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
+      style={{ animation: "spin 0.9s linear infinite" }}>
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+    </svg>
+  );
+}
+
+/* ─── Main component ─────────────────────────────────────────────────────── */
+export default function AIVoicePanel({
+  isOpen = false,
+  onClose,
+  onSwitchToText,
+  contextSource: contextSourceProp = "general",
+  studentGoal = "",
+  autoStart = false,
+  onAutoStartHandled,
+}) {
+  /* Detect context from URL if not supplied */
+  const contextSource = contextSourceProp !== "general"
+    ? contextSourceProp
+    : (typeof window !== "undefined" ? getContextSourceFromPath(window.location.pathname) : "general");
+
+  /* "closed" | "mini" | "expanded" */
+  const [panelState, setPanelState] = useState("closed");
+  const [voiceConfig, setVoiceConfig] = useState(null);
+  const [selectedVoice, setSelectedVoice] = useState("Aoede");
+  const [sessionDuration, setSessionDuration] = useState(0);
+  const [switchingToText, setSwitchingToText] = useState(false);
+  const autoStartTriggeredRef = useRef(false);
+
+  const realtimeSession = useVoiceSession();
+  const pipelineSession = useVoicePipelineSession();
+  const pipelineEnabled = env.AI_PIPELINE_ENABLED && env.AI_PIPELINE_CHANNELS.includes("voice");
+  const session = pipelineEnabled ? pipelineSession : realtimeSession;
+
+  const {
+    status = "idle",
+    error,
+    transcript,
+    isSpeaking = false,
+    audioLevel = 0,
+    isCapturing = false,
+    actionProposals = [],
+    latestResult = null,
+    startTurn = () => {},
+    stopTurn = () => {},
+    confirmProposal = async () => null,
+    connect,
+    disconnect,
+  } = session;
+
+  const isActive = status === "active";
+
+  /* Inject fonts */
+  useEffect(() => { injectFont(); }, []);
+
+  /* Sync isOpen prop */
+  useEffect(() => {
+    if (isOpen && panelState === "closed") setPanelState("expanded");
+    else if (!isOpen && panelState !== "closed") {
+      disconnect?.();
+      setPanelState("closed");
+    }
+  }, [isOpen]); // eslint-disable-line
+
+  /* Load voice config on expand */
+  useEffect(() => {
+    if (panelState !== "closed" && !voiceConfig) {
+      (async () => {
+        try {
+          if (pipelineEnabled) {
+            const cfg = await assistantPipelineService.getConfig();
+            setVoiceConfig({
+              ws_url: "",
+              session_memory: [],
+              onboarding_context: {},
+              auto_intro_prompt: "",
+              available_voices: cfg?.available_voices || [],
+            });
+          } else {
+            const cfg = await mentoringService.getVoiceConfig();
+            setVoiceConfig(cfg);
+          }
+        } catch (e) { console.error("Voice config:", e); }
+      })();
+    }
+  }, [panelState, voiceConfig, pipelineEnabled]);
+
+  /* Timer */
+  useEffect(() => {
+    let t;
+    if (isActive) t = setInterval(() => setSessionDuration((s) => s + 1), 1000);
+    else setSessionDuration(0);
+    return () => clearInterval(t);
+  }, [isActive]);
+
+  /* Auto-start */
+  useEffect(() => {
+    if (!isOpen) { autoStartTriggeredRef.current = false; return; }
+    if (autoStart && panelState === "expanded" && voiceConfig && status === "idle" && !autoStartTriggeredRef.current) {
+      autoStartTriggeredRef.current = true;
+      handleStart(true);
+      onAutoStartHandled?.();
+    }
+  }, [isOpen, autoStart, panelState, voiceConfig, status]); // eslint-disable-line
+
+  const formatTime = (s) =>
+    `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
+
+  const handleStart = useCallback((byAutoStart = false) => {
+    if (!voiceConfig) return;
+    connect?.({
+      wsUrl: voiceConfig.ws_url,
+      contextSource,
+      studentGoal,
+      sessionMemory: voiceConfig.session_memory,
+      voiceName: selectedVoice,
+      onboardingContext: voiceConfig.onboarding_context || {},
+      initialPrompt: byAutoStart ? (voiceConfig.auto_intro_prompt || "") : "",
+      languagePreference: "hinglish",
+    });
+  }, [voiceConfig, connect, contextSource, studentGoal, selectedVoice]);
+
+  const handleEnd = useCallback(() => {
+    disconnect?.();
+    setPanelState("closed");
+    onClose?.();
+  }, [disconnect, onClose]);
+
+  const handleMinimize = useCallback(() => setPanelState("mini"), []);
+  const handleExpand   = useCallback(() => setPanelState("expanded"), []);
+
+  const handleSwitchToText = useCallback(() => {
+    setSwitchingToText(true);
+    setTimeout(() => {
+      disconnect?.();
+      setPanelState("closed");
+      setSwitchingToText(false);
+      onSwitchToText?.();
+    }, 300);
+  }, [disconnect, onSwitchToText]);
+
+  const sharedProps = {
+    status, isSpeaking, audioLevel, sessionDuration, formatTime,
+    contextSource, studentGoal, voiceConfig, selectedVoice, setSelectedVoice,
+    transcript, error, pipelineEnabled, isCapturing,
+    latestResult, actionProposals, confirmProposal,
+    startTurn, stopTurn,
+    onMinimize: handleMinimize,
+    onClose: handleEnd,
+    onStart: handleStart,
+    onEnd: handleEnd,
+    onSwitchToText: handleSwitchToText,
+    onExpand: handleExpand,
+  };
+
+  return (
+    <AnimatePresence>
+      {panelState === "expanded" && <ExpandedPanel key="expanded" {...sharedProps} />}
+      {panelState === "mini"     && (
+        <MiniPill
+          key="mini"
+          isActive={isActive}
+          isSpeaking={isSpeaking}
+          audioLevel={audioLevel}
+          sessionDuration={sessionDuration}
+          formatTime={formatTime}
+          onExpand={handleExpand}
+          onEnd={handleEnd}
+        />
+      )}
+    </AnimatePresence>
+  );
 }
