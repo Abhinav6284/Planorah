@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Zap, TrendingUp, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Zap, TrendingUp, CheckCircle2, Sparkles } from "lucide-react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
   Float,
@@ -11,9 +11,6 @@ import {
   MeshTransmissionMaterial,
 } from "@react-three/drei";
 
-// ── Mobile detection ──────────────────────────────────────────────────────────
-// Disable WebGL on screens narrower than 1024 px (phones + tablets).
-// Checked once on mount, then kept in sync on resize.
 function useIsSmallScreen() {
   const [isSmall, setIsSmall] = useState(() =>
     typeof window !== "undefined" ? window.innerWidth < 1024 : false
@@ -26,7 +23,6 @@ function useIsSmallScreen() {
   return isSmall;
 }
 
-// ── 3-D scene (desktop only) ──────────────────────────────────────────────────
 function PlanoraSphere() {
   const groupRef = useRef();
   useFrame((state) => {
@@ -39,7 +35,6 @@ function PlanoraSphere() {
 
   return (
     <group ref={groupRef}>
-      {/* Outer Torus — Terracotta */}
       <mesh position={[0, 0, 0]}>
         <torusGeometry args={[2.2, 0.38, 64, 128]} />
         <MeshTransmissionMaterial
@@ -57,8 +52,6 @@ function PlanoraSphere() {
           color="#D96C4A"
         />
       </mesh>
-
-      {/* Inner Icosahedron — Charcoal */}
       <mesh position={[0, 0, 0]} rotation={[Math.PI / 4, Math.PI / 4, 0]}>
         <icosahedronGeometry args={[1, 0]} />
         <MeshTransmissionMaterial
@@ -74,23 +67,16 @@ function PlanoraSphere() {
   );
 }
 
-// ── CSS-only orb fallback (mobile / tablet) ───────────────────────────────────
-// Mimics the terracotta torus + icosahedron without any GPU/WebGL usage.
 function MobileOrbFallback() {
   return (
     <div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none">
-      {/* Ambient glow */}
       <div className="absolute w-80 h-80 rounded-full bg-terracotta/10 blur-3xl" />
-
-      {/* Outer dashed torus ring */}
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 16, repeat: Infinity, ease: "linear" }}
         className="absolute w-64 h-64 rounded-full"
         style={{ border: "2.5px dashed rgba(217,108,74,0.30)" }}
       />
-
-      {/* Mid ring */}
       <motion.div
         animate={{ rotate: -360 }}
         transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
@@ -188,53 +174,88 @@ export default function HeroSection() {
                 Transform ambitions into achievements with intelligent productivity.
               </motion.p>
 
-              {/* CTA Buttons */}
+              {/* CTA Buttons - BOLD & PROMINENT */}
               <motion.div
-                className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-1 sm:mt-2"
-                initial={{ opacity: 0, y: 20 }}
+                className="flex flex-col sm:flex-row gap-4 sm:gap-5 mt-6 sm:mt-8"
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.8 }}
               >
-                <Link to="/register" className="w-full sm:w-auto">
+                {/* PRIMARY CTA - MASSIVE, GLOWING */}
+                <Link to="/register" className="w-full sm:w-auto flex-1">
                   <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full px-9 py-4 text-[15px] font-semibold bg-white text-charcoal rounded-full shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-2 group font-outfit"
+                    whileHover={{ scale: 1.05, boxShadow: "0 0 60px rgba(217, 108, 74, 0.8)" }}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-full px-10 py-5 text-lg font-bold bg-gradient-to-r from-terracotta to-[#E8956A] text-white rounded-full shadow-2xl hover:shadow-terracotta/50 transition-all duration-300 flex items-center justify-center gap-3 group font-outfit relative overflow-hidden"
                   >
-                    Start for Free
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <Sparkles className="w-5 h-5 group-hover:animate-spin" />
+                    Start Free Now
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
                   </motion.button>
                 </Link>
-                <a href="#pricing" className="w-full sm:w-auto">
+
+                {/* SECONDARY CTA - PRICING */}
+                <Link to="/pricing" className="w-full sm:w-auto">
                   <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full px-9 py-4 text-[15px] font-semibold text-white border border-white/20 rounded-full hover:bg-white/10 transition-all flex items-center justify-center gap-2 font-outfit"
+                    whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.15)" }}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-full px-10 py-5 text-lg font-bold text-white border-2 border-white/40 rounded-full hover:border-white/70 transition-all duration-300 flex items-center justify-center gap-2 font-outfit backdrop-blur-sm"
                   >
-                    View Pricing →
+                    View Plans & Pricing
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </motion.button>
-                </a>
+                </Link>
               </motion.div>
 
-              {/* Stats Row */}
+              {/* Trust badges below buttons */}
               <motion.div
-                className="flex gap-6 sm:gap-8 pt-2 text-sm font-outfit"
+                className="flex flex-wrap gap-3 sm:gap-4 mt-6 text-sm"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.7, duration: 0.8 }}
+                transition={{ delay: 0.7 }}
               >
-                <div>
-                  <div className="text-xl sm:text-2xl font-bold text-white">5.0 ★</div>
-                  <div className="text-gray-400 text-xs sm:text-sm">Avg Rating</div>
+                <div className="flex items-center gap-2 text-gray-300">
+                  <CheckCircle2 className="w-5 h-5 text-terracotta" />
+                  <span>No credit card required</span>
                 </div>
-                <div>
-                  <div className="text-xl sm:text-2xl font-bold text-white">10,000+</div>
-                  <div className="text-gray-400 text-xs sm:text-sm">Active Users</div>
+                <div className="flex items-center gap-2 text-gray-300">
+                  <CheckCircle2 className="w-5 h-5 text-terracotta" />
+                  <span>Free forever plan</span>
                 </div>
-                <div>
-                  <div className="text-xl sm:text-2xl font-bold text-white">42%</div>
-                  <div className="text-gray-400 text-xs sm:text-sm">Productivity Boost</div>
+                <div className="flex items-center gap-2 text-gray-300">
+                  <CheckCircle2 className="w-5 h-5 text-terracotta" />
+                  <span>Cancel anytime</span>
                 </div>
+              </motion.div>
+
+              {/* Stats Row - BOLD NUMBERS */}
+              <motion.div
+                className="grid grid-cols-3 gap-4 sm:gap-8 pt-10 sm:pt-12 border-t border-white/10"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8, duration: 0.8 }}
+              >
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  className="text-center"
+                >
+                  <div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-terracotta to-[#E8956A] bg-clip-text text-transparent">5.0★</div>
+                  <div className="text-gray-400 text-xs sm:text-sm mt-2 font-outfit">Avg Rating</div>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  className="text-center"
+                >
+                  <div className="text-4xl sm:text-5xl font-bold text-white">10K+</div>
+                  <div className="text-gray-400 text-xs sm:text-sm mt-2 font-outfit">Active Users</div>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  className="text-center"
+                >
+                  <div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-terracotta to-[#E8956A] bg-clip-text text-transparent">42%</div>
+                  <div className="text-gray-400 text-xs sm:text-sm mt-2 font-outfit">Productivity +</div>
+                </motion.div>
               </motion.div>
             </motion.div>
 

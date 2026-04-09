@@ -29,7 +29,7 @@ const skillData = [
 
 export default function StatsWithCharts() {
   return (
-    <section className="py-20 px-6 bg-beigePrimary dark:bg-charcoal">
+    <section id="analytics" className="scroll-mt-32 py-20 px-6 bg-beigePrimary dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -52,13 +52,13 @@ export default function StatsWithCharts() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis dataKey="day" stroke="#9ca3af" />
                 <YAxis stroke="#9ca3af" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1f2937', 
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#1f2937',
                     border: '1px solid #374151',
                     borderRadius: '8px',
                     color: '#f3f4f6'
-                  }} 
+                  }}
                 />
                 <Bar dataKey="completed" stackId="a" fill="#10b981" radius={[8, 8, 0, 0]} />
                 <Bar dataKey="tasks" stackId="a" fill="#dbeafe" radius={[8, 8, 0, 0]} />
@@ -94,13 +94,13 @@ export default function StatsWithCharts() {
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
                 </Pie>
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1f2937', 
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#1f2937',
                     border: '1px solid #374151',
                     borderRadius: '8px',
                     color: '#f3f4f6'
-                  }} 
+                  }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -125,18 +125,18 @@ export default function StatsWithCharts() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis dataKey="month" stroke="#9ca3af" />
                 <YAxis stroke="#9ca3af" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1f2937', 
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#1f2937',
                     border: '1px solid #374151',
                     borderRadius: '8px',
                     color: '#f3f4f6'
-                  }} 
+                  }}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="xp" 
-                  stroke="#3b82f6" 
+                <Line
+                  type="monotone"
+                  dataKey="xp"
+                  stroke="#3b82f6"
                   strokeWidth={3}
                   dot={{ fill: '#3b82f6', r: 5 }}
                   activeDot={{ r: 7 }}

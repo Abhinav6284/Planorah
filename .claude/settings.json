@@ -16,7 +16,9 @@
       "Bash(wait)",
       "Bash(CI=true npm test -- CompactWidget.test.jsx --testPathPattern=\"CompactWidget\")",
       "Bash(tee /tmp/test_output.txt)",
-      "Bash(python -m py_compile backend/urls.py)"
+      "Bash(python -m py_compile backend/urls.py)",
+      "Bash(grep -l \"PublicPortfolio\" \"p:/Planora/frontend/src/components/Portfolio\"/*.jsx)",
+      "Bash(xargs ls:*)"
     ],
     "additionalDirectories": [
       "\\tmp"

@@ -46,7 +46,7 @@ export default function TestimonialsCarousel() {
   const prev = () => setCurrent((current - 1 + testimonials.length) % testimonials.length);
 
   return (
-    <section className="py-20 px-6 bg-beigePrimary dark:bg-charcoal">
+    <section id="testimonials" className="scroll-mt-32 py-20 px-6 bg-beigePrimary dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -103,9 +103,8 @@ export default function TestimonialsCarousel() {
                 <button
                   key={idx}
                   onClick={() => setCurrent(idx)}
-                  className={`w-3 h-3 rounded-full transition ${
-                    idx === current ? "bg-gray-950 dark:bg-white" : "bg-gray-300 dark:bg-white/[0.2]"
-                  }`}
+                  className={`w-3 h-3 rounded-full transition ${idx === current ? "bg-gray-950 dark:bg-white" : "bg-gray-300 dark:bg-white/[0.2]"
+                    }`}
                 />
               ))}
             </div>

@@ -16,11 +16,16 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: "Product", href: "#features" },
-    { name: "Features", href: "#features" },
-    { name: "Pricing", href: "#pricing" },
-    { name: "Resources", href: "#resources" },
+    { name: "Features", href: "#features", type: "anchor" },
+    { name: "How It Works", href: "#how-it-works", type: "anchor" },
+    { name: "Pricing", href: "#pricing", type: "anchor" },
+    { name: "Founder", href: "/founder", type: "route" },
+    { name: "Careers", href: "/careers", type: "route" },
+    { name: "Contact", href: "/contact", type: "route" },
+    { name: "Blog", href: "/blogs", type: "route" },
   ];
+  const navLinkClass = "text-[14px] font-outfit font-medium text-textSecondary dark:text-gray-400 hover:text-charcoal dark:hover:text-beigePrimary transition-colors relative group";
+  const navUnderlineClass = "absolute -bottom-1 left-0 w-0 h-[2px] bg-terracotta transition-all duration-300 group-hover:w-full rounded-full opacity-0 group-hover:opacity-100";
 
   return (
     <>
@@ -30,8 +35,8 @@ export default function Navbar() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: "spring", stiffness: 100, damping: 20 }}
           className={`flex items-center justify-between gap-8 px-8 py-3.5 rounded-full transition-all duration-300 max-w-6xl w-full ${scrolled
-              ? "bg-white/70 dark:bg-charcoalDark/70 backdrop-blur-xl border border-beigeMuted dark:border-charcoal shadow-sm"
-              : "bg-beigePrimary/40 dark:bg-charcoalDark/40 backdrop-blur-md border border-transparent"
+            ? "bg-white/70 dark:bg-charcoalDark/70 backdrop-blur-xl border border-beigeMuted dark:border-charcoal shadow-sm"
+            : "bg-beigePrimary/40 dark:bg-charcoalDark/40 backdrop-blur-md border border-transparent"
             }`}
         >
           {/* Logo */}
@@ -46,16 +51,19 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6">
             {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="text-[14px] font-outfit font-medium text-textSecondary dark:text-gray-400 hover:text-charcoal dark:hover:text-beigePrimary transition-colors relative group"
-              >
-                {link.name}
-                <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-terracotta transition-all duration-300 group-hover:w-full rounded-full opacity-0 group-hover:opacity-100" />
-              </a>
+              link.type === "anchor" ? (
+                <a key={link.name} href={link.href} className={navLinkClass}>
+                  {link.name}
+                  <span className={navUnderlineClass} />
+                </a>
+              ) : (
+                <Link key={link.name} to={link.href} className={navLinkClass}>
+                  {link.name}
+                  <span className={navUnderlineClass} />
+                </Link>
+              )
             ))}
           </div>
 
@@ -64,6 +72,7 @@ export default function Navbar() {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
+              aria-label="Toggle color theme"
               className="p-2 rounded-full text-textSecondary dark:text-gray-400 hover:bg-beigeSecondary dark:hover:bg-charcoal transition-colors group"
             >
               {theme === "dark" ? (
@@ -93,6 +102,7 @@ export default function Navbar() {
             <button
               className="md:hidden p-2 text-textSecondary dark:text-gray-400 hover:text-charcoal dark:hover:text-beigePrimary transition-colors rounded-full hover:bg-beigeSecondary dark:hover:bg-charcoal"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -112,17 +122,25 @@ export default function Navbar() {
           >
             <div className="flex flex-col gap-2 max-w-lg mx-auto">
               {navLinks.map((link, i) => (
-                <motion.a
-                  key={link.name}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-4 py-4 text-lg font-medium text-textSecondary dark:text-gray-400 font-outfit hover:text-charcoal dark:hover:text-beigePrimary hover:bg-white dark:hover:bg-charcoal rounded-2xl transition-all shadow-sm border border-transparent hover:border-beigeMuted dark:hover:border-charcoalMuted"
-                >
-                  {link.name}
-                </motion.a>
+                <motion.div key={link.name} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}>
+                  {link.type === "anchor" ? (
+                    <a
+                      href={link.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block px-4 py-4 text-lg font-medium text-textSecondary dark:text-gray-400 font-outfit hover:text-charcoal dark:hover:text-beigePrimary hover:bg-white dark:hover:bg-charcoal rounded-2xl transition-all shadow-sm border border-transparent hover:border-beigeMuted dark:hover:border-charcoalMuted"
+                    >
+                      {link.name}
+                    </a>
+                  ) : (
+                    <Link
+                      to={link.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block px-4 py-4 text-lg font-medium text-textSecondary dark:text-gray-400 font-outfit hover:text-charcoal dark:hover:text-beigePrimary hover:bg-white dark:hover:bg-charcoal rounded-2xl transition-all shadow-sm border border-transparent hover:border-beigeMuted dark:hover:border-charcoalMuted"
+                    >
+                      {link.name}
+                    </Link>
+                  )}
+                </motion.div>
               ))}
               <motion.div
                 initial={{ opacity: 0 }}

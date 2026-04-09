@@ -29,7 +29,7 @@ const steps = [
 
 export default function ProcessSection() {
   return (
-    <section className="py-20 px-6 bg-beigeSecondary dark:bg-charcoal">
+    <section id="how-it-works" className="scroll-mt-32 py-20 px-6 bg-beigeSecondary dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">

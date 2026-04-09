@@ -77,13 +77,13 @@ export default function BlogsSection() {
 
   const filteredBlogs = blogs.filter(blog => {
     const matchesSearch = blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         blog.metaDesc.toLowerCase().includes(searchTerm.toLowerCase());
+      blog.metaDesc.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesTier = selectedTier === null || blog.tier === selectedTier;
     return matchesSearch && matchesTier;
   });
 
   return (
-    <section className="py-20 px-6 bg-beigeSecondary dark:bg-charcoal">
+    <section id="resources" className="scroll-mt-32 py-20 px-6 bg-beigeSecondary dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -114,11 +114,10 @@ export default function BlogsSection() {
           <div className="flex flex-wrap gap-2 justify-center">
             <button
               onClick={() => setSelectedTier(null)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                selectedTier === null
-                    ? "bg-terracotta text-white"
-                    : "bg-beigeMuted dark:bg-charcoalMuted/50 text-textPrimary dark:text-gray-300 hover:bg-beigeMuted dark:hover:bg-charcoalMuted"
-              }`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${selectedTier === null
+                  ? "bg-terracotta text-white"
+                  : "bg-beigeMuted dark:bg-charcoalMuted/50 text-textPrimary dark:text-gray-300 hover:bg-beigeMuted dark:hover:bg-charcoalMuted"
+                }`}
             >
               All Guides
             </button>
@@ -126,11 +125,10 @@ export default function BlogsSection() {
               <button
                 key={idx}
                 onClick={() => setSelectedTier(idx + 1)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                  selectedTier === idx + 1
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${selectedTier === idx + 1
                     ? "bg-terracotta text-white"
                     : "bg-beigeMuted dark:bg-charcoalMuted/50 text-textPrimary dark:text-gray-300 hover:bg-beigeMuted dark:hover:bg-charcoalMuted"
-                }`}
+                  }`}
               >
                 {label}
               </button>
@@ -142,32 +140,32 @@ export default function BlogsSection() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredBlogs.length > 0 ? (
             filteredBlogs.map((blog, idx) => (
-                <Link
-                  key={idx}
-                  to={`/blogs?article=${blog.slug}`}
-                  className="bg-white dark:bg-charcoal border border-beigeMuted dark:border-charcoalMuted rounded-2xl p-6 hover:border-terracotta/40 dark:hover:border-terracotta/30 hover:shadow-soft transition-all duration-300 group flex flex-col"
-                >
-                  {/* Category Label */}
-                  <div className="inline-flex w-fit px-3 py-1 rounded-lg bg-terracotta/10 text-terracotta dark:bg-terracotta/20 dark:text-orange-300 text-xs font-semibold mb-4 border border-terracotta/20">
-                    {getTierLabel(blog.tier)}
-                  </div>
+              <Link
+                key={idx}
+                to={`/blogs?article=${blog.slug}`}
+                className="bg-white dark:bg-charcoal border border-beigeMuted dark:border-charcoalMuted rounded-2xl p-6 hover:border-terracotta/40 dark:hover:border-terracotta/30 hover:shadow-soft transition-all duration-300 group flex flex-col"
+              >
+                {/* Category Label */}
+                <div className="inline-flex w-fit px-3 py-1 rounded-lg bg-terracotta/10 text-terracotta dark:bg-terracotta/20 dark:text-orange-300 text-xs font-semibold mb-4 border border-terracotta/20">
+                  {getTierLabel(blog.tier)}
+                </div>
 
-                  {/* Title */}
-                  <h3 className="text-xl font-outfit font-bold text-textPrimary dark:text-beigePrimary mb-3 group-hover:text-terracotta dark:group-hover:text-terracotta transition-colors line-clamp-3">
-                    {blog.title}
-                  </h3>
+                {/* Title */}
+                <h3 className="text-xl font-outfit font-bold text-textPrimary dark:text-beigePrimary mb-3 group-hover:text-terracotta dark:group-hover:text-terracotta transition-colors line-clamp-3">
+                  {blog.title}
+                </h3>
 
-                  {/* Description */}
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow line-clamp-3">
-                    {blog.metaDesc}
-                  </p>
+                {/* Description */}
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow line-clamp-3">
+                  {blog.metaDesc}
+                </p>
 
-                  {/* Meta */}
-                  <div className="flex items-center justify-between pt-4 border-t border-beigeMuted dark:border-charcoalMuted">
-                    <span className="text-xs text-textSecondary dark:text-gray-400">{blog.words}</span>
-                    <ArrowRight className="w-4 h-4 text-textSecondary group-hover:text-terracotta dark:group-hover:text-terracotta group-hover:translate-x-1 transition-all" />
-                  </div>
-                </Link>
+                {/* Meta */}
+                <div className="flex items-center justify-between pt-4 border-t border-beigeMuted dark:border-charcoalMuted">
+                  <span className="text-xs text-textSecondary dark:text-gray-400">{blog.words}</span>
+                  <ArrowRight className="w-4 h-4 text-textSecondary group-hover:text-terracotta dark:group-hover:text-terracotta group-hover:translate-x-1 transition-all" />
+                </div>
+              </Link>
             ))
           ) : (
             <div className="col-span-full text-center py-12">

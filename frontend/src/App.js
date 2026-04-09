@@ -65,6 +65,14 @@ const PlanoraDashboard = lazy(() => import('./components/Planora/PlanoraDashboar
 const SubjectDetail = lazy(() => import('./components/Planora/SubjectDetail'));
 const TopicDetail = lazy(() => import('./components/Planora/TopicDetail'));
 const StudyPlanner = lazy(() => import('./components/Planora/StudyPlanner'));
+// New SEO Marketing Pages
+const FeaturesPage = lazy(() => import('./components/FeaturesPage'));
+const PricingPublicPage = lazy(() => import('./components/PricingPublicPage'));
+const AboutPage = lazy(() => import('./components/AboutPage'));
+const ContactPage = lazy(() => import('./components/ContactPage'));
+const CareersPage = lazy(() => import('./components/CareersPage'));
+const PrivacyPage = lazy(() => import('./components/legal/PrivacyPage'));
+const TermsPage = lazy(() => import('./components/legal/TermsPage'));
 
 export default function App() {
   // Subdomain detection logic
@@ -135,13 +143,17 @@ export default function App() {
                   {/* Public Portfolio Route - No Auth Required */}
                   <Route path="/p/:slug" element={<PublicPortfolio />} />
 
-                  {/* Public Support Page - No Auth Required */}
+                  {/* Public Pages - No Auth Required */}
                   <Route path="/support" element={<SupportPage />} />
-                  <Route path="/contact" element={<Navigate to="/support" replace />} />
-                  {/* Legal pages are routed to support until dedicated pages are shipped */}
-                  <Route path="/privacy" element={<Navigate to="/support" replace />} />
-                  <Route path="/terms" element={<Navigate to="/support" replace />} />
-                  <Route path="/cookies" element={<Navigate to="/support" replace />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/careers" element={<CareersPage />} />
+                  <Route path="/career" element={<Navigate to="/careers" replace />} />
+                  <Route path="/features" element={<FeaturesPage />} />
+                  <Route path="/pricing" element={<PricingPublicPage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/founder" element={<AboutPage />} />
+                  <Route path="/privacy" element={<PrivacyPage />} />
+                  <Route path="/terms" element={<TermsPage />} />
                   {/* Backward-compatible legacy legal paths */}
                   <Route path="/privacy-policy" element={<Navigate to="/privacy" replace />} />
                   <Route path="/terms-of-service" element={<Navigate to="/terms" replace />} />

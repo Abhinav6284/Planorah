@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-export default function Footer() {
+export default function PublicSiteFooter() {
   return (
     <footer className="bg-[#F5F1E8] dark:bg-charcoalDark border-t border-gray-300 dark:border-charcoalMuted py-16 px-6">
       <div className="max-w-7xl mx-auto">
@@ -14,25 +14,26 @@ export default function Footer() {
             </Link>
             <p className="text-sm text-gray-600 dark:text-gray-400">Master your daily progress with AI-powered planning.</p>
           </div>
+
           <div>
             <h4 className="font-semibold text-gray-950 dark:text-white mb-4">Product</h4>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-              <li><a href="#features" className="hover:text-gray-950 dark:hover:text-white transition">Features</a></li>
-              <li><a href="#how-it-works" className="hover:text-gray-950 dark:hover:text-white transition">How It Works</a></li>
-              <li><a href="#pricing" className="hover:text-gray-950 dark:hover:text-white transition">Pricing</a></li>
-              <li><a href="#resources" className="hover:text-gray-950 dark:hover:text-white transition">Resources</a></li>
+              <li><Link to="/features" className="hover:text-gray-950 dark:hover:text-white transition">Features</Link></li>
+              <li><Link to="/pricing" className="hover:text-gray-950 dark:hover:text-white transition">Pricing</Link></li>
+              <li><Link to="/blogs" className="hover:text-gray-950 dark:hover:text-white transition">Resources</Link></li>
+              <li><Link to="/support" className="hover:text-gray-950 dark:hover:text-white transition">Support</Link></li>
             </ul>
           </div>
+
           <div>
             <h4 className="font-semibold text-gray-950 dark:text-white mb-4">Company</h4>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
               <li><Link to="/founder" className="hover:text-gray-950 dark:hover:text-white transition">Founder</Link></li>
               <li><Link to="/careers" className="hover:text-gray-950 dark:hover:text-white transition">Careers</Link></li>
               <li><Link to="/contact" className="hover:text-gray-950 dark:hover:text-white transition">Contact</Link></li>
-              <li><Link to="/blogs" className="hover:text-gray-950 dark:hover:text-white transition">Blog</Link></li>
-              <li><Link to="/support" className="hover:text-gray-950 dark:hover:text-white transition">Support</Link></li>
             </ul>
           </div>
+
           <div>
             <h4 className="font-semibold text-gray-950 dark:text-white mb-4">Legal</h4>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
@@ -42,7 +43,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-gray-300 dark:border-charcoalMuted pt-8 text-center text-sm text-gray-600 dark:text-gray-400">
-          <p>© 2024 Planorah. All rights reserved.</p>
+          <p>© 2026 Planorah. All rights reserved.</p>
         </div>
       </div>
     </footer>

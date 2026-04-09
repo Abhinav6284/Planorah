@@ -1,4 +1,5 @@
 import { Check } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const plans = [
   {
@@ -13,6 +14,7 @@ const plans = [
       "Community support",
     ],
     cta: "Get Started",
+    href: "/register",
     highlighted: false,
   },
   {
@@ -29,6 +31,7 @@ const plans = [
       "Priority support",
     ],
     cta: "Start Free Trial",
+    href: "/pricing",
     highlighted: true,
   },
   {
@@ -46,13 +49,14 @@ const plans = [
       "API access",
     ],
     cta: "Get Elite",
+    href: "/pricing",
     highlighted: false,
   },
 ];
 
 export default function PricingSection() {
   return (
-    <section id="pricing" className="py-20 px-6 bg-beigeSecondary dark:bg-charcoal">
+    <section id="pricing" className="scroll-mt-32 py-20 px-6 bg-beigeSecondary dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -105,14 +109,15 @@ export default function PricingSection() {
                 </div>
 
                 {/* CTA Button */}
-                <button
-                  className={`w-full py-3 rounded-lg font-medium mb-8 transition-all duration-300 ${plan.highlighted
+                <Link
+                  to={plan.href}
+                  className={`w-full inline-flex items-center justify-center py-3 rounded-lg font-medium mb-8 transition-all duration-300 ${plan.highlighted
                       ? "bg-white dark:bg-charcoalDark text-gray-950 dark:text-white hover:bg-[#EBE6DA] dark:hover:bg-charcoal"
                       : "bg-[#EBE6DA] dark:bg-white/[0.06] text-gray-950 dark:text-white hover:bg-[#EBE6DA]/80 dark:hover:bg-white/[0.08]"
                     }`}
                 >
                   {plan.cta}
-                </button>
+                </Link>
 
                 {/* Features */}
                 <ul className="space-y-4">

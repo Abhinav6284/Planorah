@@ -3,15 +3,8 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function CTASection() {
-  const handlePricingClick = () => {
-    const pricingElement = document.getElementById('pricing');
-    if (pricingElement) {
-      pricingElement.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
-    <section className="py-32 px-4 sm:px-6 lg:px-8 bg-beigeSecondary dark:bg-charcoal border-y border-beigeMuted dark:border-white/[0.06] overflow-hidden relative">
+    <section id="get-started" className="scroll-mt-32 py-32 px-4 sm:px-6 lg:px-8 bg-beigeSecondary dark:bg-charcoal border-y border-beigeMuted dark:border-white/[0.06] overflow-hidden relative">
       <div className="max-w-4xl mx-auto text-center relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -36,12 +29,12 @@ export default function CTASection() {
               Start for Free
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <button
-              onClick={handlePricingClick}
+            <a
+              href="#pricing"
               className="inline-flex items-center justify-center h-14 px-8 rounded-full border border-beigeMuted dark:border-white/[0.08] text-gray-950 dark:text-white font-outfit font-medium hover:bg-beigeSecondary dark:hover:bg-white/[0.06] transition-all duration-300"
             >
               View Pricing
-            </button>
+            </a>
           </div>
 
           <motion.div

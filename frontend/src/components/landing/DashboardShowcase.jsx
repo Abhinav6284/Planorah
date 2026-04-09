@@ -2,7 +2,7 @@ import { Zap, Target, TrendingUp, Calendar } from "lucide-react";
 
 export default function DashboardShowcase() {
   return (
-    <section className="py-20 px-6 bg-beigeSecondary dark:bg-charcoal">
+    <section id="dashboard-preview" className="scroll-mt-32 py-20 px-6 bg-beigeSecondary dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">

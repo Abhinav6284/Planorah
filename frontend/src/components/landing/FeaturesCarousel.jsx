@@ -74,7 +74,7 @@ export default function FeaturesCarousel() {
   const Icon = feature.icon;
 
   return (
-    <section className="py-20 px-6 bg-beigePrimary dark:bg-charcoal">
+    <section id="features" className="scroll-mt-32 py-20 px-6 bg-beigePrimary dark:bg-charcoal">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -128,9 +128,8 @@ export default function FeaturesCarousel() {
                   <button
                     key={idx}
                     onClick={() => setCurrent(idx)}
-                    className={`w-2 h-2 rounded-full transition ${
-                      idx === current ? "bg-gray-950 dark:bg-white" : "bg-gray-300 dark:bg-white/[0.2]"
-                    }`}
+                    className={`w-2 h-2 rounded-full transition ${idx === current ? "bg-gray-950 dark:bg-white" : "bg-gray-300 dark:bg-white/[0.2]"
+                      }`}
                   />
                 ))}
               </div>
