@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { BrainCircuit, Flame, Sparkles, CheckCircle2, Clock, Zap } from 'lucide-react';
+import { BrainCircuit, Flame, Sparkles, CheckCircle2, Clock, Zap, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTour } from '../Tour/TourContext';
 
 import AIVoicePanel from '../Mentoring/AIVoicePanel';
 import ModeSwitch from './Execution/ModeSwitch';
@@ -205,6 +206,8 @@ const ExecutionDashboard = () => {
 
     const openVoicePanel = useCallback(() => setVoicePanelOpen(true), []);
     const closeVoicePanel = useCallback(() => setVoicePanelOpen(false), []);
+
+    const { start: startTour } = useTour();
 
     const activeTasks = useMemo(() => mode === 'exam' ? examTasks : tasks, [mode, examTasks, tasks]);
     const streak = userStats?.streak?.current || profile?.profile?.streak_count || progress?.stats?.current_streak || 0;
