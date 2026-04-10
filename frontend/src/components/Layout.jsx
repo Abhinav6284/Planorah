@@ -3,6 +3,7 @@ import { Outlet, useLocation, Link } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import AITalkPanel from './Mentoring/AITalkPanel';
 import AIVoicePanel from './Mentoring/AIVoicePanel';
+import AIMentorWidget from './AIMentorWidget';
 import WelcomeCoach from './Onboarding/WelcomeCoach';
 import { TourProvider } from './Tour/TourContext';
 import GuidedTour from './Tour/GuidedTour';
@@ -197,6 +198,9 @@ const Layout = () => {
 
             {/* Guided tour — only on dashboard routes */}
             {location.pathname.startsWith('/dashboard') && <GuidedTour />}
+
+            {/* AI Mentor Widget — Notion-style floating chat */}
+            <AIMentorWidget />
         </div>
         </TourProvider>
     );

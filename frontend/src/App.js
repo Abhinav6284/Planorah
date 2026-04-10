@@ -12,7 +12,6 @@ import { DashboardSkeleton } from "./components/common/Skeleton";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Layout from './components/Layout';
-import AIMentorWidget from './components/AIMentorWidget';
 
 // Lazy-loaded (non-critical, code-split)
 const WelcomePage = lazy(() => import("./components/WelcomePage"));
@@ -111,7 +110,6 @@ export default function App() {
                 <VercelAnalytics />
               </ErrorBoundary>
             </Router>
-            <AIMentorWidget />
           </SubscriptionProvider>
         </ToastProvider>
       </ThemeProvider>
@@ -207,7 +205,6 @@ export default function App() {
               <VercelAnalytics />
             </ErrorBoundary>
           </Router>
-          <AIMentorWidget />
         </SubscriptionProvider>
       </ToastProvider>
     </ThemeProvider>
