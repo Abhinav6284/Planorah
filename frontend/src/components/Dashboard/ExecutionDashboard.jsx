@@ -351,10 +351,19 @@ const ExecutionDashboard = () => {
                                 {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                             </p>
                         </div>
+                        {/* Tour trigger button */}
+                        <button
+                            onClick={startTour}
+                            title="Take a guided tour"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 dark:border-white/10 bg-white/60 dark:bg-white/5 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:border-terracotta/50 hover:text-terracotta dark:hover:text-terracotta transition-all"
+                        >
+                            <HelpCircle className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline">Take tour</span>
+                        </button>
                     </div>
 
                     {/* Inline Stats Pills */}
-                    <div className="flex flex-wrap items-center gap-3">
+                    <div data-tour="header-stats" className="flex flex-wrap items-center gap-3">
                         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 dark:border-white/10 bg-white/50 dark:bg-white/5 text-sm font-medium text-gray-600 dark:text-gray-300">
                             <CheckCircle2 className="w-3.5 h-3.5 text-terracotta" />
                             <span>{mergedStats.tasks_completed} done</span>
@@ -377,7 +386,7 @@ const ExecutionDashboard = () => {
                 </div>
 
                 {/* HERO: TODAY'S MISSION */}
-                <div className="mb-8">
+                <div data-tour="today-mission" className="mb-8">
                     <TodayExecution
                         user={profile}
                         todayTask={todayTask}
@@ -394,7 +403,7 @@ const ExecutionDashboard = () => {
                     {/* LEFT COLUMN: Main Activities */}
                     <div className="space-y-6 lg:col-span-8">
                         {/* Mode Switcher — compact */}
-                        <div className="flex items-center justify-between gap-4 px-4 py-3 rounded-lg bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+                        <div data-tour="mode-switch" className="flex items-center justify-between gap-4 px-4 py-3 rounded-lg bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
                             <div className="flex items-center gap-3">
                                 <ModeSwitch mode={mode} onChange={setMode} />
                                 <span className="text-xs text-gray-600 dark:text-gray-400 font-semibold hidden sm:inline">
@@ -402,6 +411,7 @@ const ExecutionDashboard = () => {
                                 </span>
                             </div>
                             <button
+                                data-tour="ai-coach-btn"
                                 onClick={openVoicePanel}
                                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-terracotta hover:bg-terracottaHover text-white font-semibold text-xs sm:text-sm transition-all active:scale-95"
                             >
@@ -411,7 +421,7 @@ const ExecutionDashboard = () => {
                         </div>
 
                         {/* Schedule Section */}
-                        <div className={shellCardClass}>
+                        <div data-tour="schedule" className={shellCardClass}>
                             <div className="mb-4 flex items-center justify-between pb-2">
                                 <h3 className="text-lg font-bold text-gray-950 dark:text-white">Schedule</h3>
                                 <span className="text-xs font-semibold text-textSecondary dark:text-gray-500">Days</span>
@@ -495,7 +505,7 @@ const ExecutionDashboard = () => {
 
                         {/* Mode-specific Linked Section */}
                         {mode === 'learning' ? (
-                            <div className={shellCardClass}>
+                            <div data-tour="linked-section" className={shellCardClass}>
                                 <div className="mb-4 flex items-center justify-between pb-2">
                                     <h3 className="text-lg font-bold text-gray-950 dark:text-white">Learning Path Roadmaps</h3>
                                     <Link to="/roadmap/list" className="text-xs font-semibold text-terracotta hover:text-terracottaHover">
@@ -522,7 +532,7 @@ const ExecutionDashboard = () => {
                                 )}
                             </div>
                         ) : (
-                            <div className={shellCardClass}>
+                            <div data-tour="linked-section" className={shellCardClass}>
                                 <div className="mb-4 flex items-center justify-between pb-2">
                                     <h3 className="text-lg font-bold text-gray-950 dark:text-white">Exam Subjects & Topics</h3>
                                     <Link to="/planora" className="text-xs font-semibold text-terracotta hover:text-terracottaHover">
@@ -559,19 +569,23 @@ const ExecutionDashboard = () => {
                     {/* RIGHT COLUMN: Feed, Progress & AI */}
                     <aside className="space-y-6 lg:col-span-4">
                         {/* 4. EXECUTION FEED */}
-                        <ExecutionFeed
-                            tasks={activeTasks}
-                            focusOpen={currentState === 'IN_PROGRESS'}
-                            todayTask={todayTask}
-                            streak={streak}
-                            recentActivity={userStats?.recent_activity}
-                        />
+                        <div data-tour="execution-feed">
+                            <ExecutionFeed
+                                tasks={activeTasks}
+                                focusOpen={currentState === 'IN_PROGRESS'}
+                                todayTask={todayTask}
+                                streak={streak}
+                                recentActivity={userStats?.recent_activity}
+                            />
+                        </div>
 
                         {/* 5. PROGRESS PANEL */}
-                        <ProgressPanel tasks={activeTasks} stats={mergedStats} activityHeatmap={userStats?.activity_heatmap} />
+                        <div data-tour="progress-panel">
+                            <ProgressPanel tasks={activeTasks} stats={mergedStats} activityHeatmap={userStats?.activity_heatmap} />
+                        </div>
 
                         {/* AI Insight Card */}
-                        <div className="rounded-2xl border border-terracotta/30 bg-white dark:bg-gradient-to-br dark:from-terracotta/5 dark:via-transparent dark:to-transparent p-5 shadow-soft dark:shadow-none dark:border-terracotta/20">
+                        <div data-tour="ai-insight" className="rounded-2xl border border-terracotta/30 bg-white dark:bg-gradient-to-br dark:from-terracotta/5 dark:via-transparent dark:to-transparent p-5 shadow-soft dark:shadow-none dark:border-terracotta/20">
                             <div className="flex items-center gap-2 text-terracotta">
                                 <BrainCircuit className="h-4 w-4" />
                                 <span className="text-[11px] font-bold uppercase tracking-wider">AI Insight</span>

@@ -4,6 +4,8 @@ import Sidebar from './Sidebar';
 import AITalkPanel from './Mentoring/AITalkPanel';
 import AIVoicePanel from './Mentoring/AIVoicePanel';
 import WelcomeCoach from './Onboarding/WelcomeCoach';
+import { TourProvider } from './Tour/TourContext';
+import GuidedTour from './Tour/GuidedTour';
 import { FaMicrophone } from 'react-icons/fa';
 import { Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -74,6 +76,7 @@ const Layout = () => {
     const userName = user?.first_name || user?.profile?.first_name || 'User';
 
     return (
+        <TourProvider>
         <div className="min-h-screen bg-gradient-to-br from-beigePrimary via-beigeSecondary to-beigeMuted dark:bg-charcoalDark transition-colors duration-200 font-sans flex">
             {/* Desktop Sidebar */}
             <Sidebar mobileOpen={sidebarOpen} onMobileClose={() => setSidebarOpen(false)} user={user} />
@@ -191,7 +194,11 @@ const Layout = () => {
                 autoStart={autoVoiceStart}
                 onAutoStartHandled={() => setAutoVoiceStart(false)}
             />
+
+            {/* Guided tour — only on dashboard routes */}
+            {location.pathname.startsWith('/dashboard') && <GuidedTour />}
         </div>
+        </TourProvider>
     );
 };
 
