@@ -18,7 +18,10 @@
       "Bash(tee /tmp/test_output.txt)",
       "Bash(python -m py_compile backend/urls.py)",
       "Bash(grep -l \"PublicPortfolio\" \"p:/Planora/frontend/src/components/Portfolio\"/*.jsx)",
-      "Bash(xargs ls:*)"
+      "Bash(xargs ls:*)",
+      "Bash(scripts/start-server.sh --project-dir p:\\\\Planora)",
+      "Bash(C:/Users/abhin/.claude/plugins/cache/superpowers-dev/superpowers/5.0.7/skills/brainstorming/scripts/start-server.sh --project-dir p:/Planora)",
+      "Bash(curl -s http://localhost:60758)"
     ],
     "additionalDirectories": [
       "\\tmp"

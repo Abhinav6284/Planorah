@@ -2,28 +2,96 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { mentoringService } from '../api/mentoringService';
 
-/* ── Page context from URL ─────────────────────────────────────────────────── */
-const getPageContext = () => {
-  const p = window.location.pathname;
-  if (p.startsWith('/roadmap'))   return { label: 'Roadmap',   icon: '🗺️', source: 'roadmap' };
-  if (p.startsWith('/dashboard')) return { label: 'Dashboard', icon: '⚡', source: 'dashboard' };
-  if (p.startsWith('/tasks'))     return { label: 'Tasks',     icon: '✅', source: 'tasks' };
-  if (p.startsWith('/resume'))    return { label: 'Resume',    icon: '📄', source: 'resume' };
-  if (p.startsWith('/scheduler')) return { label: 'Scheduler', icon: '📅', source: 'scheduler' };
-  if (p.startsWith('/planora'))   return { label: 'Planora',   icon: '📚', source: 'planora' };
-  if (p.startsWith('/portfolio')) return { label: 'Portfolio', icon: '🌐', source: 'portfolio' };
-  if (p.startsWith('/ats'))       return { label: 'ATS',       icon: '🎯', source: 'ats' };
-  if (p.startsWith('/projects'))  return { label: 'Projects',  icon: '⚙️', source: 'projects' };
-  if (p.startsWith('/interview')) return { label: 'Interview', icon: '🎤', source: 'interview' };
-  return { label: 'General', icon: '✨', source: 'general' };
+/* ── Page context from URL + section-specific actions ──────────────────────── */
+const SECTION_CONTEXTS = {
+  lab: { label: 'Virtual Lab', icon: '🔬', source: 'lab', section: 'LEARN' },
+  roadmap: { label: 'Learning Path', icon: '🗺️', source: 'roadmap', section: 'LEARN' },
+  projects: { label: 'My Projects', icon: '⚙️', source: 'projects', section: 'LEARN' },
+  planora: { label: 'Study Platform', icon: '📚', source: 'planora', section: 'LEARN' },
+  resume: { label: 'Resume Builder', icon: '📄', source: 'resume', section: 'CAREER' },
+  ats: { label: 'Compiled Resumes', icon: '📋', source: 'ats', section: 'CAREER' },
+  jobs: { label: 'Find Your Fit', icon: '🎯', source: 'jobs', section: 'CAREER' },
+  portfolio: { label: 'Job Finder', icon: '💼', source: 'portfolio', section: 'CAREER' },
+  interview: { label: 'Mock Interview', icon: '🎤', source: 'interview', section: 'CAREER' },
+  tasks: { label: 'Task Management', icon: '✅', source: 'tasks', section: 'LEARN' },
+  scheduler: { label: 'Scheduler', icon: '📅', source: 'scheduler', section: 'LEARN' },
+  dashboard: { label: 'Dashboard', icon: '⚡', source: 'dashboard', section: 'LEARN' },
 };
 
-const QUICK_ACTIONS = [
-  { emoji: '🎯', label: 'What should I focus on today?' },
-  { emoji: '📊', label: 'Analyze my progress' },
-  { emoji: '🗺️', label: 'Guide me through my roadmap' },
-  { emoji: '✅', label: 'Help me plan my tasks' },
-];
+const QUICK_ACTIONS_BY_SOURCE = {
+  lab: [
+    { emoji: '🔬', label: 'Help me set up this experiment' },
+    { emoji: '💡', label: 'Explain the concept' },
+    { emoji: '🚀', label: 'What should I try next?' },
+  ],
+  roadmap: [
+    { emoji: '🗺️', label: 'Guide me through my learning path' },
+    { emoji: '📊', label: 'Show my progress' },
+    { emoji: '⏭️', label: 'What should I study next?' },
+  ],
+  projects: [
+    { emoji: '⚙️', label: 'Help me plan this project' },
+    { emoji: '🎯', label: 'Suggest improvements' },
+    { emoji: '📈', label: 'How can I level up?' },
+  ],
+  planora: [
+    { emoji: '📚', label: 'Create a study plan' },
+    { emoji: '❓', label: 'Explain this topic' },
+    { emoji: '✨', label: 'Quiz me on this' },
+  ],
+  resume: [
+    { emoji: '📝', label: 'Improve my resume content' },
+    { emoji: '✍️', label: 'Make it more impactful' },
+    { emoji: '🎯', label: 'ATS optimization tips' },
+  ],
+  ats: [
+    { emoji: '📋', label: 'Score my resume' },
+    { emoji: '🔍', label: 'Check for ATS compatibility' },
+    { emoji: '💪', label: 'Strengthen weak areas' },
+  ],
+  jobs: [
+    { emoji: '🎯', label: 'Find roles matching my skills' },
+    { emoji: '📍', label: 'Best companies in my field' },
+    { emoji: '💼', label: 'Career path recommendations' },
+  ],
+  portfolio: [
+    { emoji: '💼', label: 'Best job opportunities for me' },
+    { emoji: '🎓', label: 'Salary insights by role' },
+    { emoji: '🚀', label: 'How to stand out?' },
+  ],
+  interview: [
+    { emoji: '🎤', label: 'Practice common questions' },
+    { emoji: '💬', label: 'Behavioral interview tips' },
+    { emoji: '🧠', label: 'Technical prep help' },
+  ],
+  tasks: [
+    { emoji: '✅', label: 'Prioritize my tasks' },
+    { emoji: '⏰', label: 'Plan my day' },
+    { emoji: '🎯', label: 'What should I do first?' },
+  ],
+  scheduler: [
+    { emoji: '📅', label: 'Optimize my schedule' },
+    { emoji: '⏱️', label: 'Time management tips' },
+    { emoji: '🎯', label: 'Build better habits' },
+  ],
+  dashboard: [
+    { emoji: '⚡', label: 'What should I focus on today?' },
+    { emoji: '📊', label: 'Analyze my progress' },
+    { emoji: '🎯', label: 'Productivity insights' },
+  ],
+};
+
+const getPageContext = () => {
+  const p = window.location.pathname;
+
+  for (const [key, context] of Object.entries(SECTION_CONTEXTS)) {
+    if (p.startsWith(`/${key}`)) return context;
+  }
+
+  return { label: 'General', icon: '✨', source: 'general', section: 'GENERAL' };
+};
+
+const getQuickActions = (source) => QUICK_ACTIONS_BY_SOURCE[source] || QUICK_ACTIONS_BY_SOURCE.dashboard;
 
 const uid = () => `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
@@ -207,10 +275,10 @@ export default function AIMentorWidget() {
         {open && (
           <motion.div
             key="naim-panel"
-            initial={{ opacity: 0, scale: 0.93, y: 10 }}
+            initial={{ opacity: 0, scale: 0.94, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.93, y: 10 }}
-            transition={{ type: 'spring', stiffness: 420, damping: 32, mass: 0.75 }}
+            exit={{ opacity: 0, scale: 0.94, y: 8 }}
+            transition={{ type: 'spring', stiffness: 350, damping: 28, mass: 0.6, duration: 0.4 }}
             style={{
               position: 'absolute', bottom: 58, right: 0,
               width: 400, maxHeight: 530,
@@ -292,25 +360,34 @@ export default function AIMentorWidget() {
                     ✨
                   </div>
 
-                  <h2 style={{
-                    color: 'rgba(255,255,255,0.92)', fontSize: 17.5, fontWeight: 600,
-                    margin: '0 0 18px', letterSpacing: '-0.015em', lineHeight: 1.3,
-                  }}>
-                    What's our quest today?
-                  </h2>
+                  <div style={{ marginBottom: 10 }}>
+                    <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11.5, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>
+                      {context.section} • {context.icon} {context.label}
+                    </div>
+                    <h2 style={{
+                      color: 'rgba(255,255,255,0.92)', fontSize: 17.5, fontWeight: 600,
+                      margin: '0 0 14px', letterSpacing: '-0.015em', lineHeight: 1.3,
+                    }}>
+                      How can I help?
+                    </h2>
+                  </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    {QUICK_ACTIONS.map(action => (
-                      <button
+                    {getQuickActions(context.source).map((action, idx) => (
+                      <motion.button
                         key={action.label}
                         className="naim-quick-btn"
                         onClick={() => handleQuickAction(action.label)}
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.35, delay: idx * 0.055, ease: 'easeOut' }}
+                        whileHover={{ x: 4 }}
                       >
                         <span style={{ fontSize: 14, flexShrink: 0 }}>{action.emoji}</span>
                         <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13.5, fontWeight: 400 }}>
                           {action.label}
                         </span>
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
                 </div>
@@ -322,9 +399,9 @@ export default function AIMentorWidget() {
                   {messages.map(msg => (
                     <motion.div
                       key={msg.id}
-                      initial={{ opacity: 0, y: 6 }}
+                      initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.22, ease: 'easeOut' }}
+                      transition={{ duration: 0.28, ease: 'easeOut', type: 'spring', stiffness: 400, damping: 30 }}
                     >
                       {msg.role === 'user' ? (
                         /* User bubble */
@@ -508,19 +585,19 @@ export default function AIMentorWidget() {
 
       {/* ── FAB ── */}
       <motion.button
-        whileHover={{ scale: 1.07 }}
-        whileTap={{ scale: 0.93 }}
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.95 }}
         onClick={() => setOpen(v => !v)}
         style={{
           width: 46, height: 46, borderRadius: '50%', border: 'none',
           background: '#191919',
           boxShadow: open
-            ? '0 0 0 2px rgba(35,131,226,0.5), 0 8px 24px rgba(0,0,0,0.5)'
+            ? '0 0 0 2px rgba(35,131,226,0.5), 0 12px 32px rgba(0,0,0,0.55)'
             : '0 4px 20px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.1)',
           cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           position: 'relative', overflow: 'hidden',
-          transition: 'box-shadow 0.2s ease',
+          transition: 'all 0.24s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
         {/* Spinning conic highlight */}
@@ -538,7 +615,7 @@ export default function AIMentorWidget() {
         {/* Icon */}
         <motion.div
           animate={{ rotate: open ? 90 : 0 }}
-          transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+          transition={{ type: 'spring', stiffness: 280, damping: 20, mass: 0.8, duration: 0.4 }}
           style={{ position: 'relative', zIndex: 1, color: 'rgba(255,255,255,0.9)' }}
         >
           {open ? (
