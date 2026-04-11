@@ -1,12 +1,64 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
+/* Import design system variables */
+@import "./styles/variables.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  /* HTML base styles */
+  html {
+    scroll-behavior: smooth;
+    @apply antialiased;
+  }
+
+  /* Body base styles */
   body {
     @apply bg-beigePrimary text-textPrimary dark:bg-charcoalDark dark:text-beigePrimary font-outfit antialiased selection:bg-terracotta selection:text-white transition-colors duration-500;
+  }
+
+  /* Typography defaults */
+  h1 {
+    @apply text-h1 font-bold tracking-tight;
+  }
+
+  h2 {
+    @apply text-h2 font-semibold tracking-tight;
+  }
+
+  h3 {
+    @apply text-h3 font-semibold tracking-tight;
+  }
+
+  p,
+  span {
+    @apply text-body;
+  }
+
+  small {
+    @apply text-sm;
+  }
+
+  /* Link defaults */
+  a {
+    @apply text-indigo-500 dark:text-blue-400 transition-colors duration-200 hover:text-indigo-700 dark:hover:text-blue-300 underline-offset-2;
+  }
+
+  /* Button defaults */
+  button {
+    @apply font-medium transition-all duration-200;
+  }
+
+  /* Focus visible styles for accessibility */
+  :focus-visible {
+    @apply outline-none ring-2 ring-indigo-500 ring-offset-2 dark:ring-blue-400 dark:ring-offset-0;
+  }
+
+  /* Selection color */
+  ::selection {
+    @apply bg-indigo-500 text-white dark:bg-blue-500;
   }
 }
 
@@ -19,11 +71,7 @@
   display: none;
 }
 
-/* Base resets & scrollbar for beige */
-html {
-  scroll-behavior: smooth;
-}
-
+/* Theme transition support */
 html.theme-switching *,
 html.theme-switching *::before,
 html.theme-switching *::after {
@@ -45,6 +93,7 @@ body.theme-fade-transition {
   }
 }
 
+/* Respect prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -61,14 +110,23 @@ body.theme-fade-transition {
   }
 }
 
+/* Custom scrollbar styling */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
+  height: 8px;
 }
+
 ::-webkit-scrollbar-track {
-  @apply bg-beigePrimary dark:bg-charcoalDark transition-colors duration-500;
+  @apply bg-gray-100 dark:bg-gray-900;
 }
+
 ::-webkit-scrollbar-thumb {
-  @apply bg-borderMuted dark:bg-charcoalMuted rounded-full hover:bg-beigeMuted dark:hover:bg-charcoal transition-colors duration-500;
+  @apply bg-gray-300 dark:bg-gray-700 rounded-full;
+  transition: background-color var(--transition-base);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-600;
 }
 
 .auth-container {
