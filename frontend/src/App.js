@@ -1,12 +1,13 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "./context/ThemeContext";
 import { SubscriptionProvider } from "./context/SubscriptionContext";
-import { ToastProvider } from "./components/common/Toast";
+import { ToastProvider, useToast } from "./components/common/Toast";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import { DashboardSkeleton } from "./components/common/Skeleton";
+import { useAuthStore } from "./stores/authStore";
 
 // Eagerly loaded (critical auth path)
 import Login from "./components/Login";
@@ -74,7 +75,61 @@ const CareersPage = lazy(() => import('./components/CareersPage'));
 const PrivacyPage = lazy(() => import('./components/legal/PrivacyPage'));
 const TermsPage = lazy(() => import('./components/legal/TermsPage'));
 
-export default function App() {
+/**
+ * AppInner - Handles user loading and routes based on auth state
+ * Must be inside ToastProvider to use useToast hook
+ */
+function AppInner() {
+  const setUser = useAuthStore((state) => state.setUser);
+  const setLoading = useAuthStore((state) => state.setLoading);
+  const setError = useAuthStore((state) => state.setError);
+  const toast = useToast();
+
+  // Load user on mount from API
+  useEffect(() => {
+    const loadUser = async () => {
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const response = await fetch('/api/users/me/', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (response.status === 401) {
+          // Unauthorized - clear token and user
+          localStorage.removeItem('access_token');
+          setUser(null);
+          setError('Session expired. Please log in again.');
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch user: ${response.status}`);
+        }
+
+        const userData = await response.json();
+        setUser(userData);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to load user:', err);
+        toast.error('Failed to load user profile');
+        setError(err.message);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUser();
+  }, [setUser, setLoading, setError, toast]);
+
   // Subdomain detection logic
   const hostname = window.location.hostname;
   const parts = hostname.split('.');
@@ -97,114 +152,114 @@ export default function App() {
   // If we are on a subdomain, show the public portfolio
   if (subdomain) {
     return (
-      <ThemeProvider>
-        <ToastProvider>
-          <SubscriptionProvider>
-            <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <ErrorBoundary>
-                <Suspense fallback={<DashboardSkeleton />}>
-                  <Routes>
-                    <Route path="*" element={<PublicPortfolio subdomain={subdomain} />} />
-                  </Routes>
-                </Suspense>
-                <VercelAnalytics />
-              </ErrorBoundary>
-            </Router>
-          </SubscriptionProvider>
-        </ToastProvider>
-      </ThemeProvider>
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <ErrorBoundary>
+          <Suspense fallback={<DashboardSkeleton />}>
+            <Routes>
+              <Route path="*" element={<PublicPortfolio subdomain={subdomain} />} />
+            </Routes>
+          </Suspense>
+          <VercelAnalytics />
+        </ErrorBoundary>
+      </Router>
     );
   }
 
   return (
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <ErrorBoundary>
+        <Suspense fallback={<DashboardSkeleton />}>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/blogs" element={<PlanorahBlogsPage />} />
+            <Route path="/home" element={<WelcomePage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/onboarding" element={<UniversalOnboarding />} />
+            <Route path="/onboarding/legacy" element={<StepForm />} />
+            <Route path="/complete-profile" element={<CompleteProfile />} />
+            <Route path="/verify-otp" element={<VerifyOtp />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/verify-reset-otp" element={<VerifyResetOTP />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/auth/github/callback" element={<GitHubCallback />} />
+            <Route path="/auth/spotify/callback" element={<SpotifyCallback />} />
+            <Route path="/auth/youtube/callback" element={<YouTubeCallback />} />
+
+            {/* Public Portfolio Route - No Auth Required */}
+            <Route path="/p/:slug" element={<PublicPortfolio />} />
+
+            {/* Public Pages - No Auth Required */}
+            <Route path="/support" element={<SupportPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/careers" element={<CareersPage />} />
+            <Route path="/career" element={<Navigate to="/careers" replace />} />
+            <Route path="/features" element={<FeaturesPage />} />
+            <Route path="/pricing" element={<PricingPublicPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/founder" element={<AboutPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            {/* Backward-compatible legacy legal paths */}
+            <Route path="/privacy-policy" element={<Navigate to="/privacy" replace />} />
+            <Route path="/terms-of-service" element={<Navigate to="/terms" replace />} />
+
+            {/* Protected App Routes */}
+            <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/scheduler" element={<Scheduler />} />
+              <Route path="/roadmap/generate" element={<RoadmapGenerator />} />
+              <Route path="/resume" element={<ResumeList />} />
+              <Route path="/resume/new" element={<ResumeBuilder />} />
+              <Route path="/resume/:id" element={<ResumeBuilder />} />
+              <Route path="/resume/compiled" element={<CompiledResumeList />} />
+              <Route path="/resume/compiled/:versionId" element={<CompiledResumeView />} />
+              <Route path="/ats" element={<ATSScanner />} />
+              <Route path="/jobs" element={<JobFinder />} />
+              <Route path="/interview" element={<MockInterviewComingSoon />} />
+              <Route path="/roadmap/:id" element={<RoadmapView />} />
+              <Route path="/roadmap/list" element={<RoadmapList />} />
+              <Route path="/roadmap/projects" element={<RoadmapProjects />} />
+              <Route path="/lab" element={<LabHub />} />
+              <Route path="/lab/code" element={<Navigate to="/lab/codespace" replace />} />
+              <Route path="/lab/codespace" element={<CodeSpace />} />
+              <Route path="/lab/resources" element={<ResourceHub />} />
+              <Route path="/lab/publish" element={<PublishResearch />} />
+              <Route path="/tasks" element={<TaskList />} />
+              <Route path="/tasks/day" element={<DayTimeline />} />
+              <Route path="/tasks/focus" element={<FocusMode />} />
+              <Route path="/tasks/analytics" element={<Analytics />} />
+              <Route path="/settings" element={<ProfilePage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/assistant" element={<AIAssistant />} />
+              {/* Subscription & Billing Routes */}
+              <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/subscription" element={<SubscriptionStatus />} />
+              <Route path="/billing/checkout" element={<CheckoutPage />} />
+              <Route path="/billing/history" element={<PaymentHistory />} />
+              <Route path="/portfolio/edit" element={<PortfolioEditor />} />
+              <Route path="/projects" element={<ProjectManager />} />
+              {/* Planora – AI Study Platform */}
+              <Route path="/planora" element={<PlanoraDashboard />} />
+              <Route path="/planora/subject/:subjectId" element={<SubjectDetail />} />
+              <Route path="/planora/subject/:subjectId/plan" element={<StudyPlanner />} />
+              <Route path="/planora/topic/:topicId/notes" element={<TopicDetail />} />
+              <Route path="/planora/topic/:topicId/guide" element={<TopicDetail />} />
+            </Route>
+          </Routes>
+        </Suspense>
+        <VercelAnalytics />
+      </ErrorBoundary>
+    </Router>
+  );
+}
+
+export default function App() {
+  return (
     <ThemeProvider>
       <ToastProvider>
         <SubscriptionProvider>
-          <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <ErrorBoundary>
-              <Suspense fallback={<DashboardSkeleton />}>
-                <Routes>
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="/blogs" element={<PlanorahBlogsPage />} />
-                  <Route path="/home" element={<WelcomePage />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/onboarding" element={<UniversalOnboarding />} />
-                  <Route path="/onboarding/legacy" element={<StepForm />} />
-                  <Route path="/complete-profile" element={<CompleteProfile />} />
-                  <Route path="/verify-otp" element={<VerifyOtp />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/verify-reset-otp" element={<VerifyResetOTP />} />
-                  <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/auth/github/callback" element={<GitHubCallback />} />
-                  <Route path="/auth/spotify/callback" element={<SpotifyCallback />} />
-                  <Route path="/auth/youtube/callback" element={<YouTubeCallback />} />
-
-                  {/* Public Portfolio Route - No Auth Required */}
-                  <Route path="/p/:slug" element={<PublicPortfolio />} />
-
-                  {/* Public Pages - No Auth Required */}
-                  <Route path="/support" element={<SupportPage />} />
-                  <Route path="/contact" element={<ContactPage />} />
-                  <Route path="/careers" element={<CareersPage />} />
-                  <Route path="/career" element={<Navigate to="/careers" replace />} />
-                  <Route path="/features" element={<FeaturesPage />} />
-                  <Route path="/pricing" element={<PricingPublicPage />} />
-                  <Route path="/about" element={<AboutPage />} />
-                  <Route path="/founder" element={<AboutPage />} />
-                  <Route path="/privacy" element={<PrivacyPage />} />
-                  <Route path="/terms" element={<TermsPage />} />
-                  {/* Backward-compatible legacy legal paths */}
-                  <Route path="/privacy-policy" element={<Navigate to="/privacy" replace />} />
-                  <Route path="/terms-of-service" element={<Navigate to="/terms" replace />} />
-
-                  {/* Protected App Routes */}
-                  <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/scheduler" element={<Scheduler />} />
-                    <Route path="/roadmap/generate" element={<RoadmapGenerator />} />
-                    <Route path="/resume" element={<ResumeList />} />
-                    <Route path="/resume/new" element={<ResumeBuilder />} />
-                    <Route path="/resume/:id" element={<ResumeBuilder />} />
-                    <Route path="/resume/compiled" element={<CompiledResumeList />} />
-                    <Route path="/resume/compiled/:versionId" element={<CompiledResumeView />} />
-                    <Route path="/ats" element={<ATSScanner />} />
-                    <Route path="/jobs" element={<JobFinder />} />
-                    <Route path="/interview" element={<MockInterviewComingSoon />} />
-                    <Route path="/roadmap/:id" element={<RoadmapView />} />
-                    <Route path="/roadmap/list" element={<RoadmapList />} />
-                    <Route path="/roadmap/projects" element={<RoadmapProjects />} />
-                    <Route path="/lab" element={<LabHub />} />
-                    <Route path="/lab/code" element={<Navigate to="/lab/codespace" replace />} />
-                    <Route path="/lab/codespace" element={<CodeSpace />} />
-                    <Route path="/lab/resources" element={<ResourceHub />} />
-                    <Route path="/lab/publish" element={<PublishResearch />} />
-                    <Route path="/tasks" element={<TaskList />} />
-                    <Route path="/tasks/day" element={<DayTimeline />} />
-                    <Route path="/tasks/focus" element={<FocusMode />} />
-                    <Route path="/tasks/analytics" element={<Analytics />} />
-                    <Route path="/settings" element={<ProfilePage />} />
-                    <Route path="/profile" element={<ProfilePage />} />
-                    <Route path="/assistant" element={<AIAssistant />} />
-                    {/* Subscription & Billing Routes */}
-                    <Route path="/pricing" element={<PricingPage />} />
-                    <Route path="/subscription" element={<SubscriptionStatus />} />
-                    <Route path="/billing/checkout" element={<CheckoutPage />} />
-                    <Route path="/billing/history" element={<PaymentHistory />} />
-                    <Route path="/portfolio/edit" element={<PortfolioEditor />} />
-                    <Route path="/projects" element={<ProjectManager />} />
-                    {/* Planora – AI Study Platform */}
-                    <Route path="/planora" element={<PlanoraDashboard />} />
-                    <Route path="/planora/subject/:subjectId" element={<SubjectDetail />} />
-                    <Route path="/planora/subject/:subjectId/plan" element={<StudyPlanner />} />
-                    <Route path="/planora/topic/:topicId/notes" element={<TopicDetail />} />
-                    <Route path="/planora/topic/:topicId/guide" element={<TopicDetail />} />
-                  </Route>
-                </Routes>
-              </Suspense>
-              <VercelAnalytics />
-            </ErrorBoundary>
-          </Router>
+          <AppInner />
         </SubscriptionProvider>
       </ToastProvider>
     </ThemeProvider>
