@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useMentorStore } from '../../stores/mentorStore';
+import * as mentorService from '../../services/mentorService';
+import { useToast } from '../shared/Toast';
 
 /**
  * QuickActions - 2 context-aware action buttons
@@ -29,14 +31,44 @@ const QUICK_ACTIONS = {
 };
 
 const QuickActions = ({ onActionSelect }) => {
-  const currentContext = useMentorStore((state) => state.currentContext);
+  const { currentContext, addMessage, setLoading, isLoading } = useMentorStore();
+  const { showToast } = useToast();
+  const isProcessingRef = useRef(false);
 
   const actions = QUICK_ACTIONS[currentContext] || QUICK_ACTIONS.dashboard;
 
-  const handleActionClick = (action) => {
-    // Append to input for user confirmation, or could auto-send
-    if (onActionSelect) {
-      onActionSelect(action.label);
+  const handleActionClick = async (action) => {
+    if (isProcessingRef.current || isLoading) return;
+
+    isProcessingRef.current = true;
+    const message = action.label;
+
+    // Add user message
+    addMessage({
+      role: 'user',
+      content: message,
+    });
+
+    setLoading(true);
+
+    try {
+      // Send message via API
+      const response = await mentorService.sendMessage(message, { context: currentContext });
+
+      // Add assistant response
+      addMessage({
+        role: 'assistant',
+        content: response.data.response || 'No response received',
+      });
+    } catch (error) {
+      showToast(`Failed to send message: ${error.message}`, 'error');
+      addMessage({
+        role: 'assistant',
+        content: 'Sorry, I encountered an error processing your request. Please try again.',
+      });
+    } finally {
+      setLoading(false);
+      isProcessingRef.current = false;
     }
   };
 
@@ -46,7 +78,8 @@ const QuickActions = ({ onActionSelect }) => {
         <button
           key={idx}
           onClick={() => handleActionClick(action)}
-          className="w-full px-3 py-2 text-sm text-left rounded-lg bg-white dark:bg-dark-bg-secondary hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
+          disabled={isLoading}
+          className="w-full px-3 py-2 text-sm text-left rounded-lg bg-white dark:bg-dark-bg-secondary hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
         >
           <span className="mr-2">{action.emoji}</span>
           {action.label}

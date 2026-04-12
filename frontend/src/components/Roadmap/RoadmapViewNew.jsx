@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, TrendingUp } from 'lucide-react';
 import { useRoadmapStore } from '../../stores/roadmapStore';
+import { useToast } from '../shared/Toast';
 import RoadmapNode from './RoadmapNode';
 import NodeDetail from './NodeDetail';
+import * as roadmapService from '../../services/roadmapService';
 
 /**
  * RoadmapViewNew - Learning roadmap with status tracking
@@ -88,21 +90,45 @@ const MOCK_ROADMAP = {
 
 const RoadmapViewNew = () => {
   const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [loading, setLoading] = useState(false);
   const {
     nodes,
     progress,
     setNodes,
-    updateNodeStatus,
+    updateNodeStatus: updateNodeInStore,
     calculateProgress,
   } = useRoadmapStore();
+  const { showToast } = useToast();
 
-  // Initialize with mock data if empty
+  // Load roadmaps from API on mount
   useEffect(() => {
+    const loadRoadmap = async () => {
+      setLoading(true);
+      try {
+        const response = await roadmapService.getRoadmaps();
+        // Get nodes from the first roadmap or use mock data
+        if (response.data && response.data.length > 0) {
+          const roadmapData = response.data[0];
+          setNodes(roadmapData.nodes || MOCK_ROADMAP.nodes);
+        } else {
+          // Fallback to mock data if no roadmaps from API
+          setNodes(MOCK_ROADMAP.nodes);
+        }
+        calculateProgress();
+      } catch (error) {
+        showToast(`Failed to load roadmap: ${error.message}`, 'error');
+        // Fallback to mock data on error
+        setNodes(MOCK_ROADMAP.nodes);
+        calculateProgress();
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (nodes.length === 0) {
-      setNodes(MOCK_ROADMAP.nodes);
-      calculateProgress();
+      loadRoadmap();
     }
-  }, [nodes.length, setNodes, calculateProgress]);
+  }, [nodes.length, setNodes, calculateProgress, showToast]);
 
   const selectedNode = nodes.find((node) => node.id === selectedNodeId);
 
@@ -114,12 +140,22 @@ const RoadmapViewNew = () => {
     setSelectedNodeId(null);
   };
 
-  const handleStatusChange = (nodeId, newStatus) => {
-    updateNodeStatus(nodeId, newStatus);
-    // Recalculate progress after status change
-    setTimeout(() => {
+  const handleStatusChange = async (nodeId, newStatus) => {
+    try {
+      // Call API to update status
+      // Assuming there's a selected roadmap ID - using first roadmap ID for now
+      const selectedRoadmapId = 1; // TODO: make this dynamic from store
+      await roadmapService.updateNodeStatus(selectedRoadmapId, nodeId, newStatus);
+
+      // Update store
+      updateNodeInStore(nodeId, newStatus);
+
+      // Recalculate progress after status change
       calculateProgress();
-    }, 0);
+      showToast('Status updated successfully', 'success', 2000);
+    } catch (error) {
+      showToast(`Status update failed: ${error.message}`, 'error');
+    }
   };
 
   return (

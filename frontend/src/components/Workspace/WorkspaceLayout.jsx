@@ -1,6 +1,7 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { useAuthStore } from '../../stores/authStore';
 import { useWorkspaceStore } from '../../stores/workspaceStore';
+import { useMentorStore } from '../../stores/mentorStore';
 import Sidebar from '../Sidebar';
 import { Navbar } from '../Navbar';
 import DashboardSkeleton from '../common/Skeleton';
@@ -60,6 +61,12 @@ const WorkspaceLayout = () => {
   const user = useAuthStore((state) => state.user);
   const isLoading = useAuthStore((state) => state.isLoading);
   const currentSection = useWorkspaceStore((state) => state.currentSection);
+  const setContext = useMentorStore((state) => state.setContext);
+
+  // Update mentor context when section changes
+  useEffect(() => {
+    setContext(currentSection);
+  }, [currentSection, setContext]);
 
   // Get the component for current section
   const SectionComponent = SECTION_COMPONENTS[currentSection] || DashboardView;

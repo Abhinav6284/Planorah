@@ -6,6 +6,7 @@ import { BLOCK_TYPES } from './blocks';
 import { useEditorStore } from '../../stores/editorStore';
 import { useToast } from '../shared/Toast';
 import { useDebounce } from '../../hooks/useDebounce';
+import * as editorService from '../../services/editorService';
 
 const BlockEditor = () => {
   const [draggedIndex, setDraggedIndex] = useState(null);
@@ -15,7 +16,7 @@ const BlockEditor = () => {
   const debouncedIsDirty = useDebounce(isDirty, 3000);
   const saveTimeoutRef = useRef(null);
 
-  // Auto-save effect
+  // Auto-save effect - debounce 3s
   useEffect(() => {
     if (!debouncedIsDirty) return;
 
@@ -28,26 +29,25 @@ const BlockEditor = () => {
     const performSave = async () => {
       setSaving(true);
       try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
+        // Call API to save document with blocks
+        await editorService.saveDocument(blocks);
         markSaved();
-        showToast('Changes saved', 'success', 2000);
+        showToast('Document saved', 'success', 2000);
       } catch (error) {
         setSaving(false);
-        showToast('Failed to save changes', 'error', 3000);
+        showToast(`Save failed: ${error.message}`, 'error', 3000);
       }
     };
 
-    // Set timeout to call performSave
-    saveTimeoutRef.current = setTimeout(performSave, 500);
+    // Set timeout to call performSave (debounce 3s)
+    saveTimeoutRef.current = setTimeout(performSave, 3000);
 
     return () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [debouncedIsDirty, setSaving, markSaved, showToast]);
+  }, [debouncedIsDirty, setSaving, markSaved, showToast, blocks]);
 
   const handleAddBlock = (type = BLOCK_TYPES.TEXT) => {
     const newBlock = {

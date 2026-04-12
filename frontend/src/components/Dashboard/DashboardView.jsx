@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Flame, CheckCircle, TrendingUp } from 'lucide-react';
 import { useDashboardStore } from '../../stores/dashboardStore';
+import { useToast } from '../shared/Toast';
 import StatsCard from './StatsCard';
 import ActivityChart from './ActivityChart';
+import * as dashboardService from '../../services/dashboardService';
 
 /**
  * Mock data for initial development
@@ -29,17 +31,52 @@ const MOCK_ACTIVITY = [
  */
 export default function DashboardView() {
   const { stats, chartData, setStats, setChartData } = useDashboardStore();
+  const { showToast } = useToast();
+  const refreshIntervalRef = useRef(null);
 
-  // Initialize with mock data on component mount
-  useEffect(() => {
-    // Only set mock data if store is empty
-    if (stats.currentStreak === 0 && stats.tasksCompletedToday === 0) {
+  // Fetch dashboard stats and chart data
+  const fetchDashboardData = async () => {
+    try {
+      // Fetch stats
+      const statsResponse = await dashboardService.getDashboardStats();
+      if (statsResponse.data) {
+        setStats({
+          currentStreak: statsResponse.data.current_streak || MOCK_STATS.currentStreak,
+          tasksCompletedToday: statsResponse.data.tasks_completed_today || MOCK_STATS.tasksCompletedToday,
+          overallCompletion: statsResponse.data.overall_completion || MOCK_STATS.overallCompletion,
+        });
+      } else {
+        setStats(MOCK_STATS);
+      }
+
+      // Fetch activity chart data
+      const chartResponse = await dashboardService.getActivityChart(7);
+      if (chartResponse.data && Array.isArray(chartResponse.data)) {
+        setChartData(chartResponse.data);
+      } else {
+        setChartData(MOCK_ACTIVITY);
+      }
+    } catch (error) {
+      showToast(`Failed to load dashboard data: ${error.message}`, 'error');
+      // Fallback to mock data on error
       setStats(MOCK_STATS);
-    }
-    if (chartData.length === 0) {
       setChartData(MOCK_ACTIVITY);
     }
-  }, [stats.currentStreak, stats.tasksCompletedToday, chartData.length, setStats, setChartData]);
+  };
+
+  // Load data on mount
+  useEffect(() => {
+    fetchDashboardData();
+
+    // Auto-refresh every 60 seconds
+    refreshIntervalRef.current = setInterval(fetchDashboardData, 60000);
+
+    return () => {
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+      }
+    };
+  }, []);
 
   // Get user's first name from localStorage or use default
   const getUserName = () => {

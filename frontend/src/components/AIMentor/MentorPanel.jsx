@@ -2,9 +2,11 @@ import React, { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, X, SendHorizontal } from 'lucide-react';
 import { useMentorStore } from '../../stores/mentorStore';
+import { useToast } from '../shared/Toast';
 import MentorChat from './MentorChat';
 import QuickActions from './QuickActions';
 import ExpandButton from './ExpandButton';
+import * as mentorService from '../../services/mentorService';
 
 /**
  * MentorPanel - Main floating AI Mentor panel with 4 expand modes
@@ -27,6 +29,7 @@ const MentorPanel = () => {
   const [input, setInput] = useState('');
   const inputRef = useRef(null);
   const textareaRef = useRef(null);
+  const { showToast } = useToast();
 
   // Auto-expand textarea
   useEffect(() => {
@@ -42,23 +45,36 @@ const MentorPanel = () => {
     const userMessage = input.trim();
     setInput('');
 
-    // Add user message
+    // Add user message to store
     addMessage({
       role: 'user',
       content: userMessage,
     });
 
-    // Simulate API call
+    // Set loading state
     setLoading(true);
 
-    // Simulate response delay
-    setTimeout(() => {
+    try {
+      // Call API with current context
+      const response = await mentorService.sendMessage(userMessage, { context: currentContext });
+
+      // Add assistant response
       addMessage({
         role: 'assistant',
-        content: 'I received your message: "' + userMessage + '". API integration coming in Task 11!',
+        content: response.data.response || 'No response received',
       });
+
+      showToast('Message received', 'success', 2000);
+    } catch (error) {
+      showToast(`Message failed: ${error.message}`, 'error');
+      // Still add a response so user knows something happened
+      addMessage({
+        role: 'assistant',
+        content: 'Sorry, I encountered an error processing your message. Please try again.',
+      });
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const handleKeyDown = (e) => {
