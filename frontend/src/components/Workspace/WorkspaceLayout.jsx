@@ -4,6 +4,7 @@ import { useWorkspaceStore } from '../../stores/workspaceStore';
 import Sidebar from '../Sidebar';
 import { Navbar } from '../Navbar';
 import DashboardSkeleton from '../common/Skeleton';
+import { MentorPanel } from '../AIMentor';
 
 // Lazy load section components
 const DashboardView = React.lazy(() =>
@@ -33,17 +34,6 @@ const SettingsPlaceholder = () => (
 );
 
 
-// MentorPanel placeholder component
-const MentorPanelPlaceholder = () => (
-  <div className="hidden lg:flex lg:w-80 border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 flex-col">
-    <div className="h-16 border-b border-gray-200 dark:border-gray-800 flex items-center px-4">
-      <h3 className="font-semibold text-gray-900 dark:text-white">AI Mentor</h3>
-    </div>
-    <div className="flex-1 p-4 flex items-center justify-center text-gray-500 dark:text-gray-400">
-      <p className="text-sm">Mentor panel loading...</p>
-    </div>
-  </div>
-);
 
 // Section component mapping
 const SECTION_COMPONENTS = {
@@ -117,8 +107,8 @@ const WorkspaceLayout = () => {
         </main>
       </div>
 
-      {/* Mentor Panel */}
-      <MentorPanelPlaceholder />
+      {/* Mentor Panel - Floating */}
+      <MentorPanel />
     </div>
   );
 };
