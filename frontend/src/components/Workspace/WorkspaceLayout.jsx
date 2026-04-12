@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { useAuthStore } from '../../stores/authStore';
 import { useWorkspaceStore } from '../../stores/workspaceStore';
 import Sidebar from '../Sidebar';
+import { Navbar } from '../Navbar';
 import DashboardSkeleton from '../common/Skeleton';
 
 // Lazy load section components
@@ -31,14 +32,6 @@ const SettingsPlaceholder = () => (
   </div>
 );
 
-// Navbar placeholder component
-const WorkspaceNavbar = ({ currentSection }) => (
-  <nav className="h-16 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 flex items-center px-6 sticky top-0 z-20">
-    <h2 className="text-lg font-semibold text-gray-900 dark:text-white capitalize">
-      {currentSection.replace('-', ' ')}
-    </h2>
-  </nav>
-);
 
 // MentorPanel placeholder component
 const MentorPanelPlaceholder = () => (
@@ -114,7 +107,7 @@ const WorkspaceLayout = () => {
       {/* Main Content Area */}
       <div className="flex-1 min-w-0 flex flex-col">
         {/* Navbar */}
-        <WorkspaceNavbar currentSection={currentSection} />
+        <Navbar />
 
         {/* Content */}
         <main className="flex-1 overflow-auto">
