@@ -377,45 +377,70 @@ function ExpandedPanel({
           </div>
         </div>
 
-        {/* ── Orb section (compact) ── */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 16,
-            padding: "16px",
-            borderBottom: "1px solid rgba(255,255,255,0.06)",
-          }}
-        >
-          <Orb size={80} isActive={isActive} isSpeaking={isSpeaking} audioLevel={audioLevel} status={status} />
+        {/* ── Orb section ── */}
+        {!isIdle && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              padding: "16px",
+              borderBottom: "1px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            <Orb size={80} isActive={isActive} isSpeaking={isSpeaking} audioLevel={audioLevel} status={status} />
 
-          {/* Status + timer */}
-          <div style={{ flex: 1 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+            {/* Status + timer */}
+            <div style={{ flex: 1 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                <motion.div
+                  animate={{ opacity: [1, 0.4, 1] }}
+                  transition={{ duration: isActive ? 1.4 : 3, repeat: Infinity }}
+                  style={{ width: 5, height: 5, borderRadius: "50%", background: statusDot }}
+                />
+                <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.5)", letterSpacing: "0.005em" }}>
+                  {statusLabel}
+                </span>
+              </div>
+              {isActive && (
+                <span
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 700,
+                    color: "rgba(255,255,255,0.9)",
+                    letterSpacing: "0.04em",
+                    fontVariantNumeric: "tabular-nums",
+                  }}
+                >
+                  {formatTime(sessionDuration)}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Centered orb for idle state */}
+        {isIdle && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            padding: '24px 20px 20px',
+            gap: 12,
+          }}>
+            <Orb size={100} isActive={false} isSpeaking={false} audioLevel={0} status="idle" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <motion.div
-                animate={{ opacity: [1, 0.4, 1] }}
-                transition={{ duration: isActive ? 1.4 : 3, repeat: Infinity }}
-                style={{ width: 5, height: 5, borderRadius: "50%", background: statusDot }}
+                animate={{ opacity: [1, 0.3, 1] }}
+                transition={{ duration: 2.5, repeat: Infinity }}
+                style={{ width: 5, height: 5, borderRadius: '50%', background: 'rgba(255,255,255,0.25)' }}
               />
-              <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.5)", letterSpacing: "0.005em" }}>
-                {statusLabel}
+              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+                Ready to start
               </span>
             </div>
-            {isActive && (
-              <span
-                style={{
-                  fontSize: 20,
-                  fontWeight: 700,
-                  color: "rgba(255,255,255,0.9)",
-                  letterSpacing: "0.04em",
-                  fontVariantNumeric: "tabular-nums",
-                }}
-              >
-                {formatTime(sessionDuration)}
-              </span>
-            )}
           </div>
-        </div>
+        )}
 
         {/* ── Live transcript ── */}
         <AnimatePresence>
@@ -530,106 +555,43 @@ function ExpandedPanel({
           </div>
         )}
 
-        {/* ── Voice selection (Notion AI-style) ── */}
-        {voiceConfig?.available_voices?.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.12 }}
-            style={{
-              padding: "14px 16px 12px",
-              flex: 1,
-              minHeight: 0,
-              overflowY: "auto",
-              borderTop: "1px solid rgba(255,255,255,0.06)",
-            }}
-          >
+        {/* ── Voice selector — compact pills ── */}
+        {isIdle && voiceConfig?.available_voices?.length > 0 && (
+          <div style={{ padding: '0 16px 16px' }}>
             <p style={{
-              fontSize: 13,
-              fontWeight: 700,
-              color: "rgba(255,255,255,0.85)",
-              margin: "0 0 14px 0",
-              letterSpacing: "0.01em",
+              fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.3)',
+              textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10,
             }}>
-              Which voice do you prefer?
+              Voice
             </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {voiceConfig.available_voices.map((v, idx) => {
-                const isSelected = selectedVoice === v.id;
-                const voiceEmojis = { Aoede: "✨", Charon: "🌙", Fenrir: "⚡", Kore: "🌸", Puck: "🎭" };
-                const emoji = voiceEmojis[v.name] || "🎤";
-
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {voiceConfig.available_voices.map(voice => {
+                const name = typeof voice === 'string' ? voice : voice.name;
+                const id = typeof voice === 'string' ? voice : voice.id;
+                const isSelected = selectedVoice === id;
                 return (
-                  <motion.button
-                    key={v.id}
-                    onClick={() => setSelectedVoice(v.id)}
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.04 }}
-                    whileHover={{ x: 4, backgroundColor: "rgba(255,255,255,0.05)" }}
-                    whileTap={{ scale: 0.98 }}
+                  <button
+                    key={id}
+                    onClick={() => setSelectedVoice(id)}
                     style={{
-                      padding: "14px 14px",
-                      background: isSelected
-                        ? "rgba(45,212,191,0.12)"
-                        : "rgba(255,255,255,0.03)",
-                      border: isSelected
-                        ? "1px solid rgba(45,212,191,0.3)"
-                        : "1px solid rgba(255,255,255,0.08)",
-                      borderRadius: 14,
-                      cursor: "pointer",
-                      fontFamily: "inherit",
-                      transition: "all 0.2s ease",
-                      textAlign: "left",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 12,
+                      padding: '6px 14px',
+                      borderRadius: 100,
+                      background: isSelected ? 'rgba(45,212,191,0.12)' : 'rgba(255,255,255,0.05)',
+                      border: isSelected ? '1px solid rgba(45,212,191,0.35)' : '1px solid rgba(255,255,255,0.08)',
+                      color: isSelected ? '#2DD4BF' : 'rgba(255,255,255,0.6)',
+                      fontSize: 13,
+                      fontWeight: isSelected ? 600 : 400,
+                      cursor: 'pointer',
+                      fontFamily: "'Bricolage Grotesque', sans-serif",
+                      transition: 'all 0.15s',
                     }}
                   >
-                    <span style={{ fontSize: 18 }}>{emoji}</span>
-                    <div style={{ flex: 1 }}>
-                      <p style={{
-                        fontSize: 13,
-                        fontWeight: 600,
-                        color: isSelected ? "#2DD4BF" : "rgba(255,255,255,0.75)",
-                        margin: 0,
-                        letterSpacing: "0.01em",
-                      }}>
-                        {v.name}
-                      </p>
-                      <p style={{
-                        fontSize: 11,
-                        color: isSelected ? "rgba(45,212,191,0.7)" : "rgba(255,255,255,0.4)",
-                        margin: 0,
-                        marginTop: 2,
-                      }}>
-                        {voiceDescriptions[v.name] || "Voice option"}
-                      </p>
-                    </div>
-                    {isSelected && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        style={{
-                          width: 20,
-                          height: 20,
-                          borderRadius: "50%",
-                          background: "#2DD4BF",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000D0B" strokeWidth="3" strokeLinecap="round">
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                      </motion.div>
-                    )}
-                  </motion.button>
+                    {name}
+                  </button>
                 );
               })}
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* ── Error ── */}
@@ -647,28 +609,40 @@ function ExpandedPanel({
               disabled={!voiceConfig}
               whileHover={voiceConfig ? { scale: 1.01 } : {}}
               whileTap={voiceConfig ? { scale: 0.97 } : {}}
-              style={{
+              style={voiceConfig ? {
+                width: '100%',
+                padding: '13px',
+                borderRadius: 14,
+                background: 'linear-gradient(135deg, #2DD4BF 0%, #0D9488 100%)',
+                border: 'none',
+                color: '#fff',
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                fontFamily: "'Bricolage Grotesque', sans-serif",
+                letterSpacing: '0.01em',
+                boxShadow: '0 4px 20px rgba(45,212,191,0.25)',
+                transition: 'opacity 0.15s',
+              } : {
                 width: "100%",
-                padding: "14px",
-                borderRadius: 12,
-                background: voiceConfig
-                  ? "linear-gradient(135deg, #0D9488 0%, #2DD4BF 100%)"
-                  : "rgba(255,255,255,0.05)",
-                border: voiceConfig
-                  ? "none"
-                  : "1px solid rgba(255,255,255,0.05)",
-                color: voiceConfig ? "#000D0B" : "rgba(255,255,255,0.15)",
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: voiceConfig ? "pointer" : "not-allowed",
+                padding: "13px",
+                borderRadius: 14,
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.05)",
+                color: "rgba(255,255,255,0.15)",
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: "not-allowed",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 8,
-                fontFamily: "inherit",
-                letterSpacing: "0.005em",
-                boxShadow: voiceConfig ? "0 6px 20px rgba(13,148,136,0.25)" : "none",
-                transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+                fontFamily: "'Bricolage Grotesque', sans-serif",
+                letterSpacing: "0.01em",
               }}
             >
               {!voiceConfig ? (

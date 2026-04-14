@@ -333,24 +333,33 @@ export default function AITalkPanel({
           {/* Scrollable content */}
           <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px 10px" }}>
             {!result && !loading && (
-              <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}>
+              <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', flexDirection: 'column' }}>
                 {userCtx && (userCtx.target_role || userCtx.goal) && (
                   <div style={{
-                    marginBottom: 16,
-                    padding: '10px 12px',
-                    borderRadius: 12,
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.07)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '5px 12px 5px 8px',
+                    borderRadius: 100,
+                    background: 'rgba(45,212,191,0.07)',
+                    border: '1px solid rgba(45,212,191,0.15)',
+                    marginBottom: 18,
+                    alignSelf: 'flex-start',
                   }}>
+                    <span style={{
+                      width: 6, height: 6, borderRadius: '50%',
+                      background: '#2DD4BF', flexShrink: 0,
+                      boxShadow: '0 0 6px rgba(45,212,191,0.7)',
+                    }} />
                     {userCtx.target_role && (
-                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', margin: '0 0 2px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-                        Target: {userCtx.target_role}
-                      </p>
+                      <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', fontWeight: 500 }}>
+                        {userCtx.target_role}
+                      </span>
                     )}
                     {userCtx.tasks_total > 0 && (
-                      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', margin: 0 }}>
-                        {userCtx.progress_pct}% done · {userCtx.tasks_completed}/{userCtx.tasks_total} tasks · {userCtx.streak}d streak
-                      </p>
+                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+                        · {userCtx.progress_pct}%
+                      </span>
                     )}
                   </div>
                 )}
@@ -358,9 +367,9 @@ export default function AITalkPanel({
                   <Sparkles size={22} strokeWidth={2.3} color="rgba(255,255,255,0.9)" />
                 </div>
                 <h3 style={{ margin: 0, fontSize: 34, lineHeight: 1.05, color: "rgba(255,255,255,0.94)", fontFamily: "'Instrument Serif', Georgia, serif", fontWeight: 500 }}>
-                  What's our
+                  How can I
                   <br />
-                  quest today?
+                  help you?
                 </h3>
                 <div style={{ marginTop: 20, display: "grid", gap: 9 }}>
                   {quickActions.map((action) => (
@@ -368,21 +377,33 @@ export default function AITalkPanel({
                       key={action.label}
                       onClick={() => handleQuickAction(action.label)}
                       style={{
-                        background: "transparent",
-                        border: "none",
-                        color: "rgba(255,255,255,0.86)",
-                        textAlign: "left",
-                        fontSize: 16,
+                        background: 'rgba(255,255,255,0.04)',
+                        border: '1px solid rgba(255,255,255,0.07)',
+                        borderRadius: 12,
+                        color: 'rgba(255,255,255,0.82)',
+                        textAlign: 'left',
+                        fontSize: 14,
                         lineHeight: 1.35,
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
                         gap: 10,
-                        padding: 0,
+                        padding: '10px 12px',
+                        width: '100%',
+                        fontFamily: 'inherit',
+                        transition: 'background 0.15s, border-color 0.15s',
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.07)';
+                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)';
                       }}
                     >
-                      <span style={{ fontSize: 18, width: 20, textAlign: "center" }}>{action.icon}</span>
-                      <span>{action.label}</span>
+                      <span style={{ fontSize: 16, width: 22, textAlign: 'center', flexShrink: 0 }}>{action.icon}</span>
+                      <span style={{ flex: 1 }}>{action.label}</span>
                     </button>
                   ))}
                 </div>
@@ -503,25 +524,26 @@ export default function AITalkPanel({
           <div style={{ padding: "10px 12px 12px", flexShrink: 0 }}>
             <div style={{
               borderRadius: 18,
-              border: "2px solid #2D8CFF",
+              border: "1px solid rgba(45,212,191,0.3)",
               background: "rgba(35,36,40,0.92)",
               boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)",
               padding: "10px 10px 8px",
             }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                 <span style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 4,
-                  padding: "5px 10px",
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  padding: '4px 10px',
                   borderRadius: 999,
-                  background: "rgba(255,255,255,0.08)",
-                  color: "rgba(255,255,255,0.82)",
-                  fontSize: 13,
-                  fontWeight: 500,
+                  background: 'rgba(255,255,255,0.06)',
+                  color: 'rgba(255,255,255,0.7)',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  letterSpacing: '0.01em',
                 }}>
-                  <Sparkles size={13} strokeWidth={2.3} />
-                  NexBuildLabs
+                  <Sparkles size={11} strokeWidth={2.3} />
+                  Planorah
                 </span>
                 <span style={{
                   display: "inline-flex",
@@ -584,9 +606,6 @@ export default function AITalkPanel({
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 28, color: "rgba(255,255,255,0.56)", fontFamily: "'Instrument Serif', Georgia, serif", lineHeight: 1 }}>
-                    Auto
-                  </span>
                   {onSwitchToVoice && (
                     <button
                       onClick={handleSwitchToVoice}
