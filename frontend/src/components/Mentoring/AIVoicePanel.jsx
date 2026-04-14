@@ -323,57 +323,64 @@ function ExpandedPanel({
           maxHeight: "min(88vh, 860px)",
         }}
       >
-        {/* ── Header with context ── */}
+        {/* ── Header ── */}
         <div
           style={{
             display: "flex",
-            alignItems: "flex-start",
+            alignItems: "center",
             justifyContent: "space-between",
-            padding: "14px 16px",
-            borderBottom: "1px solid rgba(255,255,255,0.06)",
+            padding: "12px 14px",
+            borderBottom: "1px solid rgba(255,255,255,0.05)",
           }}
         >
-          <div style={{ flex: 1 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-              <span style={{ fontSize: 18 }}>{ctx.icon}</span>
-              <div>
-                <p style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: ctx.color,
-                  margin: 0,
-                  letterSpacing: "0.03em",
-                  textTransform: "uppercase",
-                }}>
-                  {ctx.label}
-                </p>
-              </div>
-            </div>
-            {goalChip && (
-              <p style={{
-                fontSize: 12,
-                color: "rgba(255,255,255,0.55)",
-                margin: 0,
-                lineHeight: 1.4,
-              }}>
-                {goalChip}
-              </p>
-            )}
+          {/* Left: subtle context pill */}
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ fontSize: 13 }}>{ctx.icon}</span>
+            <span style={{
+              fontSize: 12,
+              fontWeight: 500,
+              color: "rgba(255,255,255,0.38)",
+              letterSpacing: "0.01em",
+            }}>
+              {ctx.label}
+            </span>
           </div>
 
-          {/* Controls */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-            <IconBtn onClick={onMinimize} title="Minimize">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round">
+          {/* Right: minimal icon controls */}
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <button
+              onClick={onMinimize}
+              title="Minimize"
+              style={{
+                width: 28, height: 28, borderRadius: 8,
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.07)",
+                color: "rgba(255,255,255,0.35)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", outline: "none",
+              }}
+            >
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                 <line x1="6" y1="12" x2="18" y2="12" />
               </svg>
-            </IconBtn>
-            <IconBtn onClick={onClose} title="Close" danger>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            </button>
+            <button
+              onClick={onClose}
+              title="Close"
+              style={{
+                width: 28, height: 28, borderRadius: 8,
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.07)",
+                color: "rgba(255,255,255,0.35)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", outline: "none",
+              }}
+            >
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
-            </IconBtn>
+            </button>
           </div>
         </div>
 
@@ -696,62 +703,67 @@ function ExpandedPanel({
         <div
           style={{
             padding: "10px 16px 14px",
-            borderTop: "1px solid rgba(255,255,255,0.06)",
+            borderTop: "1px solid rgba(255,255,255,0.05)",
             display: "flex",
             alignItems: "center",
-            gap: 4,
+            justifyContent: "center",
+            gap: 2,
           }}
         >
-          {/* Voice — active */}
-          <div
-            style={{
-              flex: 1,
-              padding: "7px",
-              borderRadius: 10,
-              background: "rgba(45,212,191,0.1)",
+          <div style={{
+            display: "inline-flex",
+            alignItems: "center",
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.07)",
+            borderRadius: 10,
+            padding: 3,
+            gap: 2,
+          }}>
+            {/* Voice — active indicator */}
+            <div style={{
+              padding: "5px 14px",
+              borderRadius: 7,
+              background: "rgba(45,212,191,0.12)",
               border: "1px solid rgba(45,212,191,0.2)",
-              textAlign: "center",
               fontSize: 12,
-              fontWeight: 700,
+              fontWeight: 600,
               color: "#2DD4BF",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
               gap: 5,
-            }}
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-              <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-            </svg>
-            Voice
+              userSelect: "none",
+            }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+              </svg>
+              Voice
+            </div>
+            {/* Text — switch */}
+            <button
+              onClick={onSwitchToText}
+              style={{
+                padding: "5px 14px",
+                borderRadius: 7,
+                background: "transparent",
+                border: "1px solid transparent",
+                fontSize: 12,
+                fontWeight: 500,
+                color: "rgba(255,255,255,0.3)",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+                fontFamily: "inherit",
+                transition: "color 0.15s",
+              }}
+            >
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+              Text
+            </button>
           </div>
-          {/* Text — switch */}
-          <button
-            onClick={onSwitchToText}
-            style={{
-              flex: 1,
-              padding: "7px",
-              borderRadius: 10,
-              background: "transparent",
-              border: "1px solid rgba(255,255,255,0.07)",
-              textAlign: "center",
-              fontSize: 12,
-              fontWeight: 600,
-              color: "rgba(255,255,255,0.35)",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 5,
-              fontFamily: "inherit",
-            }}
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-            </svg>
-            Text
-          </button>
         </div>
       </div>
     </motion.div>
