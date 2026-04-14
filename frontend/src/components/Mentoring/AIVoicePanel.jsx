@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { MessageSquare, Mic, Minus, SquarePen, X } from "lucide-react";
 import { mentoringService } from "../../api/mentoringService";
 import { assistantPipelineService } from "../../api/assistantPipelineService";
 import { getContextSourceFromPath } from "../../utils/assistantContext";
@@ -7,805 +8,151 @@ import env from "../../config/env";
 import { useVoiceSession } from "../../hooks/useVoiceSession";
 import { useVoicePipelineSession } from "../../hooks/useVoicePipelineSession";
 
-/* ─── Font injection ──────────────────────────────────────────────────────── */
 const FONT_URL =
   "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,500;12..96,700&family=Instrument+Serif:ital@0;1&display=swap";
 
-function injectFont() {
-  if (document.getElementById("planorah-voice-fonts")) return;
-  const l = document.createElement("link");
-  l.id = "planorah-voice-fonts";
-  l.rel = "stylesheet";
-  l.href = FONT_URL;
-  document.head.appendChild(l);
-}
+const DEFAULT_VOICE = "Aoede";
 
-/* ─── Context meta ────────────────────────────────────────────────────────── */
-const CTX = {
-  roadmap: { icon: "🗺️", label: "Roadmap", color: "#818CF8" },
-  dashboard: { icon: "⚡", label: "Dashboard", color: "#FBBF24" },
-  tasks: { icon: "✅", label: "Tasks", color: "#34D399" },
-  resume: { icon: "📄", label: "Resume", color: "#60A5FA" },
-  ats: { icon: "🎯", label: "ATS Scan", color: "#F472B6" },
-  interview: { icon: "🎤", label: "Interview", color: "#A78BFA" },
-  portfolio: { icon: "🌐", label: "Portfolio", color: "#2DD4BF" },
-  projects: { icon: "⚙️", label: "Projects", color: "#FB923C" },
-  planora: { icon: "📚", label: "Planora", color: "#22D3EE" },
-  scheduler: { icon: "📅", label: "Scheduler", color: "#86EFAC" },
-  general: { icon: "🤖", label: "General", color: "#94A3B8" },
+const CONTEXT_LABELS = {
+  roadmap: "Roadmap",
+  dashboard: "Dashboard",
+  tasks: "Tasks",
+  resume: "Resume",
+  ats: "ATS",
+  interview: "Interview",
+  portfolio: "Portfolio",
+  projects: "Projects",
+  planora: "Planora",
+  scheduler: "Scheduler",
+  lab: "Lab",
+  general: "General",
 };
 
-/* ─── Liquid-metal orb ───────────────────────────────────────────────────── */
-function Orb({ size = 108, audioLevel = 0, isSpeaking = false, isActive = false, status = "idle" }) {
-  const glow = isActive ? 0.35 + audioLevel * 0.35 : 0.12;
-  const isConnecting = status === "connecting";
+const makeEntry = (role, content) => ({
+  id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+  role,
+  content,
+});
+
+const getPrimaryVoiceId = (config) => {
+  if (!config?.available_voices?.length) return DEFAULT_VOICE;
+  const first = config.available_voices[0];
+  if (typeof first === "string") return first;
+  return first?.id || DEFAULT_VOICE;
+};
+
+function injectFont() {
+  if (document.getElementById("planorah-voice-fonts")) return;
+  const link = document.createElement("link");
+  link.id = "planorah-voice-fonts";
+  link.rel = "stylesheet";
+  link.href = FONT_URL;
+  document.head.appendChild(link);
+}
+
+function SessionIndicator({ size = 48, isActive = false, isSpeaking = false, status = "idle" }) {
+  const stateClass =
+    status === "connecting"
+      ? "border-amber-300/60 bg-amber-50 text-amber-700"
+      : status === "processing"
+        ? "border-sky-300/60 bg-sky-50 text-sky-700"
+        : isSpeaking
+          ? "border-teal-400/60 bg-teal-50 text-teal-700"
+          : isActive
+            ? "border-emerald-400/60 bg-emerald-50 text-emerald-700"
+            : "border-borderMuted bg-white text-textSecondary dark:border-white/10 dark:bg-charcoalDark dark:text-gray-300";
 
   return (
-    <div style={{ position: "relative", width: size, height: size, flexShrink: 0 }}>
-      {/* Ambient glow rings */}
-      <AnimatePresence>
-        {(isActive || isConnecting) &&
-          [0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              initial={{ scale: 1, opacity: 0.5 }}
-              animate={{ scale: 2.2 + i * 0.5, opacity: 0 }}
-              transition={{
-                duration: 2.2 + i * 0.5,
-                repeat: Infinity,
-                delay: i * 0.65,
-                ease: "easeOut",
-              }}
-              style={{
-                position: "absolute",
-                inset: 0,
-                borderRadius: "50%",
-                background: isSpeaking
-                  ? "rgba(251,191,36,0.18)"
-                  : "rgba(45,212,191,0.18)",
-                transformOrigin: "center",
-              }}
-            />
-          ))}
-      </AnimatePresence>
-
-      {/* Sphere */}
-      <motion.div
-        animate={{
-          scale: isActive ? 1 + audioLevel * 0.12 : isConnecting ? [1, 1.04, 1] : 1,
-          filter: `brightness(${isActive ? 1 + audioLevel * 0.25 : 1})`,
-        }}
-        transition={
-          isConnecting
-            ? { duration: 1.6, repeat: Infinity, ease: "easeInOut" }
-            : { type: "spring", stiffness: 280, damping: 22 }
-        }
-        style={{
-          position: "relative",
-          width: size,
-          height: size,
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle at 40% 33%, #A7F3D0 0%, #2DD4BF 18%, #0D9488 50%, #042F2E 80%, #010B0B 100%)",
-          boxShadow: `
-            inset 0 -8px 24px rgba(0,0,0,0.65),
-            inset 0 8px 20px rgba(167,243,208,0.22),
-            0 0 ${Math.round(size * glow * 2.2)}px rgba(45,212,191,${glow.toFixed(2)}),
-            0 ${Math.round(size * 0.18)}px ${Math.round(size * 0.55)}px rgba(0,0,0,0.55)
-          `,
-          overflow: "hidden",
-        }}
-      >
-        {/* Rotating iridescent shimmer */}
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: isActive ? 3 : 6, repeat: Infinity, ease: "linear" }}
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(167,243,208,0.55) 55deg, rgba(56,189,248,0.65) 110deg, rgba(45,212,191,0.45) 170deg, transparent 220deg, transparent 360deg)",
-            mixBlendMode: "overlay",
-          }}
-        />
-        {/* Specular highlight — top-left */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "radial-gradient(ellipse at 30% 26%, rgba(255,255,255,0.68) 0%, rgba(255,255,255,0.12) 38%, transparent 55%)",
-            mixBlendMode: "overlay",
-          }}
-        />
-        {/* Diffuse warm rim — bottom-right */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "radial-gradient(circle at 72% 78%, rgba(45,212,191,0.4) 0%, transparent 58%)",
-            mixBlendMode: "screen",
-          }}
-        />
-        {/* Speaking amber tint */}
-        <AnimatePresence>
-          {isSpeaking && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              style={{
-                position: "absolute",
-                inset: 0,
-                background: "radial-gradient(circle at 50% 50%, rgba(251,191,36,0.28) 0%, transparent 70%)",
-                mixBlendMode: "screen",
-              }}
-            />
-          )}
-        </AnimatePresence>
-      </motion.div>
+    <div
+      className={`inline-flex items-center justify-center rounded-2xl border ${stateClass}`}
+      style={{ width: size, height: size, flexShrink: 0 }}
+    >
+      <Mic size={size <= 28 ? 12 : 18} strokeWidth={2.3} />
     </div>
   );
 }
 
-/* ─── Mini-pill (collapsed state) ───────────────────────────────────────── */
-function MiniPill({ isActive, isSpeaking, audioLevel, sessionDuration, formatTime, onExpand, onEnd }) {
+function MiniPill({ isActive, isSpeaking, status, sessionDuration, formatTime, onExpand, onClose }) {
   return (
     <motion.div
-      initial={{ scale: 0.7, opacity: 0, y: 12 }}
+      initial={{ scale: 0.8, opacity: 0, y: 10 }}
       animate={{ scale: 1, opacity: 1, y: 0 }}
-      exit={{ scale: 0.7, opacity: 0, y: 12 }}
-      transition={{ type: "spring", stiffness: 380, damping: 28 }}
-      style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999 }}
+      exit={{ scale: 0.8, opacity: 0, y: 10 }}
+      transition={{ type: "spring", stiffness: 360, damping: 28 }}
+      className="fixed bottom-5 right-4 z-[9999]"
+      data-voice-overlay="true"
     >
-      <button
-        onClick={onExpand}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-          height: 44,
-          paddingLeft: 8,
-          paddingRight: isActive ? 6 : 14,
-          borderRadius: 100,
-          background: "rgba(12,14,20,0.85)",
-          backdropFilter: "blur(20px) saturate(1.8)",
-          WebkitBackdropFilter: "blur(20px) saturate(1.8)",
-          border: "1px solid rgba(45,212,191,0.18)",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.04)",
-          cursor: "pointer",
-          outline: "none",
-        }}
-      >
-        <Orb size={28} isActive={isActive} isSpeaking={isSpeaking} audioLevel={audioLevel} />
-
-        {!isActive ? (
-          <span
-            style={{
-              fontFamily: "'Bricolage Grotesque', sans-serif",
-              fontWeight: 500,
-              fontSize: 14,
-              color: "rgba(255,255,255,0.88)",
-              letterSpacing: "-0.01em",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Voice chat
-          </span>
-        ) : (
-          <span
-            style={{
-              fontFamily: "'Bricolage Grotesque', sans-serif",
-              fontWeight: 700,
-              fontSize: 14,
-              color: "rgba(255,255,255,0.9)",
-              letterSpacing: "0.02em",
-              minWidth: 42,
-              textAlign: "center",
-            }}
-          >
-            {formatTime(sessionDuration)}
-          </span>
-        )}
-
-        {isActive ? (
-          <button
-            onClick={(e) => { e.stopPropagation(); onEnd(); }}
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: "50%",
-              background: "rgba(239,68,68,0.15)",
-              border: "1px solid rgba(239,68,68,0.25)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              color: "#F87171",
-              outline: "none",
-            }}
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
-        ) : (
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 3 21 3 21 9" />
-            <polyline points="9 21 3 21 3 15" />
-            <line x1="21" y1="3" x2="14" y2="10" />
-            <line x1="3" y1="21" x2="10" y2="14" />
-          </svg>
-        )}
-      </button>
-    </motion.div>
-  );
-}
-
-/* ─── Expanded panel ─────────────────────────────────────────────────────── */
-function ExpandedPanel({
-  status, isSpeaking, audioLevel, sessionDuration, formatTime,
-  contextSource, studentGoal,
-  voiceConfig, selectedVoice, setSelectedVoice,
-  transcript, error,
-  pipelineEnabled, isCapturing,
-  latestResult, actionProposals, confirmProposal,
-  startTurn, stopTurn,
-  onMinimize, onClose, onStart, onEnd, onSwitchToText,
-}) {
-  const ctx = CTX[contextSource] || CTX.general;
-  const isIdle = status === "idle";
-  const isActive = status === "active";
-  const isConnecting = status === "connecting";
-
-  const statusLabel = isConnecting
-    ? "Connecting…"
-    : isActive
-      ? isSpeaking
-        ? "Speaking"
-        : pipelineEnabled
-          ? isCapturing ? "Recording…" : "Ready to speak"
-          : "Listening…"
-      : "Ready to start";
-
-  const statusDot = isConnecting ? "#FBBF24" : isActive ? "#34D399" : "rgba(255,255,255,0.25)";
-
-  /* Page-derived extra chips (if goal is set) */
-  const goalChip = studentGoal ? studentGoal.slice(0, 48) + (studentGoal.length > 48 ? "…" : "") : null;
-
-  /* Voice descriptions for Notion-like display */
-  const voiceDescriptions = {
-    Aoede: "Clear, engaging voice",
-    Charon: "Deep, calm voice",
-    Fenrir: "Energetic, bold voice",
-    Kore: "Warm, personable voice",
-    Puck: "Quick, witty voice",
-  };
-
-  return (
-    <motion.div
-      key="expanded"
-      initial={{ scale: 0.88, opacity: 0, y: 24, originX: 1, originY: 1 }}
-      animate={{ scale: 1, opacity: 1, y: 0 }}
-      exit={{ scale: 0.88, opacity: 0, y: 24 }}
-      transition={{ type: "spring", stiffness: 340, damping: 28 }}
-      style={{
-        position: "fixed",
-        bottom: 14,
-        left: 12,
-        right: 12,
-        maxWidth: 560,
-        width: "calc(100vw - 24px)",
-        marginLeft: "auto",
-        maxHeight: "min(88vh, 860px)",
-        zIndex: 9999,
-        fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
-        transformOrigin: "bottom right",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      {/* Card - Notion AI Style */}
-      <div
-        style={{
-          background: "linear-gradient(180deg, rgba(15,16,20,0.98) 0%, rgba(10,11,14,0.98) 100%)",
-          backdropFilter: "blur(18px) saturate(1.2)",
-          WebkitBackdropFilter: "blur(18px) saturate(1.2)",
-          borderRadius: 20,
-          border: "1px solid rgba(255,255,255,0.08)",
-          boxShadow:
-            "0 24px 70px rgba(0,0,0,0.62), inset 0 1px 0 rgba(255,255,255,0.04)",
-          overflow: "hidden",
-          display: "flex",
-          flexDirection: "column",
-          maxHeight: "min(88vh, 860px)",
-        }}
-      >
-        {/* ── Header ── */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "12px 14px",
-            borderBottom: "1px solid rgba(255,255,255,0.05)",
-          }}
+      <div className="flex items-center gap-2 rounded-full border-2 border-borderMuted bg-white/95 px-2 py-1.5 shadow-[0_8px_20px_rgba(47,39,32,0.2)] backdrop-blur-md dark:border-white/10 dark:bg-charcoal/95">
+        <button
+          type="button"
+          onClick={onExpand}
+          className="flex items-center gap-2"
         >
-          {/* Left: subtle context pill */}
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ fontSize: 13 }}>{ctx.icon}</span>
-            <span style={{
-              fontSize: 12,
-              fontWeight: 500,
-              color: "rgba(255,255,255,0.38)",
-              letterSpacing: "0.01em",
-            }}>
-              {ctx.label}
-            </span>
-          </div>
+          <SessionIndicator size={26} isActive={isActive} isSpeaking={isSpeaking} status={status} />
+          <span className="text-sm font-semibold text-textPrimary dark:text-white">
+            {isActive ? formatTime(sessionDuration) : "Voice"}
+          </span>
+        </button>
 
-          {/* Right: minimal icon controls */}
-          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <button
-              onClick={onMinimize}
-              title="Minimize"
-              style={{
-                width: 28, height: 28, borderRadius: 8,
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.07)",
-                color: "rgba(255,255,255,0.35)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                cursor: "pointer", outline: "none",
-              }}
-            >
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <line x1="6" y1="12" x2="18" y2="12" />
-              </svg>
-            </button>
-            <button
-              onClick={onClose}
-              title="Close"
-              style={{
-                width: 28, height: 28, borderRadius: 8,
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.07)",
-                color: "rgba(255,255,255,0.35)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                cursor: "pointer", outline: "none",
-              }}
-            >
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        {/* ── Orb section ── */}
-        {!isIdle && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 16,
-              padding: "16px",
-              borderBottom: "1px solid rgba(255,255,255,0.06)",
-            }}
-          >
-            <Orb size={80} isActive={isActive} isSpeaking={isSpeaking} audioLevel={audioLevel} status={status} />
-
-            {/* Status + timer */}
-            <div style={{ flex: 1 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                <motion.div
-                  animate={{ opacity: [1, 0.4, 1] }}
-                  transition={{ duration: isActive ? 1.4 : 3, repeat: Infinity }}
-                  style={{ width: 5, height: 5, borderRadius: "50%", background: statusDot }}
-                />
-                <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.5)", letterSpacing: "0.005em" }}>
-                  {statusLabel}
-                </span>
-              </div>
-              {isActive && (
-                <span
-                  style={{
-                    fontSize: 20,
-                    fontWeight: 700,
-                    color: "rgba(255,255,255,0.9)",
-                    letterSpacing: "0.04em",
-                    fontVariantNumeric: "tabular-nums",
-                  }}
-                >
-                  {formatTime(sessionDuration)}
-                </span>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Centered orb for idle state */}
-        {isIdle && (
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            padding: '24px 20px 20px',
-            gap: 12,
-          }}>
-            <Orb size={100} isActive={false} isSpeaking={false} audioLevel={0} status="idle" />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <motion.div
-                animate={{ opacity: [1, 0.3, 1] }}
-                transition={{ duration: 2.5, repeat: Infinity }}
-                style={{ width: 5, height: 5, borderRadius: '50%', background: 'rgba(255,255,255,0.25)' }}
-              />
-              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
-                Ready to start
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* ── Live transcript ── */}
-        <AnimatePresence>
-          {transcript && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              style={{ overflow: "hidden" }}
-            >
-              <div
-                style={{
-                  margin: "0 16px 12px",
-                  padding: "12px 14px",
-                  borderRadius: 14,
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.07)",
-                  maxHeight: 80,
-                  overflowY: "auto",
-                }}
-              >
-                <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(45,212,191,0.7)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 5 }}>
-                  Live
-                </p>
-                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.72)", lineHeight: 1.5, margin: 0 }}>{transcript}</p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ── Latest pipeline response ── */}
-        <AnimatePresence>
-          {pipelineEnabled && latestResult?.assistant_text && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              style={{ overflow: "hidden" }}
-            >
-              <div
-                style={{
-                  margin: "0 16px 12px",
-                  padding: "12px 14px",
-                  borderRadius: 14,
-                  background: "rgba(129,140,248,0.08)",
-                  border: "1px solid rgba(129,140,248,0.18)",
-                }}
-              >
-                <p style={{ fontSize: 11, fontWeight: 600, color: "#818CF8", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 5 }}>
-                  Mentor
-                </p>
-                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.72)", lineHeight: 1.5, margin: 0 }}>{latestResult.assistant_text}</p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ── Action proposals ── */}
-        <AnimatePresence>
-          {pipelineEnabled && Array.isArray(actionProposals) && actionProposals.length > 0 && (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
-              <div style={{ margin: "0 16px 12px" }}>
-                <p style={{ fontSize: 11, fontWeight: 600, color: "#34D399", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
-                  Confirm Actions
-                </p>
-                {actionProposals.map((p) => (
-                  <div key={p.proposal_id} style={{ padding: "10px 12px", borderRadius: 12, background: "rgba(52,211,153,0.07)", border: "1px solid rgba(52,211,153,0.18)", marginBottom: 6 }}>
-                    <p style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", marginBottom: 8 }}>{p.summary}</p>
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <button onClick={() => confirmProposal(p.proposal_id, true)}
-                        style={{ padding: "5px 14px", borderRadius: 8, background: "#059669", color: "#fff", fontSize: 12, fontWeight: 600, border: "none", cursor: "pointer" }}>
-                        Confirm
-                      </button>
-                      <button onClick={() => confirmProposal(p.proposal_id, false)}
-                        style={{ padding: "5px 14px", borderRadius: 8, background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600, border: "none", cursor: "pointer" }}>
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ── Push-to-talk ── */}
-        {pipelineEnabled && isActive && (
-          <div style={{ padding: "0 16px 12px" }}>
-            <button
-              onMouseDown={startTurn}
-              onMouseUp={stopTurn}
-              onMouseLeave={() => { if (isCapturing) stopTurn(); }}
-              onTouchStart={startTurn}
-              onTouchEnd={stopTurn}
-              style={{
-                width: "100%",
-                padding: "11px",
-                borderRadius: 14,
-                background: isCapturing ? "rgba(52,211,153,0.18)" : "rgba(255,255,255,0.06)",
-                border: `1px solid ${isCapturing ? "rgba(52,211,153,0.4)" : "rgba(255,255,255,0.1)"}`,
-                color: isCapturing ? "#34D399" : "rgba(255,255,255,0.55)",
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "all 0.15s",
-                fontFamily: "inherit",
-                letterSpacing: "0.01em",
-              }}
-            >
-              {isCapturing ? "Release to send" : "Hold to speak"}
-            </button>
-          </div>
-        )}
-
-        {/* ── Voice selector — compact pills ── */}
-        {isIdle && voiceConfig?.available_voices?.length > 0 && (
-          <div style={{ padding: '0 16px 16px' }}>
-            <p style={{
-              fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.3)',
-              textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10,
-            }}>
-              Voice
-            </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {voiceConfig.available_voices.map(voice => {
-                const name = typeof voice === 'string' ? voice : voice.name;
-                const id = typeof voice === 'string' ? voice : voice.id;
-                const isSelected = selectedVoice === id;
-                return (
-                  <button
-                    key={id}
-                    onClick={() => setSelectedVoice(id)}
-                    style={{
-                      padding: '6px 14px',
-                      borderRadius: 100,
-                      background: isSelected ? 'rgba(45,212,191,0.12)' : 'rgba(255,255,255,0.05)',
-                      border: isSelected ? '1px solid rgba(45,212,191,0.35)' : '1px solid rgba(255,255,255,0.08)',
-                      color: isSelected ? '#2DD4BF' : 'rgba(255,255,255,0.6)',
-                      fontSize: 13,
-                      fontWeight: isSelected ? 600 : 400,
-                      cursor: 'pointer',
-                      fontFamily: "'Bricolage Grotesque', sans-serif",
-                      transition: 'all 0.15s',
-                    }}
-                  >
-                    {name}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* ── Error ── */}
-        {error && (
-          <div style={{ margin: "0 16px 12px", padding: "10px 14px", borderRadius: 12, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.22)" }}>
-            <p style={{ fontSize: 12, color: "#F87171", margin: 0 }}>{error}</p>
-          </div>
-        )}
-
-        {/* ── Primary action ── */}
-        <div style={{ padding: "8px 16px 16px" }}>
-          {isIdle && (
-            <motion.button
-              onClick={onStart}
-              disabled={!voiceConfig}
-              whileHover={voiceConfig ? { scale: 1.01 } : {}}
-              whileTap={voiceConfig ? { scale: 0.97 } : {}}
-              style={voiceConfig ? {
-                width: '100%',
-                padding: '13px',
-                borderRadius: 14,
-                background: 'linear-gradient(135deg, #2DD4BF 0%, #0D9488 100%)',
-                border: 'none',
-                color: '#fff',
-                fontSize: 15,
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                fontFamily: "'Bricolage Grotesque', sans-serif",
-                letterSpacing: '0.01em',
-                boxShadow: '0 4px 20px rgba(45,212,191,0.25)',
-                transition: 'opacity 0.15s',
-              } : {
-                width: "100%",
-                padding: "13px",
-                borderRadius: 14,
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.05)",
-                color: "rgba(255,255,255,0.15)",
-                fontSize: 15,
-                fontWeight: 700,
-                cursor: "not-allowed",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                fontFamily: "'Bricolage Grotesque', sans-serif",
-                letterSpacing: "0.01em",
-              }}
-            >
-              {!voiceConfig ? (
-                <>
-                  <SpinIcon />
-                  Initialising…
-                </>
-              ) : (
-                <>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                    <line x1="12" y1="19" x2="12" y2="23" />
-                    <line x1="8" y1="23" x2="16" y2="23" />
-                  </svg>
-                  Start Conversation
-                </>
-              )}
-            </motion.button>
-          )}
-
-          {!isIdle && (
-            <motion.button
-              onClick={onEnd}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              style={{
-                width: "100%",
-                padding: "13px",
-                borderRadius: 16,
-                background: "rgba(239,68,68,0.15)",
-                border: "1px solid rgba(239,68,68,0.3)",
-                color: "#F87171",
-                fontSize: 14,
-                fontWeight: 700,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 9,
-                fontFamily: "inherit",
-                letterSpacing: "0.01em",
-              }}
-            >
-              {isConnecting ? "Cancel" : "End Session"}
-            </motion.button>
-          )}
-        </div>
-
-        {/* ── Bottom mode toggle ── */}
-        <div
-          style={{
-            padding: "10px 16px 14px",
-            borderTop: "1px solid rgba(255,255,255,0.05)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 2,
-          }}
+        <button
+          type="button"
+          onClick={onClose}
+          className="flex h-7 w-7 items-center justify-center rounded-full border border-borderMuted bg-white text-textSecondary hover:bg-beigeSecondary dark:border-white/10 dark:bg-charcoalDark dark:text-gray-300 dark:hover:bg-charcoalMuted"
+          title="Close"
         >
-          <div style={{
-            display: "inline-flex",
-            alignItems: "center",
-            background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(255,255,255,0.07)",
-            borderRadius: 10,
-            padding: 3,
-            gap: 2,
-          }}>
-            {/* Voice — active indicator */}
-            <div style={{
-              padding: "5px 14px",
-              borderRadius: 7,
-              background: "rgba(45,212,191,0.12)",
-              border: "1px solid rgba(45,212,191,0.2)",
-              fontSize: 12,
-              fontWeight: 600,
-              color: "#2DD4BF",
-              display: "flex",
-              alignItems: "center",
-              gap: 5,
-              userSelect: "none",
-            }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-              </svg>
-              Voice
-            </div>
-            {/* Text — switch */}
-            <button
-              onClick={onSwitchToText}
-              style={{
-                padding: "5px 14px",
-                borderRadius: 7,
-                background: "transparent",
-                border: "1px solid transparent",
-                fontSize: 12,
-                fontWeight: 500,
-                color: "rgba(255,255,255,0.3)",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-                fontFamily: "inherit",
-                transition: "color 0.15s",
-              }}
-            >
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-              </svg>
-              Text
-            </button>
-          </div>
-        </div>
+          <X size={13} strokeWidth={2.3} />
+        </button>
       </div>
     </motion.div>
   );
 }
 
-/* ─── Icon button ─────────────────────────────────────────────────────────── */
-function IconBtn({ onClick, children, title, danger }) {
+function VoiceHistory({ history, loading }) {
+  if (history.length === 0 && !loading) {
+    return null;
+  }
+
   return (
-    <button
-      onClick={onClick}
-      title={title}
-      style={{
-        width: 36,
-        height: 36,
-        borderRadius: 11,
-        background: danger ? "rgba(239,68,68,0.12)" : "rgba(255,255,255,0.055)",
-        border: danger ? "1px solid rgba(239,68,68,0.24)" : "1px solid rgba(255,255,255,0.1)",
-        color: danger ? "#F87171" : "rgba(255,255,255,0.5)",
-        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        cursor: "pointer",
-        outline: "none",
-      }}
-    >
-      {children}
-    </button>
+    <div className="space-y-2">
+      {history.map((entry) => (
+        <div key={entry.id} className={`flex ${entry.role === "user" ? "justify-end" : "justify-start"}`}>
+          <div className={`max-w-[90%] rounded-2xl px-3 py-2 text-[13px] leading-relaxed ${entry.role === "user"
+            ? "rounded-br-md bg-terracotta text-white"
+            : "rounded-bl-md border border-borderMuted bg-white text-textPrimary dark:border-white/10 dark:bg-charcoal dark:text-gray-100"
+            }`}>
+            {entry.content}
+          </div>
+        </div>
+      ))}
+
+      {loading && (
+        <div className="flex justify-start">
+          <div className="rounded-2xl rounded-bl-md border border-borderMuted bg-white px-3 py-2 text-sm text-textSecondary dark:border-white/10 dark:bg-charcoal dark:text-gray-400">
+            Quicky is processing your voice...
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
 function SpinIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
-      style={{ animation: "spin 0.9s linear infinite" }}>
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      style={{ animation: "spin 0.9s linear infinite" }}
+    >
       <path d="M21 12a9 9 0 1 1-6.219-8.56" />
     </svg>
   );
 }
 
-/* ─── Main component ─────────────────────────────────────────────────────── */
 export default function AIVoicePanel({
   isOpen = false,
   onClose,
@@ -815,17 +162,20 @@ export default function AIVoicePanel({
   autoStart = false,
   onAutoStartHandled,
 }) {
-  /* Detect context from URL if not supplied */
   const contextSource = contextSourceProp !== "general"
     ? contextSourceProp
     : (typeof window !== "undefined" ? getContextSourceFromPath(window.location.pathname) : "general");
 
-  /* "closed" | "mini" | "expanded" */
+  const contextLabel = useMemo(() => CONTEXT_LABELS[contextSource] || "General", [contextSource]);
+
   const [panelState, setPanelState] = useState("closed");
   const [voiceConfig, setVoiceConfig] = useState(null);
-  const [selectedVoice, setSelectedVoice] = useState("Aoede");
   const [sessionDuration, setSessionDuration] = useState(0);
+  const [history, setHistory] = useState([]);
+
   const autoStartTriggeredRef = useRef(false);
+  const lastTurnKeyRef = useRef("");
+  const historyRef = useRef(null);
 
   const realtimeSession = useVoiceSession();
   const pipelineSession = useVoicePipelineSession(contextSource);
@@ -837,12 +187,12 @@ export default function AIVoicePanel({
     error,
     transcript,
     isSpeaking = false,
-    audioLevel = 0,
     isCapturing = false,
-    actionProposals = [],
+    audioLevel = 0,
     latestResult = null,
-    startTurn = () => { },
-    stopTurn = () => { },
+    actionProposals = [],
+    startTurn = () => {},
+    stopTurn = () => {},
     confirmProposal = async () => null,
     connect,
     disconnect,
@@ -851,61 +201,102 @@ export default function AIVoicePanel({
 
   const isActive = status === "active";
 
-  /* Inject fonts */
-  useEffect(() => { injectFont(); }, []);
-
-  /* Sync isOpen prop */
   useEffect(() => {
-    if (isOpen && panelState === "closed") setPanelState("expanded");
-    else if (!isOpen && panelState !== "closed") {
+    injectFont();
+  }, []);
+
+  useEffect(() => {
+    if (isOpen && panelState === "closed") {
+      setPanelState("expanded");
+      return;
+    }
+    if (!isOpen && panelState !== "closed") {
       disconnect?.();
       setPanelState("closed");
     }
-  }, [isOpen]); // eslint-disable-line
+  }, [disconnect, isOpen, panelState]);
 
-  /* Load voice config on expand */
   useEffect(() => {
-    if (panelState !== "closed" && !voiceConfig) {
-      (async () => {
-        try {
-          if (pipelineEnabled) {
-            const cfg = await assistantPipelineService.getConfig();
-            setVoiceConfig({
-              ws_url: "",
-              session_memory: [],
-              onboarding_context: {},
-              auto_intro_prompt: "",
-              available_voices: cfg?.available_voices || [],
-            });
-          } else {
-            const cfg = await mentoringService.getVoiceConfig();
-            setVoiceConfig(cfg);
-          }
-        } catch (e) { console.error("Voice config:", e); }
-      })();
+    if (panelState === "closed" || voiceConfig) return;
+
+    (async () => {
+      try {
+        if (pipelineEnabled) {
+          const cfg = await assistantPipelineService.getConfig();
+          const voices = cfg?.available_voices || [];
+          setVoiceConfig({
+            ws_url: "",
+            session_memory: [],
+            onboarding_context: {},
+            auto_intro_prompt: "",
+            available_voices: voices,
+          });
+        } else {
+          const cfg = await mentoringService.getVoiceConfig();
+          setVoiceConfig(cfg);
+        }
+      } catch (cfgErr) {
+        console.error("Voice config error", cfgErr);
+      }
+    })();
+  }, [panelState, pipelineEnabled, voiceConfig]);
+
+  useEffect(() => {
+    let timer;
+    if (isActive) {
+      timer = setInterval(() => setSessionDuration((prev) => prev + 1), 1000);
+    } else {
+      setSessionDuration(0);
     }
-  }, [panelState, voiceConfig, pipelineEnabled]);
-
-  /* Timer */
-  useEffect(() => {
-    let t;
-    if (isActive) t = setInterval(() => setSessionDuration((s) => s + 1), 1000);
-    else setSessionDuration(0);
-    return () => clearInterval(t);
+    return () => clearInterval(timer);
   }, [isActive]);
 
-  /* Auto-start */
   useEffect(() => {
-    if (!isOpen) { autoStartTriggeredRef.current = false; return; }
+    if (!isOpen) {
+      autoStartTriggeredRef.current = false;
+      return;
+    }
+
     if (autoStart && panelState === "expanded" && voiceConfig && status === "idle" && !autoStartTriggeredRef.current) {
       autoStartTriggeredRef.current = true;
       handleStart(true);
       onAutoStartHandled?.();
     }
-  }, [isOpen, autoStart, panelState, voiceConfig, status]); // eslint-disable-line
+  }, [autoStart, isOpen, onAutoStartHandled, panelState, status, voiceConfig]);
 
-  const formatTime = (s) =>
-    `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
+  useEffect(() => {
+    if (!latestResult) return;
+    const userText = String(latestResult?.transcript || "").trim();
+    const assistantText = String(latestResult?.assistant_text || "").trim();
+    if (!userText && !assistantText) return;
+
+    const turnKey = `${userText}|${assistantText}`;
+    if (lastTurnKeyRef.current === turnKey) return;
+    lastTurnKeyRef.current = turnKey;
+
+    setHistory((prev) => {
+      const next = [...prev];
+      if (userText) next.push(makeEntry("user", userText));
+      if (assistantText) next.push(makeEntry("assistant", assistantText));
+      return next.slice(-80);
+    });
+  }, [latestResult]);
+
+  useEffect(() => {
+    if (panelState !== "expanded") return;
+    historyRef.current?.scrollTo({ top: historyRef.current.scrollHeight, behavior: "smooth" });
+  }, [history, panelState]);
+
+  const hasFeedContent = useMemo(() => (
+    history.length > 0 ||
+    Boolean(transcript) ||
+    (Array.isArray(actionProposals) && actionProposals.length > 0) ||
+    Boolean(error) ||
+    status === "processing"
+  ), [actionProposals, error, history.length, status, transcript]);
+
+  const formatTime = (seconds) =>
+    `${Math.floor(seconds / 60).toString().padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`;
 
   const handleStart = useCallback((byAutoStart = false) => {
     if (!voiceConfig) return;
@@ -914,67 +305,255 @@ export default function AIVoicePanel({
       contextSource,
       studentGoal,
       sessionMemory: voiceConfig.session_memory,
-      voiceName: selectedVoice,
+      voiceName: getPrimaryVoiceId(voiceConfig),
       onboardingContext: voiceConfig.onboarding_context || {},
       initialPrompt: byAutoStart ? (voiceConfig.auto_intro_prompt || "") : "",
       languagePreference: "hinglish",
     });
-  }, [voiceConfig, connect, contextSource, studentGoal, selectedVoice]);
+  }, [connect, contextSource, studentGoal, voiceConfig]);
 
-  // Close handler: disconnects but PRESERVES conversationId so session resumes on reopen.
-  const handleEnd = useCallback(() => {
+  const handleEndSession = useCallback(() => {
+    disconnect?.();
+  }, [disconnect]);
+
+  const handleClosePanel = useCallback(() => {
     disconnect?.();
     setPanelState("closed");
     onClose?.();
   }, [disconnect, onClose]);
 
-  // New-session handler: disconnects AND clears the persisted conversation ID.
+  const handleMinimize = useCallback(() => {
+    setPanelState("mini");
+  }, []);
+
+  const handleExpand = useCallback(() => {
+    setPanelState("expanded");
+  }, []);
+
   const handleNewSession = useCallback(() => {
     disconnect?.();
     clearConversation?.();
-    setPanelState("closed");
-    onClose?.();
-  }, [disconnect, clearConversation, onClose]);
-
-  const handleMinimize = useCallback(() => setPanelState("mini"), []);
-  const handleExpand = useCallback(() => setPanelState("expanded"), []);
+    setHistory([]);
+    setSessionDuration(0);
+    setPanelState("expanded");
+    lastTurnKeyRef.current = "";
+  }, [clearConversation, disconnect]);
 
   const handleSwitchToText = useCallback(() => {
-    setTimeout(() => {
-      disconnect?.();
-      setPanelState("closed");
-      onSwitchToText?.();
-    }, 300);
+    disconnect?.();
+    setPanelState("closed");
+    onSwitchToText?.();
   }, [disconnect, onSwitchToText]);
 
-  const sharedProps = {
-    status, isSpeaking, audioLevel, sessionDuration, formatTime,
-    contextSource, studentGoal, voiceConfig, selectedVoice, setSelectedVoice,
-    transcript, error, pipelineEnabled, isCapturing,
-    latestResult, actionProposals, confirmProposal,
-    startTurn, stopTurn,
-    onMinimize: handleMinimize,
-    onClose: handleEnd,
-    onStart: handleStart,
-    onEnd: handleEnd,
-    onNewSession: handleNewSession,
-    onSwitchToText: handleSwitchToText,
-    onExpand: handleExpand,
-  };
+  const statusLabel =
+    status === "connecting"
+      ? "Connecting"
+      : status === "processing"
+        ? "Processing"
+        : isActive
+          ? (isSpeaking ? "Speaking" : (pipelineEnabled ? (isCapturing ? "Recording" : "Ready") : "Listening"))
+          : "Ready";
 
   return (
     <AnimatePresence>
-      {panelState === "expanded" && <ExpandedPanel key="expanded" {...sharedProps} />}
+      {panelState === "expanded" && (
+        <motion.div
+          key="quicky-voice-expanded"
+          initial={{ opacity: 0, y: 16, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 16, scale: 0.96 }}
+          transition={{ type: "spring", stiffness: 320, damping: 30 }}
+          className="fixed bottom-4 left-3 right-3 z-[9999] ml-auto w-[calc(100vw-24px)] max-w-[430px] overflow-hidden rounded-3xl border-2 border-borderMuted bg-white/95 shadow-[0_14px_36px_rgba(47,39,32,0.22)] backdrop-blur-md dark:border-white/10 dark:bg-charcoal"
+          data-voice-overlay="true"
+        >
+          <div className="flex items-center justify-between gap-2 border-b border-borderMuted px-3 py-3 dark:border-white/10">
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-terracotta/30 bg-terracotta/10 text-2xl">
+                🦉
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-bold text-textPrimary dark:text-white">Quicky Voice</p>
+                <p className="truncate text-xs font-medium text-textSecondary dark:text-gray-400">{contextLabel}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={handleNewSession}
+                title="New session"
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-borderMuted bg-white text-textSecondary transition-colors hover:bg-beigeSecondary dark:border-white/10 dark:bg-charcoalDark dark:text-gray-300 dark:hover:bg-charcoalMuted"
+              >
+                <SquarePen size={15} strokeWidth={2.2} />
+              </button>
+              <button
+                type="button"
+                onClick={handleMinimize}
+                title="Minimize"
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-borderMuted bg-white text-textSecondary transition-colors hover:bg-beigeSecondary dark:border-white/10 dark:bg-charcoalDark dark:text-gray-300 dark:hover:bg-charcoalMuted"
+              >
+                <Minus size={16} strokeWidth={2.4} />
+              </button>
+              <button
+                type="button"
+                onClick={handleClosePanel}
+                title="Close"
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-borderMuted bg-white text-textSecondary transition-colors hover:bg-beigeSecondary dark:border-white/10 dark:bg-charcoalDark dark:text-gray-300 dark:hover:bg-charcoalMuted"
+              >
+                <X size={15} strokeWidth={2.4} />
+              </button>
+            </div>
+          </div>
+
+          <div className="border-b border-borderMuted px-3 pb-4 pt-4 dark:border-white/10">
+            <div className="rounded-2xl border border-borderMuted bg-beigeSecondary/45 p-3 dark:border-white/10 dark:bg-charcoalDark/60">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <SessionIndicator size={48} isActive={isActive} isSpeaking={isSpeaking} status={status} />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-textPrimary dark:text-white">{statusLabel}</p>
+                    <p className="truncate text-xs text-textSecondary dark:text-gray-400">
+                      {isActive ? "Voice session in progress" : "Start when you are ready"}
+                    </p>
+                  </div>
+                </div>
+
+                {isActive && (
+                  <span className="rounded-full border border-borderMuted bg-white px-3 py-1 text-xs font-semibold tracking-wide text-textPrimary dark:border-white/10 dark:bg-charcoal dark:text-gray-200">
+                    {formatTime(sessionDuration)}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {hasFeedContent && (
+            <div ref={historyRef} className="max-h-[28vh] space-y-2 overflow-y-auto bg-beigePrimary/55 px-3 py-3 dark:bg-charcoalDark/50">
+              <VoiceHistory history={history} loading={status === "processing"} />
+
+              {transcript && (
+                <div className="rounded-xl border border-terracotta/30 bg-terracotta/5 px-3 py-2 text-xs text-textSecondary dark:border-terracotta/40 dark:bg-terracotta/10 dark:text-gray-300">
+                  <span className="font-semibold text-terracotta">Live transcript:</span> {transcript}
+                </div>
+              )}
+
+              {Array.isArray(actionProposals) && actionProposals.length > 0 && (
+                <div className="space-y-2">
+                  {actionProposals.map((proposal) => (
+                    <div key={proposal.proposal_id} className="rounded-xl border border-terracotta/25 bg-beigeSecondary/70 p-2 dark:border-terracotta/35 dark:bg-charcoalMuted/60">
+                      <p className="mb-2 text-xs font-semibold text-textPrimary dark:text-gray-200">{proposal.summary}</p>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => confirmProposal(proposal.proposal_id, true)}
+                          className="rounded-lg bg-terracotta px-2.5 py-1 text-xs font-semibold text-white hover:bg-terracottaHover"
+                        >
+                          Confirm
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => confirmProposal(proposal.proposal_id, false)}
+                          className="rounded-lg border border-borderMuted bg-white px-2.5 py-1 text-xs font-semibold text-textSecondary hover:bg-beigeSecondary dark:border-white/10 dark:bg-charcoal dark:text-gray-300 dark:hover:bg-charcoalMuted"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {error && (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
+                  {error}
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="space-y-2 p-3">
+            {status === "idle" && !hasFeedContent && (
+              <div className="rounded-xl border border-borderMuted bg-white/80 px-3 py-2.5 dark:border-white/10 dark:bg-charcoalDark/70">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-textSecondary dark:text-gray-400">
+                  What Quicky Does
+                </p>
+                <p className="mt-1 text-xs leading-relaxed text-textSecondary dark:text-gray-300">
+                  Quicky listens to your request, gives focused guidance for this page, and asks for confirmation before taking actions.
+                </p>
+              </div>
+            )}
+
+            {isActive && pipelineEnabled && (
+              <button
+                type="button"
+                onMouseDown={startTurn}
+                onMouseUp={stopTurn}
+                onMouseLeave={() => {
+                  if (isCapturing) stopTurn();
+                }}
+                onTouchStart={startTurn}
+                onTouchEnd={stopTurn}
+                className={`w-full rounded-xl border px-3 py-2 text-sm font-semibold transition-colors ${isCapturing
+                  ? "border-terracotta bg-terracotta text-white"
+                  : "border-borderMuted bg-white text-textSecondary hover:bg-beigeSecondary dark:border-white/10 dark:bg-charcoalDark dark:text-gray-300 dark:hover:bg-charcoalMuted"
+                  }`}
+              >
+                {isCapturing ? "Release to send" : "Hold to speak"}
+              </button>
+            )}
+
+            {status === "idle" ? (
+              <motion.button
+                type="button"
+                onClick={() => handleStart(false)}
+                disabled={!voiceConfig}
+                whileHover={voiceConfig ? { scale: 1.01 } : {}}
+                whileTap={voiceConfig ? { scale: 0.98 } : {}}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-terracotta px-3 py-3 text-sm font-bold text-white shadow-[0_6px_20px_rgba(217,108,74,0.28)] disabled:cursor-not-allowed disabled:bg-beigeMuted dark:disabled:bg-charcoalMuted"
+              >
+                {!voiceConfig ? <SpinIcon /> : <Mic size={15} strokeWidth={2.2} />}
+                {!voiceConfig ? "Initializing" : "Start voice session"}
+              </motion.button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleEndSession}
+                className="w-full rounded-xl border border-red-300 bg-red-50 px-3 py-3 text-sm font-semibold text-red-600 hover:bg-red-100 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300"
+              >
+                End session
+              </button>
+            )}
+
+            <div className="flex items-center justify-center rounded-xl border border-borderMuted bg-white p-1 dark:border-white/10 dark:bg-charcoalDark">
+              <div className="grid w-full max-w-[240px] grid-cols-2 gap-1 rounded-lg bg-beigeSecondary p-1 dark:bg-charcoalMuted/70">
+                <span className="inline-flex items-center justify-center gap-1 rounded-md bg-terracotta px-3 py-1 text-xs font-semibold text-white">
+                  <Mic size={11} strokeWidth={2.2} />
+                  Voice
+                </span>
+                <button
+                  type="button"
+                  onClick={handleSwitchToText}
+                  className="inline-flex items-center justify-center gap-1 rounded-md px-3 py-1 text-xs font-semibold text-textSecondary hover:bg-white dark:text-gray-300 dark:hover:bg-charcoal"
+                >
+                  <MessageSquare size={11} strokeWidth={2.2} />
+                  Text
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {panelState === "mini" && (
         <MiniPill
-          key="mini"
+          key="quicky-voice-mini"
           isActive={isActive}
           isSpeaking={isSpeaking}
-          audioLevel={audioLevel}
+          status={status}
           sessionDuration={sessionDuration}
           formatTime={formatTime}
           onExpand={handleExpand}
-          onEnd={handleEnd}
+          onClose={handleClosePanel}
         />
       )}
     </AnimatePresence>

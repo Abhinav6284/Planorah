@@ -258,7 +258,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose = () => {}, user = null }) 
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={onMobileClose}
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
+              className="fixed inset-0 bg-black/70 backdrop-blur-md z-40 lg:hidden"
             />
             <motion.div
               initial={{ x: '-100%' }}

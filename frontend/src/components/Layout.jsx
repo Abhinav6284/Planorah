@@ -6,8 +6,7 @@ import AIVoicePanel from './Mentoring/AIVoicePanel';
 import WelcomeCoach from './Onboarding/WelcomeCoach';
 import { TourProvider } from './Tour/TourContext';
 import GuidedTour from './Tour/GuidedTour';
-import { FaMicrophone } from 'react-icons/fa';
-import { Menu } from 'lucide-react';
+import { Menu, MessageSquare, Mic } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { userService } from '../api/userService';
 import { getUserAvatar } from '../utils/avatar';
@@ -35,7 +34,6 @@ const getContextSource = (pathname) => {
 const Layout = () => {
     const [chatOpen, setChatOpen] = useState(false);
     const [voiceOpen, setVoiceOpen] = useState(false);
-    const [fabExpanded, setFabExpanded] = useState(false);
     const [welcomeUser, setWelcomeUser] = useState(null);
     const [autoVoiceStart, setAutoVoiceStart] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -75,129 +73,123 @@ const Layout = () => {
     const userAvatar = user ? getUserAvatar(user) : '';
     const userName = user?.first_name || user?.profile?.first_name || 'User';
 
+    const handleOpenVoice = () => {
+        setChatOpen(false);
+        setVoiceOpen(true);
+    };
+
+    const handleOpenChat = () => {
+        setVoiceOpen(false);
+        setAutoVoiceStart(false);
+        setChatOpen(true);
+    };
+
     return (
         <TourProvider>
-        <div className="min-h-screen bg-gradient-to-br from-beigePrimary via-beigeSecondary to-beigeMuted dark:bg-charcoalDark transition-colors duration-200 font-sans flex">
-            {/* Desktop Sidebar */}
-            <Sidebar mobileOpen={sidebarOpen} onMobileClose={() => setSidebarOpen(false)} user={user} />
+            <div className="min-h-screen bg-gradient-to-br from-beigePrimary via-beigeSecondary to-beigeMuted dark:bg-charcoalDark transition-colors duration-200 font-sans flex">
+                {/* Desktop Sidebar */}
+                <Sidebar mobileOpen={sidebarOpen} onMobileClose={() => setSidebarOpen(false)} user={user} />
 
-            {/* Main Content Column */}
-            <div className="flex-1 min-w-0 flex flex-col">
-                {/* Mobile Top Bar */}
-                <div className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-beigePrimary/95 dark:bg-[#0f0f0f]/95 border-b border-borderMuted dark:border-white/10 backdrop-blur-md">
-                    <button
-                        onClick={() => setSidebarOpen(true)}
-                        className="flex items-center justify-center w-9 h-9 rounded-lg border border-borderMuted dark:border-white/10 bg-white dark:bg-white/5 text-textPrimary dark:text-white hover:bg-beigeMuted dark:hover:bg-white/10 transition-colors"
-                        aria-label="Open navigation"
-                    >
-                        <Menu className="h-5 w-5" />
-                    </button>
-                    <Link to="/dashboard" className="text-lg font-serif font-bold text-textPrimary dark:text-white">
-                        Planorah<span className="text-terracotta">.</span>
-                    </Link>
-                    <Link to="/profile" className="w-9 h-9 rounded-full overflow-hidden border border-borderMuted hover:border-terracotta transition-colors">
-                        <img src={userAvatar} alt={userName} className="w-full h-full object-cover" />
-                    </Link>
+                {/* Main Content Column */}
+                <div className="flex-1 min-w-0 flex flex-col">
+                    {/* Mobile Top Bar */}
+                    <div className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-beigePrimary/95 dark:bg-[#0f0f0f]/95 border-b border-borderMuted dark:border-white/10 backdrop-blur-md">
+                        <button
+                            onClick={() => setSidebarOpen(true)}
+                            className="flex items-center justify-center w-9 h-9 rounded-lg border border-borderMuted dark:border-white/10 bg-white dark:bg-white/5 text-textPrimary dark:text-white hover:bg-beigeMuted dark:hover:bg-white/10 transition-colors"
+                            aria-label="Open navigation"
+                        >
+                            <Menu className="h-5 w-5" />
+                        </button>
+                        <Link to="/dashboard" className="text-lg font-serif font-bold text-textPrimary dark:text-white">
+                            Planorah<span className="text-terracotta">.</span>
+                        </Link>
+                        <Link to="/profile" className="w-9 h-9 rounded-full overflow-hidden border border-borderMuted hover:border-terracotta transition-colors">
+                            <img src={userAvatar} alt={userName} className="w-full h-full object-cover" />
+                        </Link>
+                    </div>
+
+                    {/* Page Content */}
+                    <main className="flex-1 overflow-auto">
+                        <Outlet />
+                    </main>
                 </div>
 
-                {/* Page Content */}
-                <main className="flex-1 overflow-auto">
-                    <Outlet />
-                </main>
-            </div>
-
-            {/* Floating AI Mentor FAB */}
-            <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-2">
+                {/* Floating Quicky dock */}
                 <AnimatePresence>
-                    {fabExpanded && (
-                        <>
-                            {/* Voice button */}
-                            <motion.button
-                                initial={{ opacity: 0, y: 10, scale: 0.8 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, y: 10, scale: 0.8 }}
-                                transition={{ duration: 0.15, delay: 0.05 }}
-                                onClick={() => { setVoiceOpen(true); setFabExpanded(false); }}
-                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium shadow-lg shadow-purple-500/25 transition-colors"
-                            >
-                                <FaMicrophone className="text-xs" />
-                                AI Talk
-                            </motion.button>
+                    {!chatOpen && !voiceOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 14, scale: 0.94 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                            transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+                            className="fixed bottom-5 right-4 z-50 w-[min(94vw,320px)] rounded-2xl border-2 border-borderMuted dark:border-white/10 bg-white/95 dark:bg-charcoal/95 p-3 shadow-[0_8px_0_0_rgba(234,230,219,1)] dark:shadow-[0_18px_36px_rgba(0,0,0,0.5)] backdrop-blur-lg"
+                        >
+                            <div className="mb-3 flex items-center justify-between rounded-xl border border-borderMuted dark:border-white/10 bg-beigeSecondary/70 dark:bg-charcoalMuted/60 px-3 py-2">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-lg" aria-hidden="true">🦉</span>
+                                    <div className="leading-tight">
+                                        <p className="text-sm font-bold text-textPrimary dark:text-gray-100">Quicky Assistant</p>
+                                        <p className="text-[11px] font-medium text-textSecondary dark:text-gray-400">Message-to-message and voice-to-voice</p>
+                                    </div>
+                                </div>
+                            </div>
 
-                            {/* Chat button */}
-                            <motion.button
-                                initial={{ opacity: 0, y: 10, scale: 0.8 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, y: 10, scale: 0.8 }}
-                                transition={{ duration: 0.15 }}
-                                onClick={() => { setChatOpen(true); setFabExpanded(false); }}
-                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium shadow-lg shadow-indigo-500/25 transition-colors"
-                            >
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                                </svg>
-                                AI Chat
-                            </motion.button>
-                        </>
+                            <div className="grid grid-cols-2 gap-2">
+                                <motion.button
+                                    whileHover={{ y: -1, scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={handleOpenChat}
+                                    className="flex items-center justify-center gap-2 rounded-xl border-2 border-borderMuted dark:border-charcoalMuted bg-white dark:bg-charcoalDark px-3 py-2.5 text-sm font-semibold text-textPrimary dark:text-gray-100 transition-colors hover:border-terracotta/45 dark:hover:border-terracotta/45 hover:bg-beigeSecondary dark:hover:bg-charcoalMuted"
+                                >
+                                    <MessageSquare className="h-4 w-4 text-terracotta" strokeWidth={2.2} />
+                                    <span>Text</span>
+                                </motion.button>
+
+                                <motion.button
+                                    whileHover={{ y: -1, scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={handleOpenVoice}
+                                    className="flex items-center justify-center gap-2 rounded-xl border-2 border-terracotta bg-terracotta px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-terracottaHover"
+                                >
+                                    <Mic className="h-4 w-4" strokeWidth={2.2} />
+                                    <span>Voice</span>
+                                </motion.button>
+                            </div>
+                        </motion.div>
                     )}
                 </AnimatePresence>
 
-                {/* Main FAB — AI Orb */}
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setFabExpanded(!fabExpanded)}
-                    className="w-14 h-14 rounded-full flex items-center justify-center shadow-2xl shadow-indigo-500/30 overflow-hidden relative transition-all duration-200"
-                >
-                    {fabExpanded ? (
-                        <div className="absolute inset-0 bg-gray-700 hover:bg-gray-800 flex items-center justify-center">
-                            <span className="text-xl font-light text-white">✕</span>
-                        </div>
-                    ) : (
-                        <>
-                            {/* Orb base */}
-                            <div className="absolute inset-0 bg-[#005be4]" />
-                            {/* Spinning conic highlight */}
-                            <div className="absolute inset-0 bg-[conic-gradient(from_0deg_at_50%_50%,transparent_0deg,rgba(0,242,254,0.85)_120deg,rgba(79,172,254,0.95)_180deg,transparent_240deg)] animate-[spin_3s_linear_infinite]" />
-                            {/* 3D sphere inner glow */}
-                            <div className="absolute inset-[2px] rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.6)_0%,transparent_50%,rgba(0,0,0,0.15)_100%)] mix-blend-overlay" />
-                            {/* Chat icon */}
-                            <svg className="relative z-10 text-white drop-shadow-sm" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                            </svg>
-                        </>
-                    )}
-                </motion.button>
-            </div>
+                {/* Welcome coach overlay — shown once after onboarding */}
+                {welcomeUser !== null && (
+                    <WelcomeCoach
+                        userName={welcomeUser}
+                        onDone={() => setWelcomeUser(null)}
+                    />
+                )}
 
-            {/* Welcome coach overlay — shown once after onboarding */}
-            {welcomeUser !== null && (
-                <WelcomeCoach
-                    userName={welcomeUser}
-                    onDone={() => setWelcomeUser(null)}
+                {/* Panels */}
+                <AITalkPanel
+                    isOpen={chatOpen}
+                    onClose={() => setChatOpen(false)}
+                    contextSource={contextSource}
+                    onSwitchToVoice={handleOpenVoice}
                 />
-            )}
+                <AIVoicePanel
+                    isOpen={voiceOpen}
+                    onClose={() => {
+                        setVoiceOpen(false);
+                        setAutoVoiceStart(false);
+                    }}
+                    contextSource={contextSource}
+                    autoStart={autoVoiceStart}
+                    onAutoStartHandled={() => setAutoVoiceStart(false)}
+                    onSwitchToText={handleOpenChat}
+                />
 
-            {/* Panels */}
-            <AITalkPanel
-                isOpen={chatOpen}
-                onClose={() => setChatOpen(false)}
-                contextSource={contextSource}
-            />
-            <AIVoicePanel
-                isOpen={voiceOpen}
-                onClose={() => {
-                    setVoiceOpen(false);
-                    setAutoVoiceStart(false);
-                }}
-                contextSource={contextSource}
-                autoStart={autoVoiceStart}
-                onAutoStartHandled={() => setAutoVoiceStart(false)}
-            />
-
-            {/* Guided tour — only on dashboard routes */}
-            {location.pathname.startsWith('/dashboard') && <GuidedTour />}
-        </div>
+                {/* Guided tour — only on dashboard routes */}
+                {location.pathname.startsWith('/dashboard') && <GuidedTour />}
+            </div>
         </TourProvider>
     );
 };
