@@ -373,5 +373,5 @@ def assistant_suggestions(request):
         return Response({"suggestions": suggestions}, status=status.HTTP_200_OK)
     except Exception as exc:
         logger.exception("assistant_suggestions failed: %s", exc)
-        return Response({"suggestions": []}, status=status.HTTP_200_OK)
+        return Response({"suggestions": [], "degraded": True}, status=status.HTTP_200_OK)
 
