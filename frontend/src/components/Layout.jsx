@@ -6,7 +6,7 @@ import AIVoicePanel from './Mentoring/AIVoicePanel';
 import WelcomeCoach from './Onboarding/WelcomeCoach';
 import { TourProvider } from './Tour/TourContext';
 import GuidedTour from './Tour/GuidedTour';
-import { Menu, MessageSquare, Mic } from 'lucide-react';
+import { Menu, MessageSquare, Mic, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { userService } from '../api/userService';
 import { getUserAvatar } from '../utils/avatar';
@@ -34,6 +34,7 @@ const getContextSource = (pathname) => {
 const Layout = () => {
     const [chatOpen, setChatOpen] = useState(false);
     const [voiceOpen, setVoiceOpen] = useState(false);
+    const [launcherExpanded, setLauncherExpanded] = useState(false);
     const [welcomeUser, setWelcomeUser] = useState(null);
     const [autoVoiceStart, setAutoVoiceStart] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -76,12 +77,14 @@ const Layout = () => {
     const handleOpenVoice = () => {
         setChatOpen(false);
         setVoiceOpen(true);
+        setLauncherExpanded(false);
     };
 
     const handleOpenChat = () => {
         setVoiceOpen(false);
         setAutoVoiceStart(false);
         setChatOpen(true);
+        setLauncherExpanded(false);
     };
 
     return (
@@ -118,45 +121,73 @@ const Layout = () => {
                 {/* Floating Quicky dock */}
                 <AnimatePresence>
                     {!chatOpen && !voiceOpen && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 14, scale: 0.94 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                            transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-                            className="fixed bottom-5 right-4 z-50 w-[min(94vw,320px)] rounded-2xl border-2 border-borderMuted dark:border-white/10 bg-white/95 dark:bg-charcoal/95 p-3 shadow-[0_8px_0_0_rgba(234,230,219,1)] dark:shadow-[0_18px_36px_rgba(0,0,0,0.5)] backdrop-blur-lg"
-                        >
-                            <div className="mb-3 flex items-center justify-between rounded-xl border border-borderMuted dark:border-white/10 bg-beigeSecondary/70 dark:bg-charcoalMuted/60 px-3 py-2">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-lg" aria-hidden="true">🦉</span>
-                                    <div className="leading-tight">
-                                        <p className="text-sm font-bold text-textPrimary dark:text-gray-100">Quicky Assistant</p>
-                                        <p className="text-[11px] font-medium text-textSecondary dark:text-gray-400">Message-to-message and voice-to-voice</p>
+                        launcherExpanded ? (
+                            <motion.div
+                                key="quicky-expanded"
+                                initial={{ opacity: 0, y: 14, scale: 0.94 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+                                className="fixed bottom-5 right-4 z-50 w-[min(94vw,320px)] rounded-2xl border-2 border-borderMuted dark:border-white/10 bg-white/95 dark:bg-charcoal/95 p-3 shadow-[0_8px_0_0_rgba(234,230,219,1)] dark:shadow-[0_18px_36px_rgba(0,0,0,0.5)] backdrop-blur-lg"
+                            >
+                                <div className="mb-3 flex items-center justify-between rounded-xl border border-borderMuted dark:border-white/10 bg-beigeSecondary/70 dark:bg-charcoalMuted/60 px-3 py-2">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-lg" aria-hidden="true">🦉</span>
+                                        <div className="leading-tight">
+                                            <p className="text-sm font-bold text-textPrimary dark:text-gray-100">Quicky Assistant</p>
+                                            <p className="text-[11px] font-medium text-textSecondary dark:text-gray-400">Message-to-message and voice-to-voice</p>
+                                        </div>
                                     </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setLauncherExpanded(false)}
+                                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-borderMuted bg-white text-textSecondary transition-colors hover:bg-beigeSecondary dark:border-white/10 dark:bg-charcoalDark dark:text-gray-300 dark:hover:bg-charcoalMuted"
+                                        title="Minimize Quicky"
+                                        aria-label="Minimize Quicky"
+                                    >
+                                        <X className="h-4 w-4" strokeWidth={2.4} />
+                                    </button>
                                 </div>
-                            </div>
 
-                            <div className="grid grid-cols-2 gap-2">
-                                <motion.button
-                                    whileHover={{ y: -1, scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={handleOpenChat}
-                                    className="flex items-center justify-center gap-2 rounded-xl border-2 border-borderMuted dark:border-charcoalMuted bg-white dark:bg-charcoalDark px-3 py-2.5 text-sm font-semibold text-textPrimary dark:text-gray-100 transition-colors hover:border-terracotta/45 dark:hover:border-terracotta/45 hover:bg-beigeSecondary dark:hover:bg-charcoalMuted"
-                                >
-                                    <MessageSquare className="h-4 w-4 text-terracotta" strokeWidth={2.2} />
-                                    <span>Text</span>
-                                </motion.button>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <motion.button
+                                        whileHover={{ y: -1, scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        onClick={handleOpenChat}
+                                        className="flex items-center justify-center gap-2 rounded-xl border-2 border-borderMuted dark:border-charcoalMuted bg-white dark:bg-charcoalDark px-3 py-2.5 text-sm font-semibold text-textPrimary dark:text-gray-100 transition-colors hover:border-terracotta/45 dark:hover:border-terracotta/45 hover:bg-beigeSecondary dark:hover:bg-charcoalMuted"
+                                    >
+                                        <MessageSquare className="h-4 w-4 text-terracotta" strokeWidth={2.2} />
+                                        <span>Text</span>
+                                    </motion.button>
 
-                                <motion.button
-                                    whileHover={{ y: -1, scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={handleOpenVoice}
-                                    className="flex items-center justify-center gap-2 rounded-xl border-2 border-terracotta bg-terracotta px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-terracottaHover"
-                                >
-                                    <Mic className="h-4 w-4" strokeWidth={2.2} />
-                                    <span>Voice</span>
-                                </motion.button>
-                            </div>
-                        </motion.div>
+                                    <motion.button
+                                        whileHover={{ y: -1, scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        onClick={handleOpenVoice}
+                                        className="flex items-center justify-center gap-2 rounded-xl border-2 border-terracotta bg-terracotta px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-terracottaHover"
+                                    >
+                                        <Mic className="h-4 w-4" strokeWidth={2.2} />
+                                        <span>Voice</span>
+                                    </motion.button>
+                                </div>
+                            </motion.div>
+                        ) : (
+                            <motion.button
+                                key="quicky-collapsed"
+                                type="button"
+                                initial={{ opacity: 0, y: 14, scale: 0.9 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.92 }}
+                                transition={{ type: 'spring', stiffness: 360, damping: 30 }}
+                                onClick={() => setLauncherExpanded(true)}
+                                className="fixed bottom-5 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full border-2 border-borderMuted dark:border-white/10 bg-white/95 dark:bg-charcoal/95 shadow-[0_10px_26px_rgba(47,39,32,0.25)] backdrop-blur-lg"
+                                title="Open Quicky"
+                                aria-label="Open Quicky"
+                            >
+                                <span className="text-2xl" aria-hidden="true">🦉</span>
+                            </motion.button>
+                        )
                     )}
                 </AnimatePresence>
 
