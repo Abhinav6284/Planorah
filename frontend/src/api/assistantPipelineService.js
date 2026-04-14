@@ -73,5 +73,17 @@ export const assistantPipelineService = {
     const response = await api.get(`assistant/v2/jobs/${jobId}/`);
     return response.data;
   },
+
+  getUserContext: async () => {
+    const response = await api.get('assistant/v2/user-context/');
+    return response.data;
+  },
+
+  getSuggestions: async (contextSource = 'general') => {
+    const response = await api.get('assistant/v2/suggestions/', {
+      params: { context_source: contextSource },
+    });
+    return response.data?.suggestions ?? [];
+  },
 };
 
