@@ -513,7 +513,7 @@ export default function AITalkPanel({
                       fontFamily: "inherit",
                     }}
                   >
-                    Start a new quest
+                    Start a new conversation
                   </button>
                 </motion.div>
               )}
