@@ -41,6 +41,9 @@ def generate_suggestions(context_source: str, backend_context: Dict[str, Any]) -
     Returns list of: [{text, action_label, action_type, action_target}]
     Falls back to static suggestions if Gemini fails.
     """
+    if context_source not in APP_NAVIGATION:
+        context_source = "general"
+
     profile = backend_context.get("profile", {})
     tasks = backend_context.get("tasks", {})
     roadmaps = backend_context.get("roadmaps", {})
@@ -83,7 +86,7 @@ Generate 1-2 suggestions for the "{context_source}" page. Return ONLY the JSON a
         from .pipeline_config import AI_PIPELINE_LLM_TIMEOUT_SEC
 
         payload = {
-            "contents": [{"parts": [{"text": prompt}]}],
+            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
             "generationConfig": {"temperature": 0.4, "maxOutputTokens": 256},
         }
         raw_payload = _post_generate_content(GEMINI_LLM_MODEL, payload, AI_PIPELINE_LLM_TIMEOUT_SEC)
@@ -112,7 +115,7 @@ def _fallback_suggestions(context_source: str, pending_tasks: int, roadmap_count
             {"text": f"You have {pending_tasks} pending tasks today", "action_label": "View tasks", "action_type": "navigate", "action_target": "/tasks"},
         ],
         "roadmap": [
-            {"text": "Continue your roadmap progress", "action_label": "Open roadmap", "action_type": "navigate", "action_target": "/roadmap"},
+            {"text": f"You have {roadmap_count} active roadmap(s) — keep going", "action_label": "View progress", "action_type": "navigate", "action_target": "/roadmap"},
         ],
         "tasks": [
             {"text": f"{pending_tasks} tasks are waiting for you", "action_label": "Start one", "action_type": "open_panel", "action_target": None},
