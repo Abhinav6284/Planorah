@@ -26,6 +26,8 @@ from .services.orchestrator import (
     run_turn,
 )
 from .services.pipeline_config import AI_PIPELINE_ENABLED
+from .services.context_aggregator import build_backend_context
+from .services.suggestions_service import generate_suggestions
 
 # Load environment variables
 load_dotenv()
@@ -321,4 +323,55 @@ def assistant_v2_job_status(request, job_id):
     except Exception as exc:
         logger.exception("assistant_v2_job_status failed: %s", exc)
         return Response({"error": "Unable to fetch job status", "details": str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def assistant_user_context(request):
+    """
+    Returns a cleaned summary of the user's journey for display in the
+    assistant panel header (goal, progress, streak).
+    """
+    try:
+        ctx = build_backend_context(request.user, context_source="general")
+        profile = ctx.get("profile", {})
+        task_summary = ctx.get("tasks", {}).get("summary", {})
+        roadmaps = ctx.get("roadmaps", {})
+        execution = ctx.get("execution", {})
+
+        total = task_summary.get("total", 0)
+        completed = task_summary.get("completed", 0)
+        progress_pct = round((completed / total) * 100) if total > 0 else 0
+
+        payload = {
+            "name": profile.get("name", ""),
+            "goal": profile.get("goal_statement", ""),
+            "target_role": profile.get("target_role", ""),
+            "progress_pct": progress_pct,
+            "tasks_completed": completed,
+            "tasks_total": total,
+            "streak": execution.get("current_streak", 0),
+            "roadmap_count": roadmaps.get("count", 0),
+        }
+        return Response(payload, status=status.HTTP_200_OK)
+    except Exception as exc:
+        logger.exception("assistant_user_context failed: %s", exc)
+        return Response({"error": "Could not load user context."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def assistant_suggestions(request):
+    """
+    Returns 1-2 proactive suggestions for the given page context.
+    Query param: ?context_source=dashboard
+    """
+    context_source = request.query_params.get("context_source", "general")
+    try:
+        backend_ctx = build_backend_context(request.user, context_source=context_source)
+        suggestions = generate_suggestions(context_source, backend_ctx)
+        return Response({"suggestions": suggestions}, status=status.HTTP_200_OK)
+    except Exception as exc:
+        logger.exception("assistant_suggestions failed: %s", exc)
+        return Response({"suggestions": []}, status=status.HTTP_200_OK)
 
