@@ -11,7 +11,8 @@ const base64ToBlob = (base64, mimeType = 'audio/wav') => {
   return new Blob([bytes], { type: mimeType });
 };
 
-export function useVoicePipelineSession() {
+export function useVoicePipelineSession(contextSource = 'general') {
+  const CONV_KEY = `planorah_conv_voice_${contextSource}`;
   const [status, setStatus] = useState('idle');
   const [error, setError] = useState('');
   const [transcript, setTranscript] = useState('');
@@ -20,7 +21,7 @@ export function useVoicePipelineSession() {
   const [isCapturing, setIsCapturing] = useState(false);
   const [latestResult, setLatestResult] = useState(null);
   const [actionProposals, setActionProposals] = useState([]);
-  const [conversationId, setConversationId] = useState(null);
+  const [conversationId, setConversationId] = useState(() => localStorage.getItem(CONV_KEY));
 
   const mediaStreamRef = useRef(null);
   const recorderRef = useRef(null);
@@ -91,6 +92,7 @@ export function useVoicePipelineSession() {
     setActionProposals(Array.isArray(response?.action_proposals) ? response.action_proposals : []);
     if (response?.conversation_id) {
       setConversationId(response.conversation_id);
+      localStorage.setItem(CONV_KEY, response.conversation_id);
     }
     const nextTranscript = String(response?.transcript || '').trim();
     if (nextTranscript) {
@@ -99,7 +101,7 @@ export function useVoicePipelineSession() {
     if (response?.tts) {
       await playTtsAudio(response.tts);
     }
-  }, [playTtsAudio]);
+  }, [CONV_KEY, playTtsAudio]);
 
   const connect = useCallback(async (config = {}) => {
     configRef.current = config || {};
@@ -134,6 +136,13 @@ export function useVoicePipelineSession() {
     setActionProposals([]);
     setLatestResult(null);
   }, [cleanupMedia]);
+
+  // Call this to start a brand-new session (clears persisted conversation ID).
+  // Do NOT call on panel close — close preserves the ID so the session resumes.
+  const clearConversation = useCallback(() => {
+    setConversationId(null);
+    localStorage.removeItem(CONV_KEY);
+  }, [CONV_KEY]);
 
   const startLevelMonitor = useCallback((stream) => {
     try {
@@ -294,5 +303,6 @@ export function useVoicePipelineSession() {
     startTurn,
     stopTurn,
     confirmProposal,
+    clearConversation,
   };
 }
