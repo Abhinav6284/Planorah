@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import AssistantWidget from '../Mentoring/AssistantWidget';
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "../../api/axios";
@@ -74,6 +75,7 @@ export default function InterviewChat() {
 
     return (
         <div className="flex flex-col h-[calc(100vh-80px)] bg-gray-50 dark:bg-charcoalDark font-sans relative overflow-hidden">
+            <AssistantWidget contextSource="interview" />
             {/* Header */}
             <header className="bg-white dark:bg-charcoal border-b border-gray-200 dark:border-charcoalMuted p-4 shadow-sm z-10 flex justify-between items-center">
                 <div>
