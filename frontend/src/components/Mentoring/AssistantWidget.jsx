@@ -35,7 +35,7 @@ export default function AssistantWidget({ contextSource = 'general', onOpenPanel
     }
   };
 
-  if (dismissed || (!loading && suggestions.length === 0)) return null;
+  if (!loading && suggestions.length === 0) return null;
 
   return (
     <AnimatePresence>
@@ -79,7 +79,7 @@ export default function AssistantWidget({ contextSource = 'general', onOpenPanel
             <div className="flex flex-col gap-2">
               {suggestions.map((s, i) => (
                 <div
-                  key={i}
+                  key={s.text || i}
                   className="flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 bg-white/5 hover:bg-white/[0.08] transition-colors"
                 >
                   <span className="text-sm text-white/80 leading-snug flex-1">{s.text}</span>
