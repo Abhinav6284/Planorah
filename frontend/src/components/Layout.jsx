@@ -173,20 +173,37 @@ const Layout = () => {
                                 </div>
                             </motion.div>
                         ) : (
-                            <motion.button
-                                key="quicky-collapsed"
-                                type="button"
-                                initial={{ opacity: 0, y: 14, scale: 0.9 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, y: 10, scale: 0.92 }}
-                                transition={{ type: 'spring', stiffness: 360, damping: 30 }}
-                                onClick={() => setLauncherExpanded(true)}
-                                className="fixed bottom-5 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full border-2 border-borderMuted dark:border-white/10 bg-white/95 dark:bg-charcoal/95 shadow-[0_10px_26px_rgba(47,39,32,0.25)] backdrop-blur-lg"
-                                title="Open Quicky"
-                                aria-label="Open Quicky"
-                            >
-                                <span className="text-2xl" aria-hidden="true">🦉</span>
-                            </motion.button>
+                            <div key="quicky-collapsed" className="fixed bottom-5 right-4 z-50">
+                                {/* Thinking dots bubble */}
+                                <motion.div
+                                    initial={{ opacity: 0, y: 4, scale: 0.85 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 4, scale: 0.85 }}
+                                    transition={{ delay: 0.3, type: 'spring', stiffness: 320, damping: 28 }}
+                                    className="absolute -top-8 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-white dark:bg-charcoal border border-borderMuted dark:border-white/10 shadow-sm whitespace-nowrap"
+                                >
+                                    <span className="w-1.5 h-1.5 rounded-full bg-terracotta animate-bounce" style={{ animationDelay: '0ms', animationDuration: '1s' }} />
+                                    <span className="w-1.5 h-1.5 rounded-full bg-terracotta animate-bounce" style={{ animationDelay: '180ms', animationDuration: '1s' }} />
+                                    <span className="w-1.5 h-1.5 rounded-full bg-terracotta animate-bounce" style={{ animationDelay: '360ms', animationDuration: '1s' }} />
+                                </motion.div>
+
+                                {/* Pulsing ring */}
+                                <span className="absolute inset-0 rounded-full bg-terracotta/20 animate-ping" style={{ animationDuration: '2s' }} />
+
+                                <motion.button
+                                    type="button"
+                                    initial={{ opacity: 0, y: 14, scale: 0.9 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 10, scale: 0.92 }}
+                                    transition={{ type: 'spring', stiffness: 360, damping: 30 }}
+                                    onClick={() => setLauncherExpanded(true)}
+                                    className="relative flex h-14 w-14 items-center justify-center rounded-full border-2 border-borderMuted dark:border-white/10 bg-white/95 dark:bg-charcoal/95 shadow-[0_10px_26px_rgba(47,39,32,0.25)] backdrop-blur-lg"
+                                    title="Open Quicky"
+                                    aria-label="Open Quicky"
+                                >
+                                    <span className="text-2xl" aria-hidden="true">🦉</span>
+                                </motion.button>
+                            </div>
                         )
                     )}
                 </AnimatePresence>
