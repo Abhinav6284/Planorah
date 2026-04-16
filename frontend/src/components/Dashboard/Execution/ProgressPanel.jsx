@@ -38,18 +38,36 @@ const ProgressPanel = React.memo(({ tasks, stats, activityHeatmap }) => {
     const heatmap = useMemo(() => {
         const days = [];
         const now = new Date();
+        const currentStreak = stats?.current_streak || 0;
+
         for (let i = 6; i >= 0; i--) {
             const d = new Date(now);
             d.setDate(now.getDate() - i);
             const iso = d.toISOString().slice(0, 10);
+            // Also check local date key (e.g. "2026-04-16") for timezone robustness
+            const localKey = d.toLocaleDateString('en-CA');
 
-            // Prefer server-provided activity_heatmap object
-            const count = (activityHeatmap && !Array.isArray(activityHeatmap))
-                ? (activityHeatmap[iso] ?? 0)
-                : (tasks || []).filter(t =>
+            let count = 0;
+
+            // 1. Prefer server-provided activity_heatmap (most accurate)
+            if (activityHeatmap && !Array.isArray(activityHeatmap)) {
+                count = activityHeatmap[iso] ?? activityHeatmap[localKey] ?? 0;
+            }
+
+            // 2. Fallback: scan tasks for completed_at / updated_at matching this day
+            if (count === 0) {
+                count = (tasks || []).filter(t =>
                     t.status === 'completed' &&
                     String(t.completed_at || t.updated_at || '').slice(0, 10) === iso
                 ).length;
+            }
+
+            // 3. Final fallback: infer from streak — the last `currentStreak` days
+            //    going back from today were all active (login/study days)
+            //    i=0 is today, i=1 is yesterday, etc.
+            if (count === 0 && currentStreak > 0 && i < currentStreak) {
+                count = 1;
+            }
 
             days.push({
                 label: d.toLocaleDateString('en-US', { weekday: 'narrow' }),
@@ -58,7 +76,7 @@ const ProgressPanel = React.memo(({ tasks, stats, activityHeatmap }) => {
             });
         }
         return days;
-    }, [tasks, activityHeatmap]);
+    }, [tasks, activityHeatmap, stats]);
 
     return (
         <div className="rounded-2xl border-0 bg-white dark:bg-[#1a1a1a] p-6 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] transition-all duration-300 space-y-5">
