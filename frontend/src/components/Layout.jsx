@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Outlet, useLocation, Link } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import AITalkPanel from './Mentoring/AITalkPanel';
@@ -10,6 +10,7 @@ import { Menu, MessageSquare, Mic, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { userService } from '../api/userService';
 import { getUserAvatar } from '../utils/avatar';
+import { assistantPipelineService } from '../api/assistantPipelineService';
 
 const REALTIME_ONBOARDING_INTRO_KEY = 'show_realtime_onboarding_intro';
 
@@ -39,6 +40,10 @@ const Layout = () => {
     const [autoVoiceStart, setAutoVoiceStart] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [user, setUser] = useState(null);
+    const [quickySuggestion, setQuickySuggestion] = useState(null);
+    const [quickyLoading, setQuickyLoading] = useState(false);
+    const [bubbleDismissed, setBubbleDismissed] = useState(false);
+    const prevContextRef = useRef(null);
     const location = useLocation();
     const contextSource = getContextSource(location.pathname);
 
@@ -70,6 +75,25 @@ const Layout = () => {
             .then(profileData => setUser(profileData))
             .catch(() => setUser(null));
     }, []);
+
+    // Fetch Quicky suggestion whenever the page context changes
+    useEffect(() => {
+        if (prevContextRef.current === contextSource) return;
+        prevContextRef.current = contextSource;
+        setBubbleDismissed(false);
+        setQuickySuggestion(null);
+        setQuickyLoading(true);
+        let cancelled = false;
+        assistantPipelineService.getSuggestions(contextSource)
+            .then((suggestions) => {
+                if (!cancelled && suggestions.length > 0) {
+                    setQuickySuggestion(suggestions[0].text);
+                }
+            })
+            .catch(() => {})
+            .finally(() => { if (!cancelled) setQuickyLoading(false); });
+        return () => { cancelled = true; };
+    }, [contextSource]);
 
     const userAvatar = user ? getUserAvatar(user) : '';
     const userName = user?.first_name || user?.profile?.first_name || 'User';
@@ -173,23 +197,51 @@ const Layout = () => {
                                 </div>
                             </motion.div>
                         ) : (
-                            <div key="quicky-collapsed" className="fixed bottom-5 right-4 z-50">
-                                {/* Thinking dots bubble */}
-                                <motion.div
-                                    initial={{ opacity: 0, y: 4, scale: 0.85 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: 4, scale: 0.85 }}
-                                    transition={{ delay: 0.3, type: 'spring', stiffness: 320, damping: 28 }}
-                                    className="absolute -top-8 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-white dark:bg-charcoal border border-borderMuted dark:border-white/10 shadow-sm whitespace-nowrap"
-                                >
-                                    <span className="w-1.5 h-1.5 rounded-full bg-terracotta animate-bounce" style={{ animationDelay: '0ms', animationDuration: '1s' }} />
-                                    <span className="w-1.5 h-1.5 rounded-full bg-terracotta animate-bounce" style={{ animationDelay: '180ms', animationDuration: '1s' }} />
-                                    <span className="w-1.5 h-1.5 rounded-full bg-terracotta animate-bounce" style={{ animationDelay: '360ms', animationDuration: '1s' }} />
-                                </motion.div>
+                            <div key="quicky-collapsed" className="fixed bottom-5 right-4 z-50 flex flex-col items-end gap-2">
+                                {/* Suggestion bubble */}
+                                <AnimatePresence>
+                                    {!bubbleDismissed && (quickyLoading || quickySuggestion) && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 8, scale: 0.92 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 6, scale: 0.92 }}
+                                            transition={{ type: 'spring', stiffness: 340, damping: 28 }}
+                                            className="relative max-w-[240px] rounded-2xl rounded-br-sm border border-borderMuted dark:border-white/10 bg-white dark:bg-charcoal shadow-[0_4px_20px_rgba(47,39,32,0.15)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)] px-3.5 py-2.5"
+                                        >
+                                            {/* dismiss */}
+                                            <button
+                                                type="button"
+                                                onClick={() => setBubbleDismissed(true)}
+                                                className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-white dark:bg-charcoal border border-borderMuted dark:border-white/10 text-textSecondary dark:text-gray-400 hover:text-textPrimary dark:hover:text-white transition-colors shadow-sm"
+                                                aria-label="Dismiss"
+                                            >
+                                                <X className="h-2.5 w-2.5" strokeWidth={2.5} />
+                                            </button>
 
-                                {/* Pulsing ring */}
-                                <span className="absolute inset-0 rounded-full bg-terracotta/20 animate-ping" style={{ animationDuration: '2s' }} />
+                                            {quickyLoading ? (
+                                                <div className="flex items-center gap-1.5 py-0.5">
+                                                    <span className="text-sm">🦉</span>
+                                                    <div className="flex gap-1">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-terracotta animate-bounce" style={{ animationDelay: '0ms', animationDuration: '900ms' }} />
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-terracotta animate-bounce" style={{ animationDelay: '160ms', animationDuration: '900ms' }} />
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-terracotta animate-bounce" style={{ animationDelay: '320ms', animationDuration: '900ms' }} />
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    onClick={handleOpenChat}
+                                                    className="text-left w-full"
+                                                >
+                                                    <p className="text-xs font-medium text-textSecondary dark:text-gray-400 mb-0.5">Quicky</p>
+                                                    <p className="text-sm text-textPrimary dark:text-gray-100 leading-snug">{quickySuggestion}</p>
+                                                </button>
+                                            )}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
 
+                                {/* Owl button */}
                                 <motion.button
                                     type="button"
                                     initial={{ opacity: 0, y: 14, scale: 0.9 }}
@@ -197,7 +249,7 @@ const Layout = () => {
                                     exit={{ opacity: 0, y: 10, scale: 0.92 }}
                                     transition={{ type: 'spring', stiffness: 360, damping: 30 }}
                                     onClick={() => setLauncherExpanded(true)}
-                                    className="relative flex h-14 w-14 items-center justify-center rounded-full border-2 border-borderMuted dark:border-white/10 bg-white/95 dark:bg-charcoal/95 shadow-[0_10px_26px_rgba(47,39,32,0.25)] backdrop-blur-lg"
+                                    className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-borderMuted dark:border-white/10 bg-white/95 dark:bg-charcoal/95 shadow-[0_10px_26px_rgba(47,39,32,0.25)] backdrop-blur-lg"
                                     title="Open Quicky"
                                     aria-label="Open Quicky"
                                 >

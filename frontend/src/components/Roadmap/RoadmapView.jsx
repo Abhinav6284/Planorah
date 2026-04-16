@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaCheckCircle, FaRegCircle, FaChevronDown, FaChevronUp, FaExternalLinkAlt, FaQuestionCircle, FaClock, FaTasks, FaRocket, FaCode, FaBook, FaLightbulb } from "react-icons/fa";
 import GenerateResumeButton from "../Resume/GenerateResumeButton";
 import AITalkButton from "../Mentoring/AITalkButton";
-import AssistantWidget from '../Mentoring/AssistantWidget';
 
 // Colorful milestone icons based on phase
 const milestoneIcons = [
@@ -113,7 +112,6 @@ export default function RoadmapView() {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-charcoalDark dark:to-charcoal p-6 md:p-12 font-sans transition-colors duration-200">
-            <AssistantWidget contextSource="roadmap" />
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <motion.div

@@ -4,7 +4,6 @@ import { ArrowRight, Play, Flame, Star, Medal, Crown, Sparkles, BrainCircuit, Ch
 import { Link } from 'react-router-dom';
 
 import AIVoicePanel from '../Mentoring/AIVoicePanel';
-import AssistantWidget from '../Mentoring/AssistantWidget';
 import DateTasksWidget from './NewWidgets/DateTasksWidget';
 import ProfileCard from './NewWidgets/ProfileCard';
 import CalendarWidget from './NewWidgets/CalendarWidget';
@@ -377,7 +376,6 @@ const ExecutionDashboard = () => {
     return (
         <div className={`min-h-screen text-slate-800 transition-all duration-500 dark:text-slate-100 ${focusOpen ? 'bg-[radial-gradient(1200px_600px_at_25%_0%,#111827_0%,#090909_70%)] dark:bg-[radial-gradient(1200px_600px_at_25%_0%,#161616_0%,#060606_70%)]' : 'bg-[#F5F5F7] dark:bg-[#0b0b0b]'}`}>
             <div className="mx-auto max-w-[1480px] p-3 sm:p-5 lg:p-6">
-                <AssistantWidget contextSource="dashboard" />
                 <motion.section
                     initial={{ opacity: 0, y: -8 }}
                     animate={{ opacity: 1, y: 0 }}

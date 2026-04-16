@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import AssistantWidget from '../Mentoring/AssistantWidget';
 import { useSearchParams } from 'react-router-dom';
 import { tasksService } from '../../api/tasksService';
 import { roadmapService } from '../../api/roadmapService';
@@ -237,7 +236,6 @@ export default function TaskList() {
 
     return (
         <div className="min-h-full bg-gray-50 dark:bg-charcoalDark">
-            <AssistantWidget contextSource="tasks" />
             <div className="p-6 md:p-10 relative">
                 <header className="mb-8">
                     <h1 className="text-3xl font-serif font-medium text-gray-900 dark:text-white mb-2">My Tasks</h1>

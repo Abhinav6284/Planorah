@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import AssistantWidget from '../Mentoring/AssistantWidget';
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "../../api/axios";
@@ -368,7 +367,6 @@ export default function ResumeBuilder() {
 
     return (
         <div className="flex flex-col md:flex-row min-h-[calc(100dvh-80px)] md:h-[calc(100vh-80px)] bg-gray-100 dark:bg-charcoalDark overflow-hidden">
-            <AssistantWidget contextSource="resume" />
             {/* Mobile View Toggle - only visible on mobile */}
             <div className="md:hidden flex bg-white dark:bg-charcoal border-b border-gray-200 dark:border-charcoalMuted">
                 <button
