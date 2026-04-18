@@ -1,9 +1,10 @@
 from unittest.mock import patch
 
 from django.test import TestCase
+from django.utils import timezone
 from rest_framework.test import APIClient
 
-from users.models import CustomUser, DeletedUser, OTPVerification
+from users.models import CustomUser, DeletedUser, OTPVerification, TrustedDevice
 
 
 class AuthLifecycleFlowTests(TestCase):
@@ -230,3 +231,128 @@ class DeleteAccountTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data.get('message'), 'Account deleted successfully')
         self.assertFalse(CustomUser.objects.filter(email='delete-failure@example.com').exists())
+
+
+class TrustedDeviceTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = CustomUser.objects.create(
+            email='trusted@example.com',
+            username='trusted_user',
+            status=CustomUser.STATUS_ACTIVE,
+            is_active=True,
+            is_verified=True,
+        )
+        self.user.set_unusable_password()
+        self.user.save()
+        # Create a valid OTP for social login verification
+        OTPVerification.objects.create(
+            email='trusted@example.com',
+            otp='123456',
+            is_used=False,
+        )
+
+    # ── verify_social_otp with remember_me=True issues a trusted device token ──
+
+    def test_verify_social_otp_with_remember_me_returns_trusted_token(self):
+        response = self.client.post(
+            '/api/users/verify-social-otp/',
+            {'email': 'trusted@example.com', 'otp': '123456', 'remember_me': True},
+            format='json',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('trusted_device_token', response.data)
+        token_val = response.data['trusted_device_token']
+        self.assertEqual(len(token_val), 64)
+        self.assertTrue(TrustedDevice.objects.filter(user=self.user, token=token_val).exists())
+
+    def test_verify_social_otp_without_remember_me_does_not_issue_trusted_token(self):
+        response = self.client.post(
+            '/api/users/verify-social-otp/',
+            {'email': 'trusted@example.com', 'otp': '123456', 'remember_me': False},
+            format='json',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('trusted_device_token', response.data)
+        self.assertFalse(TrustedDevice.objects.filter(user=self.user).exists())
+
+    # ── google_oauth_login skips OTP when valid trusted token is present ──
+
+    @patch('users.views.send_otp_email', return_value=True)
+    @patch('requests.get')
+    def test_google_login_skips_otp_with_valid_trusted_token(self, mock_get, mock_send_otp):
+        from datetime import timedelta
+        TrustedDevice.objects.create(
+            user=self.user,
+            token='a' * 64,
+            expires_at=timezone.now() + timedelta(days=15),
+        )
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {'email': 'trusted@example.com'}
+
+        response = self.client.post(
+            '/api/users/google/login/',
+            {'token': 'fake-google-token', 'mode': 'login', 'trusted_device_token': 'a' * 64},
+            format='json',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('two_factor_required', response.data)
+        self.assertIn('access', response.data)
+        self.assertIn('refresh', response.data)
+        mock_send_otp.assert_not_called()
+
+    @patch('users.views.send_otp_email', return_value=True)
+    @patch('requests.get')
+    def test_google_login_sends_otp_when_trusted_token_expired(self, mock_get, mock_send_otp):
+        from datetime import timedelta
+        TrustedDevice.objects.create(
+            user=self.user,
+            token='b' * 64,
+            expires_at=timezone.now() - timedelta(days=1),  # expired
+        )
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {'email': 'trusted@example.com'}
+
+        response = self.client.post(
+            '/api/users/google/login/',
+            {'token': 'fake-google-token', 'mode': 'login', 'trusted_device_token': 'b' * 64},
+            format='json',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data.get('two_factor_required'))
+        mock_send_otp.assert_called_once()
+
+    @patch('users.views.send_otp_email', return_value=True)
+    @patch('requests.get')
+    def test_google_login_sends_otp_when_no_trusted_token(self, mock_get, mock_send_otp):
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {'email': 'trusted@example.com'}
+
+        response = self.client.post(
+            '/api/users/google/login/',
+            {'token': 'fake-google-token', 'mode': 'login'},
+            format='json',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data.get('two_factor_required'))
+        mock_send_otp.assert_called_once()
+
+    # ── logout deletes trusted device ──
+
+    def test_logout_deletes_trusted_device(self):
+        from datetime import timedelta
+        from rest_framework_simplejwt.tokens import RefreshToken as JWTRefresh
+        TrustedDevice.objects.create(
+            user=self.user,
+            token='c' * 64,
+            expires_at=timezone.now() + timedelta(days=15),
+        )
+        refresh = str(JWTRefresh.for_user(self.user))
+
+        response = self.client.post(
+            '/api/users/logout/',
+            {'refresh': refresh},
+            format='json',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(TrustedDevice.objects.filter(user=self.user).exists())
