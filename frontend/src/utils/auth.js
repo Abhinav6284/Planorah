@@ -46,6 +46,27 @@ export function clearRememberMePreference() {
 }
 
 /**
+ * Store the trusted device token (issued after OTP verify with Remember Me)
+ */
+export function setTrustedDeviceToken(token) {
+    localStorage.setItem("trusted_device_token", token);
+}
+
+/**
+ * Get the trusted device token
+ */
+export function getTrustedDeviceToken() {
+    return localStorage.getItem("trusted_device_token");
+}
+
+/**
+ * Clear the trusted device token
+ */
+export function clearTrustedDeviceToken() {
+    localStorage.removeItem("trusted_device_token");
+}
+
+/**
  * Get login timestamp (only exists for Remember Me sessions)
  */
 export function getLoginTimestamp() {
@@ -85,6 +106,7 @@ export function clearTokens() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("login_timestamp");
+    localStorage.removeItem("trusted_device_token");
     sessionStorage.removeItem("access_token");
     sessionStorage.removeItem("refresh_token");
     sessionStorage.removeItem("remember_me_preference");
