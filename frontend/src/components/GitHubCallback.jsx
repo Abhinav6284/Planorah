@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from '../api/axios';
-import { setTokens, getRememberMePreference, clearRememberMePreference } from "../utils/auth";
+import { setTokens, getRememberMePreference, clearRememberMePreference, getTrustedDeviceToken } from "../utils/auth";
 
 export default function GitHubCallback() {
     const [searchParams] = useSearchParams();
@@ -25,10 +25,12 @@ export default function GitHubCallback() {
                 const mode = searchParams.get('state') || 'login'; // Get mode from state parameter
                 const rememberMe = getRememberMePreference();
 
+                const trustedToken = getTrustedDeviceToken();
                 const res = await axios.post(`/users/github/login/`, {
                     code: code,
                     redirect_uri: redirectUri,
-                    mode: mode
+                    mode: mode,
+                    ...(trustedToken && { trusted_device_token: trustedToken }),
                 });
 
                 // Check for 2FA
