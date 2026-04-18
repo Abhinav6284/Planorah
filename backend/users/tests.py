@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from django.test import TestCase
 from django.utils import timezone
@@ -356,3 +356,68 @@ class TrustedDeviceTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertFalse(TrustedDevice.objects.filter(user=self.user).exists())
+
+
+class TrustedDeviceGitHubTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = CustomUser.objects.create(
+            email='githubuser@example.com',
+            username='github_user',
+            status=CustomUser.STATUS_ACTIVE,
+            is_active=True,
+            is_verified=True,
+        )
+        self.user.set_unusable_password()
+        self.user.save()
+
+    def _mock_github_responses(self, mock_post, mock_get):
+        """Set up mocks for GitHub OAuth token exchange and user info."""
+        # POST: exchange code for access_token
+        mock_post.return_value.json.return_value = {'access_token': 'fake-gh-token'}
+        # GET calls: user info, then emails
+        user_response = MagicMock()
+        user_response.json.return_value = {'login': 'github_user'}
+        emails_response = MagicMock()
+        emails_response.json.return_value = [
+            {'email': 'githubuser@example.com', 'primary': True, 'verified': True}
+        ]
+        mock_get.side_effect = [user_response, emails_response]
+
+    @patch('users.views.send_otp_email', return_value=True)
+    @patch('requests.get')
+    @patch('requests.post')
+    def test_github_login_skips_otp_with_valid_trusted_token(self, mock_post, mock_get, mock_send_otp):
+        from datetime import timedelta
+        TrustedDevice.objects.create(
+            user=self.user,
+            token='d' * 64,
+            expires_at=timezone.now() + timedelta(days=15),
+        )
+        self._mock_github_responses(mock_post, mock_get)
+
+        response = self.client.post(
+            '/api/users/github/login/',
+            {'code': 'fake-code', 'redirect_uri': 'http://localhost/callback', 'mode': 'login', 'trusted_device_token': 'd' * 64},
+            format='json',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('two_factor_required', response.data)
+        self.assertIn('access', response.data)
+        self.assertIn('refresh', response.data)
+        mock_send_otp.assert_not_called()
+
+    @patch('users.views.send_otp_email', return_value=True)
+    @patch('requests.get')
+    @patch('requests.post')
+    def test_github_login_sends_otp_when_no_trusted_token(self, mock_post, mock_get, mock_send_otp):
+        self._mock_github_responses(mock_post, mock_get)
+
+        response = self.client.post(
+            '/api/users/github/login/',
+            {'code': 'fake-code', 'redirect_uri': 'http://localhost/callback', 'mode': 'login'},
+            format='json',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data.get('two_factor_required'))
+        mock_send_otp.assert_called_once()
