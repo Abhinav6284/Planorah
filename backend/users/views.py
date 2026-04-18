@@ -20,7 +20,7 @@ from backend.email_service import send_otp_email, send_password_reset_email, sen
 # AI onboarding call
 from ai_calls.service import trigger_onboarding_call
 
-from .models import CustomUser, OTPVerification, UserProfile, PasswordResetToken
+from .models import CustomUser, OTPVerification, UserProfile, PasswordResetToken, TrustedDevice
 from .serializers import UserSerializer, UserProfileSerializer
 from .statistics import get_user_statistics
 
@@ -1216,17 +1216,33 @@ def verify_social_otp(request):
     if hasattr(user, 'profile'):
         onboarding_complete = user.profile.onboarding_complete  # type: ignore
 
-    return Response({
+    response_data = {
         "message": "Login verification successful",
         "access": access_token,
         "refresh": refresh_token,
         "onboarding_complete": onboarding_complete,
         "user": {
-            "id": getattr(user, "id", None),  # type: ignore
+            "id": getattr(user, "id", None),
             "username": user.username,
             "email": user.email,
         }
-    }, status=status.HTTP_200_OK)
+    }
+
+    # Issue trusted device token if remember_me is True
+    remember_me = request.data.get("remember_me", False)
+    if remember_me:
+        import secrets as _secrets
+        # One trusted device per user — delete any existing ones
+        TrustedDevice.objects.filter(user=user).delete()
+        trusted_token = _secrets.token_hex(32)
+        TrustedDevice.objects.create(
+            user=user,
+            token=trusted_token,
+            expires_at=timezone.now() + timedelta(days=15),
+        )
+        response_data["trusted_device_token"] = trusted_token
+
+    return Response(response_data, status=status.HTTP_200_OK)
 
 
 # ---------------- CHECK AUTH TYPE ----------------
