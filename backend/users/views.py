@@ -863,31 +863,52 @@ def google_oauth_login(request):
                     "email": email
                 }, status=status.HTTP_404_NOT_FOUND)
 
-        # --- 2FA ENFORCEMENT START ---
+        # --- 2FA / TRUSTED DEVICE CHECK ---
+        # Prune expired trusted devices for this user
+        TrustedDevice.objects.filter(user=user, expires_at__lt=timezone.now()).delete()
+
+        # Check for a valid trusted device token
+        trusted_device_token = request.data.get("trusted_device_token")
+        if trusted_device_token:
+            try:
+                device = TrustedDevice.objects.get(token=trusted_device_token, user=user)
+                if device.is_valid():
+                    # Skip OTP — issue JWT directly
+                    refresh = RefreshToken.for_user(user)
+                    onboarding_complete = False
+                    if hasattr(user, 'profile'):
+                        onboarding_complete = user.profile.onboarding_complete  # type: ignore
+                    from .activity import record_activity
+                    record_activity(user, "login")
+                    return Response({
+                        "message": "Login successful",
+                        "access": str(refresh.access_token),
+                        "refresh": str(refresh),
+                        "onboarding_complete": onboarding_complete,
+                        "user": {
+                            "id": getattr(user, "id", None),
+                            "username": user.username,
+                            "email": user.email,
+                        }
+                    }, status=status.HTTP_200_OK)
+            except TrustedDevice.DoesNotExist:
+                pass  # fall through to OTP
+
+        # No valid trusted device — send OTP
         try:
-            # Generate OTP
             otp = str(random.randint(100000, 999999))
-
-            # Delete old OTPs
             OTPVerification.objects.filter(email=email).delete()
-
-            # Create new OTP
             OTPVerification.objects.create(email=email, otp=otp)
-
-            # Send Email
             send_otp_email(email, otp, user.username)
-
-            response_data = {
+            return Response({
                 "message": "Please verify OTP sent to your email",
                 "two_factor_required": True,
                 "email": email
-            }
-            return Response(response_data, status=status.HTTP_200_OK)
-
+            }, status=status.HTTP_200_OK)
         except Exception:
             logger.exception("Failed to send Google OAuth OTP for %s", email)
             return Response({"error": "Failed to send 2FA OTP"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        # --- 2FA ENFORCEMENT END ---
+        # --- END 2FA / TRUSTED DEVICE CHECK ---
 
     except ValueError as exc:
         return Response({"error": "Invalid Google token", "details": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
