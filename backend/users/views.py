@@ -24,6 +24,7 @@ from ai_calls.service import trigger_onboarding_call
 from .models import CustomUser, OTPVerification, UserProfile, PasswordResetToken, TrustedDevice
 from .serializers import UserSerializer, UserProfileSerializer
 from .statistics import get_user_statistics
+from .activity import record_activity
 
 # Configure module logger
 logger = logging.getLogger(__name__)
@@ -383,7 +384,6 @@ def login_user(request):
     access_token = str(refresh.access_token)
     refresh_token = str(refresh)
 
-    from .activity import record_activity
     record_activity(user, "login")
 
     # Check onboarding status
@@ -418,7 +418,6 @@ def daily_login_ping(request):
     without relying on re-login.
     """
     user = request.user
-    from .activity import record_activity
     record_activity(user, "daily_login")
 
     profile = getattr(user, 'profile', None)
@@ -749,6 +748,13 @@ def logout_view(request):
 
     try:
         token = RefreshToken(refresh_token)
+        # Identify the user from the refresh token to delete their trusted device
+        try:
+            user_id = token.payload.get("user_id")
+            if user_id:
+                TrustedDevice.objects.filter(user_id=user_id).delete()
+        except Exception:
+            pass  # non-critical — don't block logout
         token.blacklist()  # requires simplejwt token blacklist app installed & migrated
         return Response({"detail": "Logout successful. Token blacklisted."}, status=status.HTTP_200_OK)
     except TokenError as e:
@@ -878,7 +884,6 @@ def google_oauth_login(request):
                     onboarding_complete = False
                     if hasattr(user, 'profile'):
                         onboarding_complete = user.profile.onboarding_complete  # type: ignore
-                    from .activity import record_activity
                     record_activity(user, "login")
                     return Response({
                         "message": "Login successful",
@@ -1081,7 +1086,6 @@ def github_oauth_login(request):
                     onboarding_complete = False
                     if hasattr(user, 'profile'):
                         onboarding_complete = user.profile.onboarding_complete  # type: ignore
-                    from .activity import record_activity
                     record_activity(user, "login")
                     return Response({
                         "message": "Login successful",
@@ -1112,8 +1116,6 @@ def github_oauth_login(request):
             logger.exception("Failed to send GitHub OAuth OTP for %s", email)
             return Response({"error": "Failed to send 2FA OTP"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         # --- END 2FA / TRUSTED DEVICE CHECK ---
-
-        # (Original Token Generation Code is effectively replaced/bypassed)
 
     except Exception as exc:
         logger.exception("GitHub OAuth login failed")
