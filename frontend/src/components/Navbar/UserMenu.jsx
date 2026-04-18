@@ -3,6 +3,7 @@ import { Moon, Sun, LogOut } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useWorkspaceStore } from '../../stores/workspaceStore';
 import { useNavigate } from 'react-router-dom';
+import { logoutBackend, clearTokens, clearTrustedDeviceToken } from '../../utils/auth';
 
 /**
  * UserMenu - User avatar and dropdown menu with theme toggle and logout
@@ -52,14 +53,11 @@ const UserMenu = () => {
     }
   }, [isOpen]);
 
-  const handleLogout = () => {
-    // Remove access token from localStorage
-    localStorage.removeItem('access_token');
-
-    // Call logout from auth store
+  const handleLogout = async () => {
+    await logoutBackend();
+    clearTokens();
+    clearTrustedDeviceToken();
     logout();
-
-    // Redirect to login
     navigate('/login');
   };
 

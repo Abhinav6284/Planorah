@@ -106,7 +106,6 @@ export function clearTokens() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("login_timestamp");
-    localStorage.removeItem("trusted_device_token");
     sessionStorage.removeItem("access_token");
     sessionStorage.removeItem("refresh_token");
     sessionStorage.removeItem("remember_me_preference");
