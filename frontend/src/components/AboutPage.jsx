@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import {
   ArrowRight,
   BadgeCheck,
@@ -14,14 +15,34 @@ import { Link } from 'react-router-dom';
 import PublicSiteNav from './public/PublicSiteNav';
 import PublicSiteFooter from './public/PublicSiteFooter';
 
-const founder = {
-  name: 'Abhinav Goyal',
-  role: 'Founder and Builder, Planorah',
-  intro:
-    'I built Planorah to help students stop drowning in planning chaos and start executing with clarity every single day.',
-  location: 'India',
-  email: 'support@planorah.me',
-};
+const leadershipProfiles = [
+  {
+    id: 'founder',
+    tabLabel: 'Founder',
+    name: 'Abhinav Goyal',
+    role: 'Founder and Builder, Planorah',
+    intro:
+      'I built Planorah to help students stop drowning in planning chaos and start executing with clarity every single day.',
+    location: 'India',
+    email: 'support@planorah.me',
+    initials: 'AG',
+    quote:
+      'Students do not fail because they lack ambition. They fail because their systems are broken. Planorah exists to fix that system.',
+  },
+  {
+    id: 'co-founder',
+    tabLabel: 'Co Founder',
+    name: 'Abhishek Singh',
+    role: 'Co-Founder, Planorah',
+    intro:
+      'I am focused on scaling Planorah into a system students can trust daily for clear direction, accountability, and momentum.',
+    location: 'India',
+    email: 'support@planorah.me',
+    initials: 'AS',
+    quote:
+      'Execution is not about working more. It is about removing noise, choosing what matters, and showing up with consistency.',
+  },
+];
 
 const founderStats = [
   { label: 'Students impacted', value: '10,000+' },
@@ -90,6 +111,10 @@ const focusAreas = [
 ];
 
 export default function AboutPage() {
+  const [activeProfileId, setActiveProfileId] = useState(leadershipProfiles[0].id);
+  const activeProfile =
+    leadershipProfiles.find((profile) => profile.id === activeProfileId) || leadershipProfiles[0];
+
   return (
     <div className="min-h-screen bg-beigePrimary text-textPrimary dark:bg-charcoalDark dark:text-white">
       <PublicSiteNav />
@@ -106,20 +131,39 @@ export default function AboutPage() {
             transition={{ duration: 0.65 }}
             className="space-y-7"
           >
-            <div className="inline-flex items-center gap-2 rounded-full border border-terracotta/30 bg-terracotta/10 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-terracotta">
-              <BadgeCheck className="h-4 w-4" />
-              Founder Spotlight
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="inline-flex items-center gap-2 rounded-full border border-terracotta/30 bg-terracotta/10 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-terracotta">
+                <BadgeCheck className="h-4 w-4" />
+                Leadership Spotlight
+              </div>
+
+              <div className="inline-flex rounded-full border border-beigeMuted bg-white p-1 dark:border-charcoalMuted dark:bg-charcoal">
+                {leadershipProfiles.map((profile) => (
+                  <button
+                    key={profile.id}
+                    type="button"
+                    onClick={() => setActiveProfileId(profile.id)}
+                    className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
+                      activeProfileId === profile.id
+                        ? 'bg-charcoal text-beigePrimary dark:bg-beigePrimary dark:text-charcoal'
+                        : 'text-textSecondary hover:text-textPrimary dark:text-gray-400 dark:hover:text-white'
+                    }`}
+                  >
+                    {profile.tabLabel}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <h1 className="font-playfair text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
-              Meet the founder behind
+              Meet the team behind
               <span className="ml-2 bg-gradient-to-r from-terracotta to-[#e99b74] bg-clip-text text-transparent">
                 Planorah
               </span>
             </h1>
 
             <p className="max-w-2xl text-base leading-relaxed text-textSecondary dark:text-gray-300 sm:text-lg">
-              {founder.intro}
+              {activeProfile.intro}
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -132,11 +176,11 @@ export default function AboutPage() {
               </Link>
 
               <a
-                href={`mailto:${founder.email}`}
+                href={`mailto:${activeProfile.email}`}
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-beigeMuted bg-white px-7 py-3 text-sm font-semibold text-textPrimary transition-all hover:border-terracotta/40 hover:text-terracotta dark:border-charcoalMuted dark:bg-charcoal dark:text-gray-200 dark:hover:border-terracotta/50 dark:hover:text-orange-300"
               >
                 <Mail className="h-4 w-4" />
-                Contact Founder
+                Contact {activeProfile.tabLabel}
               </a>
             </div>
 
@@ -162,13 +206,13 @@ export default function AboutPage() {
             <div className="rounded-3xl border border-beigeMuted bg-white p-8 shadow-soft dark:border-charcoalMuted dark:bg-charcoal">
               <div className="rounded-2xl border border-terracotta/20 bg-gradient-to-br from-terracotta/10 to-[#e5d8c5] p-6 dark:from-terracotta/20 dark:to-charcoalMuted">
                 <div className="mb-5 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-charcoal text-2xl font-bold text-beigePrimary dark:bg-beigePrimary dark:text-charcoal">
-                  AG
+                  {activeProfile.initials}
                 </div>
 
                 <h2 className="font-playfair text-3xl font-bold text-textPrimary dark:text-white">
-                  {founder.name}
+                  {activeProfile.name}
                 </h2>
-                <p className="mt-1 text-sm font-semibold text-terracotta">{founder.role}</p>
+                <p className="mt-1 text-sm font-semibold text-terracotta">{activeProfile.role}</p>
 
                 <div className="mt-6 space-y-3 text-sm text-textSecondary dark:text-gray-300">
                   <p className="flex items-center gap-2">
@@ -181,12 +225,12 @@ export default function AboutPage() {
                   </p>
                   <p className="flex items-center gap-2">
                     <BadgeCheck className="h-4 w-4 text-terracotta" />
-                    Based in {founder.location}
+                    Based in {activeProfile.location}
                   </p>
                 </div>
 
                 <p className="mt-6 rounded-xl border border-terracotta/20 bg-white/80 p-4 text-sm italic leading-relaxed text-textPrimary dark:bg-charcoal/70 dark:text-gray-200">
-                  "Students do not fail because they lack ambition. They fail because their systems are broken. Planorah exists to fix that system."
+                  "{activeProfile.quote}"
                 </p>
               </div>
             </div>

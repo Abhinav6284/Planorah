@@ -25,7 +25,24 @@
       "Bash(python manage.py makemigrations scheduler github_integration --noinput)",
       "Bash(python -c \"from scheduler.models import GoogleCredential, SpotifyCredential; from github_integration.models import GitHubCredential; print\\('✓ Models import successfully'\\)\")",
       "Bash(python manage.py check)",
-      "Bash(grep -E \"\\\\.\\(jsx?|ts\\)$\")"
+      "Bash(grep -E \"\\\\.\\(jsx?|ts\\)$\")",
+      "Bash(python manage.py test users --dry-run)",
+      "Bash(python manage.py makemigrations users --name trusteddevice)",
+      "Bash(pip show:*)",
+      "Bash(pip install:*)",
+      "Bash(pip uninstall:*)",
+      "Bash(python manage.py test users.tests.TrustedDeviceTests.test_verify_social_otp_with_remember_me_returns_trusted_token users.tests.TrustedDeviceTests.test_verify_social_otp_without_remember_me_does_not_issue_trusted_token -v 2)",
+      "Bash(python backend/manage.py test users.tests.TrustedDeviceTests.test_verify_social_otp_with_remember_me_returns_trusted_token users.tests.TrustedDeviceTests.test_verify_social_otp_without_remember_me_does_not_issue_trusted_token -v 2)",
+      "Bash(python manage.py test users.tests.TrustedDeviceTests.test_google_login_skips_otp_with_valid_trusted_token users.tests.TrustedDeviceTests.test_google_login_sends_otp_when_trusted_token_expired users.tests.TrustedDeviceTests.test_google_login_sends_otp_when_no_trusted_token -v 2)",
+      "Bash(python backend/manage.py test users.tests.TrustedDeviceTests.test_google_login_skips_otp_with_valid_trusted_token users.tests.TrustedDeviceTests.test_google_login_sends_otp_when_trusted_token_expired users.tests.TrustedDeviceTests.test_google_login_sends_otp_when_no_trusted_token -v 2)",
+      "Bash(python manage.py test users.tests.TrustedDeviceGitHubTests -v 2)",
+      "Bash(python manage.py test users.tests.TrustedDeviceTests users.tests.TrustedDeviceGitHubTests -v 2)",
+      "Bash(python manage.py test users -v 2)",
+      "Bash(python manage.py test users.tests.TrustedDeviceTests -v 2)",
+      "Bash(python manage.py test users.tests.TrustedDeviceTests.test_logout_deletes_trusted_device -v 2)",
+      "Bash(python backend/manage.py test users.tests.TrustedDeviceTests.test_logout_deletes_trusted_device users.tests.TrustedDeviceTests -v 2.)",
+      "Bash(python backend/manage.py test users -v 2)",
+      "Bash(python3:*)"
     ]
   }
 }
