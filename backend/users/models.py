@@ -292,6 +292,24 @@ class PasswordResetToken(models.Model):
         return f"Reset token for {self.email} (used={self.is_used})"
 
 
+class TrustedDevice(models.Model):
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name='trusted_devices'
+    )
+    token = models.CharField(max_length=64, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+
+    def is_valid(self):
+        return timezone.now() < self.expires_at
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"TrustedDevice for {self.user.email} (expires {self.expires_at.strftime('%Y-%m-%d')})"
+
+
 class DeletedUser(models.Model):
     """
     Track deleted user emails to prevent them from re-registering via OAuth.
