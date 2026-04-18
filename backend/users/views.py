@@ -1,6 +1,7 @@
 from datetime import timedelta
 import random
 import logging
+import secrets
 from django.conf import settings
 from django.utils import timezone
 from django.db import IntegrityError
@@ -1231,10 +1232,9 @@ def verify_social_otp(request):
     # Issue trusted device token if remember_me is True
     remember_me = request.data.get("remember_me", False)
     if remember_me:
-        import secrets as _secrets
         # One trusted device per user — delete any existing ones
         TrustedDevice.objects.filter(user=user).delete()
-        trusted_token = _secrets.token_hex(32)
+        trusted_token = secrets.token_hex(32)
         TrustedDevice.objects.create(
             user=user,
             token=trusted_token,
