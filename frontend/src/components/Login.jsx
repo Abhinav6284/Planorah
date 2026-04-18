@@ -3,7 +3,7 @@ import axios from "../api/axios";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGoogleLogin } from "@react-oauth/google";
-import { setTokens, setRememberMePreference } from "../utils/auth";
+import { setTokens, setRememberMePreference, getTrustedDeviceToken } from "../utils/auth";
 import { useTheme } from "../context/ThemeContext";
 import env from "../config/env";
 import {
@@ -91,7 +91,12 @@ export default function Login() {
     onSuccess: async (tokenResponse) => {
       setLoading(true); setMessage("");
       try {
-        const res = await axios.post(`/api/users/google/login/`, { token: tokenResponse.access_token, mode: "login" });
+        const trustedToken = getTrustedDeviceToken();
+        const res = await axios.post(`/api/users/google/login/`, {
+          token: tokenResponse.access_token,
+          mode: "login",
+          ...(trustedToken && { trusted_device_token: trustedToken }),
+        });
         if (res.data.two_factor_required) {
           setRememberMePreference(rememberMe);
           navigate("/verify-otp", { state: { email: res.data.email, isLogin: true } });
