@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/common/ProtectedRoute";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import { DashboardSkeleton } from "./components/common/Skeleton";
 import { useAuthStore } from "./stores/authStore";
+import { userService } from "./api/userService";
 
 // Eagerly loaded (critical auth path)
 import Login from "./components/Login";
@@ -88,40 +89,27 @@ function AppInner() {
   // Load user on mount from API
   useEffect(() => {
     const loadUser = async () => {
-      const token = localStorage.getItem('access_token');
-      if (!token) {
+      if (!localStorage.getItem('access_token')) {
         setLoading(false);
         return;
       }
 
       try {
         setLoading(true);
-        const response = await fetch('/api/users/me/', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-
-        if (response.status === 401) {
-          // Unauthorized - clear token and user
-          localStorage.removeItem('access_token');
-          setUser(null);
-          setError('Session expired. Please log in again.');
-          return;
-        }
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch user: ${response.status}`);
-        }
-
-        const userData = await response.json();
+        const userData = await userService.getProfile();
         setUser(userData);
         setError(null);
       } catch (err) {
-        console.error('Failed to load user:', err);
-        toast.error('Failed to load user profile');
-        setError(err.message);
-        setUser(null);
+        const status = err?.response?.status;
+        if (status === 401) {
+          localStorage.removeItem('access_token');
+          setUser(null);
+          setError('Session expired. Please log in again.');
+        } else {
+          console.error('Failed to load user:', err);
+          setError(err.message);
+          setUser(null);
+        }
       } finally {
         setLoading(false);
       }
