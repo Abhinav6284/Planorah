@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
+from django.utils.dateparse import parse_date
 from django.db.models import Q
 from .models import Task, TaskAttempt, TaskValidator
 from .serializers import (
@@ -39,35 +40,52 @@ class TaskViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = Task.objects.filter(
             roadmap__in=user_roadmaps,
             user=user
-        ).select_related('roadmap', 'milestone').prefetch_related('attempts')
+        ).select_related('roadmap', 'milestone')
 
         # Optional filters used by frontend TaskList.
         status_param = self.request.query_params.get('status')
         if status_param and status_param != 'all':
             queryset = queryset.filter(status=status_param)
 
-        roadmap_param = self.request.query_params.get('roadmap') or self.request.query_params.get('roadmap_id')
+        roadmap_param = self.request.query_params.get(
+            'roadmap') or self.request.query_params.get('roadmap_id')
         if roadmap_param and roadmap_param != 'all':
-            queryset = queryset.filter(roadmap_id=roadmap_param)
+            try:
+                roadmap_id = int(roadmap_param)
+            except (TypeError, ValueError):
+                return queryset.none()
+            queryset = queryset.filter(roadmap_id=roadmap_id)
 
         day_param = self.request.query_params.get('day')
         if day_param:
-            queryset = queryset.filter(day=day_param)
+            try:
+                day = int(day_param)
+            except (TypeError, ValueError):
+                return queryset.none()
+            queryset = queryset.filter(day=day)
 
         due_date_param = self.request.query_params.get('due_date')
         if due_date_param:
-            queryset = queryset.filter(due_date=due_date_param)
+            parsed_due_date = parse_date(due_date_param)
+            if not parsed_due_date:
+                return queryset.none()
+            queryset = queryset.filter(due_date=parsed_due_date)
 
         return queryset.order_by('day', 'task_id')
 
     def list(self, request, *args, **kwargs):
         """List tasks with lightweight meta for better frontend empty states."""
         queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(
+            queryset,
+            many=True,
+            context={**self.get_serializer_context(), 'skip_attempt_stats': True}
+        )
         tasks_data = serializer.data
 
         selected_status = request.query_params.get('status') or 'all'
-        selected_roadmap = request.query_params.get('roadmap') or request.query_params.get('roadmap_id') or 'all'
+        selected_roadmap = request.query_params.get(
+            'roadmap') or request.query_params.get('roadmap_id') or 'all'
 
         meta = {
             'selected_status': selected_status,
@@ -81,11 +99,20 @@ class TaskViewSet(viewsets.ReadOnlyModelViewSet):
         if selected_roadmap != 'all':
             from roadmap_ai.models import Roadmap
 
-            roadmap = Roadmap.objects.filter(user=request.user, id=selected_roadmap).only('id', 'title').first()
+            try:
+                selected_roadmap_id = int(selected_roadmap)
+            except (TypeError, ValueError):
+                selected_roadmap_id = None
+
+            roadmap = None
+            if selected_roadmap_id is not None:
+                roadmap = Roadmap.objects.filter(
+                    user=request.user, id=selected_roadmap_id).only('id', 'title').first()
             if not roadmap:
                 meta['empty_reason'] = 'roadmap_not_found'
             else:
-                total_for_roadmap = Task.objects.filter(user=request.user, roadmap_id=roadmap.id).count()
+                total_for_roadmap = Task.objects.filter(
+                    user=request.user, roadmap_id=roadmap.id).count()
                 meta['selected_roadmap_name'] = roadmap.title
                 meta['total_for_selected_roadmap'] = total_for_roadmap
 
@@ -200,6 +227,23 @@ class TaskViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(response_data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['patch'])
+    def reschedule(self, request, pk=None):
+        """
+        Update due_date and/or day for a task.
+        PATCH /tasks/{task_id}/reschedule/
+        """
+        task = self.get_object()
+        day = request.data.get('day')
+        due_date = request.data.get('due_date')
+        if day is not None:
+            task.day = int(day)
+        if due_date is not None:
+            task.due_date = due_date
+        task.save(update_fields=[f for f in ['day', 'due_date'] if request.data.get(
+            f) is not None] or ['due_date'])
+        return Response(self.get_serializer(task).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['patch'])
     def complete(self, request, pk=None):
         """
         Mark a task as complete for tasks that require no validation.
@@ -274,7 +318,8 @@ class TaskViewSet(viewsets.ReadOnlyModelViewSet):
             },
         ]
 
-        acceptance_rules = task.acceptance_rules if isinstance(task.acceptance_rules, dict) else {}
+        acceptance_rules = task.acceptance_rules if isinstance(
+            task.acceptance_rules, dict) else {}
 
         steps = [
             {
@@ -312,7 +357,8 @@ class TaskViewSet(viewsets.ReadOnlyModelViewSet):
         ]
 
         if acceptance_rules:
-            best_practices.append('Use the task acceptance rules as a final checklist.')
+            best_practices.append(
+                'Use the task acceptance rules as a final checklist.')
 
         response_data = {
             'generated': True,

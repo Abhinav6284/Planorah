@@ -3,6 +3,7 @@ Task serializers with strict validation.
 """
 from rest_framework import serializers
 from django.utils import timezone
+from django.db import DatabaseError
 from .models import Task, TaskAttempt, TaskValidator, Note
 from .validators import run_validation
 import hashlib
@@ -141,30 +142,53 @@ class TaskSerializer(serializers.ModelSerializer):
         if not request or not request.user:
             return 'NOT_STARTED'
 
+        if self.context.get('skip_attempt_stats'):
+            if obj.first_passed_at or obj.status == 'completed':
+                return 'COMPLETED'
+            if obj.status in {'in_progress', 'pending_validation', 'needs_revision'}:
+                return 'IN_PROGRESS'
+            return 'NOT_STARTED'
+
         return obj.get_user_status(request.user)
 
     def get_latest_attempt(self, obj):
         """Get most recent attempt details."""
+        if self.context.get('skip_attempt_stats'):
+            return None
+
         request = self.context.get('request')
         if not request or not request.user:
             return None
 
-        attempt = obj.attempts.filter(
-            user=request.user).order_by('-submitted_at').first()
+        try:
+            attempt = obj.attempts.filter(
+                user=request.user).order_by('-submitted_at').first()
+        except DatabaseError:
+            return None
+
         if attempt:
             return TaskAttemptListSerializer(attempt).data
         return None
 
     def get_attempt_count(self, obj):
         """Get total attempts by current user."""
+        if self.context.get('skip_attempt_stats'):
+            return 0
+
         request = self.context.get('request')
         if not request or not request.user:
             return 0
 
-        return obj.attempts.filter(user=request.user).count()
+        try:
+            return obj.attempts.filter(user=request.user).count()
+        except DatabaseError:
+            return 0
 
     def get_can_attempt(self, obj):
         """Check if user can make another attempt."""
+        if self.context.get('skip_attempt_stats'):
+            return True
+
         request = self.context.get('request')
         if not request or not request.user:
             return False

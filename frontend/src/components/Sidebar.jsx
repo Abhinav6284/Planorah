@@ -73,8 +73,25 @@ const navItemBaseClass = 'flex items-center gap-2.5 px-3 py-2 rounded-lg font-me
 const navItemActiveClass = 'bg-gradient-to-r from-terracotta/20 to-terracotta/8 text-terracotta dark:text-terracotta shadow-[0_6px_14px_rgba(202,96,58,0.14)]';
 const navItemDefaultClass = 'text-gray-700 dark:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-white/5';
 
+const isPathMatch = (pathname, navPath) => pathname === navPath || pathname.startsWith(`${navPath}/`);
+
+const getActiveNavPath = (pathname) => {
+  const allNavPaths = navSections.flatMap((section) => {
+    if (section.path) return [section.path];
+    if (section.items) return section.items.map((item) => item.path);
+    return [];
+  });
+
+  const matchedPaths = allNavPaths.filter((navPath) => isPathMatch(pathname, navPath));
+  if (!matchedPaths.length) return null;
+
+  // Prefer the most specific route (longest path) so nested routes don't double-highlight.
+  return matchedPaths.sort((a, b) => b.length - a.length)[0];
+};
+
 const SidebarContent = ({ onNavClick = () => { }, user = null }) => {
   const location = useLocation();
+  const activeNavPath = getActiveNavPath(location.pathname);
   const [expandedSections, setExpandedSections] = useState(() =>
     navSections.slice(1).reduce((acc, section) => {
       acc[section.section] = true;
@@ -162,9 +179,9 @@ const SidebarContent = ({ onNavClick = () => { }, user = null }) => {
           <Link
             to="/dashboard"
             onClick={onNavClick}
-            className={`${navItemBaseClass} ${location.pathname === '/dashboard'
-                ? navItemActiveClass
-                : navItemDefaultClass
+            className={`${navItemBaseClass} ${activeNavPath === '/dashboard'
+              ? navItemActiveClass
+              : navItemDefaultClass
               }`}
           >
             <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
@@ -208,7 +225,7 @@ const SidebarContent = ({ onNavClick = () => { }, user = null }) => {
                     >
                       <div className="space-y-1">
                         {section.items.map((item, itemIdx) => {
-                          const itemActive = location.pathname.startsWith(item.path);
+                          const itemActive = activeNavPath === item.path;
                           const IconComponent = item.icon;
                           return (
                             <motion.div
@@ -222,8 +239,8 @@ const SidebarContent = ({ onNavClick = () => { }, user = null }) => {
                                 to={item.path}
                                 onClick={onNavClick}
                                 className={`${navItemBaseClass} ${itemActive
-                                    ? navItemActiveClass
-                                    : navItemDefaultClass
+                                  ? navItemActiveClass
+                                  : navItemDefaultClass
                                   }`}
                               >
                                 <IconComponent className="h-4 w-4 flex-shrink-0" />

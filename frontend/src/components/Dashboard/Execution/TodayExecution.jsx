@@ -2,6 +2,29 @@ import React, { useMemo } from 'react';
 import { Play, RefreshCw, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+const toDateKey = (dateValue) => {
+    if (!dateValue) {
+        return null;
+    }
+
+    if (typeof dateValue === 'string') {
+        const trimmed = dateValue.trim();
+        if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+            return trimmed;
+        }
+    }
+
+    const date = new Date(dateValue);
+    if (Number.isNaN(date.getTime())) {
+        return null;
+    }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 const TodayExecution = React.memo(({
     user,
     todayTask,
@@ -11,13 +34,31 @@ const TodayExecution = React.memo(({
     onChangeTask,
     loading
 }) => {
+    const focusDateKey = useMemo(() => {
+        return toDateKey(todayTask?.scheduled_for) || toDateKey(todayTask?.created_at);
+    }, [todayTask]);
+
+    const scopedTasks = useMemo(() => {
+        const sourceTasks = Array.isArray(tasks) ? tasks : [];
+        if (!focusDateKey) {
+            return sourceTasks;
+        }
+
+        const sameDayTasks = sourceTasks.filter((task) => {
+            const taskDateKey = toDateKey(task?.scheduled_for) || toDateKey(task?.created_at);
+            return taskDateKey === focusDateKey;
+        });
+
+        return sameDayTasks.length ? sameDayTasks : sourceTasks;
+    }, [tasks, focusDateKey]);
+
     const completedCount = useMemo(() => {
-        return (tasks || []).filter(t => t.status === 'completed').length;
-    }, [tasks]);
+        return scopedTasks.filter(t => t.status === 'completed').length;
+    }, [scopedTasks]);
 
     const totalCount = useMemo(() => {
-        return Math.max((tasks || []).length, completedCount + (todayTask ? 1 : 0));
-    }, [tasks, todayTask, completedCount]);
+        return Math.max(scopedTasks.length, completedCount + (todayTask ? 1 : 0));
+    }, [scopedTasks, todayTask, completedCount]);
 
     const pct = Math.round((completedCount / Math.max(totalCount, 1)) * 100);
 
@@ -100,7 +141,7 @@ const TodayExecution = React.memo(({
                         {/* CTA Buttons */}
                         <div className="flex items-center gap-3">
                             <button
-                                onClick={onStartFocus}
+                                onClick={() => onStartFocus(todayTask)}
                                 disabled={!todayTask || loading}
                                 className="flex items-center gap-2 px-6 py-3 bg-terracotta text-white text-sm font-semibold rounded-xl hover:bg-terracottaHover hover:shadow-lg hover:shadow-terracotta/25 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-150"
                             >

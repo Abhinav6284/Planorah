@@ -35,6 +35,15 @@ const buildDateKey = (dateValue) => {
     if (!dateValue) {
         return null;
     }
+
+    // Keep date-only strings stable across timezones.
+    if (typeof dateValue === 'string') {
+        const dateOnly = dateValue.trim();
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateOnly)) {
+            return dateOnly;
+        }
+    }
+
     const date = new Date(dateValue);
     if (Number.isNaN(date.getTime())) {
         return null;
@@ -43,6 +52,13 @@ const buildDateKey = (dateValue) => {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+};
+
+const resolveTaskDateKey = (task) => {
+    if (!task) {
+        return null;
+    }
+    return buildDateKey(task.scheduled_for) || buildDateKey(task.created_at);
 };
 
 const formatDateLabel = (dateKey) => {
@@ -221,19 +237,36 @@ const ExecutionDashboard = () => {
         level: progress?.stats?.level || 'Beginner',
     }), [profile, userStats, progress, streak]);
 
-    // Replace Exam Subjects with Pending Tasks (Day-wise carry over logic)
-    const pendingTaskData = useMemo(() => {
-        const pending = (activeTasks || [])
-            .filter(t => t.status !== 'completed')
-            .sort((a, b) => new Date(a.scheduled_for || a.created_at || 0) - new Date(b.scheduled_for || b.created_at || 0));
+    // Build day-wise buckets from actual task dates (pending + completed).
+    const scheduledTaskData = useMemo(() => {
+        const statusOrder = {
+            in_progress: 0,
+            pending: 1,
+            not_started: 1,
+            completed: 2,
+        };
+
+        const withDate = (activeTasks || [])
+            .map((task) => {
+                const dateKey = resolveTaskDateKey(task) || buildDateKey(new Date());
+                return { task, dateKey };
+            })
+            .sort((a, b) => {
+                const byDate = a.dateKey.localeCompare(b.dateKey);
+                if (byDate !== 0) {
+                    return byDate;
+                }
+                const aCreated = new Date(a.task?.created_at || 0).getTime();
+                const bCreated = new Date(b.task?.created_at || 0).getTime();
+                return aCreated - bCreated;
+            });
 
         const map = new Map();
-        pending.forEach((task) => {
-            const dateKey = task?.scheduled_for || buildDateKey(task?.created_at) || buildDateKey(new Date());
+        withDate.forEach(({ task, dateKey }) => {
             const card = {
                 key: task.id,
                 id: task.id,
-                tag: 'Pending',
+                tag: task.status === 'completed' ? 'Completed' : 'Pending',
                 title: normalizeDisplayTitle(task.title),
                 subtitle: task.description || (task?.scheduled_for ? `Scheduled for ${formatDateLabel(dateKey)}` : 'Pending task'),
                 description: task.description || '',
@@ -252,27 +285,49 @@ const ExecutionDashboard = () => {
             map.get(dateKey).push(card);
         });
 
+        map.forEach((cards, key) => {
+            cards.sort((a, b) => {
+                const rankA = statusOrder[a.status] ?? 99;
+                const rankB = statusOrder[b.status] ?? 99;
+                if (rankA !== rankB) {
+                    return rankA - rankB;
+                }
+                return a.title.localeCompare(b.title);
+            });
+            map.set(key, cards);
+        });
+
         const orderedDates = Array.from(map.keys()).sort();
         return { map, orderedDates };
     }, [activeTasks, mode]);
 
     useEffect(() => {
-        if (selectedDateKey) {
+        const todayKey = buildDateKey(new Date());
+
+        if (!scheduledTaskData.orderedDates.length) {
+            if (selectedDateKey !== todayKey) {
+                setSelectedDateKey(todayKey);
+            }
             return;
         }
 
-        if (pendingTaskData.orderedDates.length) {
-            setSelectedDateKey(pendingTaskData.orderedDates[0]);
+        if (selectedDateKey && scheduledTaskData.map.has(selectedDateKey)) {
             return;
         }
 
-        setSelectedDateKey(buildDateKey(new Date()));
-    }, [pendingTaskData.orderedDates, selectedDateKey]);
+        const nextDateKey = scheduledTaskData.map.has(todayKey)
+            ? todayKey
+            : (scheduledTaskData.orderedDates.find((dateKey) => dateKey >= todayKey) || scheduledTaskData.orderedDates[0]);
+
+        if (nextDateKey !== selectedDateKey) {
+            setSelectedDateKey(nextDateKey);
+        }
+    }, [scheduledTaskData.orderedDates, scheduledTaskData.map, selectedDateKey]);
 
     const selectedTasks = useMemo(() => {
-        const tasksForDate = pendingTaskData.map.get(selectedDateKey) || [];
-        return tasksForDate.slice(0, 5);
-    }, [pendingTaskData.map, selectedDateKey]);
+        const tasksForDate = scheduledTaskData.map.get(selectedDateKey) || [];
+        return tasksForDate.slice(0, 6);
+    }, [scheduledTaskData.map, selectedDateKey]);
 
     const selectedTaskProgress = useMemo(() => {
         if (!selectedTasks.length) {
@@ -283,14 +338,39 @@ const ExecutionDashboard = () => {
     }, [selectedTasks]);
 
     const scheduleDays = useMemo(() => {
-        const firstTaskDateKey = pendingTaskData.orderedDates[0] || null;
-        const baseDate = firstTaskDateKey ? new Date(`${firstTaskDateKey}T00:00:00`) : new Date();
-        baseDate.setHours(0, 0, 0, 0);
-        return buildDateRange(baseDate, 14).map((day) => ({
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const anchorDate = (() => {
+            if (selectedDateKey) {
+                const selectedDate = new Date(`${selectedDateKey}T00:00:00`);
+                if (!Number.isNaN(selectedDate.getTime())) {
+                    return selectedDate;
+                }
+            }
+
+            if (scheduledTaskData.orderedDates.length) {
+                const todayKey = buildDateKey(today);
+                const nearestDateKey = scheduledTaskData.orderedDates.find((dateKey) => dateKey >= todayKey)
+                    || scheduledTaskData.orderedDates[scheduledTaskData.orderedDates.length - 1];
+                const nearestDate = new Date(`${nearestDateKey}T00:00:00`);
+                if (!Number.isNaN(nearestDate.getTime())) {
+                    return nearestDate;
+                }
+            }
+
+            return today;
+        })();
+
+        const windowStart = new Date(anchorDate);
+        windowStart.setDate(anchorDate.getDate() - 6);
+
+        return buildDateRange(windowStart, 14).map((day) => ({
             ...day,
             isSelected: day.key === selectedDateKey,
+            hasTasks: scheduledTaskData.map.has(day.key),
         }));
-    }, [pendingTaskData.orderedDates, selectedDateKey]);
+    }, [scheduledTaskData.orderedDates, scheduledTaskData.map, selectedDateKey]);
 
     const roadmapCards = useMemo(() => {
         return (roadmaps || []).slice(0, 3).map((roadmap) => ({
@@ -427,8 +507,8 @@ const ExecutionDashboard = () => {
                                 <span className="text-xs font-semibold text-textSecondary dark:text-gray-500">Days</span>
                             </div>
 
-                            {pendingTaskData.orderedDates.length === 0 && (
-                                <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">No pending tasks. You're all caught up!</p>
+                            {scheduledTaskData.orderedDates.length === 0 && (
+                                <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">No tasks scheduled yet. Generate tasks to start your daily timeline.</p>
                             )}
 
                             <div className="space-y-4">
@@ -440,7 +520,9 @@ const ExecutionDashboard = () => {
                                             onClick={() => setSelectedDateKey(day.key)}
                                             className={`flex h-14 w-11 flex-shrink-0 flex-col items-center justify-center gap-0.5 rounded-xl font-semibold transition-all border ${day.isSelected
                                                 ? 'bg-terracotta text-white border-terracotta'
-                                                : 'bg-white/80 dark:bg-white/5 border-gray-200 dark:border-white/20 text-textPrimary dark:text-gray-300 hover:bg-white/90 dark:hover:bg-white/10'
+                                                : day.hasTasks
+                                                    ? 'bg-white/80 dark:bg-white/5 border-terracotta/40 dark:border-terracotta/35 text-textPrimary dark:text-gray-200 hover:bg-white/90 dark:hover:bg-white/10'
+                                                    : 'bg-white/80 dark:bg-white/5 border-gray-200 dark:border-white/20 text-textPrimary dark:text-gray-300 hover:bg-white/90 dark:hover:bg-white/10'
                                                 }`}
                                         >
                                             <span className="text-sm font-bold">{day.dayNumber}</span>
@@ -476,7 +558,7 @@ const ExecutionDashboard = () => {
                                                     }
                                                 }}
                                                 className="relative flex cursor-pointer items-center gap-3 p-3 bg-white/80 dark:bg-white/5 border-l-4 border-r border-t border-b border-gray-200 dark:border-white/20 rounded-lg hover:bg-white/90 dark:hover:bg-white/10 transition-all group"
-                                                style={{borderLeftColor: card.status === 'completed' ? '#10b981' : card.status === 'in_progress' ? '#d96c4a' : '#d1d5db'}}
+                                                style={{ borderLeftColor: card.status === 'completed' ? '#10b981' : card.status === 'in_progress' ? '#d96c4a' : '#d1d5db' }}
                                             >
                                                 {/* Info */}
                                                 <div className="min-w-0 flex-1">
@@ -489,11 +571,10 @@ const ExecutionDashboard = () => {
                                                 </div>
 
                                                 {/* Status Pill */}
-                                                <span className={`text-xs px-2.5 py-1 rounded-md font-semibold whitespace-nowrap ${
-                                                    card.status === 'completed' ? 'bg-emerald-100/50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300' :
-                                                    card.status === 'in_progress' ? 'bg-terracotta/15 text-terracotta' :
-                                                    'bg-gray-100/50 dark:bg-white/10 text-gray-600 dark:text-gray-400'
-                                                }`}>
+                                                <span className={`text-xs px-2.5 py-1 rounded-md font-semibold whitespace-nowrap ${card.status === 'completed' ? 'bg-emerald-100/50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300' :
+                                                        card.status === 'in_progress' ? 'bg-terracotta/15 text-terracotta' :
+                                                            'bg-gray-100/50 dark:bg-white/10 text-gray-600 dark:text-gray-400'
+                                                    }`}>
                                                     {getTaskStatusLabel(card.status)}
                                                 </span>
                                             </div>

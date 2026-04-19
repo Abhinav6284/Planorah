@@ -747,9 +747,12 @@ def _build_execution_task_guidance(task):
         'generated': True,
         'objective': objective,
         'time_breakdown': [
-            {'duration': f'{setup_minutes} min', 'activity': 'Review objective and gather required context'},
-            {'duration': f'{execute_minutes} min', 'activity': 'Execute deep work on the main deliverable'},
-            {'duration': f'{wrap_minutes} min', 'activity': 'Validate output and capture follow-up actions'},
+            {'duration': f'{setup_minutes} min',
+                'activity': 'Review objective and gather required context'},
+            {'duration': f'{execute_minutes} min',
+                'activity': 'Execute deep work on the main deliverable'},
+            {'duration': f'{wrap_minutes} min',
+                'activity': 'Validate output and capture follow-up actions'},
         ],
         'steps': base_steps,
         'best_practices': [
@@ -806,7 +809,8 @@ def _sync_roadmap_tasks_into_execution(user):
     except Exception:
         return
 
-    roadmap_tasks = RoadmapTask.objects.filter(user=user).select_related('roadmap', 'milestone')
+    roadmap_tasks = RoadmapTask.objects.filter(
+        user=user).select_related('roadmap', 'milestone')
     for source_task in roadmap_tasks:
         estimated_minutes = max(1, int(source_task.estimated_minutes or 25))
         status = _roadmap_status_to_execution_status(source_task.status)
@@ -844,7 +848,8 @@ def _sync_execution_status_to_roadmap_task(user, execution_task):
     """
     try:
         from tasks.models import Task as RoadmapTask
-        source_task = RoadmapTask.objects.get(task_id=execution_task.id, user=user)
+        source_task = RoadmapTask.objects.get(
+            task_id=execution_task.id, user=user)
     except Exception:
         return
 
@@ -870,19 +875,47 @@ def get_today_task(request):
     try:
         _sync_roadmap_tasks_into_execution(request.user)
         today = dj_timezone.localdate()
+        all_pending_qs = ExecutionTask.objects.filter(
+            user=request.user,
+            status__in=['pending', 'in_progress'],
+        )
+        real_pending_qs = all_pending_qs.filter(ai_generated=False)
+        pending_qs = real_pending_qs if real_pending_qs.exists() else all_pending_qs
 
         today_task = ExecutionTask.objects.filter(
             user=request.user,
             scheduled_for=today,
             status__in=['pending', 'in_progress'],
+            ai_generated=False,
         ).order_by('created_at').first()
 
         if not today_task:
-            stats = _get_or_create_user_stats(request.user)
-            pending = ExecutionTask.objects.filter(
+            nearest_scheduled_task = pending_qs.exclude(
+                scheduled_for__isnull=True
+            ).order_by('scheduled_for', 'created_at').first()
+
+            if nearest_scheduled_task:
+                today_task = nearest_scheduled_task
+
+        if not today_task:
+            unscheduled_task = pending_qs.filter(
+                scheduled_for__isnull=True
+            ).order_by('-priority', 'created_at').first()
+
+            if unscheduled_task:
+                today_task = unscheduled_task
+
+        if not today_task:
+            today_task = ExecutionTask.objects.filter(
                 user=request.user,
+                scheduled_for=today,
                 status__in=['pending', 'in_progress'],
-            ).order_by('-priority', 'created_at')[:5]
+                ai_generated=True,
+            ).order_by('created_at').first()
+
+        if not today_task:
+            stats = _get_or_create_user_stats(request.user)
+            pending = pending_qs.order_by('-priority', 'created_at')[:5]
 
             profile = UserProfile.objects.filter(user=request.user).first()
             payload = {
@@ -1031,7 +1064,8 @@ def execution_tasks(request):
                     updated_task.completed_at = dj_timezone.now()
                     updated_task.save(update_fields=['completed_at'])
                     _apply_completion_rewards(request.user, updated_task)
-                _sync_execution_status_to_roadmap_task(request.user, updated_task)
+                _sync_execution_status_to_roadmap_task(
+                    request.user, updated_task)
 
             return Response(ExecutionTaskSerializer(updated_task).data, status=status.HTTP_200_OK)
 

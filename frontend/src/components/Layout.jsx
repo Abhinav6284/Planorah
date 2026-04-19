@@ -90,7 +90,7 @@ const Layout = () => {
                     setQuickySuggestion(suggestions[0].text);
                 }
             })
-            .catch(() => {})
+            .catch(() => { })
             .finally(() => { if (!cancelled) setQuickyLoading(false); });
         return () => { cancelled = true; };
     }, [contextSource]);
@@ -113,7 +113,7 @@ const Layout = () => {
 
     return (
         <TourProvider>
-            <div className="min-h-screen bg-gradient-to-br from-beigePrimary via-beigeSecondary to-beigeMuted dark:bg-charcoalDark transition-colors duration-200 font-sans flex">
+            <div className="min-h-screen bg-gradient-to-br from-beigePrimary via-beigeSecondary to-beigeMuted dark:from-charcoalDark dark:via-charcoal dark:to-charcoalMuted transition-colors duration-200 font-sans flex">
                 {/* Desktop Sidebar */}
                 <Sidebar mobileOpen={sidebarOpen} onMobileClose={() => setSidebarOpen(false)} user={user} />
 

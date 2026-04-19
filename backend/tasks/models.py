@@ -1,4 +1,5 @@
 from django.db import models
+from django.db import DatabaseError
 from django.conf import settings
 from roadmap_ai.models import Roadmap, Milestone
 from django.utils import timezone
@@ -217,8 +218,17 @@ class Task(models.Model):
         if self.first_passed_at:
             return 'COMPLETED'
 
-        # Check if any attempts exist
-        has_attempts = self.attempts.filter(user=user).exists()
+        # Check if any attempts exist. Some deployments may have legacy
+        # TaskAttempt FK type drift; fail open to status-based fallback.
+        try:
+            has_attempts = self.attempts.filter(user=user).exists()
+        except DatabaseError:
+            if self.status == 'completed':
+                return 'COMPLETED'
+            if self.status in {'in_progress', 'pending_validation', 'needs_revision'}:
+                return 'IN_PROGRESS'
+            return 'NOT_STARTED'
+
         if has_attempts:
             return 'IN_PROGRESS'
 
@@ -229,7 +239,12 @@ class Task(models.Model):
         if self.max_attempts is None:
             return True
 
-        attempt_count = self.attempts.filter(user=user).count()
+        try:
+            attempt_count = self.attempts.filter(user=user).count()
+        except DatabaseError:
+            # Preserve existing UX instead of failing reads/actions.
+            return True
+
         return attempt_count < self.max_attempts
 
     def update_completion_status(self, passing_attempt):
@@ -402,13 +417,15 @@ class TaskAttempt(models.Model):
 
     def save(self, *args, **kwargs):
         """Generate proof hash on creation."""
-        if not self.pk:
+        is_create = self._state.adding
+
+        if is_create and not self.proof_hash:
             # Generate proof hash: SHA256(task_id + user_id + payload)
             hash_input = f"{self.task.task_id}{self.user.id}{str(self.proof_payload)}"
             self.proof_hash = hashlib.sha256(hash_input.encode()).hexdigest()
 
         # Prevent modification of immutable fields
-        if self.pk:
+        if not is_create:
             original = TaskAttempt.objects.get(pk=self.pk)
             if (original.proof_payload != self.proof_payload or
                 original.validation_status != self.validation_status or
