@@ -14,6 +14,7 @@ import ExecutionFeed from './Execution/ExecutionFeed';
 import ProgressPanel from './Execution/ProgressPanel';
 import TaskDetailModal from './Execution/TaskDetailModal';
 import PerformanceChart from './Execution/PerformanceChart';
+import SessionsSection from '../Sessions/SessionsSection';
 
 import { useExecutionStore } from '../../store/useExecutionStore';
 import { userService } from '../../api/userService';
@@ -664,6 +665,9 @@ const ExecutionDashboard = () => {
                         <div data-tour="progress-panel">
                             <ProgressPanel tasks={activeTasks} stats={mergedStats} activityHeatmap={userStats?.activity_heatmap} />
                         </div>
+
+                        {/* Sessions Section */}
+                        <SessionsSection />
 
                         {/* AI Insight Card */}
                         <div data-tour="ai-insight" className="rounded-2xl border border-terracotta/30 bg-white dark:bg-gradient-to-br dark:from-terracotta/5 dark:via-transparent dark:to-transparent p-5 shadow-soft dark:shadow-none dark:border-terracotta/20">
