@@ -5,16 +5,16 @@ from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
-_previous_status = {}
-
 
 @receiver(pre_save, sender='session_booking.SessionRequest')
 def capture_previous_status(sender, instance, **kwargs):
     if instance.pk:
         try:
-            _previous_status[instance.pk] = sender.objects.get(pk=instance.pk).status
+            instance._prev_status = sender.objects.get(pk=instance.pk).status
         except sender.DoesNotExist:
-            pass
+            instance._prev_status = None
+    else:
+        instance._prev_status = None
 
 
 @receiver(post_save, sender='session_booking.SessionRequest')
@@ -22,9 +22,13 @@ def on_session_request_saved(sender, instance, created, **kwargs):
     if created:
         return
 
-    prev = _previous_status.pop(instance.pk, None)
+    prev = getattr(instance, '_prev_status', None)
     if prev == instance.STATUS_CONFIRMED or instance.status != instance.STATUS_CONFIRMED:
         return
+
+    # Stamp confirmed_at if not already set
+    if not instance.confirmed_at:
+        type(instance).objects.filter(pk=instance.pk).update(confirmed_at=timezone.now())
 
     from .models import Notification
     from backend.email_service import send_session_confirmation_email
