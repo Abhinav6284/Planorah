@@ -35,7 +35,7 @@ const PricingPublicPage = () => {
         },
         {
           name: 'Starter',
-          price: '1.19',
+          price: '1.99',
           priceNote: '/month',
           description: 'For students building momentum',
           features: [
@@ -51,7 +51,7 @@ const PricingPublicPage = () => {
         },
         {
           name: 'Pro',
-          price: '2.99',
+          price: '4.99',
           priceNote: '/month',
           description: 'For serious students ready to execute',
           features: [
@@ -60,14 +60,14 @@ const PricingPublicPage = () => {
             'ATS Scanner (unlimited)',
             'Resources Hub (50+ tools)',
             'Portfolio Live (included)',
-            '2 x 1:1 Sessions/month (30 min)',
+            '5 x 1:1 Sessions/month (30 min)',
           ],
           cta: 'Start Free Trial',
           popular: true,
         },
         {
           name: 'Elite',
-          price: '5.99',
+          price: '9.99',
           priceNote: '/month',
           description: 'For the obsessed — full coaching & priority access',
           features: [
@@ -128,7 +128,7 @@ const PricingPublicPage = () => {
             'ATS Scanner (unlimited)',
             'Resources Hub (50+ tools)',
             'Portfolio Live (included)',
-            '2 x 1:1 Sessions/month (30 min)',
+            '5 x 1:1 Sessions/month (30 min)',
           ],
           cta: 'Start Free Trial',
           popular: true,

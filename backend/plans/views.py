@@ -11,17 +11,19 @@ class PlanViewSet(viewsets.ReadOnlyModelViewSet):
     ViewSet for Plan model.
     Plans are read-only - created via management command.
     """
-    queryset = Plan.objects.filter(is_active=True)
+    queryset = Plan.objects.filter(is_active=True, name__in=[name for name, _ in Plan.PLAN_CHOICES])
     serializer_class = PlanSerializer
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        """Return active plans, bootstrapping defaults when the table is empty."""
-        queryset = super().get_queryset()
-        if not queryset.exists():
-            Plan.create_default_plans()
-            queryset = Plan.objects.filter(is_active=True)
-        return queryset
+        """
+        Return active plans.
+
+        Plans are intentionally locked to the current pricing/spec; we keep the
+        DB in sync by (re)applying defaults on access.
+        """
+        Plan.create_default_plans()
+        return Plan.objects.filter(is_active=True, name__in=[name for name, _ in Plan.PLAN_CHOICES])
 
     @action(detail=False, methods=['get'])
     def compare(self, request):
@@ -38,6 +40,6 @@ class PlanViewSet(viewsets.ReadOnlyModelViewSet):
                 {"error": "Admin access required"},
                 status=status.HTTP_403_FORBIDDEN
             )
-        
+
         Plan.create_default_plans()
         return Response({"message": "Plans initialized successfully"})

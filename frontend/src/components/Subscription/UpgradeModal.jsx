@@ -74,7 +74,7 @@ export default function UpgradeModal({ feature, isOpen, onClose }) {
                             <p className="text-gray-500 dark:text-gray-400 mb-6">
                                 {featureInfo.message}
                             </p>
-                            
+
                             <div className="space-y-3">
                                 <button
                                     onClick={handleUpgrade}

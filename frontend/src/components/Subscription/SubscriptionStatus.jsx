@@ -3,17 +3,25 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { subscriptionService } from '../../api/subscriptionService';
 
+const FeatureRow = ({ label, value }) => (
+    <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-white/10 last:border-b-0">
+        <span className="text-sm text-gray-600 dark:text-gray-400">{label}</span>
+        <span className="text-sm font-medium text-gray-900 dark:text-white">{value}</span>
+    </div>
+);
+
 const UsageMeter = ({ used, limit, label }) => {
     const isUnlimited = limit === -1;
-    const percentage = isUnlimited ? 0 : Math.min((used / limit) * 100, 100);
+    const safeLimit = typeof limit === 'number' && limit > 0 ? limit : 0;
+    const percentage = isUnlimited || safeLimit === 0 ? 0 : Math.min((used / safeLimit) * 100, 100);
     const isNearLimit = percentage > 80;
-    
+
     return (
         <div className="space-y-2">
             <div className="flex justify-between text-sm">
                 <span className="text-gray-600 dark:text-gray-400">{label}</span>
                 <span className={`font-medium ${isNearLimit ? 'text-red-500' : 'text-gray-900 dark:text-white'}`}>
-                    {isUnlimited ? 'Unlimited' : `${used} / ${limit}`}
+                    {isUnlimited ? 'Unlimited' : safeLimit === 0 ? 'Not included' : `${used} / ${safeLimit}`}
                 </span>
             </div>
             <div className="w-full bg-gray-200 dark:bg-white/10 rounded-full h-2">
@@ -72,7 +80,7 @@ export default function SubscriptionStatus() {
         return (
             <div className="font-sans pb-20">
                 <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-12">
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="bg-white dark:bg-[#1a1a1a] border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] rounded-2xl p-8 text-center"
@@ -100,7 +108,7 @@ export default function SubscriptionStatus() {
         <div className="font-sans pb-20">
             <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-12">
                 {/* Header */}
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-8"
@@ -114,7 +122,7 @@ export default function SubscriptionStatus() {
                 </motion.div>
 
                 {/* Status Card */}
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="bg-white dark:bg-[#1a1a1a] border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] rounded-2xl p-6 mb-6"
@@ -168,7 +176,7 @@ export default function SubscriptionStatus() {
                     {subscription.status === 'grace' && subscription.grace_end_date && (
                         <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-900/50 rounded-xl">
                             <p className="text-sm text-yellow-700 dark:text-yellow-400">
-                                ⚠️ Your subscription has expired. You're in a grace period until {new Date(subscription.grace_end_date).toLocaleDateString()}. 
+                                ⚠️ Your subscription has expired. You're in a grace period until {new Date(subscription.grace_end_date).toLocaleDateString()}.
                                 Renew now to continue creating content.
                             </p>
                         </div>
@@ -177,40 +185,70 @@ export default function SubscriptionStatus() {
 
                 {/* Usage Section */}
                 {usage && (
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
                         className="bg-white dark:bg-[#1a1a1a] border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] rounded-2xl p-6 mb-6"
                     >
                         <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Usage</h3>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <UsageMeter 
-                                used={usage.roadmaps_used} 
-                                limit={usage.roadmap_limit} 
-                                label="Roadmaps" 
+                        <div className="grid md:grid-cols-2 gap-6 mb-6">
+                            <UsageMeter
+                                used={usage.roadmaps_used}
+                                limit={usage.roadmap_limit}
+                                label="Roadmaps"
                             />
-                            <UsageMeter 
-                                used={usage.projects_used} 
-                                limit={usage.project_limit} 
-                                label="Projects" 
+                            <UsageMeter
+                                used={usage.ats_scans_used}
+                                limit={usage.ats_scan_limit}
+                                label="ATS Scans"
                             />
-                            <UsageMeter 
-                                used={usage.resumes_used} 
-                                limit={usage.resume_limit} 
-                                label="Resumes" 
-                            />
-                            <UsageMeter 
-                                used={usage.ats_scans_used} 
-                                limit={usage.ats_scan_limit} 
-                                label="ATS Scans" 
-                            />
+                        </div>
+
+                        <div className="rounded-xl bg-gray-50 dark:bg-white/5 p-4">
+                            <div className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Plan Limits</div>
+                            <div className="space-y-0">
+                                <FeatureRow
+                                    label="Quicky AI"
+                                    value={usage.quicky_ai_daily_limit === -1 ? 'Unlimited' : `${usage.quicky_ai_daily_limit}/day`}
+                                />
+                                <FeatureRow
+                                    label="Job Finder"
+                                    value={usage.job_finder_unlimited ? 'Unlimited' : 'Limited listings'}
+                                />
+                                <FeatureRow
+                                    label="Resume Generator"
+                                    value={usage.resume_full ? 'Full' : 'Basic'}
+                                />
+                                <FeatureRow
+                                    label="Task & Project Management"
+                                    value={usage.has_project_management ? 'Included' : 'Basic'}
+                                />
+                                <FeatureRow
+                                    label="Resources Hub"
+                                    value={usage.has_resources_hub ? 'Included' : 'Not included'}
+                                />
+                                <FeatureRow
+                                    label="Portfolio Live"
+                                    value={usage.has_portfolio_live
+                                        ? (Number(usage.portfolio_addon_price_inr) > 0 ? `Addon (₹${usage.portfolio_addon_price_inr})` : 'Included')
+                                        : 'Not included'
+                                    }
+                                />
+                                <FeatureRow
+                                    label="1:1 Sessions"
+                                    value={(usage.sessions_per_month ?? 0) > 0
+                                        ? `${usage.sessions_per_month}/month (${usage.session_duration_minutes} min)`
+                                        : 'Not included'
+                                    }
+                                />
+                            </div>
                         </div>
                     </motion.div>
                 )}
 
                 {/* Actions */}
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}

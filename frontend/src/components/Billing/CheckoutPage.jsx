@@ -7,7 +7,7 @@ export default function CheckoutPage() {
     const navigate = useNavigate();
     const location = useLocation();
     const plan = location.state?.plan;
-    
+
     const [couponCode, setCouponCode] = useState('');
     const [couponApplied, setCouponApplied] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -28,7 +28,7 @@ export default function CheckoutPage() {
         if (!couponCode.trim()) return;
         setLoading(true);
         setError('');
-        
+
         try {
             const result = await billingService.validateCoupon(couponCode, plan.id);
             setCouponApplied(result);
@@ -53,22 +53,22 @@ export default function CheckoutPage() {
         try {
             // Create payment order
             const orderData = await billingService.createOrder(plan.id, couponApplied?.coupon_code);
-            
+
             // TODO: In production, integrate with Razorpay/Stripe here
             // This is a placeholder for development - actual payment gateway integration required
             // The backend should validate payment signatures from the payment provider
             console.warn('Development mode: Using mock payment. Integrate Razorpay in production.');
             const mockPaymentId = `dev_pay_${Date.now()}`;
             const mockSignature = 'dev_signature_replace_in_production';
-            
+
             // Verify payment - backend should reject invalid signatures in production
             await billingService.verifyPayment(orderData.order_id, mockPaymentId, mockSignature);
-            
+
             // Success - redirect to subscription page
-            navigate('/subscription', { 
-                state: { 
-                    message: 'Payment successful! Your subscription is now active.' 
-                } 
+            navigate('/subscription', {
+                state: {
+                    message: 'Payment successful! Your subscription is now active.'
+                }
             });
         } catch (err) {
             setError(err.response?.data?.error || 'Payment failed. Please try again.');
@@ -85,7 +85,7 @@ export default function CheckoutPage() {
         <div className="min-h-screen bg-gray-50 dark:bg-black transition-colors duration-300 font-sans pb-20">
             <div className="max-w-2xl mx-auto px-4 md:px-6 py-8 md:py-12">
                 {/* Header */}
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-8"
@@ -105,13 +105,13 @@ export default function CheckoutPage() {
                 </motion.div>
 
                 {/* Order Summary */}
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="bg-white dark:bg-[#1a1a1a] border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] rounded-2xl p-6 mb-6"
                 >
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Order Summary</h3>
-                    
+
                     <div className="flex items-center justify-between py-4 border-b border-gray-200 dark:border-charcoalMuted">
                         <div>
                             <h4 className="font-semibold text-gray-900 dark:text-white">{plan.display_name}</h4>
@@ -193,7 +193,7 @@ export default function CheckoutPage() {
                 </motion.div>
 
                 {/* Plan Features */}
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
@@ -211,7 +211,7 @@ export default function CheckoutPage() {
                             <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
-                            {plan.project_limit_min === plan.project_limit_max 
+                            {plan.project_limit_min === plan.project_limit_max
                                 ? `${plan.project_limit_min} project${plan.project_limit_min > 1 ? 's' : ''}`
                                 : `${plan.project_limit_min}-${plan.project_limit_max} projects`}
                         </div>
@@ -253,7 +253,7 @@ export default function CheckoutPage() {
                 </motion.div>
 
                 {/* Payment Button */}
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}

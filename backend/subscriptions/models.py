@@ -168,8 +168,73 @@ class Subscription(models.Model):
 
     @classmethod
     def get_active_subscription(cls, user):
-        """Get the user's active subscription."""
+        """
+        Get the user's active subscription.
+
+        Staff users should always have the maximum plan assigned so internal
+        admin accounts are never blocked by subscription checks.
+        """
+        if getattr(user, "is_staff", False):
+            return cls._get_or_ensure_staff_max_subscription(user)
+
         return cls.objects.filter(
             user=user,
             status__in=['active', 'grace']
         ).order_by('-end_date').first()
+
+    @classmethod
+    def _get_or_ensure_staff_max_subscription(cls, user):
+        """
+        Ensure staff users have an always-active subscription to the highest plan.
+
+        This is intentionally implemented at the model layer because multiple
+        permission checks call `get_active_subscription()`.
+        """
+        # If there's already an active subscription, prefer upgrading it in-place
+        # to avoid creating duplicates on repeated checks.
+        active_sub = (
+            cls.objects.filter(user=user, status='active')
+            .select_related('plan')
+            .order_by('-end_date', '-id')
+            .first()
+        )
+
+        # Resolve the highest active plan (fallback to defaults if missing)
+        from plans.models import Plan
+
+        allowed_names = [name for name, _ in Plan.PLAN_CHOICES]
+        max_plan = Plan.objects.filter(is_active=True, name__in=allowed_names).order_by('-price_inr', '-id').first()
+        if max_plan is None:
+            Plan.create_default_plans()
+            max_plan = Plan.objects.filter(is_active=True, name__in=allowed_names).order_by('-price_inr', '-id').first()
+
+        if max_plan is None:
+            # No plans exist; return whatever we can (possibly None).
+            return (
+                cls.objects.filter(user=user, status__in=['active', 'grace'])
+                .order_by('-end_date', '-id')
+                .first()
+            )
+
+        now = timezone.now()
+        far_future_end = now + timedelta(days=36500)  # ~100 years
+
+        if active_sub is None:
+            # Reuse the latest subscription row if present (keeps history small),
+            # otherwise create a new one.
+            active_sub = (
+                cls.objects.filter(user=user)
+                .select_related('plan')
+                .order_by('-created_at', '-id')
+                .first()
+            ) or cls(user=user)
+
+        # Always force staff to max plan and make it effectively non-expiring.
+        active_sub.plan = max_plan
+        active_sub.start_date = now
+        active_sub.end_date = far_future_end
+        active_sub.grace_end_date = far_future_end + timedelta(days=14)
+        active_sub.status = 'active'
+        active_sub.payment_id = active_sub.payment_id or 'STAFF_MAX_PLAN'
+        active_sub.save()
+        return active_sub

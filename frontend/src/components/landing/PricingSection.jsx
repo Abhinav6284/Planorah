@@ -45,7 +45,7 @@ const plans = [
       "ATS Scanner (unlimited)",
       "Resources Hub (50+ tools)",
       "Portfolio Live (included)",
-      "2 x 1:1 Sessions/month (30 min)",
+      "5 x 1:1 Sessions/month (30 min)",
     ],
     cta: "Start Free Trial",
     href: "/pricing",

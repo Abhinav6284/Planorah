@@ -64,9 +64,83 @@ class Plan(models.Model):
     def __str__(self):
         return f"{self.display_name} - ₹{self.price_inr}"
 
+    # ---------------------------------------------------------------------
+    # Legacy fields (API/backward compatibility)
+    #
+    # The frontend and several backend modules still expect the older plan
+    # fields (project/resume limits, portfolio analytics, etc.). These were
+    # removed from the database schema in 2026-04-22 migrations, but keeping
+    # them as computed properties preserves the public API contract and
+    # prevents subscription endpoints from failing at runtime.
+    # ---------------------------------------------------------------------
+
+    _LEGACY_BY_NAME = {
+        # Mirrors the values used by the frontend fallback plans.
+        'free': {
+            'is_short_roadmap': False,
+            'project_limit_min': 1,
+            'project_limit_max': 5,
+            'resume_limit': 1,
+            'portfolio_analytics': False,
+            'custom_subdomain': False,
+        },
+        'starter': {
+            'is_short_roadmap': False,
+            'project_limit_min': 1,
+            'project_limit_max': 9999,
+            'resume_limit': -1,
+            'portfolio_analytics': False,
+            'custom_subdomain': False,
+        },
+        'pro': {
+            'is_short_roadmap': False,
+            'project_limit_min': 1,
+            'project_limit_max': 9999,
+            'resume_limit': -1,
+            'portfolio_analytics': False,
+            'custom_subdomain': False,
+        },
+        'elite': {
+            'is_short_roadmap': False,
+            'project_limit_min': 1,
+            'project_limit_max': 9999,
+            'resume_limit': -1,
+            'portfolio_analytics': False,
+            'custom_subdomain': False,
+        },
+    }
+
+    def _legacy(self, key, default):
+        return self._LEGACY_BY_NAME.get(self.name, {}).get(key, default)
+
+    @property
+    def is_short_roadmap(self):
+        return bool(self._legacy('is_short_roadmap', False))
+
+    @property
+    def project_limit_min(self):
+        return int(self._legacy('project_limit_min', 0))
+
+    @property
+    def project_limit_max(self):
+        return int(self._legacy('project_limit_max', 0))
+
+    @property
+    def resume_limit(self):
+        return int(self._legacy('resume_limit', 0))
+
+    @property
+    def portfolio_analytics(self):
+        return bool(self._legacy('portfolio_analytics', False))
+
+    @property
+    def custom_subdomain(self):
+        return bool(self._legacy('custom_subdomain', False))
+
     @classmethod
     def create_default_plans(cls):
         """Create the 4 pricing plans."""
+        allowed_names = [name for name, _ in cls.PLAN_CHOICES]
         plans_data = [
             {
                 'name': 'free',
@@ -125,7 +199,7 @@ class Plan(models.Model):
                 'has_resources_hub': True,
                 'has_portfolio_live': True,
                 'portfolio_addon_price_inr': 0,  # included
-                'sessions_per_month': 2,
+                'sessions_per_month': 5,
                 'session_duration_minutes': 30,
                 'has_priority_booking': False,
                 'has_async_support': False,
@@ -159,3 +233,6 @@ class Plan(models.Model):
                 name=plan_data['name'],
                 defaults=plan_data
             )
+
+        # Deactivate any legacy/old plans that are no longer offered.
+        cls.objects.exclude(name__in=allowed_names).filter(is_active=True).update(is_active=False)
