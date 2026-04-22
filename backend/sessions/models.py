@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.conf import settings
+from django.core.validators import RegexValidator
 
 
 class SessionRequest(models.Model):
@@ -34,7 +35,10 @@ class SessionRequest(models.Model):
     topic_tags = models.JSONField(default=list, blank=True)
     description = models.TextField(blank=True, default='')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_REQUESTED)
-    month_year = models.CharField(max_length=7)  # "YYYY-MM"
+    month_year = models.CharField(
+        max_length=7,
+        validators=[RegexValidator(r'^\d{4}-(0[1-9]|1[0-2])$', 'Format must be YYYY-MM')],
+    )
     scheduled_at = models.DateTimeField(null=True, blank=True)
     meeting_link = models.URLField(blank=True, default='')
     confirmed_at = models.DateTimeField(null=True, blank=True)
@@ -73,6 +77,9 @@ class Notification(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'is_read']),
+        ]
 
     def __str__(self):
         return f"Notification for {self.user} — {'read' if self.is_read else 'unread'}"
