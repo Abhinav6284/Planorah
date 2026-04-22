@@ -85,7 +85,7 @@ export default function SubscriptionStatus() {
                             Get started with a plan to unlock roadmaps, projects, resume builder, and more.
                         </p>
                         <button
-                            onClick={() => navigate('/pricing')}
+                            onClick={() => navigate('/subscription/plans')}
                             className="px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-semibold hover:opacity-90 transition-all"
                         >
                             View Plans
@@ -217,7 +217,7 @@ export default function SubscriptionStatus() {
                     className="flex flex-col sm:flex-row gap-4"
                 >
                     <button
-                        onClick={() => navigate('/pricing')}
+                        onClick={() => navigate('/subscription/plans')}
                         className="flex-1 px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-semibold hover:opacity-90 transition-all text-center"
                     >
                         {subscription.status === 'active' ? 'Upgrade Plan' : 'Renew Subscription'}

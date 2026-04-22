@@ -4,6 +4,77 @@ import { useNavigate } from 'react-router-dom';
 import { planService } from '../../api/planService';
 import { subscriptionService } from '../../api/subscriptionService';
 
+const FALLBACK_PLANS = [
+    {
+        id: 'free',
+        name: 'free',
+        display_name: 'Free',
+        price_inr: 0,
+        validity_days: 36500,
+        roadmap_limit: 1,
+        is_short_roadmap: true,
+        project_limit_min: 1,
+        project_limit_max: 1,
+        resume_limit: 1,
+        ats_scan_limit: 1,
+        ats_rate_limit_per_day: 1,
+        portfolio_analytics: false,
+        custom_subdomain: false,
+        is_active: true,
+    },
+    {
+        id: 'starter',
+        name: 'starter',
+        display_name: 'Starter',
+        price_inr: 99,
+        validity_days: 30,
+        roadmap_limit: 5,
+        is_short_roadmap: false,
+        project_limit_min: 2,
+        project_limit_max: 3,
+        resume_limit: 2,
+        ats_scan_limit: 0,
+        ats_rate_limit_per_day: 0,
+        portfolio_analytics: false,
+        custom_subdomain: false,
+        is_active: true,
+    },
+    {
+        id: 'pro',
+        name: 'pro',
+        display_name: 'Pro',
+        price_inr: 249,
+        validity_days: 30,
+        roadmap_limit: 15,
+        is_short_roadmap: false,
+        project_limit_min: 4,
+        project_limit_max: 5,
+        resume_limit: -1,
+        ats_scan_limit: -1,
+        ats_rate_limit_per_day: 0,
+        portfolio_analytics: true,
+        custom_subdomain: false,
+        is_active: true,
+    },
+    {
+        id: 'elite',
+        name: 'elite',
+        display_name: 'Elite',
+        price_inr: 499,
+        validity_days: 30,
+        roadmap_limit: -1,
+        is_short_roadmap: false,
+        project_limit_min: 6,
+        project_limit_max: 8,
+        resume_limit: -1,
+        ats_scan_limit: -1,
+        ats_rate_limit_per_day: 0,
+        portfolio_analytics: true,
+        custom_subdomain: true,
+        is_active: true,
+    },
+];
+
 const PlanCard = ({ plan, currentPlan, onSelect, isPopular }) => {
     const isCurrentPlan = currentPlan?.plan === plan.id;
     
@@ -115,22 +186,40 @@ export default function PricingPage() {
         fetchData();
     }, []);
 
+    const normalizePlans = (plansData) => {
+        if (Array.isArray(plansData) && plansData.length > 0) {
+            return plansData;
+        }
+
+        if (Array.isArray(plansData?.results) && plansData.results.length > 0) {
+            return plansData.results;
+        }
+
+        return FALLBACK_PLANS;
+    };
+
     const fetchData = async () => {
         try {
             const [plansData, subscriptionData] = await Promise.all([
                 planService.getAll(),
                 subscriptionService.getCurrent().catch(() => null)
             ]);
-            setPlans(plansData);
+            setPlans(normalizePlans(plansData));
             setCurrentSubscription(subscriptionData);
         } catch (error) {
             console.error('Failed to fetch plans:', error);
+            setPlans(FALLBACK_PLANS);
         } finally {
             setLoading(false);
         }
     };
 
     const handleSelectPlan = (plan) => {
+        if (!plan?.id || typeof plan.id !== 'number') {
+            navigate('/register');
+            return;
+        }
+
         navigate('/billing/checkout', { state: { plan } });
     };
 

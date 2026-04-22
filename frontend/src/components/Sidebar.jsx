@@ -63,7 +63,7 @@ const navSections = [
     section: 'ACCOUNT',
     items: [
       { path: '/subscription', label: 'Subscription', icon: CreditCard },
-      { path: '/pricing', label: 'Pricing', icon: Tag },
+      { path: '/subscription/plans', label: 'Pricing', icon: Tag },
       { path: '/billing/history', label: 'Billing History', icon: Receipt },
     ]
   },

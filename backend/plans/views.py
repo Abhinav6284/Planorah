@@ -15,6 +15,14 @@ class PlanViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = PlanSerializer
     permission_classes = [AllowAny]
 
+    def get_queryset(self):
+        """Return active plans, bootstrapping defaults when the table is empty."""
+        queryset = super().get_queryset()
+        if not queryset.exists():
+            Plan.create_default_plans()
+            queryset = Plan.objects.filter(is_active=True)
+        return queryset
+
     @action(detail=False, methods=['get'])
     def compare(self, request):
         """Get plans formatted for comparison view."""

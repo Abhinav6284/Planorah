@@ -112,7 +112,7 @@ const SubscriptionWidget = () => {
                 </Link>
                 {planName.toLowerCase() !== 'enterprise' && (
                     <Link
-                        to="/pricing"
+                        to="/subscription/plans"
                         className="flex-1 text-center py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
                     >
                         Upgrade

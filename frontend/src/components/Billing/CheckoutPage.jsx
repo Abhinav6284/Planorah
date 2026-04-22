@@ -20,7 +20,7 @@ export default function CheckoutPage() {
 
     useEffect(() => {
         if (!plan) {
-            navigate('/pricing');
+            navigate('/subscription/plans');
         }
     }, [plan, navigate]);
 
@@ -91,7 +91,7 @@ export default function CheckoutPage() {
                     className="mb-8"
                 >
                     <button
-                        onClick={() => navigate('/pricing')}
+                        onClick={() => navigate('/subscription/plans')}
                         className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 mb-4 flex items-center gap-2"
                     >
                         ← Back to Plans

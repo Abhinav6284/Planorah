@@ -221,7 +221,7 @@ function AppInner() {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/assistant" element={<AIAssistant />} />
               {/* Subscription & Billing Routes */}
-              <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/subscription/plans" element={<PricingPage />} />
               <Route path="/subscription" element={<SubscriptionStatus />} />
               <Route path="/billing/checkout" element={<CheckoutPage />} />
               <Route path="/billing/history" element={<PaymentHistory />} />

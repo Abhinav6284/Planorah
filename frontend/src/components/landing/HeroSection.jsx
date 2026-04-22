@@ -195,7 +195,7 @@ export default function HeroSection() {
                 </Link>
 
                 {/* SECONDARY CTA - PRICING */}
-                <Link to="/pricing" className="w-full sm:w-auto">
+                <a href="#pricing" className="w-full sm:w-auto">
                   <motion.button
                     whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.15)" }}
                     whileTap={{ scale: 0.95 }}
@@ -204,7 +204,7 @@ export default function HeroSection() {
                     View Plans & Pricing
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </motion.button>
-                </Link>
+                </a>
               </motion.div>
 
               {/* Trust badges below buttons */}

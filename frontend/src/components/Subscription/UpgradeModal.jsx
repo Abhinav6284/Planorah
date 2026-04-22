@@ -46,7 +46,7 @@ export default function UpgradeModal({ feature, isOpen, onClose }) {
 
     const handleUpgrade = () => {
         onClose();
-        navigate('/pricing');
+        navigate('/subscription/plans');
     };
 
     return (

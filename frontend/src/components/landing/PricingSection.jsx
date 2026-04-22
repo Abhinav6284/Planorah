@@ -3,32 +3,49 @@ import { Link } from "react-router-dom";
 
 const plans = [
   {
-    name: "Starter",
-    price: "Free",
-    description: "Everything you need to get started",
+    name: "Free",
+    price: "₹0",
+    description: "Get started with the basics",
     features: [
-      "Brain Dump (unlimited)",
-      "Life Map (1 roadmap)",
-      "Locked In Mode (basic timer)",
-      "Reality Check (weekly)",
-      "Community support",
+      "1 Career Roadmap",
+      "Basic Resume Generator",
+      "Job Finder (limited)",
+      "Quicky AI (5/day)",
+      "Task Management (basic)",
     ],
     cta: "Get Started",
     href: "/register",
     highlighted: false,
   },
   {
-    name: "Pro",
-    price: "$9.99",
+    name: "Starter",
+    price: "₹99",
     period: "/month",
-    description: "For serious grinders",
+    description: "For students building momentum",
     features: [
+      "5 Career Roadmaps/month",
+      "Full Resume Generator",
+      "Job Finder (unlimited)",
+      "Quicky AI (unlimited)",
+      "Task & Project Management",
+      "Portfolio Live (addon ₹79)",
+    ],
+    cta: "Get Started",
+    href: "/pricing",
+    highlighted: false,
+  },
+  {
+    name: "Pro",
+    price: "₹249",
+    period: "/month",
+    description: "For serious students ready to execute",
+    features: [
+      "15 Career Roadmaps/month",
       "Everything in Starter",
-      "Life Map (unlimited roadmaps)",
-      "Next Move (AI suggestions)",
-      "Build Yourself (XP system)",
-      "Future You (resume builder)",
-      "Priority support",
+      "ATS Scanner (unlimited)",
+      "Resources Hub (50+ tools)",
+      "Portfolio Live (included)",
+      "2 x 1:1 Sessions/month (30 min)",
     ],
     cta: "Start Free Trial",
     href: "/pricing",
@@ -36,19 +53,18 @@ const plans = [
   },
   {
     name: "Elite",
-    price: "$19.99",
+    price: "₹499",
     period: "/month",
-    description: "For the obsessed",
+    description: "Full coaching & priority access",
     features: [
+      "Unlimited Career Roadmaps",
       "Everything in Pro",
-      "Inner Circle (teams)",
-      "Prep Zone (exam prep)",
-      "Mirror (behavior insights)",
-      "Advanced analytics",
-      "1-on-1 coaching",
-      "API access",
+      "10 x 1:1 Sessions/month (45 min)",
+      "Priority booking",
+      "Async support (WhatsApp/Discord)",
+      "Early access to new features",
     ],
-    cta: "Get Elite",
+    cta: "Go Elite",
     href: "/pricing",
     highlighted: false,
   },
@@ -70,7 +86,7 @@ export default function PricingSection() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {plans.map((plan, idx) => (
             <div
               key={idx}

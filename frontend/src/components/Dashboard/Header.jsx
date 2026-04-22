@@ -74,7 +74,7 @@ const Header = () => {
             type: "dropdown",
             items: [
                 { path: "/subscription", label: "Subscription" },
-                { path: "/pricing", label: "Pricing" },
+                { path: "/subscription/plans", label: "Pricing" },
                 { path: "/billing/history", label: "Billing History" },
             ]
         },
