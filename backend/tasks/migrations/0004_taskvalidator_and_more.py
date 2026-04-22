@@ -18,12 +18,28 @@ def _drop_legacy_fk_constraints(apps, schema_editor):
         """
         ALTER TABLE tasks_task
             DROP CONSTRAINT IF EXISTS tasks_task_original_task_id_5fd355c6_fk_tasks_task_id;
-        ALTER TABLE scheduler_event
-            DROP CONSTRAINT IF EXISTS scheduler_event_linked_task_id_75557d58_fk_tasks_task_id;
+        """
+    )
+    schema_editor.execute(
+        """
         ALTER TABLE tasks_taskattempt
             DROP CONSTRAINT IF EXISTS tasks_taskattempt_task_id_8de28949_fk_tasks_task_id;
         """
     )
+    # Only touch scheduler_event if it exists (avoids failures in test environments
+    # where scheduler migrations have not been applied yet).
+    with schema_editor.connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT to_regclass('public.scheduler_event')"
+        )
+        table_exists = cursor.fetchone()[0]
+    if table_exists:
+        schema_editor.execute(
+            """
+            ALTER TABLE scheduler_event
+                DROP CONSTRAINT IF EXISTS scheduler_event_linked_task_id_75557d58_fk_tasks_task_id;
+            """
+        )
 
 
 def _sqlite_rebuild_fk_field(apps, schema_editor, app_label, model_name, field_name):
@@ -55,14 +71,6 @@ def _recreate_task_fk_columns(apps, schema_editor):
                 REFERENCES tasks_task(task_id)
                 DEFERRABLE INITIALLY DEFERRED;
 
-            ALTER TABLE scheduler_event DROP COLUMN IF EXISTS linked_task_id;
-            ALTER TABLE scheduler_event ADD COLUMN linked_task_id uuid NULL;
-            ALTER TABLE scheduler_event
-                ADD CONSTRAINT scheduler_event_linked_task_id_fk
-                FOREIGN KEY (linked_task_id)
-                REFERENCES tasks_task(task_id)
-                DEFERRABLE INITIALLY DEFERRED;
-
             ALTER TABLE tasks_taskattempt DROP COLUMN IF EXISTS task_id;
             ALTER TABLE tasks_taskattempt ADD COLUMN task_id uuid NULL;
             ALTER TABLE tasks_taskattempt
@@ -72,6 +80,24 @@ def _recreate_task_fk_columns(apps, schema_editor):
                 DEFERRABLE INITIALLY DEFERRED;
             """
         )
+        # Only recreate scheduler_event FK column if the table exists
+        with schema_editor.connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT to_regclass('public.scheduler_event')"
+            )
+            table_exists = cursor.fetchone()[0]
+        if table_exists:
+            schema_editor.execute(
+                """
+                ALTER TABLE scheduler_event DROP COLUMN IF EXISTS linked_task_id;
+                ALTER TABLE scheduler_event ADD COLUMN linked_task_id uuid NULL;
+                ALTER TABLE scheduler_event
+                    ADD CONSTRAINT scheduler_event_linked_task_id_fk
+                    FOREIGN KEY (linked_task_id)
+                    REFERENCES tasks_task(task_id)
+                    DEFERRABLE INITIALLY DEFERRED;
+                """
+            )
         return
 
     if vendor == "sqlite":
