@@ -102,6 +102,7 @@ INSTALLED_APPS = [
     'ai_calls',   # AI outbound call system (onboarding guide)
     'ai_mentoring',  # Reusable AI Mentoring Engine
     'saas_admin',    # SaaS Admin Panel
+    'sessions',      # Session booking
 ]
 
 # WSGI Application (using WSGI for development instead of ASGI due to Python 3.13 compatibility)
