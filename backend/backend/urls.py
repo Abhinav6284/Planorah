@@ -53,6 +53,7 @@ urlpatterns = [
     path('api/planora/', include('planora.urls')),
     # Backward-compatible alias used by current production clients
     path('planora/', include(('planora.urls', 'planora'), namespace='planora_legacy')),
+    path('api/sessions/', include('sessions.urls')),
     # JWT token endpoints
     path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
