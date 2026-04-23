@@ -103,7 +103,7 @@ const BrandPanel = () => (
         }}>P</div>
         <span style={{ fontFamily: "'Cal Sans', sans-serif", fontWeight: 600, fontSize: 18, letterSpacing: "-0.01em", color: "#ffffff" }}>Planorah</span>
       </Link>
-      <Link to="/" style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", textDecoration: "none" }}>
+      <Link to="/" style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
         ← Back to site
       </Link>
     </div>
@@ -423,7 +423,7 @@ export default function Register() {
 
         {/* Footer */}
         <footer style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 20, padding: "16px 32px" }}>
-          {[["Privacy", "/privacy"], ["Terms", "/terms"], ["Help", "/contact"]].map(([label, to]) => (
+          {[["Privacy", "/privacy"], ["Terms", "/terms"], ["Support", "/support"]].map(([label, to]) => (
             <Link key={label} to={to} style={{ fontSize: 11.5, color: "var(--auth-mid-gray, #898989)", textDecoration: "none" }}>
               {label}
             </Link>
