@@ -268,3 +268,11 @@ body.theme-fade-transition {
 .auth-link:hover {
   opacity: 0.8;
 }
+
+@font-face {
+  font-family: 'Cal Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('https://cal.com/fonts/cal-sans/CalSans-SemiBold.woff2') format('woff2');
+}
