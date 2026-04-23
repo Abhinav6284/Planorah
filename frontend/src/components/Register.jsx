@@ -298,11 +298,12 @@ export default function Register() {
 
               {/* Username */}
               <div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--auth-midnight, #111111)", marginBottom: 6 }}>
+                <label htmlFor="register-username" style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--auth-midnight, #111111)", marginBottom: 6 }}>
                   Username
                 </label>
                 <div className="auth-input-wrap">
                   <input
+                    id="register-username"
                     className="auth-input"
                     type="text"
                     name="username"
@@ -316,11 +317,12 @@ export default function Register() {
 
               {/* School email */}
               <div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--auth-midnight, #111111)", marginBottom: 6 }}>
+                <label htmlFor="register-email" style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--auth-midnight, #111111)", marginBottom: 6 }}>
                   School email
                 </label>
                 <div className="auth-input-wrap">
                   <input
+                    id="register-email"
                     className="auth-input"
                     type="email"
                     name="email"
@@ -337,11 +339,12 @@ export default function Register() {
 
               {/* Password */}
               <div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--auth-midnight, #111111)", marginBottom: 6 }}>
+                <label htmlFor="register-password" style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--auth-midnight, #111111)", marginBottom: 6 }}>
                   Password
                 </label>
                 <div className="auth-input-wrap" style={{ position: "relative" }}>
                   <input
+                    id="register-password"
                     className="auth-input"
                     type={showPassword ? "text" : "password"}
                     name="password"
@@ -373,6 +376,10 @@ export default function Register() {
                 <div style={{ paddingTop: 2, flexShrink: 0 }}>
                   <div
                     onClick={() => setAgree((v) => !v)}
+                    role="checkbox"
+                    aria-checked={agree}
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setAgree((v) => !v); } }}
                     style={{
                       width: 16, height: 16, borderRadius: 4,
                       boxShadow: "var(--auth-shadow-ring, rgba(34,42,53,0.1) 0px 0px 0px 1px)",
@@ -428,7 +435,7 @@ export default function Register() {
               {label}
             </Link>
           ))}
-          <span style={{ fontSize: 11.5, color: "var(--auth-border-subtle, rgba(34,42,53,0.3))" }}>© Planorah 2025</span>
+          <span style={{ fontSize: 11.5, color: "var(--auth-border-subtle, rgba(34,42,53,0.3))" }}>© Planorah {new Date().getFullYear()}</span>
         </footer>
       </div>
     </motion.div>

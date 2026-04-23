@@ -282,14 +282,15 @@ export default function Login() {
 
               {/* Email field */}
               <div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--auth-midnight, #111111)", marginBottom: 6 }}>
-                  Email
+                <label htmlFor="login-identifier" style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--auth-midnight, #111111)", marginBottom: 6 }}>
+                  Email or username
                 </label>
                 <div className="auth-input-wrap">
                   <input
+                    id="login-identifier"
                     className="auth-input"
                     type="text"
-                    placeholder="you@school.edu"
+                    placeholder="you@school.edu or username"
                     autoComplete="username"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
@@ -300,13 +301,14 @@ export default function Login() {
               {/* Password field */}
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
-                  <label style={{ fontSize: 13, fontWeight: 500, color: "var(--auth-midnight, #111111)" }}>Password</label>
+                  <label htmlFor="login-password" style={{ fontSize: 13, fontWeight: 500, color: "var(--auth-midnight, #111111)" }}>Password</label>
                   <Link to="/forgot-password" style={{ fontSize: 12, color: "var(--auth-mid-gray, #898989)", textDecoration: "none" }}>
                     Forgot password?
                   </Link>
                 </div>
                 <div className="auth-input-wrap" style={{ position: "relative" }}>
                   <input
+                    id="login-password"
                     className="auth-input"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
@@ -333,6 +335,10 @@ export default function Login() {
               <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "var(--auth-midnight, #111111)", cursor: "pointer", userSelect: "none" }}>
                 <div
                   onClick={() => setRememberMe((v) => !v)}
+                  role="checkbox"
+                  aria-checked={rememberMe}
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setRememberMe((v) => !v); } }}
                   style={{
                     width: 16, height: 16, borderRadius: 4,
                     boxShadow: "var(--auth-shadow-ring, rgba(34,42,53,0.1) 0px 0px 0px 1px)",
@@ -384,7 +390,7 @@ export default function Login() {
               {label}
             </Link>
           ))}
-          <span style={{ fontSize: 11.5, color: "var(--auth-border-subtle, rgba(34,42,53,0.3))" }}>© Planorah 2025</span>
+          <span style={{ fontSize: 11.5, color: "var(--auth-border-subtle, rgba(34,42,53,0.3))" }}>© Planorah {new Date().getFullYear()}</span>
         </footer>
       </div>
     </motion.div>
