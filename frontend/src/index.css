@@ -274,7 +274,7 @@ body.theme-fade-transition {
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url('/fonts/CalSans-SemiBold.woff2') format('woff2');
+  src: url('./fonts/CalSans-SemiBold.woff2') format('woff2');
 }
 
 /* ── Auth redesign — Cal.com-inspired design system ── */
