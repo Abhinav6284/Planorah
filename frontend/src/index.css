@@ -276,3 +276,124 @@ body.theme-fade-transition {
   font-display: swap;
   src: url('https://cal.com/fonts/cal-sans/CalSans-SemiBold.woff2') format('woff2');
 }
+
+/* ── Auth redesign — Cal.com-inspired design system ── */
+:root {
+  --auth-charcoal: #242424;
+  --auth-midnight: #111111;
+  --auth-white: #ffffff;
+  --auth-light-gray: #f5f5f5;
+  --auth-mid-gray: #898989;
+  --auth-border-subtle: rgba(34, 42, 53, 0.08);
+  --auth-shadow-card:
+    rgba(19, 19, 22, 0.7) 0px 1px 5px -4px,
+    rgba(34, 42, 53, 0.08) 0px 0px 0px 1px,
+    rgba(34, 42, 53, 0.05) 0px 4px 8px 0px;
+  --auth-shadow-ring: rgba(34, 42, 53, 0.10) 0px 0px 0px 1px;
+  --auth-shadow-btn-dark:
+    rgba(255, 255, 255, 0.12) 0px 1px 0px inset,
+    rgba(0, 0, 0, 0.2) 0px 1px 2px 0px;
+  --auth-font-display: 'Cal Sans', ui-sans-serif, system-ui, sans-serif;
+  --auth-font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+}
+
+.dark {
+  --auth-charcoal: #f4f4f4;
+  --auth-midnight: #ffffff;
+  --auth-white: #0c0c0d;
+  --auth-light-gray: #161617;
+  --auth-mid-gray: #8a8a8a;
+  --auth-border-subtle: rgba(255, 255, 255, 0.08);
+  --auth-shadow-card:
+    rgba(0, 0, 0, 0.4) 0px 1px 5px -4px,
+    rgba(255, 255, 255, 0.08) 0px 0px 0px 1px,
+    rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;
+  --auth-shadow-ring: rgba(255, 255, 255, 0.12) 0px 0px 0px 1px;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 11px 14px;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'Inter', ui-sans-serif, sans-serif;
+  font-size: 14px;
+  color: var(--auth-midnight);
+  transition: none;
+}
+
+.dark .auth-input {
+  color: #ffffff;
+}
+
+.auth-input::placeholder {
+  color: var(--auth-mid-gray);
+}
+
+.auth-input-wrap {
+  border-radius: 8px;
+  box-shadow: var(--auth-shadow-ring);
+  background: var(--auth-white);
+  transition: box-shadow 0.15s ease;
+}
+
+.auth-input-wrap:focus-within {
+  box-shadow:
+    rgba(34, 42, 53, 0.16) 0px 0px 0px 2px,
+    rgba(34, 42, 53, 0.08) 0px 0px 0px 1px;
+}
+
+.dark .auth-input-wrap {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sso-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  box-shadow: var(--auth-shadow-card);
+  background: var(--auth-white);
+  color: var(--auth-midnight);
+  font-family: 'Inter', ui-sans-serif, sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.sso-btn:hover {
+  opacity: 0.88;
+}
+
+.auth-primary-btn {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 8px;
+  background: #242424;
+  color: #ffffff;
+  font-family: 'Inter', ui-sans-serif, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: rgba(255, 255, 255, 0.12) 0px 1px 0px inset, rgba(0, 0, 0, 0.2) 0px 1px 2px 0px;
+  transition: opacity 0.15s ease;
+}
+
+.auth-primary-btn:hover { opacity: 0.85; }
+.auth-primary-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.dark .auth-primary-btn {
+  background: #f4f4f4;
+  color: #111111;
+}
