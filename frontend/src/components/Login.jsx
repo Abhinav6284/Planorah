@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "../api/axios";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useGoogleLogin } from "@react-oauth/google";
 import { setTokens, setRememberMePreference, getTrustedDeviceToken } from "../utils/auth";
-import { useTheme } from "../context/ThemeContext";
 import env from "../config/env";
 import { Eye, EyeOff, CheckCircle2, AlertCircle } from "lucide-react";
 
@@ -140,7 +139,6 @@ const BrandPanel = () => (
 
 export default function Login() {
   const navigate = useNavigate();
-  const { theme } = useTheme();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -220,7 +218,8 @@ export default function Login() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
-      style={{ minHeight: "100vh", display: "grid", gridTemplateColumns: "1fr 1fr", background: "var(--auth-white, #fff)" }}
+      className="grid grid-cols-1 lg:grid-cols-2"
+      style={{ minHeight: "100vh", background: "var(--auth-white, #fff)" }}
     >
       <BrandPanel />
 
