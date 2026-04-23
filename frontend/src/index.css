@@ -400,3 +400,7 @@ body.theme-fade-transition {
   background: #f4f4f4;
   color: #111111;
 }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
