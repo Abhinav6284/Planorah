@@ -1,9 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useTheme } from '../../context/ThemeContext';
 
 const PrivacyPage = () => {
-  const { theme } = useTheme();
   const sections = [
     {
       title: '1. Introduction',

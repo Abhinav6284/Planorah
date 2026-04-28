@@ -21,9 +21,7 @@ const Ico = ({ d, size = 16, stroke = 1.5 }) => (
   </svg>
 );
 
-const IconArrowRight = ({ size = 14 }) => (
-  <Ico size={size} d={<path d="M5 12h14M13 5l7 7-7 7" />} />
-);
+
 const IconCheck = ({ size = 14, stroke = 1.5 }) => (
   <Ico size={size} stroke={stroke} d={<path d="M5 12l4 4L19 7" />} />
 );
