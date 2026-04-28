@@ -396,13 +396,6 @@ export default function Login() {
             </p>
           </div>
 
-        {/* Footer Link */}
-        <div className="mt-16 text-center">
-          <Link to="/forgot-password" className="text-lg font-medium text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors border-b-2 border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white pb-0.5">
-            Forgot Passcode?
-          </Link>
-        </div>
-
       </main>
 
         {/* Footer */}
