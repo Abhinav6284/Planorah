@@ -77,14 +77,18 @@ const features = [
 
 export default function FeaturesSection() {
   return (
-    <section
-      id="features"
-      className="relative scroll-mt-36 py-32 md:py-44 overflow-hidden bg-white dark:bg-[#0f1117] border-y border-slate-200 dark:border-gray-700"
-    >
-      {/* Ambient blobs */}
-      <div className="absolute inset-0 pointer-events-none bg-white dark:bg-[#0f1117]" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
+    <section className="py-20 px-6 bg-beigePrimary dark:bg-charcoal">
+      <div className="max-w-7xl mx-auto">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Superpowers</p>
+          <h2 className="text-5xl lg:text-6xl font-outfit font-bold text-gray-950 dark:text-white mb-6 leading-tight">
+            Everything you need to level up
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            From brain dumps to life maps. Gamified progression to accountability. We built the features that actually matter.
+          </p>
+        </div>
 
         {/* Features Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -116,20 +120,15 @@ export default function FeaturesSection() {
           })}
         </div>
 
-        {/* Feature cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
-            <motion.div
-              key={index}
-              custom={index}
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-60px" }}
-              className="group bg-white dark:bg-gray-800 rounded-2xl p-9 border border-slate-200 dark:border-gray-700 shadow-[0_8px_32px_-14px_rgba(15,23,42,0.12)] dark:shadow-none hover:shadow-[0_20px_48px_-16px_rgba(15,23,42,0.2)] hover:border-slate-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-300"
-            >
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-50 to-sky-50 border border-slate-100 dark:bg-gray-700 dark:border-gray-600 flex items-center justify-center mb-7 group-hover:scale-110 transition-transform duration-300">
-                <feature.icon className="w-5 h-5 text-gray-800 dark:text-gray-300" strokeWidth={1.5} />
+        {/* MVP Highlight */}
+        <div className="mt-16 pt-12 border-t border-beigeMuted dark:border-gray-700">
+          <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-6">
+            Core MVP (The Clean Stack)
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            {['Brain Dump', 'Life Map', 'Locked In Mode', 'Next Move', 'Reality Check'].map((item) => (
+              <div key={item} className="px-4 py-2 rounded-full bg-[#EBE6DA] dark:bg-gray-800 border border-beigeMuted dark:border-gray-700 text-sm text-gray-700 dark:text-gray-300">
+                {item}
               </div>
             ))}
           </div>

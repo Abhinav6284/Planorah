@@ -27,18 +27,22 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="fixed top-0 inset-x-0 z-50 flex justify-center px-4 sm:px-6 pt-4">
-        <nav
-          className={`flex items-center justify-between gap-6 px-4 md:px-6 py-2.5 rounded-full transition-all duration-500 max-w-6xl w-full ${scrolled
-              ? "bg-white dark:bg-gray-900 shadow-lg shadow-gray-200 dark:shadow-black border border-gray-200 dark:border-gray-700"
-              : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
-            }`}
-        >
-          {/* Brand */}
-          <Link
-            to="/"
-            className="text-base md:text-lg font-bold font-serif tracking-tight text-gray-900 dark:text-white whitespace-nowrap"
-          >
+      <nav ref={navRef} className={`lp-nav${scrolled ? ' scrolled' : ''}`}>
+        <div className="lp-nav-inner">
+
+          {/* Logo */}
+          <Link to="/" className="lp-logo">
+            <img 
+              src="/planorah_logo.png" 
+              alt="Planorah" 
+              style={{ 
+                width: 28, 
+                height: 28, 
+                objectFit: 'contain',
+                filter: 'var(--logo-invert)',
+                marginRight: 8
+              }} 
+            />
             Planorah
           </Link>
 
@@ -84,57 +88,44 @@ export default function Navbar() {
             </button>
           </div>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="fixed top-0 inset-x-0 bottom-0 z-40 bg-white dark:bg-gray-900 pt-28 px-6"
-          >
-            <div className="flex flex-col gap-6 text-lg font-medium text-gray-900 dark:text-white">
-              {navLinks.map((link) => (
-                link.to ? (
-                  <Link
-                    key={link.name}
-                    to={link.to}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="border-b border-gray-100 dark:border-white/[0.07] pb-4 text-gray-900 dark:text-gray-200"
-                  >
-                    {link.name}
-                  </Link>
-                ) : (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="border-b border-gray-100 dark:border-white/[0.07] pb-4 text-gray-900 dark:text-gray-200"
-                  >
-                    {link.name}
-                  </a>
-                )
-              ))}
-              <div className="flex flex-col gap-4 mt-4">
-                <Link
-                  to="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="text-center py-3 text-gray-600 dark:text-gray-400 font-medium"
-                >
-                  Log in
-                </Link>
-                <Link
-                  to="/register"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="text-center py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full font-medium"
-                >
-                  Join for free
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        </div>
+      </nav>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div style={{
+          position: 'fixed', inset: 0, top: 56, zIndex: 99,
+          background: 'var(--bg)',
+          padding: '20px 20px 48px',
+          display: 'flex', flexDirection: 'column', gap: 4,
+          borderTop: '1px solid var(--border-subtle)',
+          overflowY: 'auto',
+        }}>
+          {NAV_LINKS.map(l => (
+            <Link
+              key={l.to}
+              to={l.to}
+              className={`lp-nav-link${location.pathname === l.to ? ' active' : ''}`}
+              style={{ fontSize: 16, padding: '12px 14px' }}
+              onClick={() => setMobileOpen(false)}
+            >
+              {l.label}
+            </Link>
+          ))}
+          <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <Link to="/login" className="lp-btn lp-btn-plain"
+              style={{ padding: '12px 16px', justifyContent: 'center', fontSize: 15 }}
+              onClick={() => setMobileOpen(false)}>
+              Log in
+            </Link>
+            <Link to="/register" className="lp-btn lp-btn-primary"
+              style={{ padding: '12px 16px', justifyContent: 'center', fontSize: 15 }}
+              onClick={() => setMobileOpen(false)}>
+              Get started →
+            </Link>
+          </div>
+        </div>
+      )}
     </>
   );
 }

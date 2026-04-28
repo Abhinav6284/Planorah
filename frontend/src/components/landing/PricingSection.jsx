@@ -101,23 +101,25 @@ export default function PricingSection() {
                 </div>
               )}
 
-              <div
-                className={`relative rounded-2xl border ${plan.border} overflow-hidden ${plan.popular
-                    ? "bg-gradient-to-br from-violet-600 to-indigo-700 text-white shadow-2xl shadow-violet-500/25 pt-6"
-                    : `bg-white dark:bg-gray-900 shadow-sm pt-0`
-                  } p-8 flex flex-col h-full`}
-              >
-                {/* Plan name & price */}
-                <div className="mb-8">
-                  <h3 className={`text-lg font-bold mb-1 ${plan.popular ? "text-white" : "text-gray-900 dark:text-white"}`}>
-                    {plan.name}
-                  </h3>
-                  <p className={`text-sm mb-6 ${plan.popular ? "text-violet-200" : "text-gray-500 dark:text-gray-400"}`}>
-                    {plan.desc}
-                  </p>
-                  <div className="flex items-end gap-1">
-                    <span className={`text-4xl font-bold ${plan.popular ? "text-white" : "text-gray-900 dark:text-white"}`}>
-                      {plan.price}
+              <div className="p-8">
+                {/* Plan Name */}
+                <h3 className={`text-2xl font-outfit font-bold mb-2 ${plan.highlighted ? "" : "text-gray-950 dark:text-white"}`}>
+                  {plan.name}
+                </h3>
+
+                {/* Description */}
+                <p className={`text-sm mb-6 ${plan.highlighted ? "text-white/80 dark:text-gray-950/80" : "text-gray-600 dark:text-gray-400"}`}>
+                  {plan.description}
+                </p>
+
+                {/* Price */}
+                <div className="mb-6">
+                  <span className={`text-5xl font-outfit font-bold ${plan.highlighted ? "" : "text-gray-950 dark:text-white"}`}>
+                    {plan.price}
+                  </span>
+                  {plan.period && (
+                    <span className={`text-sm ${plan.highlighted ? "text-white/80 dark:text-gray-950/80" : "text-gray-600 dark:text-gray-400"}`}>
+                      {plan.period}
                     </span>
                   )}
                 </div>
@@ -134,59 +136,27 @@ export default function PricingSection() {
                 </Link>
 
                 {/* Features */}
-                <ul className="space-y-3 mb-8 flex-1">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center ${plan.popular ? "bg-gray-200 dark:bg-gray-700" : "bg-violet-100 dark:bg-violet-900"
-                        }`}>
-                        <svg
-                          className={`w-3 h-3 ${plan.popular ? "text-white" : "text-violet-600 dark:text-violet-400"}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                      <span className={`text-sm ${plan.popular ? "text-violet-100" : "text-gray-600 dark:text-gray-300"}`}>
+                <ul className="space-y-4">
+                  {plan.features.map((feature, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <Check className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                      <span className={`text-sm ${plan.highlighted ? "text-white/90 dark:text-gray-950/90" : "text-gray-600 dark:text-gray-400"}`}>
                         {feature}
                       </span>
                     </li>
                   ))}
                 </ul>
-
-                {/* CTA */}
-                <Link to={plan.href}>
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all ${plan.popular
-                        ? "bg-white text-violet-700 hover:bg-violet-50 shadow-sm"
-                        : "bg-violet-600 hover:bg-violet-700 text-white shadow-md shadow-violet-500/20"
-                      }`}
-                  >
-                    {plan.cta}
-                  </motion.button>
-                </Link>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Enterprise note */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.4 }}
-          className="text-center text-sm text-gray-400 dark:text-gray-500 mt-10"
-        >
-          Need a custom plan?{" "}
-          <a href="mailto:support@planorah.me" className="text-violet-600 dark:text-violet-400 hover:underline font-medium">
-            Contact us
-          </a>{" "}
-          for enterprise pricing.
-        </motion.p>
+        {/* Footer Note */}
+        <div className="text-center">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            All plans include 14-day free trial. No credit card required.
+          </p>
+        </div>
       </div>
     </section>
   );
