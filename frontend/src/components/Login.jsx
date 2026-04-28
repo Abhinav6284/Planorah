@@ -400,7 +400,6 @@ export default function Login() {
               Protected by industry-standard encryption. Your syllabi never train third-party models.
             </p>
           </div>
-        </div>
 
         {/* Footer Link */}
         <div className="mt-16 text-center">

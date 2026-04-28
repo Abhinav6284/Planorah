@@ -97,23 +97,9 @@ export default function PlanorahBlogsPage() {
                       <span className="text-xs font-semibold text-[var(--fg-muted)] tracking-wider uppercase">
                         {Math.ceil(parseInt(String(planorahBlogs[0].words || "800").replace(/\D/g, '') || 800, 10) / 200)} MIN READ
                       </span>
-                    </div>
-                    <h2 className="font-cal-sans text-3xl md:text-4xl font-bold tracking-tight text-[var(--fg-deep)] mb-6 group-hover:underline decoration-2 underline-offset-4">
-                      {planorahBlogs[0].title}
-                    </h2>
-                    <p className="text-base text-[var(--fg-muted)] leading-relaxed mb-8">
-                      {planorahBlogs[0].metaDesc}
-                    </p>
-                    <div className="flex items-center text-sm font-bold text-[var(--fg)] uppercase tracking-widest">
-                      Read Article <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </div>
-                  </div>
-                  <div className="hidden md:flex w-2/5 border-l border-[var(--border-subtle)] bg-[var(--bg)] items-center justify-center relative overflow-hidden">
-                     <span className="text-[10rem] font-bold text-[var(--fg-muted)] opacity-10 -rotate-12 transition-transform duration-700 group-hover:scale-110">
-                       01
-                     </span>
-                  </div>
-                </button>
+                    </button>
+                  ))}
+                </div>
               </div>
             ))}
           </div>

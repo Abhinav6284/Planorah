@@ -408,7 +408,7 @@ const ExecutionDashboard = () => {
                             onComplete={onComplete}
                             embedded={true}
                         />
-                    </div>
+                    </motion.div>
                 )}
             </AnimatePresence>
 
