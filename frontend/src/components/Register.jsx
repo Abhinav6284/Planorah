@@ -10,10 +10,10 @@ import { Eye, EyeOff, CheckCircle2, AlertCircle } from "lucide-react";
 // ── Shared icons ──────────────────────────────────────────────────────────
 
 const GridBackdrop = () => (
-  <svg width="100%" height="100%" style={{ position: "absolute", inset: 0, opacity: 0.06, pointerEvents: "none" }}>
+  <svg width="100%" height="100%" style={{ position: "absolute", inset: 0, opacity: 0.1, pointerEvents: "none" }}>
     <defs>
       <pattern id="authGrid2" width="44" height="44" patternUnits="userSpaceOnUse">
-        <path d="M44 0H0V44" fill="none" stroke="white" strokeWidth="1" />
+        <path d="M44 0H0V44" fill="none" stroke="var(--fg-muted)" strokeWidth="1" />
       </pattern>
     </defs>
     <rect width="100%" height="100%" fill="url(#authGrid2)" />
@@ -59,19 +59,29 @@ const PwStrength = ({ value }) => {
     return s;
   })();
   const label = ["Too short", "Weak", "Okay", "Strong", "Excellent"][score] || "";
+  
+  // Semantic colors based on score level
+  const colorMap = {
+    1: "#ef4444", // Red (Weak)
+    2: "#f59e0b", // Orange (Okay)
+    3: "#10b981", // Green (Strong)
+    4: "#059669", // Dark Green (Excellent)
+  };
+  const activeColor = colorMap[score] || "var(--charcoal)";
+
   return (
     <div>
-      <div style={{ display: "flex", gap: 4, marginBottom: 6 }}>
+      <div style={{ display: "flex", gap: 4, marginBottom: 8 }}>
         {[0, 1, 2, 3].map((i) => (
           <div key={i} style={{
             flex: 1, height: 3, borderRadius: 2,
-            background: i < score ? "#242424" : "rgba(34,42,53,0.1)",
+            background: i < score ? activeColor : "var(--border-subtle)",
             transition: "background 0.25s ease",
           }} />
         ))}
       </div>
-      <div style={{ fontSize: 12, color: "var(--auth-mid-gray, #898989)" }}>
-        {value ? label : "8+ characters recommended, with a number or symbol."}
+      <div style={{ fontSize: 12, color: activeColor !== "var(--charcoal)" ? activeColor : "var(--fg-muted)", marginTop: 4, fontWeight: score > 2 ? 500 : 400 }}>
+        {value ? label : <span style={{ color: "var(--fg-muted)" }}>8+ characters recommended, with a number or symbol.</span>}
       </div>
     </div>
   );
@@ -81,12 +91,12 @@ const PwStrength = ({ value }) => {
 
 const BrandPanel = () => (
   <div
-    className="hidden lg:flex flex-col justify-between"
+    className="hidden lg:flex flex-col justify-between overflow-y-auto"
     style={{
       position: "relative",
-      background: "#242424",
-      color: "#ffffff",
-      padding: "40px 56px",
+      background: "var(--surface)",
+      color: "var(--fg)",
+      padding: "28px 40px",
       overflow: "hidden",
     }}
   >
@@ -97,13 +107,24 @@ const BrandPanel = () => (
       <Link to="/" style={{ display: "inline-flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
         <div style={{
           width: 28, height: 28, borderRadius: 7,
-          background: "#ffffff", color: "#242424",
+          background: "var(--fg-deep)",
           display: "inline-flex", alignItems: "center", justifyContent: "center",
-          fontFamily: "'Cal Sans', sans-serif", fontWeight: 600, fontSize: 15,
-        }}>P</div>
-        <span style={{ fontFamily: "'Cal Sans', sans-serif", fontWeight: 600, fontSize: 18, letterSpacing: "-0.01em", color: "#ffffff" }}>Planorah</span>
+          overflow: 'hidden'
+        }}>
+          <img 
+            src="/planorah_logo.png" 
+            alt="P" 
+            style={{ 
+              width: 18, 
+              height: 18, 
+              objectFit: 'contain',
+              filter: 'invert(1)' // Always invert since container is var(--fg-deep)
+            }} 
+          />
+        </div>
+        <span style={{ fontFamily: "'Cal Sans', sans-serif", fontWeight: 600, fontSize: 18, letterSpacing: "-0.01em", color: "var(--fg-deep)" }}>Planorah</span>
       </Link>
-      <Link to="/" style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
+      <Link to="/" style={{ fontSize: 13, color: "var(--fg-muted)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
         ← Back to site
       </Link>
     </div>
@@ -112,32 +133,32 @@ const BrandPanel = () => (
     <div style={{ position: "relative", maxWidth: 440 }}>
       <div style={{
         fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: "0.18em",
-        textTransform: "uppercase", color: "rgba(255,255,255,0.5)", marginBottom: 20,
+        textTransform: "uppercase", color: "var(--fg-muted)", marginBottom: 12,
       }}>
         Start for free
       </div>
       <div style={{
         fontFamily: "'Cal Sans', sans-serif", fontWeight: 600,
-        fontSize: 44, lineHeight: 1.08, letterSpacing: "-0.025em", marginBottom: 28,
+        fontSize: 34, lineHeight: 1.08, letterSpacing: "-0.025em", marginBottom: 18,
       }}>
         Master your time.<br />Maximize your learning.
       </div>
-      <div style={{ color: "rgba(255,255,255,0.68)", fontSize: 15, lineHeight: 1.55, marginBottom: 32 }}>
+      <div style={{ color: "var(--fg-muted)", fontSize: 14, lineHeight: 1.5, marginBottom: 20 }}>
         Join thousands of students who turned a semester of chaos into a calm weekly plan.
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {[
           "Free for students — no credit card",
           "Import your syllabi in under a minute",
           "AI study assistant grounded in your plan",
         ].map((line) => (
-          <div key={line} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 14, color: "rgba(255,255,255,0.88)" }}>
+          <div key={line} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 14, color: "var(--fg)" }}>
             <span style={{
               width: 20, height: 20, borderRadius: "50%",
-              border: "1px solid rgba(255,255,255,0.25)",
-              background: "rgba(255,255,255,0.08)",
+              border: "1px solid var(--border-subtle)",
+              background: "var(--light-gray)",
               display: "inline-flex", alignItems: "center", justifyContent: "center",
-              color: "#ffffff", flexShrink: 0,
+              color: "var(--fg-deep)", flexShrink: 0,
             }}>
               <CheckIcon />
             </span>
@@ -148,14 +169,14 @@ const BrandPanel = () => (
     </div>
 
     {/* Testimonial */}
-    <div style={{ position: "relative", borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: 24 }}>
-      <div style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: 18, lineHeight: 1.4, marginBottom: 14, maxWidth: 460 }}>
+    <div style={{ position: "relative", borderTop: "1px solid var(--border-subtle)", paddingTop: 16 }}>
+      <div style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: 15, lineHeight: 1.4, marginBottom: 10, maxWidth: 460 }}>
         "I stopped keeping a bullet journal. Planorah does the hard part — deciding what to work on — so I can just work."
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "rgba(255,255,255,0.65)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "var(--fg-muted)" }}>
         <div style={{
           width: 28, height: 28, borderRadius: "50%",
-          background: "rgba(255,255,255,0.12)",
+          background: "var(--light-gray)",
           display: "inline-flex", alignItems: "center", justifyContent: "center",
           fontSize: 11, fontWeight: 600,
         }}>MS</div>
@@ -237,43 +258,43 @@ export default function Register() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="grid grid-cols-1 lg:grid-cols-2"
-      style={{ minHeight: "100vh", background: "var(--auth-white, #fff)" }}
+      className="grid grid-cols-1 lg:grid-cols-2 min-h-screen lg:h-screen w-full"
+      style={{ background: "var(--bg)" }}
     >
       <BrandPanel />
 
       {/* ── Form panel ── */}
-      <div style={{ display: "flex", flexDirection: "column", background: "var(--auth-white, #fff)", overflowY: "auto" }}>
+      <div className="overflow-y-auto" style={{ display: "flex", flexDirection: "column", background: "var(--bg)", height: "100%" }}>
 
         {/* Top bar */}
-        <header style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: "20px 32px", gap: 16 }}>
-          <span style={{ fontSize: 13, color: "var(--auth-mid-gray, #898989)" }}>Already have an account?</span>
+        <header style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: "12px 24px", gap: 16 }}>
+          <span style={{ fontSize: 13, color: "var(--fg-muted)" }}>Already have an account?</span>
           <Link to="/login" style={{
             fontSize: 13, fontWeight: 500,
-            color: "var(--auth-midnight, #111111)", textDecoration: "none",
-            borderBottom: "1px solid var(--auth-midnight, #111111)",
+            color: "var(--fg-deep)", textDecoration: "none",
+            borderBottom: "1px solid var(--fg-deep)",
           }}>
             Sign in →
           </Link>
         </header>
 
         {/* Form body */}
-        <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "32px" }}>
-          <div style={{ width: "100%", maxWidth: 420 }}>
+        <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px 24px" }}>
+          <div style={{ width: "100%", maxWidth: 400 }}>
 
             <h2 style={{
               fontFamily: "'Cal Sans', sans-serif", fontWeight: 600,
-              fontSize: 36, lineHeight: 1.1, letterSpacing: "-0.02em",
-              marginBottom: 8, color: "var(--auth-midnight, #111111)",
+              fontSize: 28, lineHeight: 1.1, letterSpacing: "-0.02em",
+              marginBottom: 6, color: "var(--fg-deep)",
             }}>
               Create your account
             </h2>
-            <p style={{ fontSize: 15, color: "var(--auth-mid-gray, #898989)", marginBottom: 32 }}>
+            <p style={{ fontSize: 13, color: "var(--fg-muted)", marginBottom: 20 }}>
               Takes less than a minute. Free while you're a student.
             </p>
 
             {/* SSO */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 22 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
               <button type="button" className="sso-btn" onClick={() => googleLogin()}>
                 <GoogleIcon />
                 Sign up with Google
@@ -285,20 +306,20 @@ export default function Register() {
             </div>
 
             {/* Divider */}
-            <div style={{ display: "flex", alignItems: "center", gap: 12, color: "var(--auth-mid-gray, #898989)", fontSize: 12, marginBottom: 22 }}>
-              <div style={{ flex: 1, height: 1, background: "var(--auth-border-subtle, rgba(34,42,53,0.08))" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: 12, color: "var(--fg-muted)", fontSize: 12, marginBottom: 14 }}>
+              <div style={{ flex: 1, height: 1, background: "var(--border-subtle)" }} />
               <span style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 or with email
               </span>
-              <div style={{ flex: 1, height: 1, background: "var(--auth-border-subtle, rgba(34,42,53,0.08))" }} />
+              <div style={{ flex: 1, height: 1, background: "var(--border-subtle)" }} />
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
 
               {/* Username */}
               <div>
-                <label htmlFor="register-username" style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--auth-midnight, #111111)", marginBottom: 6 }}>
+                <label htmlFor="register-username" style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--fg-deep)", marginBottom: 4 }}>
                   Username
                 </label>
                 <div className="auth-input-wrap">
@@ -315,10 +336,10 @@ export default function Register() {
                 </div>
               </div>
 
-              {/* School email */}
+              {/* Email */}
               <div>
-                <label htmlFor="register-email" style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--auth-midnight, #111111)", marginBottom: 6 }}>
-                  School email
+                <label htmlFor="register-email" style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--fg-deep)", marginBottom: 4 }}>
+                  Email
                 </label>
                 <div className="auth-input-wrap">
                   <input
@@ -326,20 +347,17 @@ export default function Register() {
                     className="auth-input"
                     type="email"
                     name="email"
-                    placeholder="you@school.edu"
+                    placeholder="you@example.com"
                     autoComplete="email"
                     value={formData.email}
                     onChange={handleChange}
                   />
                 </div>
-                <div style={{ fontSize: 12, color: "var(--auth-mid-gray, #898989)", marginTop: 6 }}>
-                  .edu emails unlock the free student plan automatically
-                </div>
               </div>
 
               {/* Password */}
               <div>
-                <label htmlFor="register-password" style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--auth-midnight, #111111)", marginBottom: 6 }}>
+                <label htmlFor="register-password" style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--fg-deep)", marginBottom: 4 }}>
                   Password
                 </label>
                 <div className="auth-input-wrap" style={{ position: "relative" }}>
@@ -360,20 +378,20 @@ export default function Register() {
                     style={{
                       position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
                       background: "transparent", border: 0, cursor: "pointer",
-                      color: "var(--auth-mid-gray, #898989)", padding: "4px 8px",
+                      color: "var(--fg-muted)", padding: "4px 8px",
                     }}
                   >
                     {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </div>
-                <div style={{ marginTop: 10 }}>
+                <div style={{ marginTop: 8 }}>
                   <PwStrength value={formData.password} />
                 </div>
               </div>
 
               {/* Terms checkbox */}
-              <label style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13, color: "var(--auth-midnight, #111111)", cursor: "pointer", userSelect: "none", lineHeight: 1.5 }}>
-                <div style={{ paddingTop: 2, flexShrink: 0 }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "var(--fg-deep)", cursor: "pointer", userSelect: "none", lineHeight: 1.5, marginTop: 12 }}>
+                <div style={{ flexShrink: 0, display: "flex", alignItems: "center" }}>
                   <div
                     onClick={() => setAgree((v) => !v)}
                     role="checkbox"
@@ -382,9 +400,9 @@ export default function Register() {
                     onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setAgree((v) => !v); } }}
                     style={{
                       width: 16, height: 16, borderRadius: 4,
-                      boxShadow: "var(--auth-shadow-ring, rgba(34,42,53,0.1) 0px 0px 0px 1px)",
-                      background: agree ? "#242424" : "transparent",
-                      color: "#ffffff",
+                      boxShadow: "var(--shadow-ring)",
+                      background: agree ? "var(--fg-deep)" : "transparent",
+                      color: "var(--bg)",
                       display: "inline-flex", alignItems: "center", justifyContent: "center",
                       cursor: "pointer", transition: "background 0.15s ease",
                     }}
@@ -394,9 +412,9 @@ export default function Register() {
                 </div>
                 <span>
                   I agree to the{" "}
-                  <Link to="/terms" style={{ color: "var(--auth-midnight, #111111)", borderBottom: "1px solid rgba(34,42,53,0.2)", textDecoration: "none" }}>Terms</Link>
+                  <Link to="/terms" style={{ color: "var(--fg-deep)", borderBottom: "1px solid var(--border-subtle)", textDecoration: "none" }}>Terms</Link>
                   {" "}and{" "}
-                  <Link to="/privacy" style={{ color: "var(--auth-midnight, #111111)", borderBottom: "1px solid rgba(34,42,53,0.2)", textDecoration: "none" }}>Privacy Policy</Link>.
+                  <Link to="/privacy" style={{ color: "var(--fg-deep)", borderBottom: "1px solid var(--border-subtle)", textDecoration: "none" }}>Privacy Policy</Link>.
                 </span>
               </label>
 
@@ -404,6 +422,7 @@ export default function Register() {
               {message && (
                 <div style={{
                   padding: "10px 12px",
+                  marginTop: 8,
                   background: isSuccess ? "rgba(34,197,94,0.08)" : "rgba(239,68,68,0.08)",
                   borderRadius: 8, fontSize: 13,
                   color: isSuccess ? "#166534" : "#991b1b",
@@ -414,24 +433,24 @@ export default function Register() {
                 </div>
               )}
 
-              <button type="submit" className="auth-primary-btn" disabled={loading} style={{ marginTop: 4 }}>
+              <button type="submit" className="auth-primary-btn" disabled={loading} style={{ marginTop: 16 }}>
                 {loading
-                  ? <div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.2)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.75s linear infinite" }} />
+                  ? <div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.2)", borderTopColor: "#transparent", borderRadius: "50%", animation: "spin 0.75s linear infinite" }} />
                   : <><span>Create account</span><ArrowRightIcon /></>
                 }
               </button>
             </form>
 
-            <p style={{ marginTop: 32, fontSize: 12, color: "var(--auth-mid-gray, #898989)", textAlign: "center" }}>
+            <p style={{ marginTop: 20, fontSize: 11, color: "var(--fg-muted)", textAlign: "center" }}>
               Protected by industry-standard encryption. Your syllabi never train third-party models.
             </p>
           </div>
         </main>
 
         {/* Footer */}
-        <footer style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 20, padding: "16px 32px" }}>
+        <footer style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16, padding: "10px 24px" }}>
           {[["Privacy", "/privacy"], ["Terms", "/terms"], ["Support", "/support"]].map(([label, to]) => (
-            <Link key={label} to={to} style={{ fontSize: 11.5, color: "var(--auth-mid-gray, #898989)", textDecoration: "none" }}>
+            <Link key={label} to={to} style={{ fontSize: 11.5, color: "var(--fg-muted)", textDecoration: "none" }}>
               {label}
             </Link>
           ))}

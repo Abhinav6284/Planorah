@@ -7,13 +7,23 @@ const ChartTooltip = ({ active, payload, isApiData }) => {
   if (!active || !payload?.length) return null;
   const entry = payload[0]?.payload;
   return (
-    <div className="bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/20 rounded-xl p-3 shadow-xl backdrop-blur-sm">
-      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{entry?.day}</p>
-      <p className="text-sm font-bold text-terracotta mt-1">
-        {payload[0]?.value} tasks
-      </p>
+    <div style={{ 
+        background: 'var(--el-bg)', 
+        border: '1px solid var(--el-border)', 
+        borderRadius: 12, 
+        padding: '12px 16px', 
+        boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+        backdropFilter: 'blur(8px)'
+    }}>
+      <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--el-text-muted)', textTransform: 'uppercase', marginBottom: 4 }}>{entry?.day}</p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--el-text)' }} />
+        <p style={{ fontSize: 14, fontWeight: 800, color: 'var(--el-text)' }}>
+          {payload[0]?.value} tasks
+        </p>
+      </div>
       {payload[1] && (
-        <p className="text-xs text-blue-500 dark:text-blue-400 mt-0.5">
+        <p style={{ fontSize: 11, color: 'var(--el-text-secondary)', marginTop: 4 }}>
           {payload[1]?.value} {isApiData ? 'min active' : 'total'}
         </p>
       )}
@@ -66,86 +76,85 @@ const PerformanceChart = ({ tasks = [], chartData: apiChartData = null }) => {
   }, [data]);
 
   return (
-    <div className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1a1a] p-6 shadow-soft dark:shadow-none transition-colors duration-300">
+    <div style={{ 
+        background: 'var(--el-bg)', 
+        border: '1px solid var(--el-border)', 
+        borderRadius: 16, 
+        padding: 24, 
+        boxShadow: 'var(--el-shadow-card)',
+        color: 'var(--el-text)'
+    }}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-5">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h3 className="text-xs font-bold text-gray-950 dark:text-white uppercase tracking-widest">
-            7-Day Performance
+          <h3 style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)' }}>
+            Performance Metrics
           </h3>
         </div>
-        <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-400 text-xs font-semibold hover:bg-gray-200 dark:hover:bg-white/20 transition-colors">
-          <span>{dateRangeLabel}</span>
-          <ChevronDown className="w-3 h-3" />
-        </button>
+        <div style={{ 
+            fontSize: 11, fontWeight: 600, color: 'var(--el-text-secondary)',
+            background: 'var(--el-bg-secondary)', padding: '4px 10px', borderRadius: 8
+        }}>
+          {dateRangeLabel}
+        </div>
       </div>
 
       {/* Chart */}
-      <div className="w-full h-64">
+      <div style={{ width: '100%', height: 200 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+          <AreaChart data={data} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
             <defs>
-              <linearGradient id="colorCompleted" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#D96C4A" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#D96C4A" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+              <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="var(--el-text)" stopOpacity={0.1} />
+                <stop offset="95%" stopColor="var(--el-text)" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.15)" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--el-border)" vertical={false} />
             <XAxis
               dataKey="day"
-              stroke="rgba(128,128,128,0.4)"
-              tick={{ fill: 'currentColor', fontSize: 12, fontWeight: 500 }}
+              stroke="var(--el-text-muted)"
+              tick={{ fill: 'currentColor', fontSize: 11, fontWeight: 500 }}
               axisLine={false}
               tickLine={false}
             />
             <YAxis
-              stroke="rgba(128,128,128,0.4)"
-              tick={{ fill: 'currentColor', fontSize: 12 }}
+              stroke="var(--el-text-muted)"
+              tick={{ fill: 'currentColor', fontSize: 11 }}
               axisLine={false}
               tickLine={false}
               width={30}
             />
-            <Tooltip content={<ChartTooltip isApiData={!!apiChartData} />} />
+            <Tooltip 
+              content={<ChartTooltip isApiData={!!apiChartData} />} 
+              cursor={{ stroke: 'var(--el-border)', strokeWidth: 1 }}
+            />
             <Area
               type="monotone"
               dataKey="completed"
-              stroke="#D96C4A"
+              stroke="var(--el-text)"
               strokeWidth={2}
               fillOpacity={1}
-              fill="url(#colorCompleted)"
+              fill="url(#colorValue)"
               name="Completed"
+              animationDuration={1500}
             />
-            {!apiChartData && (
-              <Area
-                type="monotone"
-                dataKey="total"
-                stroke="#3B82F6"
-                strokeWidth={2}
-                fillOpacity={1}
-                fill="url(#colorTotal)"
-                name="Total"
-              />
-            )}
           </AreaChart>
         </ResponsiveContainer>
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-6 mt-4 pt-4 border-t border-gray-200 dark:border-white/10">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-terracotta" />
-          <span className="text-xs text-gray-500 dark:text-gray-400">Completed</span>
+      <div style={{ 
+          display: 'flex', gap: 20, marginTop: 20, paddingTop: 20, 
+          borderTop: '1px solid var(--el-border-subtle)' 
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--el-text)' }} />
+          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--el-text-secondary)' }}>Tasks Completed</span>
         </div>
-        {!apiChartData && (
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-blue-500" />
-            <span className="text-xs text-gray-500 dark:text-gray-400">Total</span>
-          </div>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border)' }} />
+          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--el-text-muted)' }}>Daily Average</span>
+        </div>
       </div>
     </div>
   );

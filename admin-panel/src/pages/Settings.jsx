@@ -1,38 +1,67 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import {
-  Save, Shield, Bell, Globe, Zap, User,
-} from 'lucide-react'
+import { Save, Shield, Bell, Globe, Zap, User } from 'lucide-react'
 import { adminApi } from '../services/api'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import Button from '../components/ui/Button'
 
+// ─── Toggle switch ────────────────────────────────────────────────────────────
 function ToggleSwitch({ enabled, onChange }) {
   return (
     <button
       onClick={() => onChange(!enabled)}
-      className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer flex-shrink-0 focus:outline-none"
-      style={{ background: enabled ? 'var(--accent)' : 'var(--bg-elevated)', border: `1px solid ${enabled ? 'var(--accent)' : 'var(--border-bright)'}` }}
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer flex-shrink-0 focus:outline-none ${
+        enabled ? 'bg-charcoal' : 'bg-gray-200'
+      }`}
     >
       <motion.span
         animate={{ x: enabled ? 18 : 2 }}
         transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-        className="w-4 h-4 rounded-full"
-        style={{ background: enabled ? '#080A0F' : 'var(--text-muted)' }}
+        className={`w-4 h-4 rounded-full transition-colors ${enabled ? 'bg-white' : 'bg-mid-gray'}`}
       />
     </button>
   )
 }
 
-function SectionHeader({ icon: Icon, title, color = 'var(--accent)' }) {
+// ─── Section header ───────────────────────────────────────────────────────────
+function SectionHeader({ icon: Icon, title }) {
   return (
-    <div className="flex items-center gap-2.5 mb-4">
-      <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-        style={{ background: `${color}18`, color }}>
+    <div className="flex items-center gap-3 mb-5">
+      <div className="w-8 h-8 rounded-lg bg-charcoal text-white flex items-center justify-center">
         <Icon size={15} />
       </div>
-      <h2 className="font-display font-semibold" style={{ color: 'var(--text-primary)' }}>{title}</h2>
+      <h2 className="font-cal-sans font-semibold text-lg text-charcoal">{title}</h2>
+    </div>
+  )
+}
+
+// ─── Setting row ──────────────────────────────────────────────────────────────
+function SettingRow({ label, description, enabled, onChange }) {
+  return (
+    <div className="flex items-center justify-between gap-4 py-3 border-b border-border-gray last:border-b-0">
+      <div className="min-w-0">
+        <p className="text-sm font-inter text-charcoal capitalize">{label}</p>
+        {description && <p className="text-xs font-inter text-mid-gray mt-0.5">{description}</p>}
+      </div>
+      <ToggleSwitch enabled={enabled} onChange={onChange} />
+    </div>
+  )
+}
+
+// ─── Input field ──────────────────────────────────────────────────────────────
+function InputField({ label, value, onChange, type = 'text' }) {
+  return (
+    <div>
+      <label className="text-xs font-inter font-semibold uppercase tracking-wide text-mid-gray block mb-1.5">
+        {label}
+      </label>
+      <input
+        type={type}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        className="w-full px-4 py-2.5 rounded-lg text-sm font-inter outline-none border border-border-gray text-charcoal placeholder-mid-gray focus:border-charcoal transition-colors bg-white"
+      />
     </div>
   )
 }
@@ -40,17 +69,17 @@ function SectionHeader({ icon: Icon, title, color = 'var(--accent)' }) {
 export default function Settings() {
   const { user }     = useAuth()
   const { addToast } = useToast()
-  const [loading,  setLoading]  = useState(true)
-  const [flags,    setFlags]    = useState([])
-  const [name,     setName]     = useState(user?.name ?? '')
-  const [email,    setEmail]    = useState(user?.email ?? '')
+  const [loading,       setLoading]       = useState(true)
+  const [flags,         setFlags]         = useState([])
+  const [name,          setName]          = useState(user?.name  ?? '')
+  const [email,         setEmail]         = useState(user?.email ?? '')
   const [savingProfile, setSavingProfile] = useState(false)
 
   const [notifications, setNotifications] = useState({
-    newSignups:     true,
-    paymentFailed:  true,
+    newSignups:      true,
+    paymentFailed:   true,
     subscriptionEnd: true,
-    systemAlerts:   true,
+    systemAlerts:    true,
   })
 
   useEffect(() => {
@@ -77,44 +106,45 @@ export default function Settings() {
     addToast('Profile saved successfully.', 'success')
   }
 
-  function toggleNotif(key) {
-    setNotifications(prev => ({ ...prev, [key]: !prev[key] }))
+  const NOTIF_DESCRIPTIONS = {
+    newSignups:      'Alert when a new user registers',
+    paymentFailed:   'Alert when a payment fails',
+    subscriptionEnd: 'Alert before subscriptions expire',
+    systemAlerts:    'Critical system notifications',
   }
 
   return (
     <div>
-      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-        <h1 className="font-display font-bold text-2xl" style={{ color: 'var(--text-primary)' }}>Settings</h1>
-        <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>Platform configuration and admin preferences</p>
+      {/* Header */}
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+        <h1 className="font-cal-sans font-semibold text-4xl text-charcoal tracking-tight">Settings</h1>
+        <p className="text-sm font-inter text-mid-gray mt-2">Platform configuration and admin preferences</p>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left column */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
           {/* Admin profile */}
           <motion.div
-            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.06 }}
-            className="card p-5"
+            className="bg-white rounded-lg p-6 shadow-level-2-card"
           >
-            <SectionHeader icon={User} title="Admin Profile" color="#6366F1" />
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'var(--bg-elevated)' }}>
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0"
-                  style={{ background: 'var(--accent)', color: '#080A0F' }}
-                >
+            <SectionHeader icon={User} title="Admin Profile" />
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-3 p-4 rounded-lg bg-gray-50 border border-border-gray">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-charcoal text-white flex-shrink-0">
                   {user?.name?.[0] ?? 'A'}
                 </div>
                 <div>
-                  <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{user?.name}</p>
-                  <p className="text-xs capitalize" style={{ color: 'var(--text-muted)' }}>{user?.role}</p>
+                  <p className="text-sm font-inter font-medium text-charcoal">{user?.name}</p>
+                  <p className="text-xs font-inter text-mid-gray capitalize">{user?.role}</p>
                 </div>
               </div>
-              <InputField label="Display Name" value={name}  onChange={setName} />
-              <InputField label="Email"         value={email} onChange={setEmail} type="email" />
-              <Button variant="primary" size="sm" icon={<Save size={13} />}
-                loading={savingProfile} onClick={saveProfile} className="w-full mt-1">
+              <InputField label="Display Name" value={name}  onChange={setName}  />
+              <InputField label="Email"        value={email} onChange={setEmail} type="email" />
+              <Button variant="primary" size="sm" icon={<Save size={13} />} loading={savingProfile} onClick={saveProfile} className="w-full">
                 Save Profile
               </Button>
             </div>
@@ -122,131 +152,113 @@ export default function Settings() {
 
           {/* Notifications */}
           <motion.div
-            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.12 }}
-            className="card p-5"
+            className="bg-white rounded-lg p-6 shadow-level-2-card"
           >
-            <SectionHeader icon={Bell} title="Notifications" color="#22C55E" />
-            <div className="flex flex-col gap-2">
+            <SectionHeader icon={Bell} title="Notifications" />
+            <div>
               {Object.entries(notifications).map(([k, v]) => (
                 <SettingRow
                   key={k}
                   label={k.replace(/([A-Z])/g, ' $1').trim()}
+                  description={NOTIF_DESCRIPTIONS[k]}
                   enabled={v}
-                  onChange={() => toggleNotif(k)}
+                  onChange={() => setNotifications(prev => ({ ...prev, [k]: !prev[k] }))}
                 />
               ))}
             </div>
           </motion.div>
         </div>
 
-        {/* Middle column — Info */}
+        {/* Middle column — Platform info */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.18 }}
-          className="card p-5"
+          className="bg-white rounded-lg p-6 shadow-level-2-card h-fit"
         >
-          <SectionHeader icon={Globe} title="Platform Info" color="#EC4899" />
-          <div className="flex flex-col gap-3">
+          <SectionHeader icon={Globe} title="Platform Info" />
+          <div className="flex flex-col gap-2">
             {[
-              { label: 'Platform', value: 'Planorah' },
-              { label: 'Backend', value: 'Django + DRF' },
-              { label: 'Auth', value: 'JWT (SimpleJWT)' },
-              { label: 'Database', value: 'PostgreSQL' },
-              { label: 'API Base', value: import.meta.env.VITE_API_URL || 'http://localhost:8000' },
+              { label: 'Platform',    value: 'Planorah' },
+              { label: 'Backend',     value: 'Django + DRF' },
+              { label: 'Auth',        value: 'JWT (SimpleJWT)' },
+              { label: 'Database',    value: 'PostgreSQL' },
+              { label: 'API Base',    value: import.meta.env.VITE_API_URL || 'http://localhost:8000' },
               { label: 'Admin Panel', value: 'React + Vite' },
             ].map(({ label, value }) => (
-              <div key={label} className="flex items-start justify-between gap-3 p-3 rounded-xl"
-                style={{ background: 'var(--bg-elevated)' }}>
-                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{label}</p>
-                <p className="text-xs font-mono font-medium text-right" style={{ color: 'var(--text-primary)' }}>{value}</p>
+              <div key={label} className="flex items-center justify-between gap-4 py-3 border-b border-border-gray last:border-b-0">
+                <p className="text-xs font-inter text-mid-gray">{label}</p>
+                <p className="text-xs font-mono font-medium text-charcoal text-right truncate max-w-[60%]">{value}</p>
               </div>
             ))}
+          </div>
 
-            <div className="p-3 rounded-xl mt-2" style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)' }}>
-              <p className="text-xs font-semibold mb-1" style={{ color: 'var(--accent)' }}>Security</p>
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                All admin API endpoints require JWT Bearer token and <code className="text-[11px]">is_staff=True</code>.
-              </p>
+          <div className="mt-4 p-4 rounded-lg bg-gray-50 border border-border-gray">
+            <div className="flex items-center gap-2 mb-2">
+              <Shield size={13} className="text-mid-gray" />
+              <p className="text-xs font-inter font-semibold text-charcoal">Security</p>
             </div>
+            <p className="text-xs font-inter text-mid-gray leading-relaxed">
+              All admin API endpoints require JWT Bearer token and{' '}
+              <code className="text-[11px] bg-gray-100 px-1 py-0.5 rounded text-charcoal font-mono">is_staff=True</code>.
+            </p>
           </div>
         </motion.div>
 
         {/* Right column — Feature flags */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.24 }}
-          className="card p-5"
+          className="bg-white rounded-lg p-6 shadow-level-2-card h-fit"
         >
-          <SectionHeader icon={Zap} title="Feature Flags" color="var(--accent)" />
-          {loading
-            ? <div className="flex flex-col gap-2">{[0,1,2,3,4,5].map(i => <div key={i} className="skeleton h-14 rounded-xl" />)}</div>
-            : flags.length === 0
-              ? (
-                <div className="py-8 text-center">
-                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>No feature flags yet.</p>
-                  <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>Create them in the Django admin at <code>/saas-admin/flags/</code></p>
-                </div>
-              )
-              : (
-                <div className="flex flex-col gap-2">
-                  {flags.map(flag => (
-                    <motion.div
-                      key={flag.id}
-                      whileHover={{ x: 2 }}
-                      transition={{ duration: 0.12 }}
-                      className="flex items-start justify-between gap-3 p-3 rounded-xl transition-all cursor-pointer"
-                      style={{
-                        background: flag.enabled ? 'rgba(245,158,11,0.06)' : 'var(--bg-elevated)',
-                        border:     flag.enabled ? '1px solid rgba(245,158,11,0.2)' : '1px solid transparent',
-                      }}
-                      onClick={() => toggleFlag(flag.id)}
-                    >
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
-                          {flag.label}
-                        </p>
-                        <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--text-muted)' }}>
-                          {flag.description}
-                        </p>
-                        <code className="text-[10px] mt-0.5 block" style={{ color: 'var(--text-muted)', opacity: 0.6 }}>
-                          {flag.key}
-                        </code>
-                      </div>
-                      <ToggleSwitch enabled={flag.enabled} onChange={() => toggleFlag(flag.id)} />
-                    </motion.div>
-                  ))}
-                </div>
-              )
-          }
+          <SectionHeader icon={Zap} title="Feature Flags" />
+
+          {loading ? (
+            <div className="flex flex-col gap-2">
+              {[0, 1, 2, 3, 4, 5].map(i => (
+                <div key={i} className="h-16 bg-gray-100 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          ) : flags.length === 0 ? (
+            <div className="py-8 text-center">
+              <Zap size={24} className="text-mid-gray mx-auto mb-3" strokeWidth={1.5} />
+              <p className="text-sm font-inter text-mid-gray">No feature flags yet.</p>
+              <p className="text-xs font-inter text-mid-gray mt-1 opacity-60">
+                Create them at <code className="font-mono">/saas-admin/flags/</code>
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {flags.map(flag => (
+                <motion.div
+                  key={flag.id}
+                  whileHover={{ x: 2 }}
+                  transition={{ duration: 0.12 }}
+                  className={`flex items-start justify-between gap-3 p-4 rounded-lg cursor-pointer transition-all border ${
+                    flag.enabled
+                      ? 'bg-gray-50 border-border-gray'
+                      : 'bg-white border-border-gray hover:bg-gray-50'
+                  }`}
+                  onClick={() => toggleFlag(flag.id)}
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-inter font-medium text-charcoal truncate">{flag.label}</p>
+                    <p className="text-xs font-inter text-mid-gray mt-0.5 truncate">{flag.description}</p>
+                    <code className="text-[10px] font-mono text-mid-gray opacity-60 mt-0.5 block truncate">
+                      {flag.key}
+                    </code>
+                  </div>
+                  <ToggleSwitch enabled={flag.enabled} onChange={() => toggleFlag(flag.id)} />
+                </motion.div>
+              ))}
+            </div>
+          )}
         </motion.div>
       </div>
-    </div>
-  )
-}
-
-function SettingRow({ label, enabled, onChange }) {
-  return (
-    <div className="flex items-center justify-between gap-3 py-2">
-      <p className="text-sm capitalize" style={{ color: 'var(--text-secondary)' }}>{label}</p>
-      <ToggleSwitch enabled={enabled} onChange={onChange} />
-    </div>
-  )
-}
-
-function InputField({ label, value, onChange, type = 'text' }) {
-  return (
-    <div>
-      <label className="text-xs font-medium uppercase tracking-wide block mb-1.5" style={{ color: 'var(--text-muted)' }}>{label}</label>
-      <input
-        type={type}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        className="w-full px-3.5 py-2.5 rounded-xl text-sm outline-none transition-all"
-        style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
-        onFocus={e => e.target.style.borderColor = 'rgba(245,158,11,0.4)'}
-        onBlur={e  => e.target.style.borderColor = 'var(--border)'}
-      />
     </div>
   )
 }

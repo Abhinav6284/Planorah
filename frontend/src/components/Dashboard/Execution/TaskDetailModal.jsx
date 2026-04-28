@@ -59,86 +59,99 @@ const TaskDetailModal = ({ task, isOpen, onClose, onStartFocus }) => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+                    style={{
+                        position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)', padding: 16
+                    }}
                     onClick={onClose}
                 >
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        initial={{ opacity: 0, scale: 0.98, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        exit={{ opacity: 0, scale: 0.98, y: 10 }}
                         onClick={(e) => e.stopPropagation()}
-                        className="relative z-[101] w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-3xl border border-borderMuted/50 bg-gradient-to-br from-white via-white/95 to-beigePrimary/40 backdrop-blur-xl shadow-2xl dark:border-white/5 dark:bg-gradient-to-br dark:from-[#1a1a1a] dark:via-[#121212] dark:to-[#0f0f0f]"
+                        style={{
+                            position: 'relative', zIndex: 101, width: '100%', maxWidth: 720, maxHeight: '90vh',
+                            display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRadius: 16,
+                            background: 'var(--el-bg)', border: '1px solid var(--el-border)', boxShadow: '0 20px 50px rgba(0,0,0,0.15)'
+                        }}
                     >
                         {/* Header */}
-                        <div className="sticky top-0 z-10 flex items-start justify-between border-b border-borderMuted/50 bg-gradient-to-b from-white/80 to-beigePrimary/20 px-6 py-6 dark:border-white/5 dark:from-[#1a1a1a]/80 dark:to-[#0f0f0f]/80">
-                            <div className="flex-1 pr-4">
-                                <div className="mb-2 flex items-center gap-2">
-                                    <span className="rounded-full bg-terracotta/10 px-3 py-1 text-xs font-bold text-terracotta dark:bg-terracotta/20 dark:text-terracotta/80">
-                                        {task?.task_type === 'exam' ? 'Exam Task' : 'Learning Task'}
+                        <div style={{ 
+                            padding: '24px 32px', borderBottom: '1px solid var(--el-border-subtle)',
+                            display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'
+                        }}>
+                            <div style={{ flex: 1 }}>
+                                <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                                    <span style={{ 
+                                        padding: '4px 10px', borderRadius: 20, fontSize: 10, fontWeight: 700, 
+                                        textTransform: 'uppercase', background: 'var(--el-bg-secondary)', color: 'var(--el-text-secondary)' 
+                                    }}>
+                                        {task?.task_type === 'exam' ? 'Exam' : 'Learning'}
                                     </span>
                                     {task?.estimated_minutes && (
-                                        <span className="flex items-center gap-1 text-xs text-textSecondary dark:text-slate-400">
-                                            <Clock className="h-3 w-3" />
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 600, color: 'var(--el-text-muted)' }}>
+                                            <Clock style={{ width: 12, height: 12 }} />
                                             {task.estimated_minutes} min
-                                        </span>
+                                        </div>
                                     )}
                                 </div>
-                                <h2 className="text-2xl font-bold text-textPrimary dark:text-white">
+                                <h2 style={{ fontSize: 24, fontWeight: 800, color: 'var(--el-text)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
                                     {task?.title}
                                 </h2>
                                 {task?.description && (
-                                    <p className="mt-2 text-sm text-textSecondary dark:text-slate-400">
+                                    <p style={{ marginTop: 8, fontSize: 14, color: 'var(--el-text-muted)', lineHeight: 1.5 }}>
                                         {task.description}
                                     </p>
                                 )}
                             </div>
                             <button
                                 onClick={onClose}
-                                className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-beigeMuted/60 dark:hover:bg-white/10 transition-colors"
+                                style={{ 
+                                    width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    background: 'none', border: 'none', cursor: 'pointer', color: 'var(--el-text-muted)', transition: 'all 0.1s'
+                                }}
                             >
-                                <X className="h-5 w-5 text-textSecondary dark:text-slate-400" />
+                                <X style={{ width: 20, height: 20 }} />
                             </button>
                         </div>
 
                         {/* Content */}
-                        <div className="overflow-y-auto px-6 py-6" style={{ maxHeight: 'calc(90vh - 180px)' }}>
+                        <div style={{ overflowY: 'auto', padding: '32px', flex: 1 }}>
                             {loading ? (
-                                <div className="py-12 text-center">
-                                    <Loader2 className="mx-auto h-8 w-8 animate-spin text-terracotta dark:text-terracotta" />
-                                    <p className="mt-4 text-sm text-textSecondary dark:text-slate-400">Loading guide...</p>
+                                <div style={{ padding: '64px 0', textAlign: 'center' }}>
+                                    <Loader2 style={{ width: 32, height: 32, margin: '0 auto', color: 'var(--el-text)', animation: 'spin 1s linear infinite' }} />
+                                    <p style={{ marginTop: 16, fontSize: 13, fontWeight: 500, color: 'var(--el-text-muted)' }}>Preparing guide...</p>
                                 </div>
                             ) : guidance ? (
-                                <div className="space-y-6">
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
                                     {/* Objective */}
-                                    <div className="rounded-2xl border border-terracotta/30 bg-gradient-to-br from-terracotta/8 to-transparent p-5 dark:border-terracotta/20 dark:from-terracotta/5">
-                                        <div className="mb-2 flex items-center gap-2">
-                                            <Target className="h-4 w-4 text-terracotta dark:text-terracotta/80" />
-                                            <h3 className="text-sm font-bold uppercase tracking-widest text-terracotta dark:text-terracotta/80">
-                                                Objective
-                                            </h3>
+                                    <div>
+                                        <h3 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)', marginBottom: 12 }}>Objective</h3>
+                                        <div style={{ padding: 20, borderRadius: 12, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border-subtle)' }}>
+                                            <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--el-text-secondary)' }}>
+                                                {guidance.objective}
+                                            </p>
                                         </div>
-                                        <p className="text-sm leading-relaxed text-textPrimary dark:text-slate-300">
-                                            {guidance.objective}
-                                        </p>
                                     </div>
 
                                     {/* Time Breakdown */}
                                     {guidance.time_breakdown && guidance.time_breakdown.length > 0 && (
                                         <div>
-                                            <h3 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-terracotta dark:text-terracotta/80">
-                                                <Clock className="h-4 w-4" />
-                                                Time Breakdown
-                                            </h3>
-                                            <div className="space-y-2">
+                                            <h3 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)', marginBottom: 16 }}>Time Allocation</h3>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                                 {guidance.time_breakdown.map((item, idx) => (
                                                     <div
                                                         key={idx}
-                                                        className="flex items-center gap-3 rounded-xl border border-borderMuted/50 bg-white/60 p-3 dark:border-white/5 dark:bg-white/5"
+                                                        style={{ 
+                                                            display: 'flex', alignItems: 'center', gap: 16, padding: '12px 16px',
+                                                            borderRadius: 12, border: '1px solid var(--el-border-subtle)', background: 'var(--el-bg)'
+                                                        }}
                                                     >
-                                                        <span className="flex h-8 w-16 flex-shrink-0 items-center justify-center rounded-lg bg-terracotta/10 text-xs font-bold text-terracotta dark:bg-terracotta/20 dark:text-terracotta/80">
+                                                        <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--el-text)', minWidth: 60 }}>
                                                             {item.duration}
                                                         </span>
-                                                        <span className="text-sm text-textPrimary dark:text-slate-300">
+                                                        <span style={{ fontSize: 13, color: 'var(--el-text-secondary)' }}>
                                                             {item.activity}
                                                         </span>
                                                     </div>
@@ -150,23 +163,24 @@ const TaskDetailModal = ({ task, isOpen, onClose, onStartFocus }) => {
                                     {/* Step-by-Step Guide */}
                                     {guidance.steps && guidance.steps.length > 0 && (
                                         <div>
-                                            <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-terracotta dark:text-terracotta/80">
-                                                📝 Step-by-Step Guide
-                                            </h3>
-                                            <div className="space-y-3">
+                                            <h3 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)', marginBottom: 20 }}>Process</h3>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                                                 {guidance.steps.map((step) => (
                                                     <div
                                                         key={step.step}
-                                                        className="flex gap-4 rounded-xl border border-borderMuted/50 bg-white/60 p-4 dark:border-white/5 dark:bg-white/5"
+                                                        style={{ display: 'flex', gap: 16 }}
                                                     >
-                                                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-terracotta to-terracottaHover text-sm font-bold text-white dark:from-terracotta dark:to-terracotta/80">
+                                                        <div style={{ 
+                                                            width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                            background: 'var(--el-text)', color: '#fff', fontSize: 11, fontWeight: 700, flexShrink: 0, marginTop: 2
+                                                        }}>
                                                             {step.step}
                                                         </div>
                                                         <div>
-                                                            <h4 className="mb-1 font-semibold text-textPrimary dark:text-white">
+                                                            <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--el-text)', marginBottom: 4 }}>
                                                                 {step.title}
                                                             </h4>
-                                                            <p className="text-sm text-textSecondary dark:text-slate-400">
+                                                            <p style={{ fontSize: 13, color: 'var(--el-text-muted)', lineHeight: 1.5 }}>
                                                                 {step.description}
                                                             </p>
                                                         </div>
@@ -176,76 +190,24 @@ const TaskDetailModal = ({ task, isOpen, onClose, onStartFocus }) => {
                                         </div>
                                     )}
 
-                                    <div className="grid gap-4 md:grid-cols-2">
-                                        {/* Best Practices */}
-                                        {guidance.best_practices && guidance.best_practices.length > 0 && (
-                                            <div className="rounded-2xl border border-terracotta/30 bg-gradient-to-br from-terracotta/8 to-transparent p-4 dark:border-terracotta/20 dark:from-terracotta/5">
-                                                <h3 className="mb-2 flex items-center gap-2 font-semibold text-terracotta dark:text-terracotta/80">
-                                                    <CheckCircle2 className="h-4 w-4" />
-                                                    Best Practices
-                                                </h3>
-                                                <ul className="space-y-1">
-                                                    {guidance.best_practices.map((practice, idx) => (
-                                                        <li key={idx} className="text-sm text-terracotta dark:text-terracotta/80">
-                                                            • {practice}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
-
-                                        {/* Common Mistakes */}
-                                        {guidance.common_mistakes && guidance.common_mistakes.length > 0 && (
-                                            <div className="rounded-2xl border border-sage/30 bg-gradient-to-br from-sage/8 to-transparent p-4 dark:border-sage/20 dark:from-sage/5">
-                                                <h3 className="mb-2 flex items-center gap-2 font-semibold text-sage dark:text-sage/80">
-                                                    <AlertCircle className="h-4 w-4" />
-                                                    Avoid These
-                                                </h3>
-                                                <ul className="space-y-1">
-                                                    {guidance.common_mistakes.map((mistake, idx) => (
-                                                        <li key={idx} className="text-sm text-sage dark:text-sage/80">
-                                                            • {mistake}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Quick Tips */}
-                                    {guidance.quick_tips && guidance.quick_tips.length > 0 && (
-                                        <div className="rounded-2xl border border-terracotta/30 bg-gradient-to-br from-terracotta/8 to-transparent p-4 dark:border-terracotta/20 dark:from-terracotta/5">
-                                            <h3 className="mb-2 flex items-center gap-2 font-semibold text-terracotta dark:text-terracotta/80">
-                                                <Lightbulb className="h-4 w-4" />
-                                                Quick Tips
-                                            </h3>
-                                            <ul className="space-y-1">
-                                                {guidance.quick_tips.map((tip, idx) => (
-                                                    <li key={idx} className="text-sm text-terracotta dark:text-terracotta/80">
-                                                        • {tip}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
-
                                     {/* Related Resources */}
                                     {task?.related_links && task.related_links.length > 0 && (
                                         <div>
-                                            <h3 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-terracotta dark:text-terracotta/80">
-                                                <ExternalLink className="h-4 w-4" />
-                                                Related Resources
-                                            </h3>
-                                            <div className="space-y-2">
+                                            <h3 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)', marginBottom: 16 }}>Resources</h3>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                                 {task.related_links.map((link, idx) => (
                                                     <a
                                                         key={idx}
                                                         href={link.url}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="flex items-center gap-2 rounded-xl border border-terracotta/30 bg-gradient-to-br from-terracotta/8 to-transparent p-3 text-sm text-terracotta hover:from-terracotta/15 dark:border-terracotta/20 dark:from-terracotta/5 dark:text-terracotta/80 dark:hover:from-terracotta/10"
+                                                        style={{ 
+                                                            display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px',
+                                                            borderRadius: 12, border: '1px solid var(--el-border)', background: 'var(--el-bg-secondary)',
+                                                            textDecoration: 'none', fontSize: 13, color: 'var(--el-text)', transition: 'all 0.1s'
+                                                        }}
                                                     >
-                                                        <ExternalLink className="h-4 w-4" />
+                                                        <ExternalLink style={{ width: 14, height: 14 }} />
                                                         {link.title || link.url}
                                                     </a>
                                                 ))}
@@ -254,29 +216,37 @@ const TaskDetailModal = ({ task, isOpen, onClose, onStartFocus }) => {
                                     )}
                                 </div>
                             ) : (
-                                <div className="py-12 text-center text-textSecondary dark:text-slate-400">
-                                    No guidance available
+                                <div style={{ padding: '32px 0', textAlign: 'center', color: 'var(--el-text-muted)' }}>
+                                    No detailed guide found for this task.
                                 </div>
                             )}
                         </div>
 
                         {/* Footer */}
-                        <div className="sticky bottom-0 flex items-center justify-between border-t border-borderMuted/50 bg-gradient-to-t from-white/80 to-transparent px-6 py-5 dark:border-white/5 dark:from-[#0f0f0f]/80 dark:to-transparent">
+                        <div style={{ 
+                            padding: '20px 32px', borderTop: '1px solid var(--el-border-subtle)',
+                            display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                        }}>
                             <button
                                 onClick={onClose}
-                                className="rounded-xl border border-borderMuted/60 bg-white/40 px-5 py-2.5 text-sm font-semibold text-textPrimary backdrop-blur-sm transition-all hover:bg-white/70 hover:border-terracotta/30 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10 dark:hover:border-terracotta/30"
+                                style={{ 
+                                    padding: '10px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600,
+                                    background: 'var(--el-bg)', border: '1px solid var(--el-border)', color: 'var(--el-text-secondary)', cursor: 'pointer'
+                                }}
                             >
                                 Close
                             </button>
-                            <motion.button
-                                whileHover={{ scale: 1.05, y: -2 }}
-                                whileTap={{ scale: 0.95 }}
+                            <button
                                 onClick={handleStartFocusFromModal}
-                                className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-br from-terracotta to-terracottaHover px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-terracotta/40 transition-all hover:shadow-terracotta/60 dark:from-terracotta dark:to-terracottaHover dark:shadow-terracotta/30 dark:hover:shadow-terracotta/50"
+                                style={{ 
+                                    display: 'flex', alignItems: 'center', gap: 8, padding: '10px 24px', 
+                                    borderRadius: 10, background: 'var(--el-text)', color: '#fff', 
+                                    fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer'
+                                }}
                             >
-                                <Play className="h-4 w-4 fill-current" />
-                                <span>Start Focus Session</span>
-                            </motion.button>
+                                <Play style={{ width: 14, height: 14, fill: 'currentColor' }} />
+                                Start Session
+                            </button>
                         </div>
                     </motion.div>
                 </motion.div>

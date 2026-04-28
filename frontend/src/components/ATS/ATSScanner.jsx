@@ -92,7 +92,7 @@ export default function ATSScanner() {
                                 <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Target Job Role</label>
                                 <input
                                     type="text"
-                                    className="w-full px-4 py-3 bg-gray-50 dark:bg-white/10 border border-gray-200 dark:border-charcoalMuted rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white outline-none text-gray-900 dark:text-white"
+                                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-charcoalMuted rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white outline-none text-gray-900 dark:text-white"
                                     placeholder="e.g. Senior Product Designer"
                                     value={formData.job_role}
                                     onChange={(e) => handleInputChange("job_role", e.target.value)}
@@ -102,7 +102,7 @@ export default function ATSScanner() {
                             <div className="mb-6">
                                 <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Job Description</label>
                                 <textarea
-                                    className="w-full h-32 px-4 py-3 bg-gray-50 dark:bg-white/10 border border-gray-200 dark:border-charcoalMuted rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white outline-none text-gray-900 dark:text-white resize-none"
+                                    className="w-full h-32 px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-charcoalMuted rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white outline-none text-gray-900 dark:text-white resize-none"
                                     placeholder="Paste the JD here..."
                                     value={formData.job_description}
                                     onChange={(e) => handleInputChange("job_description", e.target.value)}
@@ -111,7 +111,7 @@ export default function ATSScanner() {
 
                             {/* Resume Input Toggle */}
                             <div className="mb-6">
-                                <div className="flex gap-4 mb-4 border-b border-gray-100 dark:border-white/5 pb-2">
+                                <div className="flex gap-4 mb-4 border-b border-gray-100 dark:border-gray-600 pb-2">
                                     <button
                                         onClick={() => setInputMode('select')}
                                         className={`pb-2 text-sm font-bold ${inputMode === 'select' ? 'text-black dark:text-white border-b-2 border-black dark:border-white' : 'text-gray-400'}`}
@@ -131,7 +131,7 @@ export default function ATSScanner() {
                                         {myResumes.length > 0 ? (
                                             <select
                                                 onChange={(e) => handleResumeSelect(e.target.value)}
-                                                className="w-full px-4 py-3 bg-gray-50 dark:bg-white/10 border border-gray-200 dark:border-charcoalMuted rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white outline-none text-gray-900 dark:text-white appearance-none"
+                                                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-charcoalMuted rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white outline-none text-gray-900 dark:text-white appearance-none"
                                             >
                                                 <option value="">Select a generated resume...</option>
                                                 {myResumes.map(r => (
@@ -144,7 +144,7 @@ export default function ATSScanner() {
                                     </div>
                                 ) : (
                                     <textarea
-                                        className="w-full h-40 px-4 py-3 bg-gray-50 dark:bg-white/10 border border-gray-200 dark:border-charcoalMuted rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white outline-none text-gray-900 dark:text-white resize-none"
+                                        className="w-full h-40 px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-charcoalMuted rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white outline-none text-gray-900 dark:text-white resize-none"
                                         placeholder="Paste resume text here..."
                                         value={formData.resume_text}
                                         onChange={(e) => handleInputChange("resume_text", e.target.value)}
@@ -179,22 +179,22 @@ export default function ATSScanner() {
                                         </div>
 
                                         <div className="flex-1 w-full grid grid-cols-2 lg:grid-cols-4 gap-4">
-                                            <div className="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl text-center">
+                                            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-2xl text-center">
                                                 <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Keywords</div>
                                                 <div className="text-xl font-bold text-gray-900 dark:text-white">{result.missing_keywords.length > 0 ? "Missing" : "Great"}</div>
                                                 <div className="text-xs text-red-500">{result.missing_keywords.length} alerts</div>
                                             </div>
-                                            <div className="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl text-center">
+                                            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-2xl text-center">
                                                 <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Strengths</div>
                                                 <div className="text-xl font-bold text-green-600">{result.strength_areas.length}</div>
                                                 <div className="text-xs text-green-500">Detected</div>
                                             </div>
-                                            <div className="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl text-center">
+                                            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-2xl text-center">
                                                 <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Improvement</div>
                                                 <div className="text-xl font-bold text-blue-600">{result.improvement_areas.length}</div>
                                                 <div className="text-xs text-blue-500">Tips</div>
                                             </div>
-                                            <div className="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
+                                            <div className="bg-gray-50 dark:bg-gray-700 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors p-4 rounded-2xl text-center">
                                                 <span className="text-2xl">📥</span>
                                                 <span className="text-xs font-bold mt-1">Download</span>
                                             </div>
@@ -216,7 +216,7 @@ export default function ATSScanner() {
                                             </div>
                                             <div className="flex flex-wrap gap-2">
                                                 {result.missing_keywords.map((kw, i) => (
-                                                    <span key={i} className="px-3 py-1 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 rounded-lg text-sm border border-red-100 dark:border-red-900/20">{kw}</span>
+                                                    <span key={i} className="px-3 py-1 bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-300 rounded-lg text-sm border border-red-100 dark:border-red-800">{kw}</span>
                                                 ))}
                                                 {result.missing_keywords.length === 0 && <span className="text-gray-400 italic">None! Good job.</span>}
                                             </div>
@@ -245,7 +245,7 @@ export default function ATSScanner() {
                                         </div>
                                         <ul className="space-y-3">
                                             {result.improvement_areas.map((item, i) => (
-                                                <li key={i} className="flex items-start gap-3 p-3 rounded-xl bg-blue-50/50 dark:bg-white/5">
+                                                <li key={i} className="flex items-start gap-3 p-3 rounded-xl bg-blue-50 dark:bg-gray-800">
                                                     <span className="text-blue-500 mt-0.5">•</span>
                                                     <span className="text-sm text-gray-700 dark:text-gray-200">{item}</span>
                                                 </li>
@@ -255,8 +255,8 @@ export default function ATSScanner() {
 
                                 </motion.div>
                             ) : (
-                                <div className="h-full flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-3xl min-h-[500px] bg-white/50 dark:bg-[#1a1a1a]/50 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] transition-all duration-300">
-                                    <div className="w-20 h-20 bg-gray-100 dark:bg-white/10 rounded-full flex items-center justify-center mb-6 text-4xl">
+                                <div className="h-full flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-3xl min-h-[500px] bg-white dark:bg-gray-800 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4)] transition-all duration-300">
+                                    <div className="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-6 text-4xl">
                                         📄
                                     </div>
                                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Ready to Analyze</h3>

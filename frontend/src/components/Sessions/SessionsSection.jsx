@@ -19,7 +19,7 @@ const STATUS_CONFIG = {
 };
 
 function RequestModal({ onClose }) {
-    const { submitRequest, isSubmitting, error, clearError } = useSessionsStore();
+    const { submitRequest, isSubmitting, error } = useSessionsStore();
     const [selectedTags, setSelectedTags] = useState([]);
     const [description, setDescription] = useState('');
     const [submitted, setSubmitted] = useState(false);
@@ -39,73 +39,79 @@ function RequestModal({ onClose }) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className="w-full max-w-md rounded-2xl bg-white dark:bg-[#1a1a1a] p-6 shadow-xl mx-4">
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)', padding: 16 }}>
+            <div style={{ width: '100%', maxWidth: 440, background: 'var(--el-bg)', border: '1px solid var(--el-border)', borderRadius: 16, padding: 32, boxShadow: '0 20px 50px rgba(0,0,0,0.1)' }}>
                 {submitted ? (
-                    <div className="text-center py-4">
-                        <div className="text-4xl mb-3">✅</div>
-                        <p className="text-gray-800 dark:text-white font-semibold">Request sent! We'll get back to you within 12 hours.</p>
+                    <div style={{ textAlign: 'center', padding: '32px 0' }}>
+                        <div style={{ fontSize: 32, marginBottom: 16 }}>✅</div>
+                        <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--el-text)', marginBottom: 8 }}>Request Received</p>
+                        <p style={{ fontSize: 14, color: 'var(--el-text-muted)' }}>We'll confirm your session within 12 hours.</p>
                     </div>
                 ) : (
                     <>
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Request a 1:1 Session</h3>
-                            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-                                <X size={20} />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+                            <div>
+                                <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--el-text)', letterSpacing: '-0.02em' }}>Request Mentor Session</h3>
+                                <p style={{ fontSize: 13, color: 'var(--el-text-muted)', marginTop: 4 }}>Get 1:1 guidance from our experts.</p>
+                            </div>
+                            <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--el-text-muted)' }}>
+                                <X style={{ width: 20, height: 20 }} />
                             </button>
                         </div>
 
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                            Select a topic and optionally describe what you'd like to discuss. We'll confirm a time within 12 hours.
-                        </p>
-
-                        <div className="mb-4">
-                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Topic (optional)</p>
-                            <div className="flex flex-wrap gap-2">
-                                {TOPIC_OPTIONS.map((opt) => (
-                                    <button
-                                        key={opt.value}
-                                        onClick={() => toggleTag(opt.value)}
-                                        className={`px-3 py-1 rounded-full text-sm border transition-colors ${
-                                            selectedTags.includes(opt.value)
-                                                ? 'bg-indigo-600 text-white border-indigo-600'
-                                                : 'border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-indigo-400'
-                                        }`}
-                                    >
-                                        {opt.label}
-                                    </button>
-                                ))}
+                        <div style={{ marginBottom: 24 }}>
+                            <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: 'var(--el-text-muted)', marginBottom: 12 }}>Focus Topics</p>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                                {TOPIC_OPTIONS.map((opt) => {
+                                    const active = selectedTags.includes(opt.value);
+                                    return (
+                                        <button
+                                            key={opt.value}
+                                            onClick={() => toggleTag(opt.value)}
+                                            style={{
+                                                padding: '6px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                                                border: '1px solid var(--el-border)', cursor: 'pointer', transition: 'all 0.1s',
+                                                background: active ? 'var(--el-text)' : 'var(--el-bg-secondary)',
+                                                color: active ? '#fff' : 'var(--el-text-secondary)',
+                                                borderColor: active ? 'var(--el-text)' : 'var(--el-border)'
+                                            }}
+                                        >
+                                            {opt.label}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
 
-                        <div className="mb-4">
-                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description (optional)</p>
+                        <div style={{ marginBottom: 24 }}>
+                            <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: 'var(--el-text-muted)', marginBottom: 12 }}>Description</p>
                             <textarea
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 placeholder="Describe what you'd like to discuss..."
-                                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#111] text-gray-800 dark:text-gray-200 p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                rows={3}
+                                style={{
+                                    width: '100%', borderRadius: 12, border: '1px solid var(--el-border)', 
+                                    background: 'var(--el-bg-secondary)', color: 'var(--el-text)', padding: 16, 
+                                    fontSize: 14, minHeight: 100, resize: 'none', outline: 'none'
+                                }}
                             />
                         </div>
 
-                        {error && (
-                            <p className="text-sm text-red-500 mb-3">{error}</p>
-                        )}
+                        {error && <p style={{ fontSize: 12, color: '#ef4444', marginBottom: 16, fontWeight: 600 }}>{error}</p>}
 
-                        <div className="flex gap-3">
+                        <div style={{ display: 'flex', gap: 12 }}>
                             <button
                                 onClick={onClose}
-                                className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#222] transition-colors"
+                                style={{ flex: 1, padding: '12px', borderRadius: 12, fontSize: 13, fontWeight: 700, background: 'var(--el-bg)', border: '1px solid var(--el-border)', color: 'var(--el-text-secondary)', cursor: 'pointer' }}
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleSubmit}
                                 disabled={isSubmitting}
-                                className="flex-1 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white py-2 text-sm font-medium transition-colors disabled:opacity-60"
+                                style={{ flex: 1, padding: '12px', borderRadius: 12, fontSize: 13, fontWeight: 700, background: 'var(--el-text)', color: '#fff', border: 'none', cursor: 'pointer', opacity: isSubmitting ? 0.6 : 1 }}
                             >
-                                {isSubmitting ? 'Sending…' : 'Request Session'}
+                                {isSubmitting ? 'Sending…' : 'Send Request'}
                             </button>
                         </div>
                     </>
@@ -128,96 +134,112 @@ export default function SessionsSection() {
     const visibleSessions = expanded ? sessions : sessions.slice(0, 3);
 
     return (
-        <div className="rounded-2xl border-0 bg-white dark:bg-[#1a1a1a] p-6 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)]">
+        <div style={{ 
+            background: 'var(--el-bg)', 
+            border: '1px solid var(--el-border)', 
+            borderRadius: 16, 
+            padding: 24, 
+            boxShadow: 'var(--el-shadow-card)',
+            color: 'var(--el-text)'
+        }}>
             {notifications.map((notif) => (
                 <div
                     key={notif.id}
-                    className="flex items-start justify-between gap-3 mb-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 p-3"
+                    style={{ 
+                        display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', 
+                        borderRadius: 12, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border)',
+                        marginBottom: 20
+                    }}
                 >
-                    <p className="text-sm text-indigo-700 dark:text-indigo-300">{notif.message}</p>
+                    <p style={{ flex: 1, fontSize: 13, fontWeight: 600, color: 'var(--el-text)' }}>{notif.message}</p>
                     <button
                         onClick={() => markNotificationRead(notif.id)}
-                        className="text-indigo-400 hover:text-indigo-600 shrink-0"
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--el-text-muted)' }}
                     >
-                        <X size={14} />
+                        <X style={{ width: 14, height: 14 }} />
                     </button>
                 </div>
             ))}
 
-            <div className="flex items-center justify-between mb-4">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
                 <div>
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                        <Calendar size={18} className="text-indigo-500" />
-                        1:1 Mentor Sessions
-                    </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        <Calendar style={{ width: 16, height: 16, color: 'var(--el-text)' }} />
+                        <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--el-text)' }}>1:1 Mentoring</h3>
+                    </div>
+                    <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--el-text-muted)' }}>
                         {remaining.limit === 0
-                            ? 'Upgrade to Pro or Elite to access sessions'
-                            : `${remaining.remaining} of ${remaining.limit} sessions remaining this month`}
+                            ? 'Upgrade plan for mentoring'
+                            : `${remaining.remaining} sessions left this month`}
                     </p>
                 </div>
                 <button
                     onClick={() => setModalOpen(true)}
                     disabled={!canRequest}
-                    title={!canRequest ? (remaining.limit === 0 ? 'Upgrade your plan to book sessions' : 'Monthly session limit reached') : undefined}
-                    className="rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-200 dark:disabled:bg-gray-700 disabled:text-gray-400 text-white px-4 py-2 text-sm font-medium transition-colors"
+                    style={{
+                        padding: '8px 16px', borderRadius: 10, fontSize: 12, fontWeight: 700,
+                        background: 'var(--el-text)', color: '#fff', border: 'none', 
+                        cursor: 'pointer', opacity: !canRequest ? 0.4 : 1
+                    }}
                 >
-                    Request Session
+                    Request
                 </button>
             </div>
 
             {isLoading ? (
-                <p className="text-sm text-gray-400 text-center py-4">Loading…</p>
+                <p style={{ textAlign: 'center', padding: '12px 0', fontSize: 13, color: 'var(--el-text-muted)' }}>Loading sessions...</p>
             ) : sessions.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-4">No sessions yet. Request your first one!</p>
+                <div style={{ textAlign: 'center', padding: '24px 0', borderRadius: 12, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border-subtle)' }}>
+                    <p style={{ fontSize: 13, color: 'var(--el-text-muted)' }}>No sessions requested yet.</p>
+                </div>
             ) : (
                 <>
-                    <div className="space-y-3">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                         {visibleSessions.map((session) => {
                             const cfg = STATUS_CONFIG[session.status] || STATUS_CONFIG.requested;
+                            const isConfirmed = session.status === 'confirmed';
                             return (
                                 <div
                                     key={session.id}
-                                    className="rounded-xl border border-gray-100 dark:border-gray-800 p-4 flex items-start justify-between gap-3"
+                                    style={{ 
+                                        padding: 16, borderRadius: 12, border: '1px solid var(--el-border-subtle)',
+                                        background: 'var(--el-bg)', display: 'flex', justifyContent: 'space-between', gap: 12
+                                    }}
                                 >
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                            {session.topic_tags && session.topic_tags.length > 0 ? (
-                                                session.topic_tags.map((tag) => (
-                                                    <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
-                                                        {tag}
-                                                    </span>
-                                                ))
-                                            ) : (
-                                                <span className="text-xs text-gray-400">No topic</span>
-                                            )}
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+                                            {session.topic_tags?.map(tag => (
+                                                <span key={tag} style={{ 
+                                                    fontSize: 10, fontWeight: 700, textTransform: 'uppercase', 
+                                                    padding: '2px 8px', borderRadius: 4, background: 'var(--el-bg-secondary)', color: 'var(--el-text-muted)' 
+                                                }}>{tag}</span>
+                                            ))}
                                         </div>
                                         {session.description && (
-                                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate">{session.description}</p>
+                                            <p style={{ fontSize: 13, color: 'var(--el-text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{session.description}</p>
                                         )}
-                                        {session.status === 'confirmed' && session.scheduled_at && (
-                                            <div className="flex items-center gap-3 mt-2 flex-wrap">
-                                                <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                                                    <Clock size={12} />
-                                                    {new Date(session.scheduled_at).toLocaleString()}
-                                                </span>
+                                        {isConfirmed && session.scheduled_at && (
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 12 }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--el-text-muted)', fontWeight: 600 }}>
+                                                    <Clock style={{ width: 12, height: 12 }} />
+                                                    {new Date(session.scheduled_at).toLocaleDateString()}
+                                                </div>
                                                 {session.meeting_link && (
-                                                    <a
-                                                        href={session.meeting_link}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 font-medium"
-                                                    >
-                                                        <Video size={12} />
-                                                        Join Session
+                                                    <a href={session.meeting_link} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: 'var(--el-text)', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                                        <Video style={{ width: 12, height: 12 }} />
+                                                        Join
                                                     </a>
                                                 )}
                                             </div>
                                         )}
                                     </div>
-                                    <span className={`text-xs px-2.5 py-1 rounded-full font-medium shrink-0 ${cfg.color}`}>
+                                    <div style={{ 
+                                        height: 'fit-content', padding: '4px 10px', borderRadius: 8, fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
+                                        background: session.status === 'confirmed' ? '#dcfce7' : 'var(--el-bg-secondary)',
+                                        color: session.status === 'confirmed' ? '#166534' : 'var(--el-text-secondary)'
+                                    }}>
                                         {cfg.label}
-                                    </span>
+                                    </div>
                                 </div>
                             );
                         })}
@@ -226,9 +248,14 @@ export default function SessionsSection() {
                     {sessions.length > 3 && (
                         <button
                             onClick={() => setExpanded((v) => !v)}
-                            className="mt-3 w-full flex items-center justify-center gap-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                            style={{ 
+                                marginTop: 16, width: '100%', background: 'none', border: 'none', 
+                                cursor: 'pointer', fontSize: 12, fontWeight: 600, color: 'var(--el-text-muted)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4
+                            }}
                         >
-                            {expanded ? <><ChevronUp size={14} /> Show less</> : <><ChevronDown size={14} /> Show {sessions.length - 3} more</>}
+                            {expanded ? <ChevronUp style={{ width: 14, height: 14 }} /> : <ChevronDown style={{ width: 14, height: 14 }} />}
+                            {expanded ? 'Show less' : `Show ${sessions.length - 3} more`}
                         </button>
                     )}
                 </>

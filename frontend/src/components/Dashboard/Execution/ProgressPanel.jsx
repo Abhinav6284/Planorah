@@ -79,60 +79,78 @@ const ProgressPanel = React.memo(({ tasks, stats, activityHeatmap }) => {
     }, [tasks, activityHeatmap, stats]);
 
     return (
-        <div className="rounded-2xl border-0 bg-white dark:bg-[#1a1a1a] p-6 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] transition-all duration-300 space-y-5">
-            {/* Header: Level + XP + Focus */}
-            <div className="flex items-end justify-between pb-4 border-b border-gray-100 dark:border-white/10">
-                <div className="flex items-center gap-4">
-                    <div>
-                        <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2">Level</p>
-                        <p className="text-xl font-bold text-gray-950 dark:text-white">{xpData.current.level}</p>
-                    </div>
-                    <div className="border-l border-gray-200 dark:border-white/10 pl-4">
-                        <p className="text-xs text-gray-600 dark:text-gray-400">XP</p>
-                        <p className="text-lg font-bold text-terracotta">{xpData.xpTotal}</p>
+        <div style={{ 
+            background: 'var(--el-bg)', 
+            border: '1px solid var(--el-border)', 
+            borderRadius: 16, 
+            padding: 24, 
+            boxShadow: 'var(--el-shadow-card)',
+            color: 'var(--el-text)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 24
+        }}>
+            {/* Header: Level + XP */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                    <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)', marginBottom: 8 }}>Status</p>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                        <span style={{ fontSize: 28, fontWeight: 300, color: 'var(--el-text)', letterSpacing: '-0.04em', fontFamily: "'Inter', sans-serif" }}>{xpData.current.level}</span>
+                        <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--el-text-muted)' }}>Lvl {Math.floor(xpData.xpTotal / 500) + 1}</span>
                     </div>
                 </div>
-                <div className="text-right">
-                    <p className="text-xs text-gray-600 dark:text-gray-400">Focus</p>
-                    <p className="text-2xl font-bold text-gray-950 dark:text-white">{todayData.percent}%</p>
+                <div style={{ textAlign: 'right' }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)', marginBottom: 8 }}>Daily Focus</p>
+                    <span style={{ fontSize: 28, fontWeight: 300, color: 'var(--el-text)', letterSpacing: '-0.04em', fontFamily: "'Inter', sans-serif" }}>{todayData.percent}%</span>
                 </div>
             </div>
 
             {/* XP Progress Bar */}
             {xpData.next && (
-                <div>
-                    <div className="flex justify-between text-xs mb-2 text-gray-600 dark:text-gray-400">
-                        <span>→ {xpData.next.level}</span>
-                        <span className="text-terracotta font-semibold">{xpData.remaining} XP</span>
+                <div style={{ marginBottom: 4 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, fontSize: 12, fontWeight: 600 }}>
+                        <span style={{ color: 'var(--el-text-muted)' }}>Next: {xpData.next.level}</span>
+                        <span style={{ color: 'var(--el-text)' }}>{xpData.remaining} XP to go</span>
                     </div>
-                    <div className="h-2 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
+                    <div style={{ height: 6, background: 'var(--el-bg-secondary)', borderRadius: 10, overflow: 'hidden' }}>
                         <div
-                            className="h-full bg-terracotta transition-all duration-500"
-                            style={{ width: `${xpData.percent}%` }}
+                            style={{ 
+                                height: '100%', 
+                                background: 'var(--el-text)', 
+                                borderRadius: 10, 
+                                width: `${xpData.percent}%`,
+                                transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' 
+                            }}
                         />
                     </div>
                 </div>
             )}
 
             {/* Missions Info */}
-            <p className="text-xs text-gray-600 dark:text-gray-400">
-                <span className="font-bold text-gray-950 dark:text-white">{todayData.completed}/{todayData.total}</span> missions completed
-            </p>
+            <div style={{ 
+                padding: '12px 16px', borderRadius: 12, background: 'var(--el-bg-secondary)', 
+                display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: 'var(--el-text-secondary)' 
+            }}>
+                <span style={{ fontWeight: 800, color: 'var(--el-text)' }}>{todayData.completed}/{todayData.total}</span>
+                <span>Missions completed today</span>
+            </div>
 
             {/* Weekly Heatmap */}
             <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">Consistency</p>
-                <div className="flex justify-between gap-2">
+                <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)', marginBottom: 16 }}>Activity consistency</p>
+                <div style={{ display: 'flex', gap: 6 }}>
                     {heatmap.map((day, i) => (
-                        <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
+                        <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
                             <div
                                 title={`${day.count} task${day.count !== 1 ? 's' : ''} on ${day.iso}`}
-                                className={`w-full h-6 rounded-md transition-all ${day.count > 0
-                                        ? `bg-terracotta ${day.count > 2 ? 'opacity-100' : 'opacity-60'}`
-                                        : 'bg-gray-200 dark:bg-white/10'
-                                    }`}
+                                style={{
+                                    width: '100%', height: 24, borderRadius: 4, 
+                                    background: day.count > 0 ? 'var(--el-text)' : 'var(--el-bg-secondary)',
+                                    opacity: day.count > 0 ? Math.min(1, 0.3 + (day.count * 0.2)) : 1,
+                                    transition: 'all 0.2s'
+                                }}
                             />
-                            <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400">{day.label}</span>
+                            <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--el-text-muted)', textTransform: 'uppercase' }}>{day.label}</span>
                         </div>
                     ))}
                 </div>

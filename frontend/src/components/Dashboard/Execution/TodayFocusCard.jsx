@@ -9,8 +9,8 @@ const difficultyStyles = {
 const TodayFocusCard = ({ task, onStart, onSkip, onChangeTask }) => {
     if (!task) {
         return (
-            <div className="rounded-3xl border border-cyan-500/20 bg-[#07131b] p-6 text-cyan-100">
-                <p className="text-sm">Generating your task for today...</p>
+            <div style={{ padding: 32, borderRadius: 16, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border)', textAlign: 'center' }}>
+                <p style={{ fontSize: 14, color: 'var(--el-text-muted)' }}>Preparing your focus session...</p>
             </div>
         );
     }
@@ -18,40 +18,56 @@ const TodayFocusCard = ({ task, onStart, onSkip, onChangeTask }) => {
     const level = (task.difficulty || 'medium').toLowerCase();
 
     return (
-        <div className="rounded-3xl border border-cyan-400/20 bg-[radial-gradient(circle_at_15%_20%,rgba(34,211,238,0.2),transparent_40%),linear-gradient(140deg,#07131b,#0d1f2b_55%,#10212a)] p-5 sm:p-6 shadow-[0_24px_60px_rgba(0,0,0,0.45)]">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-cyan-200/70 mb-3">Today Focus</p>
-            <h2 className="text-xl sm:text-2xl font-semibold text-white leading-snug">{task.title}</h2>
+        <div style={{ 
+            borderRadius: 16, border: '1px solid var(--el-border)', background: 'var(--el-bg)', 
+            padding: 32, boxShadow: 'var(--el-shadow-card)', color: 'var(--el-text)'
+        }}>
+            <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)', marginBottom: 12 }}>Current Objective</p>
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: 'var(--el-text)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>{task.title}</h2>
 
-            <div className="flex flex-wrap items-center gap-2 mt-4">
-                <span className="px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs text-cyan-50">{task.estimated_time || '25 min'}</span>
-                <span className={`px-3 py-1 rounded-full border text-xs ${difficultyStyles[level] || difficultyStyles.medium}`}>
-                    {level}
-                </span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 16 }}>
+                <span style={{ 
+                    padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700, 
+                    background: 'var(--el-bg-secondary)', color: 'var(--el-text-secondary)', border: '1px solid var(--el-border-subtle)'
+                }}>{task.estimated_time || '25 min'}</span>
+                <span style={{ 
+                    padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
+                    background: 'var(--el-bg-secondary)', color: 'var(--el-text-secondary)', border: '1px solid var(--el-border-subtle)'
+                }}>{level}</span>
             </div>
 
-            <div className="mt-4 rounded-2xl border border-cyan-300/15 bg-black/20 p-3">
-                <p className="text-[11px] uppercase tracking-wide text-cyan-200/70">Why this task?</p>
-                <p className="text-sm text-slate-100 mt-1 leading-relaxed">{task.reason || 'This task is selected for momentum and consistency.'}</p>
+            <div style={{ marginTop: 24, padding: 20, borderRadius: 12, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border-subtle)' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: 'var(--el-text-muted)', marginBottom: 8 }}>Strategic Rationale</p>
+                <p style={{ fontSize: 14, color: 'var(--el-text-secondary)', lineHeight: 1.5 }}>{task.reason || 'This task is selected to maintain your current learning momentum and ensure consistent progress towards your goals.'}</p>
             </div>
 
-            <div className="mt-5 flex flex-wrap gap-2">
+            <div style={{ marginTop: 32, display: 'flex', flexWrap: 'wrap', gap: 12 }}>
                 <button
                     onClick={onStart}
-                    className="px-4 py-2 rounded-xl bg-cyan-300 text-[#062231] text-sm font-bold hover:bg-cyan-200 transition-colors"
+                    style={{ 
+                        padding: '10px 24px', borderRadius: 10, background: 'var(--el-text)', color: '#fff', 
+                        fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.1s'
+                    }}
                 >
-                    Start Now
-                </button>
-                <button
-                    onClick={onSkip}
-                    className="px-4 py-2 rounded-xl border border-white/20 text-white/85 text-sm font-semibold hover:bg-white/10 transition-colors"
-                >
-                    Skip
+                    Initiate Focus
                 </button>
                 <button
                     onClick={onChangeTask}
-                    className="px-4 py-2 rounded-xl border border-cyan-300/40 text-cyan-100 text-sm font-semibold hover:bg-cyan-500/10 transition-colors"
+                    style={{ 
+                        padding: '10px 24px', borderRadius: 10, background: 'var(--el-bg)', border: '1px solid var(--el-border)', 
+                        color: 'var(--el-text-secondary)', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'all 0.1s'
+                    }}
                 >
-                    Change Task
+                    Modify Objective
+                </button>
+                <button
+                    onClick={onSkip}
+                    style={{ 
+                        padding: '10px 20px', borderRadius: 10, background: 'transparent', border: 'none', 
+                        color: 'var(--el-text-muted)', fontSize: 13, fontWeight: 600, cursor: 'pointer'
+                    }}
+                >
+                    Dismiss
                 </button>
             </div>
         </div>

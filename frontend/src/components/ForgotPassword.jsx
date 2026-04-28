@@ -79,10 +79,10 @@ export default function ForgotPassword() {
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             className="flex items-center gap-3"
           >
-            <div className="w-9 h-9 rounded-[10px] bg-white/10 border border-white/15 backdrop-blur-sm overflow-hidden flex items-center justify-center">
+            <div className="w-9 h-9 rounded-[10px] bg-indigo-900 border border-indigo-700 overflow-hidden flex items-center justify-center">
               <img src="/planorah_logo.png" alt="Planorah" className="w-7 h-7 object-contain invert" />
             </div>
-            <span className="text-xl font-semibold font-cormorant text-white/90 tracking-wide">Planorah</span>
+            <span className="text-xl font-semibold font-cormorant text-white tracking-wide">Planorah</span>
           </motion.div>
 
           {/* Center content */}
@@ -92,7 +92,7 @@ export default function ForgotPassword() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="text-[13px] font-medium text-white/40 uppercase tracking-[0.2em] mb-5 font-outfit"
+                className="text-[13px] font-medium text-gray-300 uppercase tracking-[0.2em] mb-5 font-outfit"
               >
                 Secure Access
               </motion.p>
@@ -110,7 +110,7 @@ export default function ForgotPassword() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="text-base text-white/45 max-w-sm leading-relaxed mt-4 font-outfit"
+                className="text-base text-gray-400 max-w-sm leading-relaxed mt-4 font-outfit"
               >
                 Verify your email and set a new password to regain access to your account.
               </motion.p>
@@ -122,12 +122,12 @@ export default function ForgotPassword() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.7 }}
-            className="flex items-center gap-10 pt-8 border-t border-white/[0.08]"
+            className="flex items-center gap-10 pt-8 border-t border-indigo-500"
           >
             {[["256-bit", "Encryption"], ["Zero", "Tracking"], ["Instant", "Verification"]].map(([val, label]) => (
               <div key={label}>
                 <div className="text-[22px] font-bold text-white font-outfit leading-none">{val}</div>
-                <div className="text-[12px] text-white/40 mt-1 font-outfit">{label}</div>
+                <div className="text-[12px] text-gray-400 mt-1 font-outfit">{label}</div>
               </div>
             ))}
           </motion.div>
@@ -146,7 +146,7 @@ export default function ForgotPassword() {
           </Link>
           <button
             onClick={toggleTheme}
-            className="ml-auto w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+            className="ml-auto w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
           >
             {theme === "light" ? <Moon className="w-[15px] h-[15px]" /> : <Sun className="w-[15px] h-[15px] text-yellow-400" />}
           </button>
@@ -172,11 +172,10 @@ export default function ForgotPassword() {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className={`relative rounded-xl border transition-all duration-200 ${
-                focusedField === "email"
-                  ? "border-[#D96C4A] ring-2 ring-[#D96C4A]/15 bg-white dark:bg-white/[0.08]"
-                  : "border-black/[0.09] dark:border-white/[0.09] bg-white dark:bg-white/[0.04]"
-              }`}>
+              <div className={`relative rounded-xl border transition-all duration-200 ${focusedField === "email"
+                  ? "border-[#D96C4A] ring-2 ring-[#D96C4A]/25 bg-white dark:bg-gray-800"
+                  : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
+                }`}>
                 <input
                   type="email"
                   value={email}
@@ -197,11 +196,10 @@ export default function ForgotPassword() {
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.2 }}
-                    className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[12.5px] font-medium overflow-hidden ${
-                      isSuccess
-                        ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400"
-                        : "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400"
-                    }`}
+                    className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[12.5px] font-medium overflow-hidden ${isSuccess
+                        ? "bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-200"
+                        : "bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-200"
+                      }`}
                   >
                     {isSuccess ? <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" /> : <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />}
                     {message.replace("success:", "")}
@@ -217,7 +215,7 @@ export default function ForgotPassword() {
                 className="w-full py-3 rounded-xl bg-charcoal dark:bg-white text-white dark:text-charcoal text-[14px] font-semibold transition-all duration-200 hover:bg-[#2a2a2a] dark:hover:bg-gray-100 disabled:opacity-60 flex items-center justify-center gap-2 group shadow-[0_2px_12px_rgba(26,26,26,0.18)] dark:shadow-[0_2px_12px_rgba(255,255,255,0.08)]"
               >
                 {loading ? (
-                  <div className="w-[17px] h-[17px] border-2 border-white/20 dark:border-charcoal/20 border-t-white dark:border-t-charcoal rounded-full animate-spin" />
+                  <div className="w-[17px] h-[17px] border-2 border-gray-300 dark:border-gray-600 border-t-charcoal dark:border-t-white rounded-full animate-spin" />
                 ) : (
                   <>
                     Send OTP

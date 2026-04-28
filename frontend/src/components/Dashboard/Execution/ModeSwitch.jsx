@@ -2,17 +2,23 @@ import React from 'react';
 
 const ModeSwitch = ({ mode, onChange }) => {
     return (
-        <div className="inline-flex items-center rounded-xl border border-borderMuted/60 bg-white/50 p-1 backdrop-blur-sm dark:border-white/10 dark:bg-white/5">
+        <div style={{ 
+            display: 'inline-flex', alignItems: 'center', borderRadius: 12, 
+            border: '1px solid var(--el-border)', background: 'var(--el-bg-secondary)', padding: 4
+        }}>
             {['learning', 'exam'].map((item) => {
                 const active = mode === item;
                 return (
                     <button
                         key={item}
                         onClick={() => onChange(item)}
-                        className={`rounded-lg px-3 py-2 text-xs font-semibold capitalize transition-all sm:text-[13px] ${active
-                            ? 'bg-gradient-to-br from-terracotta to-terracottaHover text-white shadow-lg shadow-terracotta/30 dark:shadow-terracotta/20'
-                            : 'text-textSecondary hover:text-textPrimary hover:bg-beigeMuted/50 dark:text-slate-300 dark:hover:text-white dark:hover:bg-white/10'
-                            }`}
+                        style={{
+                            padding: '6px 14px', borderRadius: 10, fontSize: 13, fontWeight: 700,
+                            textTransform: 'capitalize', border: 'none', cursor: 'pointer',
+                            background: active ? 'var(--el-text)' : 'transparent',
+                            color: active ? '#fff' : 'var(--el-text-secondary)',
+                            transition: 'all 0.2s'
+                        }}
                     >
                         {item}
                     </button>

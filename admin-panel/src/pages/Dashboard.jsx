@@ -6,18 +6,18 @@ import {
 } from 'recharts'
 import {
   Users, DollarSign, CreditCard, TrendingUp,
-  UserPlus, Crown, AlertCircle, XCircle, Trash2,
+  ArrowUpRight, AlertCircle,
 } from 'lucide-react'
 import { adminApi } from '../services/api'
 
-// ─── Animated counter ─────────────────────────────────────────────────────────
+// ─── Animated Counter ─────────────────────────────────────────────────────────
 function Counter({ target, prefix = '', suffix = '', decimals = 0 }) {
   const [val, setVal] = useState(0)
   const raf = useRef(null)
   useEffect(() => {
     const start = performance.now()
-    const dur   = 1200
-    const step  = ts => {
+    const dur = 1200
+    const step = ts => {
       const p = Math.min((ts - start) / dur, 1)
       const ease = 1 - Math.pow(1 - p, 3)
       setVal(target * ease)
@@ -30,67 +30,63 @@ function Counter({ target, prefix = '', suffix = '', decimals = 0 }) {
   return <span>{prefix}{display}{suffix}</span>
 }
 
-// ─── KPI card ─────────────────────────────────────────────────────────────────
-function KpiCard({ icon: Icon, label, value, prefix, suffix, sub, accentColor, delay: d = 0 }) {
+// ─── KPI Card ─────────────────────────────────────────────────────────────────
+function KpiCard({ icon: Icon, label, value, prefix, suffix, trend, delay: d = 0 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0  }}
-      transition={{ delay: d, duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-      whileHover={{ y: -2, transition: { duration: 0.15 } }}
-      className="card p-5 relative overflow-hidden cursor-default"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: d, duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+      whileHover={{ y: -3, transition: { duration: 0.18 } }}
+      className="bg-white rounded-lg p-6 shadow-level-2-card cursor-default"
     >
-      <div
-        className="absolute -top-8 -right-8 w-32 h-32 rounded-full pointer-events-none"
-        style={{ background: `radial-gradient(circle, ${accentColor}18 0%, transparent 70%)` }}
-      />
-      <div className="flex items-start justify-between mb-4">
-        <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center"
-          style={{ background: `${accentColor}18`, color: accentColor }}
-        >
-          <Icon size={18} />
+      <div className="flex items-start justify-between mb-6">
+        <div className="w-10 h-10 rounded-lg bg-charcoal text-white flex items-center justify-center">
+          <Icon size={18} strokeWidth={1.8} />
         </div>
-        {sub && (
-          <span className="text-xs font-medium px-2 py-0.5 rounded-lg"
-            style={{ background: 'rgba(34,197,94,0.1)', color: '#22C55E' }}>
-            {sub}
+        {trend != null && (
+          <span className="flex items-center gap-1 text-xs font-inter font-medium text-charcoal bg-gray-50 px-2 py-1 rounded-lg border border-border-gray">
+            <ArrowUpRight size={12} />
+            {trend}%
           </span>
         )}
       </div>
-      <p className="font-display font-bold text-2xl mb-1" style={{ color: 'var(--text-primary)' }}>
+      <p className="font-cal-sans font-semibold text-3xl text-charcoal mb-1.5 tracking-tight">
         <Counter target={value} prefix={prefix} suffix={suffix} />
       </p>
-      <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{label}</p>
+      <p className="text-sm font-inter text-mid-gray">{label}</p>
     </motion.div>
   )
 }
 
-// ─── Custom tooltip ───────────────────────────────────────────────────────────
+// ─── Chart Tooltip ────────────────────────────────────────────────────────────
 function ChartTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="rounded-xl px-3 py-2.5 shadow-2xl text-xs"
-      style={{ background: 'var(--bg-elevated)', border: '1px solid rgba(255,255,255,0.12)' }}>
-      <p className="font-semibold mb-1" style={{ color: 'var(--text-secondary)' }}>{label}</p>
+    <div className="rounded-lg px-3 py-2.5 shadow-level-2-card bg-white text-xs font-inter">
+      <p className="font-semibold text-charcoal mb-1">{label}</p>
       {payload.map(p => (
-        <p key={p.dataKey} style={{ color: p.color }}>
-          {p.name}: <span className="font-bold">{p.name === 'Revenue' ? '₹' : ''}{Number(p.value).toLocaleString()}</span>
+        <p key={p.dataKey} className="text-mid-gray">
+          {p.name}:{' '}
+          <span className="font-semibold text-charcoal">
+            {p.name === 'Revenue' ? '₹' : ''}{Number(p.value).toLocaleString()}
+          </span>
         </p>
       ))}
     </div>
   )
 }
 
+// ─── Skeleton ────────────────────────────────────────────────────────────────
 function Sk({ h = 'h-4', w = 'w-full', r = 'rounded-lg' }) {
-  return <div className={`skeleton ${h} ${w} ${r}`} />
+  return <div className={`${h} ${w} ${r} bg-gray-100 animate-pulse`} />
 }
 
 export default function Dashboard() {
-  const [loading,  setLoading]  = useState(true)
-  const [stats,    setStats]    = useState(null)
+  const [loading,   setLoading]   = useState(true)
+  const [stats,     setStats]     = useState(null)
   const [analytics, setAnalytics] = useState(null)
-  const [error,    setError]    = useState(null)
+  const [error,     setError]     = useState(null)
 
   useEffect(() => {
     Promise.all([adminApi.getStats(), adminApi.getAnalytics(12, 30)])
@@ -99,27 +95,35 @@ export default function Dashboard() {
       .finally(() => setLoading(false))
   }, [])
 
-  // Build chart data arrays from API response
-  const revenueData = analytics ? analytics.revenue_chart.labels.map((label, i) => ({
-    month: label,
-    revenue: analytics.revenue_chart.values[i] ?? 0,
-  })) : []
+  const revenueData = analytics
+    ? analytics.revenue_chart.labels.map((label, i) => ({
+        month: label,
+        revenue: analytics.revenue_chart.values[i] ?? 0,
+      }))
+    : []
 
-  const signupData = analytics ? analytics.signup_chart.labels.map((label, i) => ({
-    month: label,
-    newUsers: analytics.signup_chart.values[i] ?? 0,
-  })) : []
+  const signupData = analytics
+    ? analytics.signup_chart.labels.map((label, i) => ({
+        month: label,
+        newUsers: analytics.signup_chart.values[i] ?? 0,
+      }))
+    : []
 
   if (loading) {
     return (
       <div>
-        <Sk h="h-7" w="w-48" r="rounded-xl" />
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-          {[0,1,2,3].map(i => <div key={i} className="card p-5"><Sk h="h-24" /></div>)}
+        <Sk h="h-9" w="w-40" />
+        <div className="mt-1.5"><Sk h="h-4" w="w-56" /></div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-10">
+          {[0, 1, 2, 3].map(i => (
+            <div key={i} className="bg-white rounded-lg p-6 shadow-level-2-card">
+              <Sk h="h-32" />
+            </div>
+          ))}
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
-          <div className="card p-5 lg:col-span-2"><Sk h="h-64" /></div>
-          <div className="card p-5"><Sk h="h-64" /></div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <div className="bg-white rounded-lg p-6 shadow-level-2-card lg:col-span-2"><Sk h="h-64" /></div>
+          <div className="bg-white rounded-lg p-6 shadow-level-2-card"><Sk h="h-64" /></div>
         </div>
       </div>
     )
@@ -129,108 +133,119 @@ export default function Dashboard() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <p className="text-sm font-medium mb-2" style={{ color: '#EF4444' }}>Failed to load dashboard</p>
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{error}</p>
+          <AlertCircle size={32} className="text-red-500 mx-auto mb-3" />
+          <p className="text-sm font-inter font-semibold text-charcoal mb-1">Failed to load dashboard</p>
+          <p className="text-xs font-inter text-mid-gray">{error}</p>
         </div>
       </div>
     )
   }
 
   const CARDS = [
-    { icon: Users,      label: 'Total Users',           value: stats?.total_users ?? 0,          prefix: '',  accentColor: '#6366F1', sub: `+${stats?.user_growth_pct ?? 0}%`, delay: 0    },
-    { icon: DollarSign, label: 'Monthly Recurring Rev',  value: Math.round(stats?.mrr ?? 0),      prefix: '₹', accentColor: '#F59E0B', sub: '↑ MRR',                            delay: 0.06 },
-    { icon: CreditCard, label: 'Active Subscriptions',   value: stats?.active_subscriptions ?? 0, prefix: '',  accentColor: '#22C55E', sub: null,                               delay: 0.12 },
-    { icon: TrendingUp, label: 'Total Revenue',           value: Math.round(stats?.total_revenue ?? 0), prefix: '₹', accentColor: '#EC4899', sub: null,                         delay: 0.18 },
+    { icon: Users,      label: 'Total Users',          value: stats?.total_users ?? 0,              prefix: '',  trend: stats?.user_growth_pct ?? 0, delay: 0    },
+    { icon: DollarSign, label: 'Monthly Recurring Rev', value: Math.round(stats?.mrr ?? 0),          prefix: '₹', trend: 12,                           delay: 0.06 },
+    { icon: CreditCard, label: 'Active Subscriptions',  value: stats?.active_subscriptions ?? 0,     prefix: '',  trend: 8,                            delay: 0.12 },
+    { icon: TrendingUp, label: 'Total Revenue',         value: Math.round(stats?.total_revenue ?? 0), prefix: '₹', trend: null,                         delay: 0.18 },
   ]
+
+  const AXIS_STYLE = { fill: '#898989', fontSize: 11, fontFamily: 'Inter' }
 
   return (
     <div>
-      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}
-        className="mb-6">
-        <h1 className="font-display font-bold text-2xl" style={{ color: 'var(--text-primary)' }}>Dashboard</h1>
-        <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-10"
+      >
+        <h1 className="font-cal-sans font-semibold text-4xl text-charcoal tracking-tight">
+          Dashboard
+        </h1>
+        <p className="text-sm font-inter text-mid-gray mt-2">
           Platform overview · {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
         </p>
       </motion.div>
 
-      {/* KPI Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         {CARDS.map(c => <KpiCard key={c.label} {...c} />)}
       </div>
 
-      {/* Charts + Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-        {/* Revenue chart */}
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+        {/* Revenue */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.24, duration: 0.35 }}
-          className="card p-5 lg:col-span-2"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.24, duration: 0.4 }}
+          className="lg:col-span-2 bg-white rounded-lg p-8 shadow-level-2-card"
         >
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-start justify-between mb-8">
             <div>
-              <p className="font-display font-semibold" style={{ color: 'var(--text-primary)' }}>Revenue Growth</p>
-              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Monthly revenue (12 mo)</p>
+              <h2 className="font-cal-sans font-semibold text-xl text-charcoal">Revenue Growth</h2>
+              <p className="font-inter text-sm text-mid-gray mt-1">Monthly revenue (12 months)</p>
             </div>
-            <span className="text-xs px-2.5 py-1 rounded-lg font-medium"
-              style={{ background: 'rgba(245,158,11,0.12)', color: 'var(--accent)' }}>
+            <span className="font-inter text-sm font-semibold text-charcoal bg-gray-50 rounded-lg px-3 py-1.5 border border-border-gray">
               ₹{Math.round(stats?.mrr ?? 0).toLocaleString()} MRR
             </span>
           </div>
-          <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={revenueData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
+          <ResponsiveContainer width="100%" height={240}>
+            <AreaChart data={revenueData} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
               <defs>
                 <linearGradient id="gradRevenue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#F59E0B" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#F59E0B" stopOpacity={0}    />
+                  <stop offset="5%"  stopColor="#242424" stopOpacity={0.10} />
+                  <stop offset="95%" stopColor="#242424" stopOpacity={0}    />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#475569', fontSize: 11 }} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fill: '#475569', fontSize: 11 }}
-                tickFormatter={v => `₹${(v/1000).toFixed(0)}k`} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(34,42,53,0.05)" vertical={false} />
+              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_STYLE} />
+              <YAxis axisLine={false} tickLine={false} tick={AXIS_STYLE} tickFormatter={v => `₹${(v / 1000).toFixed(0)}k`} />
               <Tooltip content={<ChartTooltip />} />
               <Area type="monotone" dataKey="revenue" name="Revenue"
-                stroke="#F59E0B" strokeWidth={2} fill="url(#gradRevenue)" dot={false} activeDot={{ r: 4, fill: '#F59E0B' }} />
+                stroke="#242424" strokeWidth={2} fill="url(#gradRevenue)"
+                dot={false} activeDot={{ r: 5, fill: '#242424' }} />
             </AreaChart>
           </ResponsiveContainer>
         </motion.div>
 
-        {/* New users bar */}
+        {/* New Users */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.30, duration: 0.35 }}
-          className="card p-5"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.30, duration: 0.4 }}
+          className="bg-white rounded-lg p-8 shadow-level-2-card"
         >
-          <p className="font-display font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>New Users</p>
-          <p className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>Daily signups (30 days)</p>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={signupData} margin={{ top: 4, right: 4, bottom: 0, left: -10 }}
-              barSize={14}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#475569', fontSize: 10 }} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fill: '#475569', fontSize: 10 }} />
+          <h2 className="font-cal-sans font-semibold text-xl text-charcoal mb-1">New Users</h2>
+          <p className="font-inter text-sm text-mid-gray mb-6">Daily signups (30 days)</p>
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={signupData} margin={{ top: 8, right: 8, bottom: 0, left: -16 }} barSize={14}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(34,42,53,0.05)" vertical={false} />
+              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_STYLE} />
+              <YAxis axisLine={false} tickLine={false} tick={AXIS_STYLE} />
               <Tooltip content={<ChartTooltip />} />
-              <Bar dataKey="newUsers" name="Users" fill="#6366F1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="newUsers" name="Users" fill="#242424" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
       </div>
 
-      {/* Key stats row */}
+      {/* Secondary Metrics */}
       <motion.div
-        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.36, duration: 0.35 }}
-        className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.36, duration: 0.4 }}
+        className="grid grid-cols-2 lg:grid-cols-4 gap-6"
       >
         {[
-          { label: 'Active Users (7d)', value: (stats?.active_users ?? 0).toLocaleString(), color: '#22C55E' },
-          { label: 'New This Month',    value: (stats?.new_users_month ?? 0).toLocaleString(), color: '#6366F1' },
-          { label: 'Total Roadmaps',    value: (stats?.total_roadmaps ?? 0).toLocaleString(), color: '#F59E0B' },
-          { label: 'Tasks Completed',   value: (stats?.tasks_completed ?? 0).toLocaleString(), color: '#EC4899' },
-        ].map(({ label, value, color }) => (
-          <div key={label} className="card p-4">
-            <p className="text-xs mb-1.5" style={{ color: 'var(--text-muted)' }}>{label}</p>
-            <p className="font-display font-bold text-xl" style={{ color }}>{value}</p>
+          { label: 'Active Users (7d)', value: (stats?.active_users    ?? 0).toLocaleString() },
+          { label: 'New This Month',    value: (stats?.new_users_month ?? 0).toLocaleString() },
+          { label: 'Total Roadmaps',    value: (stats?.total_roadmaps  ?? 0).toLocaleString() },
+          { label: 'Tasks Completed',   value: (stats?.tasks_completed ?? 0).toLocaleString() },
+        ].map(({ label, value }) => (
+          <div key={label} className="bg-white rounded-lg p-6 shadow-level-2-card">
+            <p className="font-inter text-xs text-mid-gray mb-2">{label}</p>
+            <p className="font-cal-sans font-semibold text-2xl text-charcoal">{value}</p>
           </div>
         ))}
       </motion.div>

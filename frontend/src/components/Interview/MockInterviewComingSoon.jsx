@@ -42,7 +42,7 @@ export default function MockInterviewComingSoon() {
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.2, duration: 0.5 }}
-                    className="inline-flex items-center gap-2 bg-white/80 dark:bg-charcoal/80 backdrop-blur-xl px-5 py-2.5 rounded-full shadow-sm border border-borderMuted dark:border-white/10 mb-8"
+                    className="inline-flex items-center gap-2 bg-white dark:bg-charcoal px-5 py-2.5 rounded-full shadow-sm border border-borderMuted dark:border-gray-700 mb-8"
                 >
                     <span className="relative flex h-3 w-3">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-terracotta opacity-75"></span>
@@ -109,7 +109,7 @@ export default function MockInterviewComingSoon() {
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.7 + index * 0.1, duration: 0.4 }}
-                            className="flex items-center gap-2 bg-white/70 dark:bg-charcoal/70 backdrop-blur-sm px-4 py-2 rounded-full border border-borderMuted dark:border-white/10 text-sm text-textPrimary dark:text-gray-300 font-outfit"
+                            className="flex items-center gap-2 bg-white dark:bg-charcoal px-4 py-2 rounded-full border border-borderMuted dark:border-gray-700 text-sm text-textPrimary dark:text-gray-300 font-outfit"
                         >
                             <span>{feature.icon}</span>
                             <span>{feature.text}</span>
@@ -122,7 +122,7 @@ export default function MockInterviewComingSoon() {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8, duration: 0.6 }}
-                    className="bg-white/60 dark:bg-charcoal/60 backdrop-blur-xl rounded-2xl p-8 shadow-soft border border-borderMuted dark:border-white/10 mb-10"
+                    className="bg-white dark:bg-charcoal rounded-2xl p-8 shadow-soft border border-borderMuted dark:border-gray-700 mb-10"
                 >
                     <p className="text-textSecondary dark:text-gray-400 leading-relaxed text-lg font-outfit">
                         Get ready to ace your next interview! Our intelligent mock interview system will simulate real interview scenarios,
@@ -149,7 +149,7 @@ export default function MockInterviewComingSoon() {
 
                     <button
                         onClick={() => window.open('mailto:support@planorah.me?subject=Notify%20me%20about%20Mock%20Interview', '_blank')}
-                        className="inline-flex items-center gap-2 px-8 py-4 bg-white/80 dark:bg-charcoal/80 text-textPrimary dark:text-gray-300 rounded-xl font-semibold border border-borderMuted dark:border-white/10 hover:bg-white dark:hover:bg-charcoalMuted transition-all duration-200 hover:scale-[1.02] font-outfit"
+                        className="inline-flex items-center gap-2 px-8 py-4 bg-white dark:bg-charcoal text-textPrimary dark:text-gray-300 rounded-xl font-semibold border border-borderMuted dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-charcoalMuted transition-all duration-200 hover:scale-[1.02] font-outfit"
                     >
                         <span>🔔</span>
                         <span>Notify Me</span>

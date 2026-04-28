@@ -2,62 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Cal Sans — self-hosted */
+@font-face {
+  font-family: 'Cal Sans';
+  src: url('/fonts/CalSans-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --bg-base:       #080A0F;
-  --bg-surface:    #0F1117;
-  --bg-elevated:   #161820;
-  --bg-hover:      #1C1F2A;
-  --accent:        #F59E0B;
-  --accent-light:  #FCD34D;
-  --accent-muted:  rgba(245, 158, 11, 0.12);
-  --accent-border: rgba(245, 158, 11, 0.30);
-  --text-primary:  #F1F5F9;
-  --text-secondary:#94A3B8;
-  --text-muted:    #475569;
-  --border:        rgba(255, 255, 255, 0.06);
-  --border-bright: rgba(255, 255, 255, 0.10);
-  --success:       #22C55E;
-  --error:         #EF4444;
-  --warning:       #F59E0B;
-  --info:          #38BDF8;
+  /* Cal.com monochromatic palette */
+  --charcoal:      #242424;
+  --midnight:      #111111;
+  --mid-gray:      #898989;
+  --white:         #ffffff;
+  --border-ring:   rgba(34, 42, 53, 0.08);
+  --border-bright: rgba(34, 42, 53, 0.14);
+
+  /* Semantic */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error:   #ef4444;
+  --info:    #3b82f6;
 }
 
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
-*::-webkit-scrollbar       { width: 4px; height: 4px; }
-*::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
 
-html, body {
-  background-color: var(--bg-base);
-  color: var(--text-primary);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+html,
+body {
+  background-color: #ffffff;
+  color: #242424;
+  font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.font-display { font-family: 'Syne', sans-serif; }
+/* Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(34, 42, 53, 0.15) transparent;
+}
+*::-webkit-scrollbar       { width: 4px; height: 4px; }
+*::-webkit-scrollbar-thumb { background: rgba(34, 42, 53, 0.15); border-radius: 4px; }
 
-/* grain overlay */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  background-size: 128px 128px;
+/* Cal.com card — white + multi-layered shadow ring */
+.card {
+  background: #ffffff;
+  box-shadow:
+    rgba(19, 19, 22, 0.7) 0px 1px 5px -4px,
+    rgba(34, 42, 53, 0.08) 0px 0px 0px 1px,
+    rgba(34, 42, 53, 0.05) 0px 4px 8px 0px;
+  border-radius: 8px;
 }
 
-/* shimmer skeleton */
+/* Skeleton shimmer — light mode */
 .skeleton {
   background: linear-gradient(
     90deg,
-    rgba(255,255,255,0.04) 25%,
-    rgba(255,255,255,0.08) 50%,
-    rgba(255,255,255,0.04) 75%
+    #f3f4f6 25%,
+    #e5e7eb 50%,
+    #f3f4f6 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.6s infinite linear;
@@ -69,18 +78,13 @@ body::before {
   100% { background-position:  200% 0; }
 }
 
-/* card base */
-.card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
+/* Table row hover */
+tr.row-hover:hover td {
+  background: rgba(34, 42, 53, 0.02);
 }
 
-/* focus ring */
+/* Focus ring */
 .focus-ring:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid rgba(59, 130, 246, 0.5);
   outline-offset: 2px;
 }
-
-/* table hover */
-tr.row-hover:hover td { background: var(--bg-hover); }

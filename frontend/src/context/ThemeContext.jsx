@@ -13,11 +13,11 @@ export const useTheme = () => {
 export const ThemeProvider = ({ children }) => {
     const themeTransitionTimerRef = useRef(null);
     const [theme, setTheme] = useState(() => {
-        // Check localStorage first, then system preference
+        // Check localStorage first
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) return savedTheme;
 
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        return 'dark'; // Default to dark theme for all users
     });
 
     useEffect(() => {
@@ -26,8 +26,10 @@ export const ThemeProvider = ({ children }) => {
 
         if (theme === 'dark') {
             root.classList.add('dark');
+            root.classList.remove('light');
         } else {
             root.classList.remove('dark');
+            root.classList.add('light');
         }
 
         localStorage.setItem('theme', theme);
