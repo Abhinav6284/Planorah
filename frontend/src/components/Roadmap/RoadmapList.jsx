@@ -37,7 +37,7 @@ export default function RoadmapList() {
     };
 
     return (
-        <div className="min-h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+        <div className="min-h-full bg-gray-50 dark:bg-charcoalDark transition-colors duration-300">
             <div className="p-4 sm:p-8 md:p-12 max-w-7xl mx-auto font-sans overflow-auto">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8 sm:mb-12">
                     <div>
@@ -56,19 +56,19 @@ export default function RoadmapList() {
                 {loading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {[1, 2, 3].map((i) => (
-                            <div key={i} className="h-64 bg-gray-100 dark:bg-gray-800 rounded-3xl animate-pulse" />
+                            <div key={i} className="h-64 bg-gray-100 dark:bg-charcoal rounded-3xl animate-pulse" />
                         ))}
                     </div>
                 ) : roadmaps.length === 0 ? (
-                    <div className="text-center py-32 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border border-gray-100 dark:border-gray-700 border-dashed">
-                        <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+                    <div className="text-center py-32 bg-gray-50 dark:bg-charcoal/50 rounded-3xl border border-gray-100 dark:border-charcoalMuted border-dashed">
+                        <div className="w-16 h-16 bg-white dark:bg-charcoal rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
                             <FaMapMarkedAlt className="text-2xl text-gray-400 dark:text-gray-500" />
                         </div>
                         <h3 className="text-xl font-serif font-medium text-gray-900 dark:text-white mb-2">No roadmaps yet</h3>
                         <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto">Start your learning journey by creating a personalized roadmap powered by AI.</p>
                         <button
                             onClick={() => navigate("/roadmap/generate")}
-                            className="px-8 py-3 bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                            className="px-8 py-3 bg-white dark:bg-charcoal text-black dark:text-white border border-gray-200 dark:border-charcoalMuted rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-charcoalMuted transition-colors"
                         >
                             Create First Roadmap
                         </button>
@@ -82,12 +82,12 @@ export default function RoadmapList() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.1 }}
                                 onClick={() => navigate(`/roadmap/${roadmap.id}`)}
-                                className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group relative overflow-hidden"
+                                className="bg-white dark:bg-charcoal p-6 rounded-3xl border border-gray-100 dark:border-charcoalMuted shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group relative overflow-hidden"
                             >
                                 <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                                     <button
                                         onClick={(e) => handleDelete(e, roadmap.id)}
-                                        className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-700 text-red-500 rounded-full shadow-sm hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                                        className="w-8 h-8 flex items-center justify-center bg-white dark:bg-charcoalMuted text-red-500 rounded-full shadow-sm hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
                                     >
                                         <FaTrash size={12} />
                                     </button>
@@ -107,7 +107,7 @@ export default function RoadmapList() {
                                     </p>
                                 </div>
 
-                                <div className="flex items-center justify-between pt-6 border-t border-gray-50 dark:border-gray-700">
+                                <div className="flex items-center justify-between pt-6 border-t border-gray-50 dark:border-charcoalMuted">
                                     <div className="flex items-center gap-2 text-xs font-medium text-gray-400 dark:text-gray-500">
                                         <FaClock />
                                         <span>{roadmap.estimated_duration}</span>

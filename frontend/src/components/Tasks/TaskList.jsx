@@ -235,7 +235,7 @@ export default function TaskList() {
     if (loading) return <Loader message="Loading your tasks..." />;
 
     return (
-        <div className="min-h-full bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-full bg-gray-50 dark:bg-charcoalDark">
             <div className="p-6 md:p-10 relative">
                 <header className="mb-8">
                     <h1 className="text-3xl font-serif font-medium text-gray-900 dark:text-white mb-2">My Tasks</h1>
@@ -243,7 +243,7 @@ export default function TaskList() {
                 </header>
 
                 {/* Roadmap Selector */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 mb-6 border border-gray-100 dark:border-gray-700">
+                <div className="bg-white dark:bg-charcoal rounded-2xl p-6 mb-6 border border-gray-100 dark:border-charcoalMuted">
                     <div className="flex flex-col md:flex-row md:items-center gap-4">
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -256,7 +256,7 @@ export default function TaskList() {
                                         setSelectedRoadmap(e.target.value);
                                         setLoading(true);
                                     }}
-                                    className="w-full md:w-80 px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white font-medium appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+                                    className="w-full md:w-80 px-4 py-3 bg-gray-50 dark:bg-charcoalDark border border-gray-200 dark:border-charcoalMuted rounded-xl text-gray-900 dark:text-white font-medium appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
                                 >
                                     <option value="all">📚 All Roadmaps</option>
                                     {roadmaps.map(roadmap => (
@@ -276,7 +276,7 @@ export default function TaskList() {
                             <motion.div
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-xl"
+                                className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-charcoal/30 text-blue-700 dark:text-blue-300 rounded-xl"
                             >
                                 <span className="text-sm font-medium">Viewing: {selectedRoadmapName}</span>
                                 <button
@@ -294,14 +294,14 @@ export default function TaskList() {
                 </div>
 
                 {/* Progress Bar */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 mb-6 border border-gray-100 dark:border-gray-700">
+                <div className="bg-white dark:bg-charcoal rounded-2xl p-6 mb-6 border border-gray-100 dark:border-charcoalMuted">
                     <div className="flex justify-between items-center mb-3">
                         <span className="font-medium text-gray-900 dark:text-white">
                             {selectedRoadmap === 'all' ? 'Overall Progress' : `${selectedRoadmapName} Progress`}
                         </span>
                         <span className="text-sm text-gray-500 dark:text-gray-400">{completedCount} / {totalCount} completed</span>
                     </div>
-                    <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div className="h-3 bg-gray-100 dark:bg-charcoalMuted rounded-full overflow-hidden">
                         <motion.div
                             className="h-full bg-gradient-to-r from-green-500 to-emerald-500"
                             initial={{ width: 0 }}
@@ -322,7 +322,7 @@ export default function TaskList() {
                             }}
                             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${filter === status
                                 ? 'bg-black dark:bg-white text-white dark:text-black'
-                                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                                : 'bg-gray-100 dark:bg-charcoal text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-charcoalMuted'
                                 }`}
                         >
                             {status === 'all' ? 'All Tasks' : status.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
@@ -333,7 +333,7 @@ export default function TaskList() {
                 {/* Grouped Task List */}
                 <div className="space-y-12">
                     {Object.keys(groupedTasks).length === 0 ? (
-                        <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
+                        <div className="text-center py-20 bg-white dark:bg-charcoal rounded-2xl border border-gray-100 dark:border-charcoalMuted">
                             <p className="text-gray-300 text-xl font-semibold mb-2">{emptyTitle}</p>
                             <p className="text-gray-500 mb-6">{emptySubtitle}</p>
                             {isRoadmapScoped && tasksMeta?.selected_roadmap_name && (
@@ -363,7 +363,7 @@ export default function TaskList() {
                                             setFilter('all');
                                             setLoading(true);
                                         }}
-                                        className="px-5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                        className="px-5 py-2.5 rounded-xl border border-gray-300 dark:border-charcoalMuted text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-charcoalMuted transition-colors"
                                     >
                                         Clear Status Filter
                                     </button>
@@ -374,7 +374,7 @@ export default function TaskList() {
                                             setSelectedRoadmap('all');
                                             setLoading(true);
                                         }}
-                                        className="px-5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                        className="px-5 py-2.5 rounded-xl border border-gray-300 dark:border-charcoalMuted text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-charcoalMuted transition-colors"
                                     >
                                         Show All Roadmaps
                                     </button>
@@ -393,16 +393,16 @@ export default function TaskList() {
                     ) : (
                         Object.entries(groupedTasks).map(([roadmapTitle, days]) => (
                             <div key={roadmapTitle} className="animate-fade-in">
-                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 border-b border-gray-200 dark:border-gray-700 pb-2">
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 border-b border-gray-200 dark:border-charcoalMuted pb-2">
                                     {roadmapTitle}
                                 </h2>
                                 <div className="space-y-8">
                                     {Object.entries(days)
                                         .sort((a, b) => parseInt(a[0].split(' ')[1]) - parseInt(b[0].split(' ')[1]))
                                         .map(([day, dayTasks]) => (
-                                            <div key={day} className="bg-white dark:bg-gray-800/50 rounded-2xl p-6 border border-gray-100 dark:border-gray-700/50">
+                                            <div key={day} className="bg-white dark:bg-charcoal/50 rounded-2xl p-6 border border-gray-100 dark:border-charcoalMuted/50">
                                                 <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
-                                                    <span className="bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-lg text-sm">{day}</span>
+                                                    <span className="bg-gray-100 dark:bg-charcoalMuted px-3 py-1 rounded-lg text-sm">{day}</span>
                                                     <span className="text-sm font-normal text-gray-500">
                                                         ({dayTasks.length} tasks)
                                                     </span>
@@ -419,7 +419,7 @@ export default function TaskList() {
                                                         >
                                                             {task.milestone_title && (
                                                                 <div className="absolute -top-2 left-4 z-10">
-                                                                    <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-blue-100 dark:border-blue-800">
+                                                                    <span className="bg-blue-50 dark:bg-charcoal/30 text-blue-600 dark:text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-blue-100 dark:border-blue-800">
                                                                         {task.milestone_title}
                                                                     </span>
                                                                 </div>
@@ -456,7 +456,7 @@ export default function TaskList() {
                             <span className="font-medium">Task deleted</span>
                             <button
                                 onClick={handleUndo}
-                                className="flex items-center gap-2 bg-gray-700 dark:bg-gray-200 text-white dark:text-black px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-gray-600 dark:hover:bg-gray-300 transition-colors"
+                                className="flex items-center gap-2 bg-gray-700 dark:bg-charcoalMuted200 text-white dark:text-black px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-gray-600 dark:hover:bg-gray-300 transition-colors"
                             >
                                 <FaUndo className="text-xs" /> Undo
                             </button>

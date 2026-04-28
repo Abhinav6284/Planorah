@@ -66,7 +66,7 @@ class UploadService:
         return {
             "category": normalized_category,
             "file_name": filename,
-            "file_path": str(target_path),
+            "file_path": relative_path,
             "public_url": public_url,
         }
 

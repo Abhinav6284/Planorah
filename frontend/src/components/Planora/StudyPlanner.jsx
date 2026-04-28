@@ -10,11 +10,11 @@ import { planoraService } from '../../api/planoraService';
 
 const SessionCard = ({ session }) => (
   <div className="flex items-start gap-3 py-2">
-    <div className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 mt-2 shrink-0" />
+    <div className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-[#1a1a1a]Muted500 mt-2 shrink-0" />
     <div className="flex-1 min-w-0">
       <div className="flex items-center gap-2 flex-wrap">
         <span className="text-sm font-medium text-gray-900 dark:text-white">{session.topic_name}</span>
-        <span className="text-[10px] text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
+        <span className="text-[10px] text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-[#1a1a1a]Muted px-2 py-0.5 rounded-full">
           {session.duration_minutes} min
         </span>
       </div>
@@ -35,7 +35,7 @@ const DayCard = ({ day, index }) => {
   return (
     <motion.div
       layout
-      className={`bg-white dark:bg-gray-800 rounded-2xl border transition-colors ${isToday ? 'border-gray-900 dark:border-white' : 'border-gray-200 dark:border-gray-700'} overflow-hidden`}
+      className={`bg-white dark:bg-[#1a1a1a] rounded-2xl border transition-colors ${isToday ? 'border-gray-900 dark:border-white' : 'border-gray-200 dark:border-white/5'} overflow-hidden`}
     >
       <button
         onClick={() => setOpen(o => !o)}
@@ -67,7 +67,7 @@ const DayCard = ({ day, index }) => {
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="px-5 pb-4 border-t border-gray-100 dark:border-gray-700 divide-y divide-gray-50 dark:divide-gray-700/50">
+            <div className="px-5 pb-4 border-t border-gray-100 dark:border-white/5 divide-y divide-gray-50 dark:divide-charcoalMuted/50">
               {(day.sessions || []).map((s, i) => <SessionCard key={i} session={s} />)}
               {day.notes && (
                 <p className="text-xs text-gray-500 dark:text-gray-400 pt-2 italic">{day.notes}</p>
@@ -129,14 +129,14 @@ export default function StudyPlanner() {
 
   if (loading) {
     return (
-      <div className="min-h-[calc(100vh-80px)] bg-[#F5F5F7] dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-[calc(100vh-80px)] bg-[#F5F5F7] dark:bg-[#1a1a1a]Dark flex items-center justify-center">
         <div className="text-sm text-gray-400">Loading…</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-[#F5F5F7] dark:bg-gray-900 transition-colors">
+    <div className="min-h-[calc(100vh-80px)] bg-[#F5F5F7] dark:bg-[#1a1a1a]Dark transition-colors">
       <div className="max-w-3xl mx-auto px-4 py-10">
         {/* Back */}
         <Link to={`/planora/subject/${subjectId}`} className="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6 transition-colors">
@@ -147,7 +147,7 @@ export default function StudyPlanner() {
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">AI-generated day-by-day schedule based on your topics.</p>
 
         {/* Generate form */}
-        <form onSubmit={handleGenerate} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 mb-8">
+        <form onSubmit={handleGenerate} className="bg-white dark:bg-[#1a1a1a] rounded-2xl border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] p-6 mb-8">
           <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4">
             {plan ? 'Regenerate Plan' : 'Generate Plan'}
           </h3>
@@ -158,7 +158,7 @@ export default function StudyPlanner() {
                 type="date"
                 value={form.exam_date}
                 onChange={e => setForm(f => ({ ...f, exam_date: e.target.value }))}
-                className="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white"
+                className="px-4 py-2.5 rounded-xl border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] bg-gray-50 dark:bg-[#1a1a1a]Dark text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white"
               />
             </div>
             <div>
@@ -166,7 +166,7 @@ export default function StudyPlanner() {
               <select
                 value={form.daily_hours}
                 onChange={e => setForm(f => ({ ...f, daily_hours: e.target.value }))}
-                className="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white"
+                className="px-4 py-2.5 rounded-xl border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] bg-gray-50 dark:bg-[#1a1a1a]Dark text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white"
               >
                 {[1, 1.5, 2, 2.5, 3, 4, 5, 6, 8].map(h => (
                   <option key={h} value={h}>{h}h/day</option>

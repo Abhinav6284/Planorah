@@ -4,17 +4,95 @@ import django.db.models.deletion
 from django.db import migrations, models
 
 
+def _alter_linked_task_field(apps, schema_editor):
+    """
+    Alter the scheduler_event.linked_task_id column to point at tasks.task
+    (uuid PK). When tasks.0004 has already converted the column to uuid we
+    only need to refresh the FK constraint; when it is still bigint (legacy
+    on-disk DB) we drop and recreate it.
+    """
+    if schema_editor.connection.vendor != "postgresql":
+        return
+
+    with schema_editor.connection.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT data_type
+            FROM information_schema.columns
+            WHERE table_name = 'scheduler_event'
+              AND column_name = 'linked_task_id'
+            """
+        )
+        row = cursor.fetchone()
+        col_type = row[0] if row else None
+
+    if col_type == 'uuid':
+        # Column already converted to uuid (tasks.0004 ran before scheduler.0004
+        # in a fresh test database). Just ensure the FK constraint is correct.
+        schema_editor.execute(
+            """
+            ALTER TABLE scheduler_event
+                DROP CONSTRAINT IF EXISTS scheduler_event_linked_task_id_75557d58_fk_tasks_task_id;
+            ALTER TABLE scheduler_event
+                DROP CONSTRAINT IF EXISTS scheduler_event_linked_task_id_fk;
+            """
+        )
+        schema_editor.execute(
+            """
+            ALTER TABLE scheduler_event
+                ADD CONSTRAINT scheduler_event_linked_task_id_fk
+                FOREIGN KEY (linked_task_id)
+                REFERENCES tasks_task(task_id)
+                DEFERRABLE INITIALLY DEFERRED;
+            """
+        )
+    else:
+        # Column is still bigint (production upgrade path): drop and recreate.
+        schema_editor.execute(
+            """
+            ALTER TABLE scheduler_event
+                DROP CONSTRAINT IF EXISTS scheduler_event_linked_task_id_75557d58_fk_tasks_task_id;
+            ALTER TABLE scheduler_event DROP COLUMN IF EXISTS linked_task_id;
+            ALTER TABLE scheduler_event ADD COLUMN linked_task_id uuid NULL;
+            ALTER TABLE scheduler_event
+                ADD CONSTRAINT scheduler_event_linked_task_id_fk
+                FOREIGN KEY (linked_task_id)
+                REFERENCES tasks_task(task_id)
+                DEFERRABLE INITIALLY DEFERRED;
+            """
+        )
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
         ('scheduler', '0003_spotifycredential'),
-        ('tasks', '0001_initial'),
+        ('tasks', '0004_taskvalidator_and_more'),
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='event',
-            name='linked_task',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='calendar_events', to='tasks.task'),
+        # Use SeparateDatabaseAndState so the ORM state is updated without
+        # Django trying to issue its own ALTER COLUMN TYPE (which would fail
+        # on the bigint -> uuid cast or be redundant when already uuid).
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunPython(
+                    code=_alter_linked_task_field,
+                    reverse_code=migrations.RunPython.noop,
+                ),
+            ],
+            state_operations=[
+                migrations.AlterField(
+                    model_name='event',
+                    name='linked_task',
+                    field=models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='calendar_events',
+                        to='tasks.task',
+                    ),
+                ),
+            ],
         ),
     ]

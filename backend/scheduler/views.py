@@ -333,3 +333,49 @@ def spotify_control(request):
         return Response({"error": str(e), "spotify_error": e.response.json().get('error', {})}, status=e.response.status_code)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# --- Safe OAuth Status Endpoints (no token exposure) ---
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def google_status(request):
+    """
+    Get Google Calendar connection status.
+    SAFE: Returns only metadata, never exposes tokens.
+    """
+    try:
+        credential = GoogleCredential.objects.get(user=request.user)
+        from .serializers import GoogleCredentialStatusSerializer
+        serializer = GoogleCredentialStatusSerializer(credential)
+        return Response({
+            'connected': True,
+            **serializer.data
+        })
+    except GoogleCredential.DoesNotExist:
+        return Response({
+            'connected': False,
+            'message': 'Google Calendar not connected'
+        })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def spotify_status(request):
+    """
+    Get Spotify connection status.
+    SAFE: Returns only metadata, never exposes tokens.
+    """
+    try:
+        credential = SpotifyCredential.objects.get(user=request.user)
+        from .serializers import SpotifyCredentialStatusSerializer
+        serializer = SpotifyCredentialStatusSerializer(credential)
+        return Response({
+            'connected': True,
+            **serializer.data
+        })
+    except SpotifyCredential.DoesNotExist:
+        return Response({
+            'connected': False,
+            'message': 'Spotify not connected'
+        })

@@ -87,7 +87,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                 onClick={() => setSelectedDate(day.isoDate)}
                                 className={`flex flex-col items-center justify-center min-w-[42px] sm:min-w-[50px] h-[58px] sm:h-[66px] rounded-2xl transition-all duration-200 flex-shrink-0 ${isSelected
                                     ? 'bg-[#E0C8FF] text-black scale-105 z-10'
-                                    : 'bg-gray-100 dark:bg-[#1C1C1E] text-gray-500 hover:bg-gray-200 dark:hover:bg-[#2C2C2E] hover:text-gray-900 dark:hover:text-white'
+                                    : 'bg-gray-100 dark:bg-charcoal text-gray-500 hover:bg-gray-200 dark:hover:bg-[#2C2C2E] hover:text-gray-900 dark:hover:text-white'
                                     }`}
                             >
                                 <span className={`text-sm sm:text-base font-bold leading-none mb-0.5 ${isSelected ? 'text-black' : 'text-gray-700 dark:text-gray-200'}`}>
@@ -137,7 +137,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                                     transition={{ delay: i * 0.05 }}
                                     key={task.id || i}
                                     onClick={() => handleTaskClick(task)}
-                                    className="group flex items-center gap-3 p-3 rounded-xl bg-white/60 dark:bg-[#1C1C1E]/60 hover:bg-white/80 dark:hover:bg-[#2C2C2E]/80 backdrop-blur-md border border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10 transition-all hover:shadow-md cursor-pointer"
+                                    className="group flex items-center gap-3 p-3 rounded-xl bg-white/60 dark:bg-charcoal/60 hover:bg-white/80 dark:hover:bg-[#2C2C2E]/80 backdrop-blur-md border border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10 transition-all hover:shadow-md cursor-pointer"
                                 >
                                     {/* Task Number/Icon */}
                                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${task.status === 'completed' ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
@@ -209,7 +209,7 @@ const TaskSchedulerWidget = ({ tasks = [] }) => {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className="bg-white dark:bg-[#1C1C1E] rounded-3xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden"
+                            className="bg-white dark:bg-charcoal rounded-3xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden"
                             onClick={(e) => e.stopPropagation()}
                         >
                             {/* Modal Header */}

@@ -71,7 +71,7 @@ const ProfileCard = ({ user, streak, variant = 'default', summaryItems = [], cur
         <div
             className={`rounded-[32px] p-6 flex flex-col gap-6 border relative overflow-hidden group ${isExecution
                 ? 'bg-[linear-gradient(145deg,#10151f,#1a1c27_45%,#111723)] border-cyan-300/20 shadow-[0_22px_55px_rgba(0,0,0,0.45)]'
-                : 'bg-white dark:bg-[#1C1C1E] border-gray-100 dark:border-gray-800/60 shadow-xl shadow-gray-100/50 dark:shadow-none'
+                : 'bg-white dark:bg-charcoal border-gray-100 dark:border-charcoalMuted/60 shadow-xl shadow-gray-100/50 dark:shadow-none'
                 }`}
         >
 
@@ -88,13 +88,13 @@ const ProfileCard = ({ user, streak, variant = 'default', summaryItems = [], cur
                                 alt="User"
                                 className={`w-full h-full rounded-full object-cover border-2 ${isExecution
                                     ? 'bg-[#0d141f] border-[#0d141f]'
-                                    : 'bg-white dark:bg-zinc-900 border-white dark:border-zinc-900'
+                                    : 'bg-white dark:bg-charcoal border-white dark:border-charcoalMuted'
                                     }`}
                             />
                         </div>
                         <div className={`absolute -bottom-1 -right-1 p-1.5 rounded-full border shadow-sm ${isExecution
                             ? 'bg-[#0d141f] border-cyan-300/20'
-                            : 'bg-white dark:bg-zinc-800 border-gray-100 dark:border-zinc-700'
+                            : 'bg-white dark:bg-charcoal border-gray-100 dark:border-charcoalMuted'
                             }`}>
                             <div className="text-[10px]">✏️</div>
                         </div>
@@ -114,7 +114,7 @@ const ProfileCard = ({ user, streak, variant = 'default', summaryItems = [], cur
                             )}
                         </h3>
                         <p className={`text-sm font-medium ${isExecution ? 'text-cyan-100/70' : 'text-gray-500 dark:text-gray-400'}`}>
-                            {user?.role || "Planora Learner"}
+                            {user?.role || "Planorah Learner"}
                         </p>
                     </div>
                 </div>
@@ -145,7 +145,7 @@ const ProfileCard = ({ user, streak, variant = 'default', summaryItems = [], cur
             </div>
 
             {/* Streak Visualization - "Duolingo Style" */}
-            <div className={`z-10 rounded-2xl p-5 border w-full ${isExecution ? 'bg-black/20 border-cyan-300/15' : 'bg-gray-50 dark:bg-zinc-900/50 border-gray-100 dark:border-white/5'}`}>
+            <div className={`z-10 rounded-2xl p-5 border w-full ${isExecution ? 'bg-black/20 border-cyan-300/15' : 'bg-gray-50 dark:bg-charcoal/50 border-gray-100 dark:border-white/5'}`}>
                 <div className="flex justify-between items-center mb-4">
                     <span className={`text-xs font-bold uppercase tracking-widest ${isExecution ? 'text-cyan-100/55' : 'text-gray-400 dark:text-gray-500'}`}>
                         Week {weekNumber}
@@ -157,7 +157,7 @@ const ProfileCard = ({ user, streak, variant = 'default', summaryItems = [], cur
 
                 <div className="flex justify-between items-center relative w-full px-1 py-1">
                     {/* Connecting Line (Background) */}
-                    <div className={`absolute top-[18px] sm:top-[22px] left-4 right-4 h-1 rounded-full z-0 ${isExecution ? 'bg-cyan-200/10' : 'bg-gray-100 dark:bg-zinc-700/90'}`} />
+                    <div className={`absolute top-[18px] sm:top-[22px] left-4 right-4 h-1 rounded-full z-0 ${isExecution ? 'bg-cyan-200/10' : 'bg-gray-100 dark:bg-charcoal/90'}`} />
 
                     {/* Active Line Fill (Dynamic) */}
                     {weekDays.filter(d => d.active).length > 1 && (
@@ -187,10 +187,10 @@ const ProfileCard = ({ user, streak, variant = 'default', summaryItems = [], cur
                                         : day.isToday
                                             ? isExecution
                                                 ? 'w-6 h-6 sm:w-7 sm:h-7 bg-[#121a27] border-[2px] border-cyan-300 shadow-sm z-10'
-                                                : 'w-6 h-6 sm:w-7 sm:h-7 bg-white dark:bg-[#1C1C1E] border-[2px] border-orange-400 dark:border-orange-500 shadow-sm z-10'
+                                                : 'w-6 h-6 sm:w-7 sm:h-7 bg-white dark:bg-charcoal border-[2px] border-orange-400 dark:border-orange-500 shadow-sm z-10'
                                             : isExecution
                                                 ? 'w-2 h-2 sm:w-2.5 sm:h-2.5 bg-cyan-100/30'
-                                                : 'w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gray-200 dark:bg-zinc-700'
+                                                : 'w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gray-200 dark:bg-charcoal'
                                         }`}
                                 >
                                     {day.active ? (

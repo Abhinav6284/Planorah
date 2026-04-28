@@ -3,82 +3,144 @@ import { motion } from "framer-motion";
 import AITalkPanel from "./AITalkPanel";
 import AIVoicePanel from "./AIVoicePanel";
 
-// activeMode: null | "text" | "voice"
-
 /**
- * Floating "AI Talk" trigger buttons (Text + Voice).
- * Drop this anywhere to add AI mentoring capability to a page.
+ * Floating AI mentor trigger — voice + text.
+ * Drop this anywhere to add mentoring to a page.
  *
- * Props:
- *  - contextSource   (string, required)
- *  - studentGoal     (string, optional)
- *  - currentProgress (string, optional)
- *  - mode            ("panel" | "modal")  default "panel" (for text chat)
- *  - className       (string, optional)   extra wrapper classes
+ * Props: contextSource, studentGoal, currentProgress, mode, className
  */
 export default function AITalkButton({
-    contextSource = "general",
-    studentGoal = "",
-    currentProgress = "",
-    mode = "panel",
-    className = "",
+  contextSource = "general",
+  studentGoal = "",
+  currentProgress = "",
+  mode = "panel",
+  className = "",
 }) {
-    const [textOpen, setTextOpen] = useState(false);
-    const [voiceOpen, setVoiceOpen] = useState(false);
+  const [textOpen, setTextOpen] = useState(false);
+  const [voiceOpen, setVoiceOpen] = useState(false);
 
-    const openText = () => { setVoiceOpen(false); setTextOpen(true); };
-    const openVoice = () => { setTextOpen(false); setVoiceOpen(true); };
+  const openText  = () => { setVoiceOpen(false); setTextOpen(true); };
+  const openVoice = () => { setTextOpen(false); setVoiceOpen(true); };
 
-    return (
-        <>
-            <div className={`flex flex-wrap items-center gap-3 ${className}`}>
-                {/* Voice chat button */}
-                <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => openVoice()}
-                    className="flex items-center gap-3 px-4 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700/50 rounded-full text-gray-800 dark:text-gray-200 text-[15px] font-medium shadow-sm hover:shadow transition-all"
-                >
-                    <div className="relative w-6 h-6 rounded-full bg-[conic-gradient(at_center,_var(--tw-gradient-stops))] from-blue-500 via-cyan-400 to-blue-500 shadow-sm border border-blue-400/20 flex items-center justify-center overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-cyan-300/40 to-transparent mix-blend-overlay" />
-                    </div>
-                    Voice chat
-                </motion.button>
-
-                {/* Text chat button */}
-                <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => openText()}
-                    className="flex items-center gap-3 px-4 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700/50 rounded-full text-gray-800 dark:text-gray-200 text-[15px] font-medium shadow-sm hover:shadow transition-all"
-                >
-                    <div className="relative w-6 h-6 rounded-full bg-[conic-gradient(at_center,_var(--tw-gradient-stops))] from-purple-500 via-fuchsia-400 to-purple-500 shadow-sm border border-purple-400/20 flex items-center justify-center overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-fuchsia-300/40 to-transparent mix-blend-overlay" />
-                    </div>
-                    AI Chat
-                </motion.button>
-            </div>
-
-            {/* Text chat panel */}
-            <AITalkPanel
-                isOpen={textOpen}
-                onClose={() => setTextOpen(false)}
-                onSwitchToVoice={openVoice}
-                contextSource={contextSource}
-                studentGoal={studentGoal}
-                currentProgress={currentProgress}
-                mode={mode}
+  return (
+    <>
+      <div className={`flex flex-wrap items-center gap-2.5 ${className}`}>
+        {/* ── Voice button ── */}
+        <motion.button
+          whileHover={{ scale: 1.03, y: -1 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={openVoice}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 9,
+            padding: "8px 16px 8px 9px",
+            borderRadius: 100,
+            background: "rgba(13,148,136,0.1)",
+            border: "1px solid rgba(45,212,191,0.22)",
+            color: "#2DD4BF",
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: "pointer",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            letterSpacing: "-0.01em",
+          }}
+        >
+          {/* Mini teal orb */}
+          <div
+            style={{
+              width: 22,
+              height: 22,
+              borderRadius: "50%",
+              flexShrink: 0,
+              position: "relative",
+              overflow: "hidden",
+              background:
+                "radial-gradient(circle at 38% 32%, #A7F3D0 0%, #2DD4BF 22%, #0D9488 58%, #042F2E 100%)",
+              boxShadow: "0 0 10px rgba(45,212,191,0.4)",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "radial-gradient(circle at 30% 26%, rgba(255,255,255,0.6) 0%, transparent 45%)",
+                mixBlendMode: "overlay",
+              }}
             />
+          </div>
+          Voice
+        </motion.button>
 
-            {/* Voice panel */}
-            <AIVoicePanel
-                isOpen={voiceOpen}
-                onClose={() => setVoiceOpen(false)}
-                onSwitchToText={openText}
-                contextSource={contextSource}
-                studentGoal={studentGoal}
-                currentProgress={currentProgress}
+        {/* ── Text / Chat button ── */}
+        <motion.button
+          whileHover={{ scale: 1.03, y: -1 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={openText}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 9,
+            padding: "8px 16px 8px 9px",
+            borderRadius: 100,
+            background: "rgba(99,102,241,0.09)",
+            border: "1px solid rgba(129,140,248,0.22)",
+            color: "#818CF8",
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: "pointer",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            letterSpacing: "-0.01em",
+          }}
+        >
+          {/* Mini indigo orb */}
+          <div
+            style={{
+              width: 22,
+              height: 22,
+              borderRadius: "50%",
+              flexShrink: 0,
+              position: "relative",
+              overflow: "hidden",
+              background:
+                "radial-gradient(circle at 38% 32%, #C4B5FD 0%, #818CF8 22%, #4F46E5 58%, #1E1B4B 100%)",
+              boxShadow: "0 0 10px rgba(129,140,248,0.4)",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "radial-gradient(circle at 30% 26%, rgba(255,255,255,0.55) 0%, transparent 45%)",
+                mixBlendMode: "overlay",
+              }}
             />
-        </>
-    );
+          </div>
+          AI Chat
+        </motion.button>
+      </div>
+
+      <AITalkPanel
+        isOpen={textOpen}
+        onClose={() => setTextOpen(false)}
+        onSwitchToVoice={openVoice}
+        contextSource={contextSource}
+        studentGoal={studentGoal}
+        currentProgress={currentProgress}
+        mode={mode}
+      />
+
+      <AIVoicePanel
+        isOpen={voiceOpen}
+        onClose={() => setVoiceOpen(false)}
+        onSwitchToText={openText}
+        contextSource={contextSource}
+        studentGoal={studentGoal}
+      />
+    </>
+  );
 }

@@ -2,79 +2,60 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 export default function Loader({ message = "Loading..." }) {
+    const dots = [0, 1, 2];
+
     return (
-        <div className="fixed inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center z-50">
-            {/* Subtle background pattern */}
-            <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]"
-                style={{
-                    backgroundImage: `radial-gradient(circle at 1px 1px, rgba(0,0,0,0.15) 1px, transparent 0)`,
-                    backgroundSize: '24px 24px'
-                }}
-            />
-
-            <div className="relative flex flex-col items-center gap-8">
-                {/* Elegant spinner */}
-                <div className="relative w-16 h-16">
-                    {/* Outer ring */}
-                    <motion.div
-                        className="absolute inset-0 rounded-full"
-                        style={{
-                            background: 'conic-gradient(from 0deg, transparent, rgba(99, 102, 241, 0.4), transparent)',
-                        }}
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                    />
-
-                    {/* Inner ring */}
-                    <motion.div
-                        className="absolute inset-1 rounded-full"
-                        style={{
-                            background: 'conic-gradient(from 180deg, transparent, rgba(139, 92, 246, 0.3), transparent)',
-                        }}
-                        animate={{ rotate: -360 }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                    />
-
-                    {/* Center circle */}
-                    <div className="absolute inset-3 bg-white dark:bg-gray-900 rounded-full shadow-inner" />
-
-                    {/* Pulsing core */}
-                    <motion.div
-                        className="absolute inset-5 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-full"
-                        animate={{
-                            scale: [1, 1.15, 1],
-                            opacity: [0.8, 1, 0.8]
-                        }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-beigePrimary dark:bg-charcoalDark">
+            <motion.div
+                initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.24, ease: 'easeOut' }}
+                className="w-[min(92vw,420px)] rounded-2xl border border-borderMuted dark:border-gray-700 bg-white dark:bg-charcoal px-6 py-5 shadow-[0_16px_36px_rgba(47,39,32,0.12)] dark:shadow-[0_18px_40px_rgba(0,0,0,0.45)]"
+            >
+                <div className="mb-4 flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-terracotta" />
+                    <span className="h-px flex-1 bg-beigeMuted dark:bg-gray-700" />
+                    <span className="h-2 w-2 rounded-full bg-sage dark:bg-sage/80" />
                 </div>
 
-                {/* Message */}
-                <div className="flex flex-col items-center gap-3">
-                    <motion.p
-                        className="text-sm font-medium text-gray-600 dark:text-gray-400 tracking-wide"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                    >
-                        {message}
-                    </motion.p>
+                <motion.p
+                    className="text-sm font-semibold text-textPrimary dark:text-white"
+                    initial={{ opacity: 0.5 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
+                >
+                    {message}
+                </motion.p>
 
-                    {/* Minimal progress bar */}
-                    <div className="w-32 h-0.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div className="mt-4 space-y-2.5">
+                    {[78, 62, 70].map((width, index) => (
                         <motion.div
-                            className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full"
-                            initial={{ x: '-100%' }}
-                            animate={{ x: '100%' }}
+                            key={width}
+                            className="h-2 rounded-full bg-beigeMuted dark:bg-gray-700"
+                            style={{ width: `${width}%` }}
+                            animate={{ opacity: [0.35, 0.8, 0.35] }}
                             transition={{
                                 duration: 1.2,
                                 repeat: Infinity,
-                                ease: "easeInOut"
+                                ease: 'easeInOut',
+                                delay: index * 0.16,
                             }}
                         />
-                    </div>
+                    ))}
                 </div>
-            </div>
+
+                <div className="mt-5 flex items-center gap-2">
+                    {dots.map((dot) => (
+                        <motion.span
+                            key={dot}
+                            className="h-1.5 w-1.5 rounded-full bg-terracotta"
+                            animate={{ y: [0, -3, 0], opacity: [0.45, 1, 0.45] }}
+                            transition={{ duration: 0.9, repeat: Infinity, delay: dot * 0.12, ease: 'easeInOut' }}
+                        />
+                    ))}
+                    <span className="ml-1 text-xs text-textSecondary dark:text-gray-400">Please wait</span>
+                </div>
+            </motion.div>
         </div>
     );
 }

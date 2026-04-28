@@ -1,0 +1,80 @@
+<h2>AI Mentor Widget - Proposed Design</h2>
+<p class="subtitle">Header + Quick Actions + Expand Modes</p>
+
+<div class="mockup">
+  <div class="mockup-header">Default Mode (Floating Widget)</div>
+  <div class="mockup-body" style="padding:0;border-radius:8px;overflow:hidden;background:#1a1a1a;width:100%;max-width:400px;">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.06);">
+      <button style="padding:4px 8px;background:rgba(255,255,255,0.07);border:none;border-radius:7px;color:rgba(255,255,255,0.72);font-size:13px;cursor:pointer;gap:5px;display:flex;align-items:center;">
+        New AI chat ↓
+      </button>
+      <div style="display:flex;gap:6px;">
+        <button style="width:28px;height:28px;border:none;background:transparent;color:rgba(255,255,255,0.3);cursor:pointer;display:flex;align-items:center;justify-content:center;">⛶</button>
+        <button style="width:28px;height:28px;border:none;background:transparent;color:rgba(255,255,255,0.3);cursor:pointer;display:flex;align-items:center;justify-content:center;">−</button>
+      </div>
+    </div>
+
+    <!-- Welcome Content -->
+    <div style="padding:28px 18px;display:flex;flex-direction:column;">
+      <div style="width:46px;height:46px;border-radius:10px;margin-bottom:16px;background:linear-gradient(135deg,#1a6ef5 0%,#4fa3ff 100%);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 6px 24px rgba(26,110,245,0.35);">✨</div>
+
+      <div style="margin-bottom:14px;">
+        <div style="color:rgba(255,255,255,0.45);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">LEARN • ⚡ Dashboard</div>
+        <h3 style="color:rgba(255,255,255,0.92);font-size:17px;font-weight:600;margin:0 0 14px;">How can I help?</h3>
+      </div>
+
+      <!-- Quick Actions (2 items) -->
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button style="padding:7px 10px;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;gap:10px;border-radius:6px;text-align:left;transition:background 0.1s;width:100%;">
+          <span style="font-size:14px;">⚡</span>
+          <span style="color:rgba(255,255,255,0.6);font-size:13px;">What should I focus on today?</span>
+        </button>
+        <button style="padding:7px 10px;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;gap:10px;border-radius:6px;text-align:left;transition:background 0.1s;width:100%;">
+          <span style="font-size:14px;">📊</span>
+          <span style="color:rgba(255,255,255,0.6);font-size:13px;">Analyze my progress</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div style="padding:8px 12px 12px;">
+      <div style="background:#272727;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);padding:10px 12px;">
+        <div style="display:flex;align-items:center;margin-bottom:7px;">
+          <div style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.09);border-radius:5px;padding:2px 8px;font-size:11.5px;color:rgba(255,255,255,0.45);">
+            <span style="font-size:12px;">⚡</span>
+            <span>Dashboard</span>
+          </div>
+        </div>
+        <textarea style="width:100%;background:transparent;border:none;outline:none;resize:none;color:rgba(255,255,255,0.87);font-size:13.5px;font-family:inherit;" rows="2" placeholder="Do anything with AI..."></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Quick Action Strategy</h3>
+  <p><strong>Each page shows 2 carefully chosen actions:</strong></p>
+  <ul style="margin-top:8px;padding-left:20px;">
+    <li><strong>Action 1:</strong> "What should I..." (insight/analysis)</li>
+    <li><strong>Action 2:</strong> "How do I..." OR specific to the page</li>
+  </ul>
+  <p style="margin-top:10px;font-size:13px;color:#666;">Examples by page:</p>
+  <ul style="margin-top:6px;padding-left:20px;font-size:13px;">
+    <li><strong>Dashboard:</strong> "What should I focus on?" + "Analyze my progress"</li>
+    <li><strong>Roadmap:</strong> "Show my progress" + "What should I study next?"</li>
+    <li><strong>Lab:</strong> "Explain the concept" + "Help me set up"</li>
+    <li><strong>Interview:</strong> "Practice common questions" + "Behavioral tips"</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h3>Expand Behavior (Cycling)</h3>
+  <p><strong>Click expand icon (⛶) to cycle:</strong></p>
+  <ol style="margin-top:8px;padding-left:20px;">
+    <li>Click 1: <strong>Larger panel</strong> (600px width, more visible)</li>
+    <li>Click 2: <strong>Fullscreen modal</strong> (full screen, same widget UI)</li>
+    <li>Click 3: <strong>New tab</strong> (opens chat in separate browser tab)</li>
+    <li>Click 4: Back to default floating size</li>
+  </ol>
+</div>

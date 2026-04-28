@@ -1,89 +1,161 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: 'class', // Enable dark mode with class strategy
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  darkMode: 'class',
   theme: {
     extend: {
-      fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        serif: ['Fraunces', 'Georgia', 'serif'],
-      },
       colors: {
-        gray: {
-          900: '#000000', // Pure Black
-          800: '#121212', // Dark Surface
-          700: '#1E1E1E',
-          600: '#2C2C2C',
-          500: '#3D3D3D',
-          400: '#5C5C5C',
-          300: '#858585',
-          200: '#A3A3A3',
-          100: '#E5E5E5',
-          50: '#FAFAFA',
+        // ── Cal.com design system tokens ────────────────────────
+        charcoal:     '#242424',
+        'mid-gray':   '#898989',
+        'border-gray':'#E8E7E7',
+
+        // Design System Accent Colors
+        indigo: {
+          50: "#eef2ff",
+          100: "#e0e7ff",
+          500: "#4f46e5",
+          900: "#312e81",
         },
+        blue: {
+          50: "#eff6ff",
+          100: "#dbeafe",
+          500: "#3b82f6",
+          900: "#1e3a8a",
+        },
+
+        // Semantic Colors
+        success: {
+          50: "#d1fae5",
+          500: "#10b981",
+          700: "#047857",
+        },
+        warning: {
+          50: "#fef3c7",
+          500: "#f59e0b",
+          700: "#d97706",
+        },
+        error: {
+          50: "#fee2e2",
+          500: "#ef4444",
+          700: "#dc2626",
+        },
+
+        // Beige Minimalist Design System (preserved for backward compatibility)
+        beigePrimary: "#FDFBF7",
+        beigeSecondary: "#F4F1EA",
+        beigeMuted: "#EAE6DB",
+        charcoal: "#1A1A1A",
+        charcoalMuted: "#333333",
+        charcoalDark: "#0F0F0F",
+        terracotta: "#D96C4A",
+        terracottaHover: "#C45B3A",
+        sage: "#8B9681",
+
+        textPrimary: "#2D2A26",
+        textSecondary: "#7A756D",
+        borderMuted: "#E8E2D6",
       },
+
+      fontFamily: {
+        // ── Cal.com fonts ────────────────────────────────────────
+        'cal-sans': ['Cal Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        inter:      ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        // Legacy
+        outfit: ['"Outfit"', "sans-serif"],
+        cormorant: ['"Cormorant Garamond"', "serif"],
+        space: ['"Space Mono"', "monospace"],
+        playfair: ['"Playfair Display"', "serif"],
+        poppins: ['"Poppins"', "sans-serif"],
+      },
+
+      fontSize: {
+        // Typography system
+        h1: ["2rem", { lineHeight: "2.5rem", fontWeight: "700" }],     // 32px
+        h2: ["1.25rem", { lineHeight: "1.75rem", fontWeight: "600" }], // 20px
+        h3: ["1.125rem", { lineHeight: "1.5rem", fontWeight: "600" }], // 18px
+        body: ["1rem", { lineHeight: "1.5rem", fontWeight: "400" }],   // 16px
+        sm: ["0.875rem", { lineHeight: "1.25rem", fontWeight: "400" }], // 14px
+      },
+
+      borderRadius: {
+        lg: "0.5rem",  // 8px
+        xl: "0.75rem", // 12px
+        "2xl": "1rem", // 16px
+      },
+
+      boxShadow: {
+        // ── Cal.com multi-layer shadows ───────────────────────────
+        'level-2-card':
+          'rgba(19,19,22,0.7) 0px 1px 5px -4px, rgba(34,42,53,0.08) 0px 0px 0px 1px, rgba(34,42,53,0.05) 0px 4px 8px 0px',
+        'level-4-highlight':
+          'rgba(255,255,255,0.12) 0px 1px 0px inset, rgba(0,0,0,0.2) 0px 1px 2px 0px',
+        // Refined shadow system
+        sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+        lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+
+        // Preserved custom shadows for backward compatibility
+        soft: "0 20px 40px -15px rgba(180, 170, 150, 0.15)",
+        warmHover: "0 30px 60px -15px rgba(180, 170, 150, 0.25)",
+        darkDepth: "0 20px 40px -15px rgba(0, 0, 0, 0.4)",
+        darkSoft: "0 20px 40px -15px rgba(0, 0, 0, 0.6)",
+        darkHover: "0 30px 60px -15px rgba(0, 0, 0, 0.8)",
+      },
+
       animation: {
-        'slide-up': 'slide-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-        'fade-in': 'fade-in 1s ease-out forwards',
-        'float-random': 'float-random 6s ease-in-out infinite',
-        'scroll': 'scroll 1.5s ease-in-out infinite',
+        // Smooth transitions for interactive elements
+        "fade-in": "fadeIn 200ms ease-in-out forwards",
+        "fade-out": "fadeOut 200ms ease-in-out forwards",
+        "slide-up": "slideUp 250ms ease-out forwards",
+        "scale-in": "scaleIn 200ms ease-out forwards",
+
+        // Preserved animations for backward compatibility
+        'blob': 'blob 7s infinite',
+        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
       },
+
       keyframes: {
-        'slide-up': {
-          '0%': {
-            transform: 'translateY(100%)',
-            opacity: 0,
-          },
-          '100%': {
-            transform: 'translateY(0)',
-            opacity: 1,
-          },
+        fadeIn: {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
         },
-        'fade-in': {
-          '0%': {
-            opacity: 0,
-            transform: 'translateY(20px)',
-          },
-          '100%': {
-            opacity: 1,
-            transform: 'translateY(0)',
-          },
+        fadeOut: {
+          "0%": { opacity: "1" },
+          "100%": { opacity: "0" },
         },
-        'float-random': {
-          '0%, 100%': {
-            transform: 'translateY(0px) translateX(0px) rotate(0deg)',
-          },
-          '25%': {
-            transform: 'translateY(-20px) translateX(10px) rotate(5deg)',
-          },
-          '50%': {
-            transform: 'translateY(-40px) translateX(-10px) rotate(-5deg)',
-          },
-          '75%': {
-            transform: 'translateY(-20px) translateX(5px) rotate(3deg)',
-          },
+        slideUp: {
+          "0%": { opacity: "0", transform: "translateY(10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
         },
-        'scroll': {
-          '0%': {
-            transform: 'translateY(0)',
-            opacity: 0,
-          },
-          '40%': {
-            opacity: 1,
-          },
-          '80%': {
-            transform: 'translateY(20px)',
-            opacity: 0,
-          },
-          '100%': {
-            opacity: 0,
-          },
+        scaleIn: {
+          "0%": { opacity: "0", transform: "scale(0.95)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
         },
+
+        // Preserved keyframes for backward compatibility
+        blob: {
+          '0%': { transform: 'translate(0px, 0px) scale(1)' },
+          '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+          '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+          '100%': { transform: 'translate(0px, 0px) scale(1)' },
+        },
+        fadeInUp: {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        }
+      },
+
+      spacing: {
+        // 4px grid base (Tailwind standard already provides this)
+        // Additional custom spacing if needed
+        "safe-top": "env(safe-area-inset-top)",
+        "safe-bottom": "env(safe-area-inset-bottom)",
+        "safe-left": "env(safe-area-inset-left)",
+        "safe-right": "env(safe-area-inset-right)",
       },
     },
   },
-  plugins: [],
-}
+  plugins: [require("@tailwindcss/typography")],
+};

@@ -1,15 +1,155 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "../api/axios";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useGoogleLogin } from '@react-oauth/google';
-import { setTokens, setRememberMePreference } from "../utils/auth";
-import { useTheme } from "../context/ThemeContext";
+import { useGoogleLogin } from "@react-oauth/google";
+import { setTokens, setRememberMePreference, getTrustedDeviceToken } from "../utils/auth";
 import env from "../config/env";
+import { Eye, EyeOff, CheckCircle2, AlertCircle } from "lucide-react";
+
+// ── Shared brand-panel pieces ──────────────────────────────────────────────
+
+const GridBackdrop = () => (
+  <svg width="100%" height="100%" style={{ position: "absolute", inset: 0, opacity: 0.1, pointerEvents: "none" }}>
+    <defs>
+      <pattern id="authGrid" width="44" height="44" patternUnits="userSpaceOnUse">
+        <path d="M44 0H0V44" fill="none" stroke="var(--fg-muted)" strokeWidth="1" />
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#authGrid)" />
+  </svg>
+);
+
+const CheckIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 12l4 4L19 7" />
+  </svg>
+);
+
+const ArrowRightIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 12h14M13 5l7 7-7 7" />
+  </svg>
+);
+
+const GoogleIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 48 48">
+    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+  </svg>
+);
+
+const GitHubIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+    <path fillRule="evenodd" clipRule="evenodd" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+  </svg>
+);
+
+// ── Brand panel (left half) ────────────────────────────────────────────────
+
+const BrandPanel = () => (
+  <div
+    className="hidden lg:flex flex-col justify-between overflow-y-auto"
+    style={{
+      position: "relative",
+      background: "var(--surface)",
+      color: "var(--fg)",
+      padding: "28px 40px",
+      overflow: "hidden",
+    }}
+  >
+    <GridBackdrop />
+
+    {/* Top: logo */}
+    <div style={{ position: "relative", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <Link to="/" style={{ display: "inline-flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+        <div style={{
+          width: 28, height: 28, borderRadius: 7,
+          background: "var(--fg-deep)",
+          display: "inline-flex", alignItems: "center", justifyContent: "center",
+          overflow: 'hidden'
+        }}>
+          <img 
+            src="/planorah_logo.png" 
+            alt="P" 
+            style={{ 
+              width: 18, 
+              height: 18, 
+              objectFit: 'contain',
+              filter: 'invert(1)' // Always invert since container is var(--fg-deep)
+            }} 
+          />
+        </div>
+        <span style={{ fontFamily: "'Cal Sans', sans-serif", fontWeight: 600, fontSize: 18, letterSpacing: "-0.01em", color: "var(--fg-deep)" }}>Planorah</span>
+      </Link>
+      <Link to="/" style={{ fontSize: 13, color: "var(--fg-muted)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
+        ← Back to site
+      </Link>
+    </div>
+
+    {/* Middle: headline + bullets */}
+    <div style={{ position: "relative", maxWidth: 440 }}>
+      <div style={{
+        fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: "0.18em",
+        textTransform: "uppercase", color: "var(--fg-muted)", marginBottom: 12,
+      }}>
+        Welcome back
+      </div>
+      <div style={{
+        fontFamily: "'Cal Sans', sans-serif", fontWeight: 600,
+        fontSize: 34, lineHeight: 1.08, letterSpacing: "-0.025em", marginBottom: 18,
+      }}>
+        Your week,<br />already planned.
+      </div>
+      <div style={{ color: "var(--fg-muted)", fontSize: 14, lineHeight: 1.5, marginBottom: 20 }}>
+        Pick up where you left off — your syllabi, schedule, and AI study assistant are waiting.
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {[
+          "Your plan syncs across every device",
+          "Weekly focus score stays up to date",
+          "Syllabus edits propagate automatically",
+        ].map((line) => (
+          <div key={line} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 14, color: "var(--fg)" }}>
+            <span style={{
+              width: 20, height: 20, borderRadius: "50%",
+              border: "1px solid var(--border-subtle)",
+              background: "var(--light-gray)",
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              color: "var(--fg-deep)", flexShrink: 0,
+            }}>
+              <CheckIcon />
+            </span>
+            {line}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Bottom: testimonial */}
+    <div style={{ position: "relative", borderTop: "1px solid var(--border-subtle)", paddingTop: 16 }}>
+      <div style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: 15, lineHeight: 1.4, marginBottom: 10, maxWidth: 460 }}>
+        "I stopped keeping a bullet journal. Planorah does the hard part — deciding what to work on — so I can just work."
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "var(--fg-muted)" }}>
+        <div style={{
+          width: 28, height: 28, borderRadius: "50%",
+          background: "var(--light-gray)",
+          display: "inline-flex", alignItems: "center", justifyContent: "center",
+          fontSize: 11, fontWeight: 600,
+        }}>MS</div>
+        Maya S. · Junior, Comp Sci — UC Berkeley
+      </div>
+    </div>
+  </div>
+);
+
+// ── Main component ─────────────────────────────────────────────────────────
 
 export default function Login() {
   const navigate = useNavigate();
-  const { theme, toggleTheme } = useTheme();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -19,212 +159,225 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!identifier || !password) {
-      setMessage("Please enter both email and password.");
-      return;
-    }
-    setLoading(true);
-    setMessage("");
+    if (!identifier || !password) { setMessage("Please enter both fields."); return; }
+    setLoading(true); setMessage("");
     try {
-      const payload = { identifier: identifier.trim(), password };
-      const res = await axios.post(`/api/users/login/`, payload);
+      const res = await axios.post(`/api/users/login/`, { identifier: identifier.trim(), password });
       setTokens(res.data.access, res.data.refresh, rememberMe);
       setMessage("success:Welcome back!");
-      if (res.data.onboarding_complete) {
-        setTimeout(() => navigate("/dashboard"), 1500);
-      } else {
-        setTimeout(() => navigate("/onboarding"), 1500);
-      }
+      setTimeout(() => navigate(res.data.onboarding_complete ? "/dashboard" : "/onboarding"), 1400);
     } catch (err) {
-      const signupRequired = err.response?.data?.signup_required;
-      const signupEmail = err.response?.data?.email;
-      if (signupRequired && signupEmail) {
-        setMessage("success:No account found. Redirecting to sign up...");
-        setTimeout(() => navigate("/register", { state: { prefillEmail: signupEmail } }), 1200);
+      const d = err.response?.data;
+      if (d?.signup_required && d?.email) {
+        setMessage("success:No account found. Taking you to sign up...");
+        setTimeout(() => navigate("/register", { state: { prefillEmail: d.email } }), 1200);
         return;
       }
-
-      const verifyRequired = err.response?.data?.verify_required;
-      const verifyEmail = err.response?.data?.email;
-      if (verifyRequired && verifyEmail) {
-        setMessage("success:Please verify your email. Redirecting to OTP...");
-        setTimeout(() => navigate("/verify-otp", { state: { email: verifyEmail } }), 1200);
+      if (d?.verify_required && d?.email) {
+        setMessage("success:Please verify your email. Redirecting...");
+        setTimeout(() => navigate("/verify-otp", { state: { email: d.email } }), 1200);
         return;
       }
-
-      const serverMsg = err.response?.data?.error || err.response?.data?.message;
-      setMessage(serverMsg || "Invalid credentials.");
-    } finally {
-      setLoading(false);
-    }
+      setMessage(d?.error || d?.message || "Invalid credentials.");
+    } finally { setLoading(false); }
   };
 
-  const login = useGoogleLogin({
+  const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
-      setLoading(true);
-      setMessage("");
+      setLoading(true); setMessage("");
       try {
+        const trustedToken = getTrustedDeviceToken();
         const res = await axios.post(`/api/users/google/login/`, {
           token: tokenResponse.access_token,
-          mode: "login"
+          mode: "login",
+          ...(trustedToken && { trusted_device_token: trustedToken }),
         });
         if (res.data.two_factor_required) {
-          // Store rememberMe preference for after OTP verification
           setRememberMePreference(rememberMe);
-          // Redirect to OTP verification page
-          navigate("/verify-otp", {
-            state: {
-              email: res.data.email,
-              isLogin: true
-            }
-          });
+          navigate("/verify-otp", { state: { email: res.data.email, isLogin: true } });
           return;
         }
-
         setTokens(res.data.access, res.data.refresh, rememberMe);
         setMessage("success:Google login successful!");
-        if (res.data.onboarding_complete) {
-          setTimeout(() => navigate("/dashboard"), 1500);
-        } else {
-          setTimeout(() => navigate("/onboarding"), 1500);
-        }
+        setTimeout(() => navigate(res.data.onboarding_complete ? "/dashboard" : "/onboarding"), 1400);
       } catch (err) {
-        const signupRequired = err.response?.data?.signup_required;
-        const signupEmail = err.response?.data?.email;
-        if (signupRequired && signupEmail) {
-          setMessage("success:No account found. Redirecting to sign up...");
-          setTimeout(() => navigate("/register", { state: { prefillEmail: signupEmail } }), 1200);
+        const d = err.response?.data;
+        if (d?.signup_required && d?.email) {
+          setMessage("success:No account found. Taking you to sign up...");
+          setTimeout(() => navigate("/register", { state: { prefillEmail: d.email } }), 1200);
           return;
         }
-
-        console.error('Google OAuth Error:', err.response?.data);
-        const serverMsg = err.response?.data?.error || err.response?.data?.message;
-        const details = err.response?.data?.details ? ` (${err.response.data.details})` : '';
-        setMessage(serverMsg ? `${serverMsg}${details}` : "Google login failed.");
-      } finally {
-        if (!loading) setLoading(false);
-      }
+        const details = d?.details ? ` (${d.details})` : "";
+        setMessage(d?.error ? `${d.error}${details}` : "Google login failed.");
+      } finally { setLoading(false); }
     },
-    onError: () => {
-      setMessage("Google login failed. Please try again.");
-      setLoading(false);
-    }
+    onError: () => { setMessage("Google login failed."); setLoading(false); },
   });
 
+  const handleGitHub = () => {
+    setRememberMePreference(rememberMe);
+    const clientId = env.GITHUB_CLIENT_ID;
+    const redirectUri = encodeURIComponent(window.location.origin + "/auth/github/callback");
+    const scope = encodeURIComponent("read:user user:email");
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${encodeURIComponent("login")}`;
+  };
 
+  const isSuccess = message.startsWith("success:");
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-sans selection:bg-yellow-100 dark:selection:bg-yellow-900 flex flex-col justify-between p-4 md:p-6 lg:p-12 transition-colors duration-300">
-      {/* Header */}
-      <header className="flex justify-between items-center w-full max-w-7xl mx-auto">
-        <Link to="/" className="text-xl md:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Planorah.</Link>
-        <div className="flex items-center gap-3 md:gap-6">
-          <Link to="/support" className="text-sm font-medium hover:opacity-70 text-gray-700 dark:text-gray-300">Support</Link>
-          <Link to="/register" className="hidden md:block text-sm font-medium hover:opacity-70 text-gray-700 dark:text-gray-300">Create Account</Link>
-          <button
-            onClick={toggleTheme}
-            className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-          >
-            {theme === 'light' ? (
-              <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            )}
-          </button>
-        </div>
-      </header>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className="grid grid-cols-1 lg:grid-cols-2 min-h-screen lg:h-screen w-full"
+      style={{ background: "var(--bg)" }}
+    >
+      <BrandPanel />
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center w-full max-w-6xl mx-auto mt-12 md:mt-0">
+      {/* ── Form panel ── */}
+      <div className="overflow-y-auto" style={{
+        display: "flex",
+        flexDirection: "column",
+        background: "var(--bg)",
+        height: "100%"
+      }}>
+        {/* Top bar */}
+        <header style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: "12px 24px", gap: 16 }}>
+          <span style={{ fontSize: 13, color: "var(--fg-muted)" }}>Don't have an account?</span>
+          <Link to="/register" style={{
+            fontSize: 13, fontWeight: 500,
+            color: "var(--fg-deep)", textDecoration: "none",
+            borderBottom: "1px solid var(--fg-deep)",
+          }}>
+            Create one →
+          </Link>
+        </header>
 
-        {/* Hero Section */}
-        <div className="text-center mb-16 relative">
-          <span className="inline-block py-1 px-3 rounded-full bg-gray-100 dark:bg-gray-800 text-xs font-medium text-gray-500 dark:text-gray-400 mb-6">
-            Welcome back to Planorah
-          </span>
-          <h1 className="text-5xl md:text-7xl font-serif max-w-4xl mx-auto leading-tight relative z-10 text-gray-900 dark:text-white">
-            Login to Your <br />
-            <span className="relative inline-block">
-              Account
-              <motion.svg
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
-                className="absolute -bottom-2 left-0 w-full h-4 text-yellow-300 -z-10"
-                viewBox="0 0 100 10"
-                preserveAspectRatio="none"
-              >
-                <path d="M0 5 Q 50 10 100 5" fill="none" stroke="currentColor" strokeWidth="8" />
-              </motion.svg>
-            </span>
-          </h1>
-          <p className="mt-6 text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
-            Uncover the untapped potential of your productivity and verify your growth.
-          </p>
-        </div>
+        {/* Form body */}
+        <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px 24px" }}>
+          <div style={{ width: "100%", maxWidth: 400 }}>
 
-        {/* Split Layout Form */}
-        <div className="flex flex-col md:flex-row items-stretch justify-between w-full gap-12 md:gap-20">
+            <h2 style={{
+              fontFamily: "'Cal Sans', sans-serif", fontWeight: 600,
+              fontSize: 28, lineHeight: 1.1, letterSpacing: "-0.02em",
+              marginBottom: 6, color: "var(--fg-deep)",
+            }}>
+              Sign in to Planorah
+            </h2>
+            <p style={{ fontSize: 13, color: "var(--fg-muted)", marginBottom: 20 }}>
+              Welcome back. Let's get your week moving.
+            </p>
 
-          {/* Left Column: Manual Login */}
-          <div className="flex-1 w-full space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder="Username / Email"
-                  autoComplete="username"
-                  className="w-full px-8 py-5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-sm text-lg text-gray-900 dark:text-white"
-                  required
-                />
-                <div className="relative">
+            {/* SSO buttons */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
+              <button type="button" className="sso-btn" onClick={() => googleLogin()}>
+                <GoogleIcon />
+                Continue with Google
+              </button>
+              <button type="button" className="sso-btn" onClick={handleGitHub}>
+                <GitHubIcon />
+                Continue with GitHub
+              </button>
+            </div>
+
+            {/* Divider */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, color: "var(--fg-muted)", fontSize: 12, marginBottom: 14 }}>
+              <div style={{ flex: 1, height: 1, background: "var(--border-subtle)" }} />
+              <span style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                or with email
+              </span>
+              <div style={{ flex: 1, height: 1, background: "var(--border-subtle)" }} />
+            </div>
+
+            {/* Email + password form */}
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+
+              {/* Email field */}
+              <div>
+                <label htmlFor="login-identifier" style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--fg-deep)", marginBottom: 4 }}>
+                  Email or username
+                </label>
+                <div className="auth-input-wrap">
                   <input
+                    id="login-identifier"
+                    className="auth-input"
+                    type="text"
+                    placeholder="you@school.edu or username"
+                    autoComplete="username"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Password field */}
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
+                  <label htmlFor="login-password" style={{ fontSize: 12, fontWeight: 500, color: "var(--fg-deep)" }}>Password</label>
+                  <Link to="/forgot-password" style={{ fontSize: 12, color: "var(--fg-muted)", textDecoration: "none" }}>
+                    Forgot password?
+                  </Link>
+                </div>
+                <div className="auth-input-wrap" style={{ position: "relative" }}>
+                  <input
+                    id="login-password"
+                    className="auth-input"
                     type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
-                    autoComplete="current-password"
-                    className="w-full px-8 py-5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-sm text-lg pr-14 text-gray-900 dark:text-white"
-                    required
+                    style={{ paddingRight: 56 }}
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors p-1"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    onClick={() => setShowPassword((v) => !v)}
+                    style={{
+                      position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                      background: "transparent", border: 0, cursor: "pointer",
+                      color: "var(--fg-muted)", padding: "4px 8px",
+                    }}
                   >
-                    {showPassword ? (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
-                    ) : (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                    )}
+                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </div>
               </div>
 
-              {/* Remember Me Checkbox */}
-              <div className="flex items-center gap-3 px-2">
-                <input
-                  type="checkbox"
-                  id="rememberMe"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 text-black dark:text-white focus:ring-black dark:focus:ring-white focus:ring-offset-0 cursor-pointer"
-                />
-                <label htmlFor="rememberMe" className="text-gray-600 dark:text-gray-400 text-sm cursor-pointer select-none">
-                  Remember me for 15 days
-                </label>
-              </div>
+              {/* Remember me */}
+              <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "var(--fg-deep)", cursor: "pointer", userSelect: "none" }}>
+                <div
+                  onClick={() => setRememberMe((v) => !v)}
+                  role="checkbox"
+                  aria-checked={rememberMe}
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setRememberMe((v) => !v); } }}
+                  style={{
+                    width: 16, height: 16, borderRadius: 4,
+                    boxShadow: "var(--shadow-ring)",
+                    background: rememberMe ? "var(--charcoal)" : "transparent",
+                    color: "var(--fg-deep)",
+                    display: "inline-flex", alignItems: "center", justifyContent: "center",
+                    cursor: "pointer", transition: "background 0.15s ease", flexShrink: 0,
+                  }}
+                >
+                  {rememberMe && <CheckIcon />}
+                </div>
+                Keep me signed in on this device
+              </label>
 
+              {/* Error / success banner */}
               {message && (
-                <div className={`text-sm font-medium ${message.startsWith("success:") ? "text-green-600" : "text-red-500"}`}>
+                <div style={{
+                  padding: "10px 12px",
+                  marginTop: 8,
+                  background: isSuccess ? "rgba(34,197,94,0.08)" : "rgba(239,68,68,0.08)",
+                  borderRadius: 8, fontSize: 13,
+                  color: isSuccess ? "#166534" : "#991b1b",
+                  display: "flex", alignItems: "center", gap: 8,
+                }}>
+                  {isSuccess
+                    ? <CheckCircle2 size={14} />
+                    : <AlertCircle size={14} />}
                   {message.replace("success:", "")}
                 </div>
               )}
@@ -242,85 +395,10 @@ export default function Login() {
                 </span>
               </button>
             </form>
-          </div>
 
-          {/* Divider */}
-          <div className="hidden md:flex flex-col items-center justify-center">
-            <div className="h-full w-px bg-gray-200/50 dark:bg-gray-700/50"></div>
-            <span className="py-4 text-gray-400 dark:text-gray-500 italic font-serif text-xl">/</span>
-            <div className="h-full w-px bg-gray-200/50 dark:bg-gray-700/50"></div>
-          </div>
-          <div className="md:hidden flex items-center gap-4 w-full">
-            <div className="h-px bg-gray-200 dark:bg-gray-700 flex-1"></div>
-            <span className="text-gray-400 dark:text-gray-500 italic">or</span>
-            <div className="h-px bg-gray-200 dark:bg-gray-700 flex-1"></div>
-          </div>
-
-          {/* Right Column: Social Login */}
-          <div className="flex-1 w-full space-y-4 flex flex-col justify-center">
-            {/* Google Button */}
-            <button
-              onClick={() => login()}
-              className="w-full py-4 px-8 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center justify-start gap-4 group bg-white dark:bg-gray-800/50 shadow-sm hover:shadow-md"
-            >
-              <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-full group-hover:scale-110 transition-transform">
-                <svg className="w-6 h-6" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                </svg>
-              </div>
-              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">Sign in with Gmail Account</span>
-            </button>
-
-
-
-            {/* GitHub Button */}
-            <button
-              onClick={() => {
-                // Store rememberMe preference for after OAuth callback
-                setRememberMePreference(rememberMe);
-                const clientId = env.GITHUB_CLIENT_ID;
-                const redirectUri = encodeURIComponent(window.location.origin + '/auth/github/callback');
-                const scope = encodeURIComponent('read:user user:email');
-                const state = encodeURIComponent('login');
-                window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
-              }}
-              className="w-full py-4 px-8 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center justify-start gap-4 group bg-white dark:bg-gray-800/50 shadow-sm hover:shadow-md"
-            >
-              <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-full group-hover:scale-110 transition-transform">
-                <svg className="w-6 h-6 text-gray-900 dark:text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path fillRule="evenodd" clipRule="evenodd" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-                </svg>
-              </div>
-              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">Sign in with GitHub account</span>
-            </button>
-
-            {/* Placeholder for more buttons (Apple, Facebook etc) */}
-            <div className="w-full py-4 px-8 rounded-full border border-gray-100 dark:border-gray-800 flex items-center justify-start gap-4 opacity-50 cursor-not-allowed">
-              <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-full">
-                <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M17.05 20.28c-.98.95-2.05.88-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.78 1.18-.19 2.31-.89 3.51-.84 1.54.02 2.68.75 3.37 1.74-2.69 1.63-2.12 5.04.5 6.13-.57 1.4-1.31 2.76-2.46 3.16zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.17 2.29-2.08 4.28-3.74 4.25z" />
-                </svg>
-              </div>
-              <span className="text-lg font-medium text-gray-400">Sign in Apple Secure ID</span>
-            </div>
-
-            {/* New to us? CTA */}
-            <div className="pt-4">
-              <Link
-                to="/register"
-                className="w-full py-4 px-8 rounded-full bg-yellow-300 hover:bg-yellow-400 dark:bg-yellow-500 dark:hover:bg-yellow-400 text-black font-bold text-lg transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-between shadow-sm hover:shadow-md"
-              >
-                <span>New to us? Get Started</span>
-                <span className="bg-black/10 p-2 rounded-full">
-                  <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </span>
-              </Link>
-            </div>
+            <p style={{ marginTop: 14, fontSize: 11, color: "var(--fg-muted)", textAlign: "center" }}>
+              Protected by industry-standard encryption. Your syllabi never train third-party models.
+            </p>
           </div>
         </div>
 
@@ -333,17 +411,16 @@ export default function Login() {
 
       </main>
 
-      {/* Footer */}
-      <footer className="w-full max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-400 dark:text-gray-500 mt-12 py-4 border-t border-gray-100 dark:border-gray-800 md:border-none">
-        <div className="flex gap-6">
-          <Link to="/privacy">Privacy Policy</Link>
-          <Link to="/terms">Terms & Conditions</Link>
-        </div>
-        <div className="text-center sm:text-right">
-          Copyrights @Planorah 2025
-        </div>
-      </footer>
-    </div>
+        {/* Footer */}
+        <footer style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16, padding: "10px 24px" }}>
+          {[["Privacy", "/privacy"], ["Terms", "/terms"], ["Support", "/support"]].map(([label, to]) => (
+            <Link key={label} to={to} style={{ fontSize: 11.5, color: "var(--fg-muted)", textDecoration: "none" }}>
+              {label}
+            </Link>
+          ))}
+          <span style={{ fontSize: 11.5, color: "var(--auth-border-subtle, rgba(34,42,53,0.3))" }}>© Planorah {new Date().getFullYear()}</span>
+        </footer>
+      </div>
+    </motion.div>
   );
 }
-

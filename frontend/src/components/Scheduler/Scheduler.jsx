@@ -1,34 +1,19 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { schedulerService } from "../../api/schedulerService";
 import { roadmapService } from "../../api/roadmapService";
-import { FaGoogle, FaClock, FaPlay, FaPause, FaRedo, FaSync, FaTrash, FaBars, FaTimes } from "react-icons/fa";
+import { FaGoogle, FaSync, FaTrash, FaTimes } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import FullCalendar from "./FullCalendar";
 import { AnimatePresence, motion } from "framer-motion";
 
-const DEFAULT_FOCUS_MINUTES = 25;
-const DEFAULT_FOCUS_SECONDS = DEFAULT_FOCUS_MINUTES * 60;
 const GOOGLE_STATE_KEY = "google_calendar_oauth_state";
 const GOOGLE_REDIRECT_URI_KEY = "google_calendar_redirect_uri";
 
-const getTaskTimerSeconds = (task) => {
-    const minutes = Number(task?.estimated_minutes);
-    if (Number.isFinite(minutes) && minutes > 0) {
-        return Math.round(minutes * 60);
-    }
-    return DEFAULT_FOCUS_SECONDS;
-};
-
 export default function Scheduler() {
-    const [tasks, setTasks] = useState([]);
     const [roadmaps, setRoadmaps] = useState([]);
-    const [timerActive, setTimerActive] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(DEFAULT_FOCUS_SECONDS);
-    const [activeTask, setActiveTask] = useState(null);
+    const [selectedRoadmap, setSelectedRoadmap] = useState("");
     const [syncing, setSyncing] = useState(false);
     const [calendarKey, setCalendarKey] = useState(0); // Force calendar refresh
-    const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile sidebar state
     const [scheduleModal, setScheduleModal] = useState(null); // { roadmapId, roadmapTitle }
     const [scheduleForm, setScheduleForm] = useState({ startDate: new Date().toISOString().split('T')[0], startTime: '09:00' });
     const [scheduling, setScheduling] = useState(false);
@@ -59,18 +44,21 @@ export default function Scheduler() {
         sessionStorage.removeItem(GOOGLE_REDIRECT_URI_KEY);
     }, [navigate]);
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
-            const [tasksData, roadmapsData] = await Promise.all([
-                schedulerService.getTasks(),
-                roadmapService.getUserRoadmaps(),
-            ]);
-            setTasks(tasksData);
-            setRoadmaps(roadmapsData);
+            const roadmapsData = await roadmapService.getUserRoadmaps();
+            const roadmapList = Array.isArray(roadmapsData) ? roadmapsData : [];
+            setRoadmaps(roadmapList);
+            setSelectedRoadmap((prev) => {
+                if (prev && roadmapList.some((r) => String(r.id) === String(prev))) {
+                    return prev;
+                }
+                return roadmapList.length > 0 ? String(roadmapList[0].id) : "";
+            });
         } catch (err) {
             console.error("Failed to fetch scheduler data", err);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchData();
@@ -95,21 +83,7 @@ export default function Scheduler() {
             processedGoogleCodeRef.current = code;
             handleGoogleCallback(code, state, storedRedirectUri);
         }
-    }, [location.search, handleGoogleCallback, navigate]);
-
-    useEffect(() => {
-        let interval = null;
-        if (timerActive && timeLeft > 0) {
-            interval = setInterval(() => {
-                setTimeLeft((prev) => prev - 1);
-            }, 1000);
-        } else if (timeLeft === 0) {
-            setTimerActive(false);
-            const taskLabel = activeTask?.title ? ` for "${activeTask.title}"` : "";
-            alert(`Focus session complete${taskLabel}!`);
-        }
-        return () => clearInterval(interval);
-    }, [timerActive, timeLeft, activeTask]);
+    }, [location.search, handleGoogleCallback, navigate, fetchData]);
 
     const connectGoogleCalendar = async () => {
         try {
@@ -135,12 +109,6 @@ export default function Scheduler() {
             alert(message);
         }
     };
-
-    const selectTask = useCallback((task) => {
-        setActiveTask(task);
-        setTimerActive(false);
-        setTimeLeft(getTaskTimerSeconds(task));
-    }, []);
 
     const syncCalendar = async () => {
         setSyncing(true);
@@ -205,22 +173,6 @@ export default function Scheduler() {
         }
     };
 
-    const onDragEnd = (result) => {
-        if (!result.destination) return;
-    };
-
-    const formatTime = (seconds) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
-    };
-
-    const toggleTimer = () => setTimerActive(!timerActive);
-    const resetTimer = () => {
-        setTimerActive(false);
-        setTimeLeft(getTaskTimerSeconds(activeTask));
-    };
-
     const handleEventClick = (event) => {
         // Navigate to tasks section
         if (event.task_id) {
@@ -235,238 +187,42 @@ export default function Scheduler() {
 
     return (
         <>
-            <div className="flex flex-col md:flex-row h-full bg-gray-50 dark:bg-gray-900 overflow-hidden font-sans transition-colors duration-200">
+            <div className="flex h-full min-h-full flex-col bg-gray-50 dark:bg-charcoalDark font-sans transition-colors duration-200">
+                <div className="border-b border-gray-200 dark:border-charcoalMuted bg-white dark:bg-charcoal px-4 py-4 md:px-8 md:py-6">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        <h1 className="text-xl font-serif font-bold text-gray-900 dark:text-white md:text-2xl">Schedule</h1>
 
-                {/* Mobile Header with Menu Button */}
-                <div className="md:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                    <h1 className="text-xl font-serif font-bold text-gray-900 dark:text-white">Schedule</h1>
-                    <button
-                        onClick={() => setSidebarOpen(true)}
-                        className="p-2 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
-                    >
-                        <FaBars />
-                    </button>
-                </div>
-
-                {/* Mobile Sidebar Overlay */}
-                <AnimatePresence>
-                    {sidebarOpen && (
-                        <>
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                onClick={() => setSidebarOpen(false)}
-                                className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-                            />
-                            <motion.div
-                                initial={{ x: '-100%' }}
-                                animate={{ x: 0 }}
-                                exit={{ x: '-100%' }}
-                                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                                className="md:hidden fixed top-0 left-0 bottom-0 w-full max-w-[320px] bg-white dark:bg-gray-800 z-50 overflow-y-auto shadow-2xl"
-                            >
-                                {/* Mobile Sidebar Header */}
-                                <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-                                    <h2 className="text-xl font-serif font-bold text-gray-900 dark:text-white">My Tasks</h2>
-                                    <button
-                                        onClick={() => setSidebarOpen(false)}
-                                        className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                        <div className="flex flex-wrap items-center gap-2 md:gap-3">
+                            {roadmaps.length > 0 && (
+                                <>
+                                    <select
+                                        value={selectedRoadmap}
+                                        onChange={(e) => setSelectedRoadmap(e.target.value)}
+                                        className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-700 dark:border-charcoalMuted dark:bg-charcoalMuted dark:text-white md:text-sm"
                                     >
-                                        <FaTimes />
-                                    </button>
-                                </div>
-
-                                {/* Mobile Sidebar Content */}
-                                <div className="p-4">
-                                    {/* Focus Timer Widget */}
-                                    <div className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-5 rounded-2xl shadow-lg mb-6">
-                                        <div className="flex items-center justify-between mb-3">
-                                            <span className="text-xs font-bold uppercase tracking-widest text-white/70">Focus Mode</span>
-                                            <FaClock className="text-white/70" />
-                                        </div>
-                                        <div className="text-4xl font-medium text-center mb-4 tracking-tight">
-                                            {formatTime(timeLeft)}
-                                        </div>
-                                        <div className="flex justify-center gap-3">
-                                            <button onClick={toggleTimer} className="w-10 h-10 flex items-center justify-center bg-white text-indigo-600 rounded-full hover:bg-gray-100 transition-colors shadow-md">
-                                                {timerActive ? <FaPause size={14} /> : <FaPlay size={14} className="ml-0.5" />}
-                                            </button>
-                                            <button onClick={resetTimer} className="w-10 h-10 flex items-center justify-center border border-white/30 rounded-full hover:bg-white/10 transition-colors">
-                                                <FaRedo size={14} />
-                                            </button>
-                                        </div>
-                                        {activeTask && (
-                                            <div className="mt-3 text-xs text-center text-white/70 font-medium">
-                                                Focusing on: <span className="text-white">{activeTask.title}</span>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <button className="w-full py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-medium transition-all shadow-md hover:shadow-lg mb-6">
-                                        + Add New Task
-                                    </button>
-
-                                    <div className="mb-4">
-                                        <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Roadmaps to Schedule</h3>
-                                        {roadmaps.length === 0 ? (
-                                            <p className="text-sm text-gray-400 dark:text-gray-500">No roadmaps available</p>
-                                        ) : (
-                                            roadmaps.map(r => (
-                                                <div key={r.id} className="flex justify-between items-center text-sm mb-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                                                    <span className="truncate flex-1 mr-2 font-medium text-gray-700 dark:text-gray-300">{r.title}</span>
-                                                    <button
-                                                        onClick={() => {
-                                                            handleScheduleRoadmap(r.id);
-                                                            setSidebarOpen(false);
-                                                        }}
-                                                        className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 bg-indigo-100 dark:bg-indigo-900/30 px-2 py-1 rounded flex-shrink-0"
-                                                    >
-                                                        Schedule
-                                                    </button>
-                                                </div>
-                                            ))
-                                        )}
-                                    </div>
-
-                                    {/* Tasks List */}
-                                    <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                                        <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Tasks</h3>
-                                        <div className="space-y-3">
-                                            {tasks.map((task) => (
-                                                <div
-                                                    key={task.id}
-                                                    className="p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl shadow-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-                                                    onClick={() => {
-                                                        selectTask(task);
-                                                        setSidebarOpen(false);
-                                                    }}
-                                                >
-                                                    <div className="flex justify-between items-start mb-1">
-                                                        <h3 className="font-bold text-gray-900 dark:text-white text-sm">{task.title}</h3>
-                                                        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${task.priority === 'high' ? 'bg-red-400' :
-                                                            task.priority === 'medium' ? 'bg-yellow-400' : 'bg-green-400'
-                                                            }`} />
-                                                    </div>
-                                                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 font-medium">
-                                                        <span className="flex items-center gap-1">
-                                                            🍅 {task.estimated_pomodoros}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                            {tasks.length === 0 && (
-                                                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">No tasks available</p>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        </>
-                    )}
-                </AnimatePresence>
-
-                {/* Desktop Sidebar / Task List */}
-                <div className="hidden md:flex w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-col shadow-sm z-10">
-                    <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                        <h2 className="text-xl font-serif font-bold text-gray-900 dark:text-white mb-6">My Tasks</h2>
-
-                        {/* Focus Timer Widget */}
-                        <div className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg mb-8">
-                            <div className="flex items-center justify-between mb-4">
-                                <span className="text-xs font-bold uppercase tracking-widest text-white/70">Focus Mode</span>
-                                <FaClock className="text-white/70" />
-                            </div>
-                            <div className="text-5xl font-medium text-center mb-6 tracking-tight">
-                                {formatTime(timeLeft)}
-                            </div>
-                            <div className="flex justify-center gap-4">
-                                <button onClick={toggleTimer} className="w-12 h-12 flex items-center justify-center bg-white text-indigo-600 rounded-full hover:bg-gray-100 transition-colors shadow-md">
-                                    {timerActive ? <FaPause /> : <FaPlay className="ml-1" />}
-                                </button>
-                                <button onClick={resetTimer} className="w-12 h-12 flex items-center justify-center border border-white/30 rounded-full hover:bg-white/10 transition-colors">
-                                    <FaRedo />
-                                </button>
-                            </div>
-                            {activeTask && (
-                                <div className="mt-4 text-xs text-center text-white/70 font-medium">
-                                    Focusing on: <span className="text-white">{activeTask.title}</span>
-                                </div>
-                            )}
-                        </div>
-
-                        <button className="w-full py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-medium transition-all shadow-md hover:shadow-lg mb-6">
-                            + Add New Task
-                        </button>
-
-                        <div className="mb-4">
-                            <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Roadmaps to Schedule</h3>
-                            {roadmaps.length === 0 ? (
-                                <p className="text-sm text-gray-400 dark:text-gray-500">No roadmaps available</p>
-                            ) : (
-                                roadmaps.map(r => (
-                                    <div key={r.id} className="flex justify-between items-center text-sm mb-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                                        <span className="truncate w-40 font-medium text-gray-700 dark:text-gray-300">{r.title}</span>
-                                        <button
-                                            onClick={() => handleScheduleRoadmap(r.id, r.title)}
-                                            className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 bg-indigo-100 dark:bg-indigo-900/30 px-2 py-1 rounded"
-                                        >
-                                            Schedule
-                                        </button>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto p-4">
-                        <DragDropContext onDragEnd={onDragEnd}>
-                            <Droppable droppableId="tasks">
-                                {(provided) => (
-                                    <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
-                                        {tasks.map((task, index) => (
-                                            <Draggable key={task.id} draggableId={String(task.id)} index={index}>
-                                                {(provided) => (
-                                                    <div
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
-                                                        className="p-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing group"
-                                                        onClick={() => selectTask(task)}
-                                                    >
-                                                        <div className="flex justify-between items-start mb-2">
-                                                            <h3 className="font-bold text-gray-900 dark:text-white text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{task.title}</h3>
-                                                            <span className={`w-2 h-2 rounded-full ${task.priority === 'high' ? 'bg-red-400' :
-                                                                task.priority === 'medium' ? 'bg-yellow-400' : 'bg-green-400'
-                                                                }`} />
-                                                        </div>
-                                                        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 font-medium">
-                                                            <span className="flex items-center gap-1">
-                                                                🍅 {task.estimated_pomodoros}
-                                                            </span>
-                                                            <button className="hover:text-indigo-500 transition-colors"><FaGoogle /></button>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </Draggable>
+                                        {roadmaps.map((roadmap) => (
+                                            <option key={roadmap.id} value={String(roadmap.id)}>
+                                                {roadmap.title}
+                                            </option>
                                         ))}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
-                        </DragDropContext>
-                    </div>
-                </div>
+                                    </select>
+                                    <button
+                                        onClick={() => {
+                                            const roadmap = roadmaps.find((r) => String(r.id) === String(selectedRoadmap));
+                                            if (roadmap) {
+                                                handleScheduleRoadmap(roadmap.id, roadmap.title);
+                                            }
+                                        }}
+                                        className="rounded-xl bg-indigo-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-indigo-700 md:text-sm"
+                                    >
+                                        Schedule Roadmap
+                                    </button>
+                                </>
+                            )}
 
-                {/* Main Calendar Area */}
-                <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900 min-w-0">
-                    <div className="px-4 md:px-8 py-4 md:py-6 border-b border-gray-200 dark:border-gray-700 flex flex-wrap gap-3 justify-between items-center bg-white dark:bg-gray-800">
-                        <h1 className="hidden md:block text-2xl font-serif font-bold text-gray-900 dark:text-white">Schedule</h1>
-
-                        <div className="flex items-center gap-2 md:gap-4 flex-wrap">
                             <button
                                 onClick={connectGoogleCalendar}
-                                className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-xs md:text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-white transition-colors"
+                                className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-charcoalMuted dark:bg-charcoalMuted dark:text-white dark:hover:bg-charcoalMuted md:px-4 md:text-sm"
                             >
                                 <FaGoogle className="text-red-500" />
                                 <span className="hidden sm:inline">Connect Calendar</span>
@@ -476,7 +232,7 @@ export default function Scheduler() {
                             <button
                                 onClick={syncCalendar}
                                 disabled={syncing}
-                                className={`p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-white transition-colors ${syncing ? 'animate-spin' : ''}`}
+                                className={`rounded-xl p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-charcoalMuted dark:hover:text-white ${syncing ? 'animate-spin' : ''}`}
                                 title="Sync with Google Calendar"
                             >
                                 <FaSync />
@@ -484,17 +240,17 @@ export default function Scheduler() {
 
                             <button
                                 onClick={clearAllEvents}
-                                className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                                className="rounded-xl p-2 text-gray-500 transition-colors hover:bg-red-100 hover:text-red-600 dark:text-gray-400 dark:hover:bg-red-900/30 dark:hover:text-red-400"
                                 title="Clear All Events"
                             >
                                 <FaTrash />
                             </button>
                         </div>
                     </div>
+                </div>
 
-                    <div className="flex-1 p-3 md:p-6 overflow-auto">
-                        <FullCalendar key={calendarKey} onEventClick={handleEventClick} />
-                    </div>
+                <div className="flex-1 overflow-auto p-3 md:p-6">
+                    <FullCalendar key={calendarKey} onEventClick={handleEventClick} />
                 </div>
             </div>
 
@@ -513,7 +269,7 @@ export default function Scheduler() {
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.9, opacity: 0, y: 20 }}
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6"
+                            className="bg-white dark:bg-charcoal rounded-2xl shadow-2xl w-full max-w-md p-6"
                         >
                             <div className="flex items-center justify-between mb-5">
                                 <div>
@@ -522,7 +278,7 @@ export default function Scheduler() {
                                 </div>
                                 <button
                                     onClick={() => setScheduleModal(null)}
-                                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-charcoalMuted text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
                                 >
                                     <FaTimes />
                                 </button>
@@ -538,7 +294,7 @@ export default function Scheduler() {
                                         value={scheduleForm.startDate}
                                         min={new Date().toISOString().split('T')[0]}
                                         onChange={e => setScheduleForm(f => ({ ...f, startDate: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-charcoalMuted bg-gray-50 dark:bg-charcoalMuted text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
                                     />
                                 </div>
 
@@ -550,7 +306,7 @@ export default function Scheduler() {
                                         type="time"
                                         value={scheduleForm.startTime}
                                         onChange={e => setScheduleForm(f => ({ ...f, startTime: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-charcoalMuted bg-gray-50 dark:bg-charcoalMuted text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
                                     />
                                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1.5">Tasks will be scheduled starting from this time each day.</p>
                                 </div>
@@ -566,7 +322,7 @@ export default function Scheduler() {
                             <div className="flex gap-3 mt-6">
                                 <button
                                     onClick={() => setScheduleModal(null)}
-                                    className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium text-sm transition-colors"
+                                    className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoalMuted font-medium text-sm transition-colors"
                                 >
                                     Cancel
                                 </button>

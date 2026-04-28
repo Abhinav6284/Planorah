@@ -2,17 +2,23 @@ import React from 'react';
 
 const ModeSwitch = ({ mode, onChange }) => {
     return (
-        <div className="inline-flex items-center rounded-xl border border-slate-300 bg-white p-0.5 dark:border-white/15 dark:bg-[#121212]">
+        <div style={{ 
+            display: 'inline-flex', alignItems: 'center', borderRadius: 12, 
+            border: '1px solid var(--el-border)', background: 'var(--el-bg-secondary)', padding: 4
+        }}>
             {['learning', 'exam'].map((item) => {
                 const active = mode === item;
                 return (
                     <button
                         key={item}
                         onClick={() => onChange(item)}
-                        className={`rounded-lg px-3 py-1.5 text-xs font-semibold capitalize transition-all sm:text-[13px] ${active
-                            ? 'bg-blue-100 text-blue-700 dark:bg-white dark:text-black'
-                            : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-white/10'
-                            }`}
+                        style={{
+                            padding: '6px 14px', borderRadius: 10, fontSize: 13, fontWeight: 700,
+                            textTransform: 'capitalize', border: 'none', cursor: 'pointer',
+                            background: active ? 'var(--el-text)' : 'transparent',
+                            color: active ? '#fff' : 'var(--el-text-secondary)',
+                            transition: 'all 0.2s'
+                        }}
                     >
                         {item}
                     </button>
@@ -22,4 +28,4 @@ const ModeSwitch = ({ mode, onChange }) => {
     );
 };
 
-export default ModeSwitch;
+export default React.memo(ModeSwitch);

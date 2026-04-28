@@ -18,7 +18,9 @@ planorah.me host (PLANORAH_HOST setting) so normal routing is unaffected.
 from __future__ import annotations
 
 import logging
+from collections.abc import Awaitable, Callable
 
+from starlette.concurrency import run_in_threadpool
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
@@ -41,31 +43,36 @@ def _is_planorah_host(host: str) -> bool:
     )
 
 
+def _resolve_custom_domain_user_id(host: str) -> int | None:
+    db = SessionLocal()
+    try:
+        cd = get_domain_by_host(db, host)
+        if cd is None:
+            return None
+        return cd.user_id
+    finally:
+        db.close()
+
+
 class CustomDomainMiddleware(BaseHTTPMiddleware):
     """Resolve a custom Host header to a portfolio user_id."""
 
     def __init__(self, app: ASGIApp) -> None:
         super().__init__(app)
 
-    async def dispatch(self, request: Request, call_next: object) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         host = request.headers.get("host", "")
 
         if host and not _is_planorah_host(host):
-            # Synchronous SQLAlchemy session — run in a thread pool via
-            # Starlette's run_in_threadpool when the ORM is sync
             try:
-                db = SessionLocal()
-                try:
-                    cd = get_domain_by_host(db, host)
-                    if cd is not None:
-                        request.state.custom_domain_user_id = cd.user_id
-                        logger.info(
-                            "Custom domain '%s' resolved to user_id=%s",
-                            host,
-                            cd.user_id,
-                        )
-                finally:
-                    db.close()
+                user_id = await run_in_threadpool(_resolve_custom_domain_user_id, host)
+                if user_id is not None:
+                    request.state.custom_domain_user_id = user_id
+                    logger.info(
+                        "Custom domain '%s' resolved to user_id=%s",
+                        host,
+                        user_id,
+                    )
             except Exception:
                 # Never let a DB error break an incoming request
                 logger.exception("CustomDomainMiddleware: DB lookup failed for host '%s'", host)

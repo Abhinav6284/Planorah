@@ -1,84 +1,96 @@
-import os
 import json
 import logging
+import os
+
 import requests
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
 from django.conf import settings
 from dotenv import load_dotenv
+from rest_framework import status
+from rest_framework.decorators import api_view, parser_classes, permission_classes
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
-from roadmap_ai.models import Roadmap, Milestone
+from roadmap_ai.models import Roadmap
 from tasks.models import Task
+
+from .serializers import (
+    AssistantV2ConfirmSerializer,
+    AssistantV2JobSerializer,
+    AssistantV2TurnSerializer,
+)
+from .services.orchestrator import (
+    confirm_action,
+    get_job_payload,
+    get_pipeline_config,
+    run_turn,
+)
+from .services.pipeline_config import AI_PIPELINE_ENABLED
+from .services.context_aggregator import build_backend_context
+from .services.suggestions_service import generate_suggestions
 
 # Load environment variables
 load_dotenv()
 
-# Get API key
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") or getattr(settings, 'GEMINI_API_KEY', None)
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") or getattr(settings, "GEMINI_API_KEY", None)
 logger = logging.getLogger(__name__)
 
 
 def build_user_context(user):
     """Build a context string with user's roadmaps and tasks."""
     context_parts = []
-    
-    # Get user's roadmaps
-    roadmaps = Roadmap.objects.filter(user=user).prefetch_related('milestones')
-    
+
+    roadmaps = Roadmap.objects.filter(user=user).prefetch_related("milestones")
     if roadmaps.exists():
         context_parts.append("## User's Learning Roadmaps:\n")
-        for roadmap in roadmaps[:5]:  # Limit to 5 roadmaps to avoid token overflow
+        for roadmap in roadmaps[:5]:
             context_parts.append(f"\n### {roadmap.title}")
             context_parts.append(f"- Goal: {roadmap.goal}")
             context_parts.append(f"- Duration: {roadmap.estimated_duration}")
             context_parts.append(f"- Level: {roadmap.difficulty_level}")
             context_parts.append(f"- Category: {roadmap.category}")
-            
-            # Add milestones
-            milestones = roadmap.milestones.all().order_by('order')[:10]
+            milestones = roadmap.milestones.all().order_by("order")[:10]
             if milestones:
                 context_parts.append("- Milestones:")
-                for m in milestones:
-                    status_icon = "✅" if m.is_completed else "⏳"
-                    context_parts.append(f"  {status_icon} {m.title} ({m.duration})")
-                    
-                    # Add resources if available
-                    if m.resources:
-                        for res in m.resources[:3]:
-                            if isinstance(res, dict):
-                                context_parts.append(f"    - Resource: {res.get('title', 'N/A')} - {res.get('url', '')}")
-    
-    # Get user's tasks
-    tasks = Task.objects.filter(user=user).order_by('day', '-status')
-    
-    pending_tasks = tasks.filter(status__in=['not_started', 'in_progress'])[:15]
-    completed_tasks = tasks.filter(status='completed')[:5]
-    
+                for milestone in milestones:
+                    status_icon = "✅" if milestone.is_completed else "⏳"
+                    context_parts.append(f"  {status_icon} {milestone.title} ({milestone.duration})")
+                    if milestone.resources:
+                        for resource in milestone.resources[:3]:
+                            if isinstance(resource, dict):
+                                context_parts.append(
+                                    f"    - Resource: {resource.get('title', 'N/A')} - {resource.get('url', '')}"
+                                )
+
+    tasks = Task.objects.filter(user=user).order_by("day", "-status")
+    pending_tasks = tasks.filter(status__in=["not_started", "in_progress"])[:15]
+    completed_tasks = tasks.filter(status="completed")[:5]
+
     if pending_tasks.exists():
         context_parts.append("\n## Pending Tasks:\n")
         for task in pending_tasks:
             status_map = {
-                'not_started': '⬜',
-                'in_progress': '🔄',
-                'needs_revision': '⚠️'
+                "not_started": "⬜",
+                "in_progress": "🔄",
+                "needs_revision": "⚠️",
             }
-            icon = status_map.get(task.status, '⬜')
-            context_parts.append(f"{icon} Day {task.day}: {task.title} ({task.estimated_minutes} min) - Roadmap: {task.roadmap.title if task.roadmap else 'General'}")
-    
+            icon = status_map.get(task.status, "⬜")
+            context_parts.append(
+                f"{icon} Day {task.day}: {task.title} ({task.estimated_minutes} min) - "
+                f"Roadmap: {task.roadmap.title if task.roadmap else 'General'}"
+            )
+
     if completed_tasks.exists():
         context_parts.append("\n## Recently Completed:\n")
         for task in completed_tasks:
             context_parts.append(f"✅ {task.title}")
-    
-    # Task statistics
+
     total_tasks = tasks.count()
-    completed_count = tasks.filter(status='completed').count()
+    completed_count = tasks.filter(status="completed").count()
     if total_tasks > 0:
         progress = (completed_count / total_tasks) * 100
         context_parts.append(f"\n## Progress: {completed_count}/{total_tasks} tasks completed ({progress:.1f}%)")
-    
+
     return "\n".join(context_parts)
 
 
@@ -107,118 +119,60 @@ CONTENT RULES:
 - Keep responses concise and actionable
 - When referencing tasks or milestones, use the specific names from their data
 - If they ask about resources, refer to the resources in their roadmap milestones
-
-NEVER:
-- Answer general programming questions (tell them to check their roadmap resources)
-- Discuss topics unrelated to learning/productivity
-- Make up information not present in their context
-- Write plain text paragraphs without structure - ALWAYS use bullet points and formatting
-
-PLATFORM FEATURES (for reference):
-- Dashboard: Overview of progress and widgets
-- Tasks: View and manage daily learning tasks
-- Learning Path: View and generate AI roadmaps
-- Resume Builder: Create and manage resumes
-- Job Finder: Search for jobs
-- Calendar: Schedule and view events
-
-Current user context is provided below. Use this to give personalized responses.
 """
 
 
 class GeminiAPIError(Exception):
-    """Custom exception for Gemini API errors."""
     pass
 
+
 def call_gemini_api(prompt, max_retries=3):
-    """Call Gemini API directly via HTTP with retry logic."""
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
-    
-    headers = {
-        "Content-Type": "application/json"
-    }
-    
+    headers = {"Content-Type": "application/json"}
     payload = {
-        "contents": [{
-            "parts": [{
-                "text": prompt
-            }]
-        }],
-        "generationConfig": {
-            "temperature": 0.7,
-            "topP": 0.9,
-            "maxOutputTokens": 1024
-        }
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"temperature": 0.7, "topP": 0.9, "maxOutputTokens": 1024},
     }
-    
+
     last_error = None
-    for attempt in range(max_retries):
+    for _ in range(max_retries):
         try:
             response = requests.post(url, headers=headers, json=payload, timeout=30)
-            
-            # Handle specific HTTP status codes
             if response.status_code == 429:
                 raise GeminiAPIError("I'm receiving too many requests right now. Please wait a minute and try again.")
-            elif response.status_code == 400:
-                raise GeminiAPIError("There was an issue with the API configuration. Please contact support.")
-            elif response.status_code == 403:
+            if response.status_code in {400, 403}:
                 raise GeminiAPIError("The AI service is unavailable. Please try again later.")
-            elif not response.ok:
+            if not response.ok:
                 raise GeminiAPIError(f"AI service returned an error (code {response.status_code}). Please try again.")
-            
+
             data = response.json()
-            
-            # Extract text from response
-            if "candidates" in data and len(data["candidates"]) > 0:
-                candidate = data["candidates"][0]
-                if "content" in candidate and "parts" in candidate["content"]:
-                    parts = candidate["content"]["parts"]
-                    if len(parts) > 0 and "text" in parts[0]:
-                        return parts[0]["text"]
-            
+            candidates = data.get("candidates") or []
+            if candidates:
+                parts = candidates[0].get("content", {}).get("parts") or []
+                if parts and parts[0].get("text"):
+                    return parts[0]["text"]
             return "I'm sorry, I couldn't generate a response. Please try again."
-            
-        except requests.exceptions.SSLError as e:
-            last_error = e
-            logger.warning("SSL error on attempt %s/%s: %s", attempt + 1, max_retries, e)
-            import time
-            time.sleep(1)  # Wait before retry
+        except (requests.exceptions.SSLError, requests.exceptions.ConnectionError) as exc:
+            last_error = exc
             continue
-        except requests.exceptions.ConnectionError as e:
-            last_error = e
-            logger.warning("Connection error on attempt %s/%s: %s", attempt + 1, max_retries, e)
-            import time
-            time.sleep(1)
-            continue
-    
-    # All retries failed
+
     raise requests.exceptions.RequestException(f"Failed after {max_retries} attempts: {last_error}")
 
 
-
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def chat(request):
-    """Handle chat messages with the AI assistant."""
-    
+    """Legacy assistant endpoint retained for fallback compatibility."""
     if not GEMINI_API_KEY:
-        return Response({
-            "error": "AI service is not configured."
-        }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
-    
+        return Response({"error": "AI service is not configured."}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
     user = request.user
-    message = request.data.get('message', '').strip()
-    
+    message = (request.data.get("message") or "").strip()
     if not message:
-        return Response({
-            "error": "Message is required."
-        }, status=status.HTTP_400_BAD_REQUEST)
-    
+        return Response({"error": "Message is required."}, status=status.HTTP_400_BAD_REQUEST)
+
     try:
-        # Build user context
         user_context = build_user_context(user)
-        
-        # Build the full prompt
         full_prompt = f"""{SYSTEM_PROMPT}
 
 ---
@@ -229,33 +183,195 @@ USER LEARNING CONTEXT:
 User Question: {message}
 
 Assistant Response:"""
-        
-        # Call Gemini via HTTP
+
         assistant_response = call_gemini_api(full_prompt)
-        
-        return Response({
-            "message": assistant_response.strip(),
-            "success": True
-        })
-        
-    except GeminiAPIError as e:
-        logger.warning("Gemini API warning: %s", e)
-        return Response({
-            "message": "I'm getting too many requests right now. Please wait a minute and try again. In the meantime, focus on your top pending task and complete one small milestone.",
-            "error": str(e),
-            "success": False,
-            "rate_limited": True
-        }, status=status.HTTP_200_OK)
-    except requests.exceptions.RequestException as e:
-        logger.error("Gemini API request error: %s", e)
-        return Response({
-            "error": "Sorry, I couldn't connect to the AI service. Please try again.",
-            "details": str(e)
-        }, status=status.HTTP_502_BAD_GATEWAY)
-    except Exception as e:
-        logger.exception("Assistant error: %s", e)
-        return Response({
-            "error": "Sorry, I encountered an error. Please try again.",
-            "details": str(e)
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"message": assistant_response.strip(), "success": True})
+    except GeminiAPIError as exc:
+        logger.warning("Gemini API warning: %s", exc)
+        return Response(
+            {
+                "message": "I'm getting too many requests right now. Please wait a minute and try again.",
+                "error": str(exc),
+                "success": False,
+                "rate_limited": True,
+            },
+            status=status.HTTP_200_OK,
+        )
+    except requests.exceptions.RequestException as exc:
+        logger.error("Gemini API request error: %s", exc)
+        return Response(
+            {"error": "Sorry, I couldn't connect to the AI service. Please try again.", "details": str(exc)},
+            status=status.HTTP_502_BAD_GATEWAY,
+        )
+    except Exception as exc:
+        logger.exception("Assistant error: %s", exc)
+        return Response(
+            {"error": "Sorry, I encountered an error. Please try again.", "details": str(exc)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def assistant_v2_config(request):
+    payload = get_pipeline_config()
+    payload["feature_flags"]["enabled"] = bool(AI_PIPELINE_ENABLED)
+    return Response(payload, status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser, JSONParser])
+def assistant_v2_turn(request):
+    if not AI_PIPELINE_ENABLED:
+        return Response(
+            {
+                "status": "error",
+                "assistant_text": "Assistant pipeline is disabled right now.",
+                "fallback": {"legacy_endpoint": "/api/assistant/chat/"},
+            },
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+
+    incoming = request.data.copy()
+    if "channel" not in incoming:
+        incoming["channel"] = "voice" if request.FILES.get("audio") else "text"
+
+    frontend_context = incoming.get("frontend_context")
+    if isinstance(frontend_context, str):
+        try:
+            incoming["frontend_context"] = json.loads(frontend_context)
+        except json.JSONDecodeError:
+            incoming["frontend_context"] = {}
+
+    serializer = AssistantV2TurnSerializer(data=incoming)
+    serializer.is_valid(raise_exception=True)
+    validated = serializer.validated_data
+
+    audio_file = request.FILES.get("audio")
+    audio_bytes = b""
+    audio_mime_type = ""
+    if validated["channel"] == "voice":
+        if not audio_file:
+            return Response({"error": "audio is required for voice channel"}, status=status.HTTP_400_BAD_REQUEST)
+        audio_bytes = audio_file.read()
+        audio_mime_type = getattr(audio_file, "content_type", "") or "audio/webm"
+
+    try:
+        result = run_turn(
+            user=request.user,
+            channel=validated["channel"],
+            context_source=validated.get("context_source", "assistant"),
+            frontend_context=validated.get("frontend_context") or {},
+            conversation_id=str(validated.get("conversation_id")) if validated.get("conversation_id") else None,
+            message=validated.get("message", ""),
+            audio_bytes=audio_bytes,
+            audio_mime_type=audio_mime_type,
+            language_preference=validated.get("language_preference", ""),
+            voice_name=validated.get("voice_name", ""),
+        )
+        return Response(result, status=status.HTTP_200_OK)
+    except ValueError as exc:
+        return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as exc:
+        logger.exception("assistant_v2_turn failed: %s", exc)
+        return Response(
+            {
+                "status": "error",
+                "assistant_text": "Turn processing failed. Please retry.",
+                "error": str(exc),
+            },
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def assistant_v2_action_confirm(request):
+    serializer = AssistantV2ConfirmSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    validated = serializer.validated_data
+
+    try:
+        result = confirm_action(
+            user=request.user,
+            conversation_id=str(validated["conversation_id"]),
+            proposal_id=str(validated["proposal_id"]),
+            confirmed=bool(validated["confirmed"]),
+            idempotency_key=validated.get("idempotency_key", ""),
+        )
+        return Response(result, status=status.HTTP_200_OK)
+    except ValueError as exc:
+        return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as exc:
+        logger.exception("assistant_v2_action_confirm failed: %s", exc)
+        return Response({"error": "Failed to confirm action", "details": str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def assistant_v2_job_status(request, job_id):
+    serializer = AssistantV2JobSerializer(data={"job_id": job_id})
+    serializer.is_valid(raise_exception=True)
+    validated = serializer.validated_data
+
+    try:
+        payload = get_job_payload(user=request.user, job_id=str(validated["job_id"]))
+        return Response(payload, status=status.HTTP_200_OK)
+    except ValueError as exc:
+        return Response({"error": str(exc)}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as exc:
+        logger.exception("assistant_v2_job_status failed: %s", exc)
+        return Response({"error": "Unable to fetch job status", "details": str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def assistant_user_context(request):
+    """
+    Returns a cleaned summary of the user's journey for display in the
+    assistant panel header (goal, progress, streak).
+    """
+    try:
+        ctx = build_backend_context(request.user, context_source="general")
+        profile = ctx.get("profile", {})
+        task_summary = ctx.get("tasks", {}).get("summary", {})
+        roadmaps = ctx.get("roadmaps", {})
+        execution = ctx.get("execution", {})
+
+        total = task_summary.get("total", 0)
+        completed = task_summary.get("completed", 0)
+        progress_pct = round((completed / total) * 100) if total > 0 else 0
+
+        payload = {
+            "name": profile.get("name", ""),
+            "goal": profile.get("goal_statement", ""),
+            "target_role": profile.get("target_role", ""),
+            "progress_pct": progress_pct,
+            "tasks_completed": completed,
+            "tasks_total": total,
+            "streak": execution.get("current_streak", 0),
+            "roadmap_count": roadmaps.get("count", 0),
+        }
+        return Response(payload, status=status.HTTP_200_OK)
+    except Exception as exc:
+        logger.exception("assistant_user_context failed: %s", exc)
+        return Response({"error": "Could not load user context."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def assistant_suggestions(request):
+    """
+    Returns 1-2 proactive suggestions for the given page context.
+    Query param: ?context_source=dashboard
+    """
+    context_source = request.query_params.get("context_source", "general")
+    try:
+        backend_ctx = build_backend_context(request.user, context_source=context_source)
+        suggestions = generate_suggestions(context_source, backend_ctx)
+        return Response({"suggestions": suggestions}, status=status.HTTP_200_OK)
+    except Exception as exc:
+        logger.exception("assistant_suggestions failed: %s", exc)
+        return Response({"suggestions": [], "degraded": True}, status=status.HTTP_200_OK)
 

@@ -63,7 +63,7 @@ const colorMap = {
   indigo: { bg: 'bg-indigo-100 dark:bg-indigo-900/20', icon: 'text-indigo-500', btn: 'bg-indigo-600 hover:bg-indigo-700' },
   emerald: { bg: 'bg-emerald-100 dark:bg-emerald-900/20', icon: 'text-emerald-500', btn: 'bg-emerald-600 hover:bg-emerald-700' },
   violet: { bg: 'bg-violet-100 dark:bg-violet-900/20', icon: 'text-violet-500', btn: 'bg-violet-600 hover:bg-violet-700' },
-  blue: { bg: 'bg-blue-100 dark:bg-blue-900/20', icon: 'text-blue-500', btn: 'bg-blue-600 hover:bg-blue-700' },
+  blue: { bg: 'bg-blue-100 dark:bg-blue-900', icon: 'text-blue-500', btn: 'bg-blue-600 hover:bg-blue-700' },
   amber: { bg: 'bg-amber-100 dark:bg-amber-900/20', icon: 'text-amber-500', btn: 'bg-amber-600 hover:bg-amber-700' },
   rose: { bg: 'bg-rose-100 dark:bg-rose-900/20', icon: 'text-rose-500', btn: 'bg-rose-600 hover:bg-rose-700' },
 };

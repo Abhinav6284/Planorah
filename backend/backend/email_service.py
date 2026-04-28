@@ -412,5 +412,32 @@ def send_account_deleted_email(to_email, username=None):
     subject = "Planorah Account Deleted"
     html_content = get_account_deleted_template(username)
     text_content = f"Your Planorah account ({username}) has been successfully deleted. We're sorry to see you go."
-    
+
+    return send_email_via_brevo(to_email, subject, html_content, text_content)
+
+
+def send_session_confirmation_email(to_email, username, scheduled_at, meeting_link):
+    """Send session confirmation email to user."""
+    subject = "Your Planorah 1:1 Session is Confirmed!"
+    scheduled_str = scheduled_at.strftime("%A, %B %d %Y at %I:%M %p") if scheduled_at else "To be communicated"
+    html_content = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; background: #f9f9f9; padding: 32px;">
+      <div style="max-width: 560px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+        <h2 style="color: #1a1a2e; margin-bottom: 8px;">Session Confirmed!</h2>
+        <p style="color: #444;">Hi {username},</p>
+        <p style="color: #444;">Your 1:1 mentor session has been confirmed. Here are the details:</p>
+        <div style="background: #f0f4ff; border-radius: 8px; padding: 16px; margin: 20px 0;">
+          <p style="margin: 4px 0; color: #333;"><strong>Date &amp; Time:</strong> {scheduled_str}</p>
+          <p style="margin: 4px 0; color: #333;"><strong>Join Link:</strong>
+            <a href="{meeting_link}" style="color: #4f46e5;">{meeting_link}</a>
+          </p>
+        </div>
+        <p style="color: #444;">Make sure to prepare any questions or topics you want to cover. We're looking forward to your session!</p>
+        <p style="color: #888; font-size: 12px; margin-top: 32px;">Planorah · support@planorah.me</p>
+      </div>
+    </body>
+    </html>
+    """
+    text_content = f"Your Planorah session is confirmed for {scheduled_str}. Join here: {meeting_link}"
     return send_email_via_brevo(to_email, subject, html_content, text_content)

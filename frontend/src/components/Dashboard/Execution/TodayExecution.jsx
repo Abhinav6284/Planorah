@@ -1,8 +1,31 @@
 import React, { useMemo } from 'react';
-import { Play, Sparkles, Flame } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Play, RefreshCw, Plus, Timer } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-const TodayExecution = ({
+const toDateKey = (dateValue) => {
+    if (!dateValue) {
+        return null;
+    }
+
+    if (typeof dateValue === 'string') {
+        const trimmed = dateValue.trim();
+        if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+            return trimmed;
+        }
+    }
+
+    const date = new Date(dateValue);
+    if (Number.isNaN(date.getTime())) {
+        return null;
+    }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+const TodayExecution = React.memo(({
     user,
     todayTask,
     tasks,
@@ -11,15 +34,27 @@ const TodayExecution = ({
     onChangeTask,
     loading
 }) => {
-    const displayName = useMemo(() => {
-        const firstName = user?.first_name;
-        if (firstName) return firstName;
-        return user?.username || 'there';
-    }, [user]);
+    const focusDateKey = useMemo(() => {
+        return toDateKey(todayTask?.scheduled_for) || toDateKey(todayTask?.created_at);
+    }, [todayTask]);
+
+    const scopedTasks = useMemo(() => {
+        const sourceTasks = Array.isArray(tasks) ? tasks : [];
+        if (!focusDateKey) {
+            return sourceTasks;
+        }
+
+        const sameDayTasks = sourceTasks.filter((task) => {
+            const taskDateKey = toDateKey(task?.scheduled_for) || toDateKey(task?.created_at);
+            return taskDateKey === focusDateKey;
+        });
+
+        return sameDayTasks.length ? sameDayTasks : sourceTasks;
+    }, [tasks, focusDateKey]);
 
     const completedCount = useMemo(() => {
-        return (tasks || []).filter(t => t.status === 'completed').length;
-    }, [tasks]);
+        return scopedTasks.filter(t => t.status === 'completed').length;
+    }, [scopedTasks]);
 
     const totalCount = useMemo(() => {
         return Math.max((tasks || []).length, completedCount + (todayTask ? 1 : 0));
@@ -75,24 +110,39 @@ const TodayExecution = ({
                             </div>
                         </div>
                     </div>
+                </div>
+            ) : null}
 
-                    {/* Milestone Progress Bar */}
-                    {milestoneData.current > 0 && (
-                        <div className="rounded-xl border border-blue-200 bg-blue-50 p-3 dark:border-blue-500/20 dark:bg-blue-500/10">
-                            <div className="mb-1.5 flex items-center justify-between">
-                                <span className="text-xs font-semibold uppercase tracking-wider text-blue-700 dark:text-blue-300">
-                                    Week {milestoneData.weekNumber} Progress
-                                </span>
-                                <span className="text-xs font-bold text-blue-700 dark:text-blue-300">
-                                    {milestoneData.current % 7 || 7}/7 days
-                                </span>
+            {/* Mission Card */}
+            {!isNewUser && todayTask ? (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 40, alignItems: 'center' }}>
+                    {/* Left: Task Content */}
+                    <div style={{ flex: 1, minWidth: 280 }}>
+                        <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)', marginBottom: 12 }}>Focus Task</p>
+                        <h2 style={{ fontSize: 26, fontWeight: 300, color: 'var(--el-text)', letterSpacing: '-0.02em', marginBottom: 6 }}>
+                            {todayTask.title}
+                        </h2>
+                        {todayTask.reason && (
+                            <p style={{ fontSize: 15, color: 'var(--el-text-muted)', lineHeight: 1.6, marginBottom: 20 }}>
+                                {todayTask.reason}
+                            </p>
+                        )}
+
+                        {/* Progress bar */}
+                        <div style={{ marginBottom: 24 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 12, fontWeight: 600 }}>
+                                <span style={{ color: 'var(--el-text-muted)' }}>Daily Progress</span>
+                                <span style={{ color: 'var(--el-text)' }}>{completedCount}/{totalCount}</span>
                             </div>
-                            <div className="h-1.5 overflow-hidden rounded-full bg-blue-200 dark:bg-blue-900/30">
-                                <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${milestoneData.progressPercent}%` }}
-                                    transition={{ duration: 1, ease: "easeOut" }}
-                                    className="h-full rounded-full bg-blue-600 dark:bg-blue-400"
+                            <div style={{ height: 6, background: 'var(--el-bg-secondary)', borderRadius: 10, overflow: 'hidden' }}>
+                                <div
+                                    style={{ 
+                                        height: '100%', 
+                                        background: 'var(--el-text)', 
+                                        borderRadius: 10, 
+                                        width: `${pct}%`,
+                                        transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)' 
+                                    }}
                                 />
                             </div>
                             <p className="mt-1.5 text-xs text-blue-700 dark:text-blue-300">
@@ -101,23 +151,75 @@ const TodayExecution = ({
                                     : `${milestoneData.daysRemaining} more days to complete this week!`}
                             </p>
                         </div>
-                    )}
 
-                    <div className="max-w-2xl">
-                        <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                            Today's Prime Mission
-                        </p>
-                        <h2 className="text-lg font-medium leading-snug text-slate-700 dark:text-slate-200 sm:text-xl">
-                            {todayTask?.title || "Loading your mission..."}
-                        </h2>
-                        {todayTask?.reason && (
-                            <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
-                                <Sparkles className="mr-1.5 inline-block h-3 w-3 text-amber-500" />
-                                {todayTask.reason}
-                            </p>
+                        {/* CTA Buttons */}
+                        <div style={{ display: 'flex', gap: 12 }}>
+                            <button
+                                onClick={() => onStartFocus(todayTask)}
+                                disabled={!todayTask || loading}
+                                style={{
+                                    display: 'flex', alignItems: 'center', gap: 8, padding: '10px 28px', 
+                                    background: 'var(--el-text)', color: 'var(--el-bg)', fontSize: 13, fontWeight: 700, 
+                                    borderRadius: 9999, border: 'none', cursor: 'pointer', opacity: loading ? 0.6 : 1,
+                                    boxShadow: 'var(--el-shadow-button)'
+                                }}
+                            >
+                                <Play style={{ width: 15, height: 15, fill: 'currentColor' }} />
+                                Start Session
+                            </button>
+                            <button
+                                onClick={onChangeTask}
+                                style={{
+                                    display: 'flex', alignItems: 'center', gap: 8, padding: '10px 24px', 
+                                    background: 'var(--el-bg)', border: '1px solid var(--el-border)', 
+                                    color: 'var(--el-text)', fontSize: 13, fontWeight: 600, 
+                                    borderRadius: 9999, cursor: 'pointer',
+                                    boxShadow: 'var(--el-shadow-inset)'
+                                }}
+                            >
+                                <RefreshCw style={{ width: 14, height: 14 }} />
+                                Swap Task
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Right: Circular Progress Ring */}
+                    <div style={{ display: 'flex', flexDirection: 'column', items: 'center', gap: 16, textAlign: 'center' }}>
+                        <div style={{ position: 'relative', width: 120, height: 120 }}>
+                            <svg style={{ width: 120, height: 120, transform: 'rotate(-90deg)' }} viewBox="0 0 120 120">
+                                <circle
+                                    cx="60" cy="60" r="54"
+                                    stroke="var(--el-bg-secondary)" strokeWidth="8" fill="none"
+                                />
+                                <circle
+                                    cx="60" cy="60" r="54"
+                                    stroke="var(--el-text)" strokeWidth="8" fill="none"
+                                    strokeLinecap="round"
+                                    strokeDasharray={`${(2 * Math.PI * 54).toFixed(2)}`}
+                                    strokeDashoffset={`${(2 * Math.PI * 54 * (1 - pct / 100)).toFixed(2)}`}
+                                    style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
+                                />
+                            </svg>
+                            <div style={{ 
+                                position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', 
+                                alignItems: 'center', justifyContent: 'center' 
+                            }}>
+                                <span style={{ fontSize: 28, fontWeight: 300, color: 'var(--el-text)', letterSpacing: '-0.04em' }}>{pct}%</span>
+                                <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--el-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Done</span>
+                            </div>
+                        </div>
+                        {todayTask.estimated_time && (
+                            <div style={{ 
+                                display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px',
+                                background: 'var(--el-bg-secondary)', borderRadius: 20, fontSize: 11, fontWeight: 600, color: 'var(--el-text-secondary)'
+                            }}>
+                                <Timer style={{ width: 12, height: 12 }} />
+                                {todayTask.estimated_time}
+                            </div>
                         )}
                     </div>
                 </div>
+            ) : null}
 
                 <div className="flex flex-shrink-0 flex-col gap-2 sm:flex-row sm:items-center lg:pt-1">
                     <motion.button
@@ -139,18 +241,9 @@ const TodayExecution = ({
                         Change Task
                     </button>
                 </div>
-            </div>
-
-            {/* Progress Bar Bottom */}
-            <div className="absolute bottom-0 left-0 h-0.5 w-full bg-slate-100 dark:bg-white/5">
-                <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(completedCount / Math.max(totalCount, 1)) * 100}%` }}
-                    className="h-full bg-blue-500 dark:bg-white"
-                />
-            </div>
+            )}
         </section>
     );
-};
+});
 
 export default TodayExecution;

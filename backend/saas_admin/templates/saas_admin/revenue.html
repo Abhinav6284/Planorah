@@ -1,0 +1,158 @@
+{% extends "saas_admin/base.html" %}
+{% block content %}
+
+<!-- KPI Cards -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  <div class="metric-card border-l-4 border-l-brand-500">
+    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">MRR</p>
+    <p class="text-3xl font-bold text-slate-900">₹{{ mrr|floatformat:0 }}</p>
+    <p class="text-xs text-slate-500 mt-1">Monthly Recurring Revenue</p>
+  </div>
+  <div class="metric-card">
+    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">ARR</p>
+    <p class="text-3xl font-bold text-slate-900">₹{{ arr|floatformat:0 }}</p>
+    <p class="text-xs text-slate-500 mt-1">Annual Run Rate</p>
+  </div>
+  <div class="metric-card">
+    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Total Revenue</p>
+    <p class="text-3xl font-bold text-slate-900">₹{{ total_revenue|floatformat:0 }}</p>
+    <p class="text-xs text-slate-500 mt-1">All-time completed</p>
+  </div>
+  <div class="metric-card">
+    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">This Month</p>
+    <p class="text-3xl font-bold text-slate-900">₹{{ revenue_this_month|floatformat:0 }}</p>
+    <p class="text-xs text-slate-500 mt-1">Current month</p>
+  </div>
+  <div class="metric-card">
+    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Churn Rate</p>
+    <p class="text-3xl font-bold {% if churn_rate > 5 %}text-red-600{% elif churn_rate > 2 %}text-amber-600{% else %}text-emerald-600{% endif %}">
+      {{ churn_rate }}%
+    </p>
+    <p class="text-xs text-slate-500 mt-1">Cancelled this month</p>
+  </div>
+  <div class="metric-card col-span-1">
+    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Conversion Rate</p>
+    <p class="text-3xl font-bold text-emerald-600">{{ conversion_rate }}%</p>
+    <p class="text-xs text-slate-500 mt-1">Free → Paid</p>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+  <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+    <h3 class="text-sm font-semibold text-slate-900 mb-1">Monthly Revenue</h3>
+    <p class="text-xs text-slate-500 mb-4">Last 12 months (₹)</p>
+    <div class="h-56">
+      <canvas id="revenueChart"></canvas>
+    </div>
+  </div>
+  <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+    <h3 class="text-sm font-semibold text-slate-900 mb-1">Subscription Growth</h3>
+    <p class="text-xs text-slate-500 mb-4">New subscriptions per month</p>
+    <div class="h-56">
+      <canvas id="subChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Revenue by Plan -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+  <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+    <h3 class="text-sm font-semibold text-slate-900 mb-4">Revenue by Plan</h3>
+    <div class="space-y-3">
+      {% for item in revenue_by_plan %}
+      <div>
+        <div class="flex justify-between text-xs text-slate-600 mb-1">
+          <span class="font-medium">{{ item.plan__display_name|default:"Unknown" }}</span>
+          <span class="font-semibold text-slate-900">₹{{ item.total|floatformat:0 }}</span>
+        </div>
+        <div class="w-full bg-slate-100 rounded-full h-1.5">
+          <div class="bg-brand-500 h-1.5 rounded-full"
+               style="width: {{ item.total|floatformat:0 }}%"
+               data-max="{{ revenue_by_plan.0.total }}"></div>
+        </div>
+        <p class="text-xs text-slate-400 mt-0.5">{{ item.count }} payments</p>
+      </div>
+      {% empty %}
+      <p class="text-sm text-slate-400 text-center py-4">No revenue data yet</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Recent Payments -->
+  <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100">
+      <h3 class="text-sm font-semibold text-slate-900">Recent Payments</h3>
+    </div>
+    <table class="w-full data-table">
+      <thead>
+        <tr>
+          <th>Receipt</th>
+          <th>User</th>
+          <th>Plan</th>
+          <th>Amount</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for payment in recent_payments %}
+        <tr>
+          <td class="font-mono text-xs text-slate-500">{{ payment.receipt_number }}</td>
+          <td>
+            <a href="{% url 'saas_admin:user_detail' payment.user.id %}"
+               class="text-brand-600 hover:text-brand-800 font-medium text-sm">
+              {{ payment.user.first_name|default:payment.user.username }}
+            </a>
+          </td>
+          <td><span class="badge badge-blue">{{ payment.plan.display_name }}</span></td>
+          <td class="font-bold text-emerald-600">₹{{ payment.amount|floatformat:0 }}</td>
+          <td class="text-xs text-slate-500">{{ payment.created_at|date:"M d, Y H:i" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center py-8 text-slate-400">No payments yet</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const revenueData = {{ revenue_chart|safe }};
+  const subData = {{ sub_chart|safe }};
+
+  const opts = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#94a3b8', maxRotation: 45 } },
+      y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 }, color: '#94a3b8' } }
+    }
+  };
+
+  new Chart(document.getElementById('revenueChart'), {
+    type: 'bar',
+    data: {
+      labels: revenueData.labels,
+      datasets: [{ data: revenueData.values, backgroundColor: '#6366f1', borderRadius: 5, borderSkipped: false }]
+    },
+    options: opts
+  });
+
+  new Chart(document.getElementById('subChart'), {
+    type: 'line',
+    data: {
+      labels: subData.labels,
+      datasets: [{
+        data: subData.values,
+        borderColor: '#10b981',
+        backgroundColor: 'rgba(16,185,129,0.1)',
+        borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0
+      }]
+    },
+    options: opts
+  });
+</script>
+{% endblock %}

@@ -138,7 +138,7 @@ const FullCalendar = ({ onEventClick }) => {
     const maxTime = useMemo(() => new Date(1970, 1, 1, 23, 0, 0), []);
 
     return (
-        <div className="scheduler-full-calendar h-full min-h-[680px] rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-[#111318] md:p-4">
+        <div className="scheduler-full-calendar h-full min-h-[680px] rounded-2xl border border-gray-200 bg-white p-3 dark:border-charcoalMuted dark:bg-[#111318] md:p-4">
             <Calendar
                 localizer={localizer}
                 events={events}

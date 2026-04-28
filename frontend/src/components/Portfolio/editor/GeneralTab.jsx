@@ -1,8 +1,8 @@
 import React from 'react';
 import { parseSkillsInput, stringifySkills } from './portfolioEditorUtils';
 
-const inputCls = 'w-full px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-colors text-sm';
-const inputErrCls = 'w-full px-4 py-2.5 bg-white dark:bg-gray-900 border border-red-400 dark:border-red-500 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-red-500 outline-none transition-colors text-sm';
+const inputCls = 'w-full px-4 py-2.5 bg-white dark:bg-charcoalDark border border-gray-200 dark:border-charcoalMuted rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-colors text-sm';
+const inputErrCls = 'w-full px-4 py-2.5 bg-white dark:bg-charcoalDark border border-red-400 dark:border-red-500 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-red-500 outline-none transition-colors text-sm';
 
 function FieldError({ error }) {
   if (!error) return null;
@@ -13,7 +13,7 @@ export default function GeneralTab({ portfolio, onFieldChange, fieldErrors = {} 
   const cls = (field) => fieldErrors[field] ? inputErrCls : inputCls;
   return (
     <div className="space-y-5">
-      <div className="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
+      <div className="bg-white dark:bg-charcoal border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
         <h3 className="text-gray-900 dark:text-white font-semibold mb-5">Basic Information</h3>
         <div className="space-y-4">
           <div>

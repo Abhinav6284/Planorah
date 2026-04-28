@@ -10,7 +10,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     username_field = User.USERNAME_FIELD  # keep compatibility
 
     def validate(self, attrs):
-        identifier = attrs.get("username")
+        # USERNAME_FIELD is "email" on CustomUser, so attrs contains "email".
+        # Fall back to "username" for legacy callers.
+        identifier = attrs.get(self.username_field) or attrs.get("username")
         password = attrs.get("password")
 
         user = None
@@ -18,7 +20,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             try:
                 user_obj = User.objects.get(email=identifier)
                 user = authenticate(
-                    username=user_obj.username, password=password)
+                    username=user_obj.email, password=password)
             except User.DoesNotExist:
                 pass
         else:

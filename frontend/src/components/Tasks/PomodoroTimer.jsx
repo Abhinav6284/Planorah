@@ -126,7 +126,7 @@ export default function PomodoroTimer({ taskId, estimatedMinutes }) {
                 </button>
                 <button
                     onClick={resetTimer}
-                    className="px-8 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-all"
+                    className="px-8 py-3 bg-gray-200 dark:bg-charcoalMuted text-gray-700 dark:text-gray-300 rounded-full font-medium hover:bg-gray-300 dark:hover:bg-charcoalMuted transition-all"
                 >
                     Reset
                 </button>

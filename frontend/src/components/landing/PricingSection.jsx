@@ -1,127 +1,103 @@
-import React from "react";
+import { Check } from "lucide-react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+
+const plans = [
+  {
+    name: "Free",
+    price: "₹0",
+    description: "Get started with the basics",
+    features: [
+      "1 Career Roadmap",
+      "Basic Resume Generator",
+      "Job Finder (limited)",
+      "Quicky AI (5/day)",
+      "Task Management (basic)",
+    ],
+    cta: "Get Started",
+    href: "/register",
+    highlighted: false,
+  },
+  {
+    name: "Starter",
+    price: "₹99",
+    period: "/month",
+    description: "For students building momentum",
+    features: [
+      "5 Career Roadmaps/month",
+      "Full Resume Generator",
+      "Job Finder (unlimited)",
+      "Quicky AI (unlimited)",
+      "Task & Project Management",
+      "Portfolio Live (addon ₹79)",
+    ],
+    cta: "Get Started",
+    href: "/pricing",
+    highlighted: false,
+  },
+  {
+    name: "Pro",
+    price: "₹249",
+    period: "/month",
+    description: "For serious students ready to execute",
+    features: [
+      "15 Career Roadmaps/month",
+      "Everything in Starter",
+      "ATS Scanner (unlimited)",
+      "Resources Hub (50+ tools)",
+      "Portfolio Live (included)",
+      "5 x 1:1 Sessions/month (30 min)",
+    ],
+    cta: "Start Free Trial",
+    href: "/pricing",
+    highlighted: true,
+  },
+  {
+    name: "Elite",
+    price: "₹499",
+    period: "/month",
+    description: "Full coaching & priority access",
+    features: [
+      "Unlimited Career Roadmaps",
+      "Everything in Pro",
+      "10 x 1:1 Sessions/month (45 min)",
+      "Priority booking",
+      "Async support (WhatsApp/Discord)",
+      "Early access to new features",
+    ],
+    cta: "Go Elite",
+    href: "/pricing",
+    highlighted: false,
+  },
+];
 
 export default function PricingSection() {
-  const plans = [
-    {
-      name: "Starter",
-      price: "Free",
-      period: null,
-      desc: "Perfect for getting started",
-      features: [
-        "5 Active Goals",
-        "Basic Roadmaps",
-        "Community Support",
-        "Public Portfolio",
-        "3 Resume Exports",
-      ],
-      cta: "Get Started Free",
-      href: "/register",
-      popular: false,
-      gradient: "from-gray-50 to-gray-100 dark:from-gray-800/60 dark:to-gray-800/40",
-      border: "border-gray-200 dark:border-gray-700",
-    },
-    {
-      name: "Pro",
-      price: "$9",
-      period: "/month",
-      desc: "For serious creators and learners",
-      features: [
-        "Unlimited Goals",
-        "AI Roadmap Generator",
-        "Priority AI Mentor",
-        "Custom Portfolio Domain",
-        "Unlimited Resume Exports",
-        "ATS Resume Scanner",
-        "Advanced Analytics",
-      ],
-      cta: "Start Pro Trial",
-      href: "/register",
-      popular: true,
-      gradient: "from-gray-50 to-gray-100 dark:from-gray-800/60 dark:to-gray-800/40",
-      border: "border-violet-400/30",
-    },
-    {
-      name: "Team",
-      price: "$29",
-      period: "/month",
-      desc: "For ambitious groups and teams",
-      features: [
-        "Everything in Pro",
-        "Up to 10 Members",
-        "Team Dashboard",
-        "Shared Roadmaps",
-        "Dedicated Support",
-        "Custom Integrations",
-      ],
-      cta: "Start Team Trial",
-      href: "/register",
-      popular: false,
-      gradient: "from-gray-50 to-gray-100 dark:from-gray-800/60 dark:to-gray-800/40",
-      border: "border-gray-200 dark:border-gray-700",
-    },
-  ];
-
   return (
-    <section id="pricing" className="relative scroll-mt-36 py-32 md:py-40 overflow-hidden bg-white dark:bg-[#0f1117] border-y border-slate-200/60 dark:border-white/[0.05]">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-8 left-[8%] h-56 w-56 rounded-full bg-indigo-100/35 dark:bg-indigo-900/15 blur-3xl" />
-        <div className="absolute bottom-0 right-[10%] h-64 w-64 rounded-full bg-cyan-100/35 dark:bg-cyan-900/12 blur-3xl" />
-        <div className="absolute inset-0 opacity-[0.07] dark:opacity-[0.12] [background-image:radial-gradient(rgba(15,23,42,0.12)_1px,transparent_1px)] dark:[background-image:radial-gradient(rgba(255,255,255,0.07)_1px,transparent_1px)] [background-size:34px_34px]" />
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
-        {/* Header */}
+    <section id="pricing" className="scroll-mt-32 py-20 px-6 bg-beigeSecondary dark:bg-charcoal">
+      <div className="max-w-7xl mx-auto">
+        {/* Section Header */}
         <div className="text-center mb-16">
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-block px-4 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-800/50 text-indigo-700 dark:text-indigo-300 text-sm font-semibold mb-4"
-          >
-            Simple pricing
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-4xl md:text-5xl font-bold font-serif text-gray-900 dark:text-white mb-5 tracking-tight"
-          >
-            Invest in your{" "}
-            <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
-              future
-            </span>
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto font-medium"
-          >
-            No hidden fees. No surprise charges. Cancel anytime.
-          </motion.p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Pricing</p>
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-playfair font-bold text-gray-950 dark:text-white mb-6 leading-tight">
+            Simple, transparent pricing
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            Pick what works. Cancel anytime. No BS.
+          </p>
         </div>
 
-        {/* Pricing cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-          {plans.map((plan, index) => (
-            <motion.div
-              key={plan.name}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ y: plan.popular ? -6 : -3, transition: { duration: 0.2 } }}
-              className="relative"
+        {/* Pricing Cards */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {plans.map((plan, idx) => (
+            <div
+              key={idx}
+              className={`relative rounded-2xl transition-all duration-300 ${plan.highlighted
+                  ? "md:scale-[1.04] bg-gray-950 dark:bg-white text-white dark:text-gray-950"
+                  : "bg-white dark:bg-charcoalDark border border-beigeMuted dark:border-white/[0.08] hover:border-terracotta/30 dark:hover:border-white/[0.12]"
+                }`}
             >
-              {plan.popular && (
-                <div className="absolute -top-4 inset-x-0 flex justify-center z-10">
-                  <span className="px-4 py-1 bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-xs font-bold rounded-full shadow-lg shadow-violet-500/30 tracking-wide uppercase">
-                    Most Popular
-                  </span>
+              {plan.highlighted && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-gray-950 dark:bg-white text-white dark:text-gray-950 text-xs font-semibold rounded-full">
+                  Popular
                 </div>
               )}
 
@@ -143,13 +119,19 @@ export default function PricingSection() {
                     <span className={`text-4xl font-bold ${plan.popular ? "text-white" : "text-gray-900 dark:text-white"}`}>
                       {plan.price}
                     </span>
-                    {plan.period && (
-                      <span className={`text-sm mb-1 ${plan.popular ? "text-violet-200" : "text-gray-500 dark:text-gray-400"}`}>
-                        {plan.period}
-                      </span>
-                    )}
-                  </div>
+                  )}
                 </div>
+
+                {/* CTA Button */}
+                <Link
+                  to={plan.href}
+                  className={`w-full inline-flex items-center justify-center py-3 rounded-lg font-medium mb-8 transition-all duration-300 ${plan.highlighted
+                      ? "bg-white dark:bg-charcoalDark text-gray-950 dark:text-white hover:bg-[#EBE6DA] dark:hover:bg-charcoal"
+                      : "bg-[#EBE6DA] dark:bg-white/[0.06] text-gray-950 dark:text-white hover:bg-[#EBE6DA]/80 dark:hover:bg-white/[0.08]"
+                    }`}
+                >
+                  {plan.cta}
+                </Link>
 
                 {/* Features */}
                 <ul className="space-y-3 mb-8 flex-1">
@@ -187,7 +169,7 @@ export default function PricingSection() {
                   </motion.button>
                 </Link>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 

@@ -86,7 +86,7 @@ const ResearchWidget = ({ userField = '' }) => {
     }
 
     return (
-        <div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm h-full">
+        <div className="bg-white dark:bg-charcoal rounded-3xl p-5 border border-gray-100 dark:border-charcoalMuted shadow-sm h-full">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                     <span className="text-xl">🔬</span>
@@ -101,7 +101,7 @@ const ResearchWidget = ({ userField = '' }) => {
                         href={platform.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all group"
+                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-charcoalMuted transition-all group"
                     >
                         <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${platform.color} flex items-center justify-center text-white flex-shrink-0`}>
                             {platform.icon}

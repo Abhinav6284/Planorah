@@ -6,6 +6,105 @@ from django.conf import settings
 from django.db import migrations, models
 
 
+def _drop_legacy_fk_constraints(apps, schema_editor):
+    """
+    Drop old FK constraints before replacing tasks_task.id as primary key.
+    Required on PostgreSQL; SQLite does not support DROP CONSTRAINT syntax.
+    """
+    if schema_editor.connection.vendor != "postgresql":
+        return
+
+    schema_editor.execute(
+        """
+        ALTER TABLE tasks_task
+            DROP CONSTRAINT IF EXISTS tasks_task_original_task_id_5fd355c6_fk_tasks_task_id;
+        """
+    )
+    schema_editor.execute(
+        """
+        ALTER TABLE tasks_taskattempt
+            DROP CONSTRAINT IF EXISTS tasks_taskattempt_task_id_8de28949_fk_tasks_task_id;
+        """
+    )
+    # Only touch scheduler_event if it exists (avoids failures in test environments
+    # where scheduler migrations have not been applied yet).
+    with schema_editor.connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT to_regclass('public.scheduler_event')"
+        )
+        table_exists = cursor.fetchone()[0]
+    if table_exists:
+        schema_editor.execute(
+            """
+            ALTER TABLE scheduler_event
+                DROP CONSTRAINT IF EXISTS scheduler_event_linked_task_id_75557d58_fk_tasks_task_id;
+            """
+        )
+
+
+def _sqlite_rebuild_fk_field(apps, schema_editor, app_label, model_name, field_name):
+    """
+    Rebuild a FK column on SQLite using Django schema editor so indexes and
+    constraints are recreated consistently.
+    """
+    model = apps.get_model(app_label, model_name)
+    field = model._meta.get_field(field_name)
+    schema_editor.remove_field(model, field)
+    schema_editor.add_field(model, field)
+
+
+def _recreate_task_fk_columns(apps, schema_editor):
+    """
+    Recreate FK columns to target tasks_task.task_id (UUID PK after this migration).
+    PostgreSQL gets strict FK constraints; SQLite gets compatible columns.
+    """
+    vendor = schema_editor.connection.vendor
+
+    if vendor == "postgresql":
+        schema_editor.execute(
+            """
+            ALTER TABLE tasks_task DROP COLUMN IF EXISTS original_task_id;
+            ALTER TABLE tasks_task ADD COLUMN original_task_id uuid NULL;
+            ALTER TABLE tasks_task
+                ADD CONSTRAINT tasks_task_original_task_id_fk
+                FOREIGN KEY (original_task_id)
+                REFERENCES tasks_task(task_id)
+                DEFERRABLE INITIALLY DEFERRED;
+
+            ALTER TABLE tasks_taskattempt DROP COLUMN IF EXISTS task_id;
+            ALTER TABLE tasks_taskattempt ADD COLUMN task_id uuid NULL;
+            ALTER TABLE tasks_taskattempt
+                ADD CONSTRAINT tasks_taskattempt_task_id_fk
+                FOREIGN KEY (task_id)
+                REFERENCES tasks_task(task_id)
+                DEFERRABLE INITIALLY DEFERRED;
+            """
+        )
+        # Only recreate scheduler_event FK column if the table exists
+        with schema_editor.connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT to_regclass('public.scheduler_event')"
+            )
+            table_exists = cursor.fetchone()[0]
+        if table_exists:
+            schema_editor.execute(
+                """
+                ALTER TABLE scheduler_event DROP COLUMN IF EXISTS linked_task_id;
+                ALTER TABLE scheduler_event ADD COLUMN linked_task_id uuid NULL;
+                ALTER TABLE scheduler_event
+                    ADD CONSTRAINT scheduler_event_linked_task_id_fk
+                    FOREIGN KEY (linked_task_id)
+                    REFERENCES tasks_task(task_id)
+                    DEFERRABLE INITIALLY DEFERRED;
+                """
+            )
+        return
+
+    if vendor == "sqlite":
+        _sqlite_rebuild_fk_field(apps, schema_editor, "scheduler", "Event", "linked_task")
+        _sqlite_rebuild_fk_field(apps, schema_editor, "tasks", "TaskAttempt", "task")
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -47,18 +146,10 @@ class Migration(migrations.Migration):
             name='taskattempt',
             unique_together=set(),
         ),
-        # Drop FK constraints that reference tasks_task.id before we remove it.
-        # PostgreSQL refuses to drop a PK column while FK constraints depend on it.
-        migrations.RunSQL(
-            sql="""
-                ALTER TABLE tasks_task
-                    DROP CONSTRAINT IF EXISTS tasks_task_original_task_id_5fd355c6_fk_tasks_task_id;
-                ALTER TABLE scheduler_event
-                    DROP CONSTRAINT IF EXISTS scheduler_event_linked_task_id_75557d58_fk_tasks_task_id;
-                ALTER TABLE tasks_taskattempt
-                    DROP CONSTRAINT IF EXISTS tasks_taskattempt_task_id_8de28949_fk_tasks_task_id;
-            """,
-            reverse_sql=migrations.RunSQL.noop,
+        # Drop legacy constraints only on PostgreSQL.
+        migrations.RunPython(
+            code=_drop_legacy_fk_constraints,
+            reverse_code=migrations.RunPython.noop,
         ),
         migrations.RemoveField(
             model_name='task',
@@ -94,36 +185,10 @@ class Migration(migrations.Migration):
             field=models.UUIDField(
                 default=uuid.uuid4, editable=False, primary_key=True, serialize=False),
         ),
-        # The three FK columns that referenced the old integer tasks_task.id are now
-        # orphaned (their FK constraints were dropped above and the target column is gone).
-        # Recreate them as UUID columns pointing to the new task_id PK.
-        migrations.RunSQL(
-            sql="""
-                ALTER TABLE tasks_task DROP COLUMN IF EXISTS original_task_id;
-                ALTER TABLE tasks_task ADD COLUMN original_task_id uuid NULL;
-                ALTER TABLE tasks_task
-                    ADD CONSTRAINT tasks_task_original_task_id_fk
-                    FOREIGN KEY (original_task_id)
-                    REFERENCES tasks_task(task_id)
-                    DEFERRABLE INITIALLY DEFERRED;
-
-                ALTER TABLE scheduler_event DROP COLUMN IF EXISTS linked_task_id;
-                ALTER TABLE scheduler_event ADD COLUMN linked_task_id uuid NULL;
-                ALTER TABLE scheduler_event
-                    ADD CONSTRAINT scheduler_event_linked_task_id_fk
-                    FOREIGN KEY (linked_task_id)
-                    REFERENCES tasks_task(task_id)
-                    DEFERRABLE INITIALLY DEFERRED;
-
-                ALTER TABLE tasks_taskattempt DROP COLUMN IF EXISTS task_id;
-                ALTER TABLE tasks_taskattempt ADD COLUMN task_id uuid NULL;
-                ALTER TABLE tasks_taskattempt
-                    ADD CONSTRAINT tasks_taskattempt_task_id_fk
-                    FOREIGN KEY (task_id)
-                    REFERENCES tasks_task(task_id)
-                    DEFERRABLE INITIALLY DEFERRED;
-            """,
-            reverse_sql=migrations.RunSQL.noop,
+        # Recreate FK columns with backend-specific SQL.
+        migrations.RunPython(
+            code=_recreate_task_fk_columns,
+            reverse_code=migrations.RunPython.noop,
         ),
         migrations.AddField(
             model_name='task',

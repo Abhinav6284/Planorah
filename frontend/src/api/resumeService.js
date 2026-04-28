@@ -3,7 +3,7 @@ import api from "./axios";
 export const resumeService = {
     // Generate new resume from PASS attempts
     generateResume: async (roadmapId, templateId = null) => {
-        const response = await api.post("tasks/resume/generate/", {
+        const response = await api.post("resume/generate/", {
             roadmap_id: roadmapId,
             template_id: templateId
         });
@@ -12,7 +12,7 @@ export const resumeService = {
 
     // Get latest resume for roadmap
     getLatestResume: async (roadmapId) => {
-        const response = await api.get(`tasks/resume/latest/`, {
+        const response = await api.get(`resume/latest/`, {
             params: { roadmap_id: roadmapId }
         });
         return response.data;
@@ -20,25 +20,25 @@ export const resumeService = {
 
     // Get specific resume version
     getResumeVersion: async (versionId) => {
-        const response = await api.get(`tasks/resume/${versionId}/`);
+        const response = await api.get(`resume/${versionId}/`);
         return response.data;
     },
 
     // Get all resume versions for user
     getResumeHistory: async () => {
-        const response = await api.get("tasks/resume/");
+        const response = await api.get("resume/");
         return response.data;
     },
 
     // Verify resume integrity
     verifyResume: async (versionId) => {
-        const response = await api.get(`tasks/resume/${versionId}/verify/`);
+        const response = await api.get(`resume/${versionId}/verify/`);
         return response.data;
     },
 
     // Export resume
     exportResume: async (versionId, format = 'json') => {
-        const response = await api.get(`tasks/resume/${versionId}/export/`, {
+        const response = await api.get(`resume/${versionId}/export/`, {
             params: { format }
         });
         return response.data;

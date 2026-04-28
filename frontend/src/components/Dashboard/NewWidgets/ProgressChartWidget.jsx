@@ -43,7 +43,7 @@ const ProgressChartWidget = ({ data = [] }) => {
         : 0;
 
     return (
-        <div className="bg-white dark:bg-[#1C1C1E] rounded-[28px] p-5 h-full flex flex-col relative overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm">
+        <div className="bg-white dark:bg-charcoal rounded-[28px] p-5 h-full flex flex-col relative overflow-hidden border border-gray-100 dark:border-charcoalMuted shadow-sm">
             {/* Header */}
             <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-3">
@@ -80,7 +80,7 @@ const ProgressChartWidget = ({ data = [] }) => {
                             <div className="relative w-full h-full flex items-end justify-center">
                                 {/* Hover tooltip */}
                                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10">
-                                    <div className="bg-gray-900 dark:bg-gray-700 text-white text-[10px] px-2 py-1 rounded-lg whitespace-nowrap shadow-lg">
+                                    <div className="bg-gray-900 dark:bg-charcoalMuted text-white text-[10px] px-2 py-1 rounded-lg whitespace-nowrap shadow-lg">
                                         {item.count} task{item.count !== 1 ? 's' : ''}
                                     </div>
                                 </div>
@@ -92,7 +92,7 @@ const ProgressChartWidget = ({ data = [] }) => {
                                             ? 'bg-gradient-to-t from-yellow-500 to-yellow-400 shadow-md shadow-yellow-500/30'
                                             : item.count > 0
                                                 ? 'bg-gradient-to-t from-emerald-500 to-emerald-400 shadow-sm'
-                                                : 'bg-gray-100 dark:bg-gray-800'
+                                                : 'bg-gray-100 dark:bg-charcoal'
                                         }
                                         group-hover:scale-105 group-hover:shadow-lg
                                     `}
@@ -115,7 +115,7 @@ const ProgressChartWidget = ({ data = [] }) => {
             </div>
 
             {/* Legend */}
-            <div className="flex items-center justify-center gap-5 text-xs mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
+            <div className="flex items-center justify-center gap-5 text-xs mt-4 pt-3 border-t border-gray-100 dark:border-charcoalMuted">
                 <div className="flex items-center gap-1.5">
                     <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-yellow-500 to-yellow-400" />
                     <span className="text-gray-500 dark:text-gray-400">Today</span>
@@ -125,7 +125,7 @@ const ProgressChartWidget = ({ data = [] }) => {
                     <span className="text-gray-500 dark:text-gray-400">Completed</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-gray-100 dark:bg-charcoal border border-gray-200 dark:border-charcoalMuted" />
                     <span className="text-gray-500 dark:text-gray-400">No tasks</span>
                 </div>
             </div>

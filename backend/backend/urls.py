@@ -7,9 +7,17 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
 from dashboard import views as dashboard_views
+from rest_framework_simplejwt.views import TokenObtainPairView as DefaultTokenObtainPairView
+from users.serializers import CustomTokenObtainPairSerializer
+
+
+class CustomTokenObtainPairView(DefaultTokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('saas-admin/', include('saas_admin.urls')),
+    path('api/admin/', include('saas_admin.api_urls')),
     path('api/', include('api.urls')),
     path('api/users/', include('users.urls')),
     path('api/resume/', include('resume.urls')),
@@ -32,6 +40,7 @@ urlpatterns = [
     # Career execution platform modules
     path('api/plans/', include('plans.urls')),
     path('api/subscriptions/', include('subscriptions.urls')),
+    path('api/projects/', include('projects.urls')),
     path('api/portfolio/', include('portfolio.urls')),
     path('api/github/', include('github_integration.urls')),
     path('api/billing/', include('billing.urls')),
@@ -43,9 +52,10 @@ urlpatterns = [
     # Planora AI-powered study platform
     path('api/planora/', include('planora.urls')),
     # Backward-compatible alias used by current production clients
-    path('planora/', include('planora.urls')),
+    path('planora/', include(('planora.urls', 'planora'), namespace='planora_legacy')),
+    path('api/sessions/', include('sessions.urls')),
     # JWT token endpoints
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 

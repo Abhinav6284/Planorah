@@ -3,8 +3,7 @@ Pre-validation for manual submissions.
 Reduces human reviewer load by catching obvious issues automatically.
 """
 import requests
-import hashlib
-from typing import Dict, Any, List, Tuple, Optional
+from typing import Dict, Any, Tuple
 from urllib.parse import urlparse
 
 
@@ -160,35 +159,3 @@ class PreValidator:
                 'reason': 'URL not reachable',
                 'errors': self.errors
             }
-
-
-def compute_content_hash(content: bytes) -> str:
-    """
-    Compute SHA256 hash of content for similarity detection.
-
-    Args:
-        content: File content as bytes
-
-    Returns:
-        Hex digest of SHA256 hash
-    """
-    return hashlib.sha256(content).hexdigest()
-
-
-def check_hash_similarity(new_hash: str, existing_hashes: list) -> Tuple[bool, Optional[str]]:
-    """
-    Check if content hash matches existing submissions (plagiarism detection).
-
-    Args:
-        new_hash: Hash of new submission
-        existing_hashes: List of hashes from previous submissions
-
-    Returns:
-        (is_duplicate, matching_hash) where:
-        - is_duplicate: True if hash matches an existing submission
-        - matching_hash: The matching hash if found, else None
-    """
-    if new_hash in existing_hashes:
-        return True, new_hash
-
-    return False, None

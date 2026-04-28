@@ -27,14 +27,14 @@ const importanceMap = {
 };
 
 const statusMap = {
-  not_started: 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600',
+  not_started: 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-charcoalMuted dark:text-gray-300 dark:border-charcoalMuted',
   weak: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800',
   strong: 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800',
   _default: 'bg-gray-100 text-gray-600 border-gray-200',
 };
 
 const depthMap = {
-  short: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800',
+  short: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-charcoal/20 dark:text-blue-400 dark:border-blue-800',
   medium: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800',
   long: 'bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-900/20 dark:text-pink-400 dark:border-pink-800',
   _default: 'bg-gray-100 text-gray-600 border-gray-200',
@@ -72,7 +72,7 @@ const TopicRow = ({ topic, onProgressChange }) => {
   return (
     <motion.div
       layout
-      className="flex items-center gap-4 py-3 px-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group"
+      className="flex items-center gap-4 py-3 px-4 rounded-xl hover:bg-gray-50 dark:hover:bg-charcoalMuted/50 transition-colors group"
     >
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
@@ -104,13 +104,13 @@ const TopicRow = ({ topic, onProgressChange }) => {
       <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
         <Link
           to={`/planora/topic/${topic.id}/notes`}
-          className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+          className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium bg-gray-100 dark:bg-charcoalMuted text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-charcoalMuted transition-colors"
         >
           Notes
         </Link>
         <Link
           to={`/planora/topic/${topic.id}/guide`}
-          className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+          className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium bg-gray-100 dark:bg-charcoalMuted text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-charcoalMuted transition-colors"
         >
           Guide
         </Link>
@@ -162,7 +162,7 @@ const SyllabusPanel = ({ subject, onTopicsGenerated }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
+    <div className="bg-white dark:bg-charcoal rounded-2xl border border-gray-200 dark:border-charcoalMuted p-6">
       <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
         📄 Syllabus
       </h3>
@@ -171,12 +171,12 @@ const SyllabusPanel = ({ subject, onTopicsGenerated }) => {
         value={text}
         onChange={e => setText(e.target.value)}
         placeholder="Paste your syllabus here…"
-        className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white resize-none mb-3"
+        className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-charcoalMuted bg-gray-50 dark:bg-charcoalDark text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white resize-none mb-3"
       />
       <div className="flex items-center gap-2 mb-3">
         <button
           onClick={() => fileRef.current?.click()}
-          className="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          className="px-3 py-2 rounded-xl border border-gray-200 dark:border-charcoalMuted text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-charcoalMuted transition-colors"
         >
           {file ? file.name : 'Upload PDF'}
         </button>
@@ -184,7 +184,7 @@ const SyllabusPanel = ({ subject, onTopicsGenerated }) => {
       </div>
       {message && <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">{message}</p>}
       <div className="flex items-center gap-2">
-        <button onClick={handleUpload} disabled={uploading} className="px-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50">
+        <button onClick={handleUpload} disabled={uploading} className="px-4 py-2 rounded-xl bg-gray-100 dark:bg-charcoalMuted text-gray-800 dark:text-gray-200 text-xs font-semibold hover:bg-gray-200 dark:hover:bg-charcoalMuted transition-colors disabled:opacity-50">
           {uploading ? 'Saving…' : 'Save Syllabus'}
         </button>
         <button onClick={handleGenerate} disabled={generating} className="px-4 py-2 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-semibold hover:opacity-80 transition-opacity disabled:opacity-50">
@@ -229,32 +229,32 @@ const ExamPatternPanel = ({ subjectId, initial }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
+    <div className="bg-white dark:bg-charcoal rounded-2xl border border-gray-200 dark:border-charcoalMuted p-6">
       <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4">📊 Exam Pattern</h3>
       <div className="flex items-center gap-4 mb-4 text-xs text-gray-600 dark:text-gray-400">
         <label className="flex items-center gap-2">
           Total marks
-          <input type="number" value={totalMarks} onChange={e => setTotalMarks(e.target.value)} className="w-16 px-2 py-1 rounded border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-xs focus:outline-none" />
+          <input type="number" value={totalMarks} onChange={e => setTotalMarks(e.target.value)} className="w-16 px-2 py-1 rounded border border-gray-200 dark:border-charcoalMuted bg-gray-50 dark:bg-charcoalDark text-gray-900 dark:text-white text-xs focus:outline-none" />
         </label>
         <label className="flex items-center gap-2">
           Duration (min)
-          <input type="number" value={duration} onChange={e => setDuration(e.target.value)} className="w-16 px-2 py-1 rounded border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-xs focus:outline-none" />
+          <input type="number" value={duration} onChange={e => setDuration(e.target.value)} className="w-16 px-2 py-1 rounded border border-gray-200 dark:border-charcoalMuted bg-gray-50 dark:bg-charcoalDark text-gray-900 dark:text-white text-xs focus:outline-none" />
         </label>
       </div>
       <div className="space-y-2 mb-4">
         {rows.map((row, i) => (
           <div key={i} className="flex items-center gap-2 text-xs">
-            <input type="number" value={row.marks} onChange={e => updateRow(i, 'marks', e.target.value)} placeholder="Marks" className="w-16 px-2 py-1 rounded border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none" />
+            <input type="number" value={row.marks} onChange={e => updateRow(i, 'marks', e.target.value)} placeholder="Marks" className="w-16 px-2 py-1 rounded border border-gray-200 dark:border-charcoalMuted bg-gray-50 dark:bg-charcoalDark text-gray-900 dark:text-white focus:outline-none" />
             <span className="text-gray-400">×</span>
-            <input type="number" value={row.count} onChange={e => updateRow(i, 'count', e.target.value)} placeholder="Questions" className="w-16 px-2 py-1 rounded border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none" />
-            <input type="text" value={row.type} onChange={e => updateRow(i, 'type', e.target.value)} placeholder="Type" className="flex-1 px-2 py-1 rounded border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none" />
+            <input type="number" value={row.count} onChange={e => updateRow(i, 'count', e.target.value)} placeholder="Questions" className="w-16 px-2 py-1 rounded border border-gray-200 dark:border-charcoalMuted bg-gray-50 dark:bg-charcoalDark text-gray-900 dark:text-white focus:outline-none" />
+            <input type="text" value={row.type} onChange={e => updateRow(i, 'type', e.target.value)} placeholder="Type" className="flex-1 px-2 py-1 rounded border border-gray-200 dark:border-charcoalMuted bg-gray-50 dark:bg-charcoalDark text-gray-900 dark:text-white focus:outline-none" />
             <button onClick={() => removeRow(i)} className="text-red-400 hover:text-red-600 px-1">✕</button>
           </div>
         ))}
       </div>
       {msg && <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">{msg}</p>}
       <div className="flex items-center gap-2">
-        <button onClick={addRow} className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+        <button onClick={addRow} className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-charcoalMuted text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-charcoalMuted transition-colors">
           + Row
         </button>
         <button onClick={save} disabled={saving} className="px-4 py-1.5 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-semibold hover:opacity-80 transition-opacity disabled:opacity-50">
@@ -296,7 +296,7 @@ export default function SubjectDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-[calc(100vh-80px)] bg-[#F5F5F7] dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-[calc(100vh-80px)] bg-[#F5F5F7] dark:bg-charcoalDark flex items-center justify-center">
         <div className="text-sm text-gray-400">Loading…</div>
       </div>
     );
@@ -316,7 +316,7 @@ export default function SubjectDetail() {
   ];
 
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-[#F5F5F7] dark:bg-gray-900 transition-colors">
+    <div className="min-h-[calc(100vh-80px)] bg-[#F5F5F7] dark:bg-charcoalDark transition-colors">
       <div className="max-w-4xl mx-auto px-4 py-10">
         {/* Back */}
         <Link to="/planora" className="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6 transition-colors">
@@ -324,7 +324,7 @@ export default function SubjectDetail() {
         </Link>
 
         {/* Subject Header */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 mb-6">
+        <div className="bg-white dark:bg-charcoal rounded-2xl border border-gray-200 dark:border-charcoalMuted p-6 mb-6">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
               <h1 className="text-xl font-bold text-gray-900 dark:text-white">{subject.name}</h1>
@@ -350,7 +350,7 @@ export default function SubjectDetail() {
                 <span>Progress</span>
                 <span>{ps.strong || 0}/{ps.total} strong</span>
               </div>
-              <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-2 bg-gray-100 dark:bg-charcoalMuted rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gray-900 dark:bg-white rounded-full transition-all duration-700"
                   style={{ width: `${Math.round(((ps.strong || 0) / ps.total) * 100)}%` }}
@@ -367,7 +367,7 @@ export default function SubjectDetail() {
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1 mb-6 w-fit">
+        <div className="flex items-center gap-1 bg-white dark:bg-charcoal border border-gray-200 dark:border-charcoalMuted rounded-xl p-1 mb-6 w-fit">
           {tabs.map(t => (
             <button
               key={t.id}
@@ -384,18 +384,18 @@ export default function SubjectDetail() {
           {tab === 'topics' && (
             <motion.div key="topics" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
               {topics.length === 0 ? (
-                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-12 text-center">
+                <div className="bg-white dark:bg-charcoal rounded-2xl border border-gray-200 dark:border-charcoalMuted p-12 text-center">
                   <p className="text-gray-400 text-sm mb-3">No topics yet.</p>
                   <button onClick={() => setTab('syllabus')} className="text-xs text-gray-900 dark:text-white font-semibold underline underline-offset-2">
                     Upload syllabus to generate topics →
                   </button>
                 </div>
               ) : (
-                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                  <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <div className="bg-white dark:bg-charcoal rounded-2xl border border-gray-200 dark:border-charcoalMuted overflow-hidden">
+                  <div className="px-4 py-3 border-b border-gray-100 dark:border-charcoalMuted flex items-center justify-between">
                     <p className="text-xs text-gray-500 dark:text-gray-400">Click status badge to cycle • Drag slider for confidence</p>
                   </div>
-                  <div className="divide-y divide-gray-50 dark:divide-gray-700/50">
+                  <div className="divide-y divide-gray-50 dark:divide-charcoalMuted/50">
                     {topics.map(topic => (
                       <TopicRow
                         key={topic.id}

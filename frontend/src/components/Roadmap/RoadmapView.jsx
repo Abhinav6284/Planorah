@@ -9,7 +9,7 @@ import AITalkButton from "../Mentoring/AITalkButton";
 
 // Colorful milestone icons based on phase
 const milestoneIcons = [
-    { icon: FaBook, color: 'from-blue-500 to-cyan-500', bg: 'bg-blue-100 dark:bg-blue-900/30' },
+    { icon: FaBook, color: 'from-blue-500 to-cyan-500', bg: 'bg-blue-100 dark:bg-charcoal/30' },
     { icon: FaCode, color: 'from-purple-500 to-pink-500', bg: 'bg-purple-100 dark:bg-purple-900/30' },
     { icon: FaRocket, color: 'from-orange-500 to-red-500', bg: 'bg-orange-100 dark:bg-orange-900/30' },
     { icon: FaLightbulb, color: 'from-yellow-500 to-amber-500', bg: 'bg-yellow-100 dark:bg-yellow-900/30' },
@@ -87,7 +87,7 @@ export default function RoadmapView() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white dark:from-charcoalDark dark:to-charcoal transition-colors">
                 <div className="text-center">
                     <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                     <div className="text-xl font-medium text-gray-400 animate-pulse">Loading your journey...</div>
@@ -98,7 +98,7 @@ export default function RoadmapView() {
 
     if (!roadmap) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-gray-900 gap-4 transition-colors">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-charcoalDark gap-4 transition-colors">
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">Roadmap Not Found</div>
                 <button
                     onClick={() => navigate("/dashboard")}
@@ -111,7 +111,7 @@ export default function RoadmapView() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 p-6 md:p-12 font-sans transition-colors duration-200">
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-charcoalDark dark:to-charcoal p-6 md:p-12 font-sans transition-colors duration-200">
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <motion.div
@@ -133,12 +133,12 @@ export default function RoadmapView() {
                     </p>
 
                     {/* Progress Card */}
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 mb-8 max-w-xl mx-auto">
+                    <div className="bg-white dark:bg-charcoal rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-charcoalMuted mb-8 max-w-xl mx-auto">
                         <div className="flex items-center justify-between mb-4">
                             <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Overall Progress</span>
                             <span className="text-2xl font-bold text-gray-900 dark:text-white">{overallProgress}%</span>
                         </div>
-                        <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden mb-4">
+                        <div className="h-3 bg-gray-100 dark:bg-charcoalMuted rounded-full overflow-hidden mb-4">
                             <motion.div
                                 className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full"
                                 initial={{ width: 0 }}
@@ -178,7 +178,7 @@ export default function RoadmapView() {
                     <div className="flex justify-center gap-4 mt-8">
                         <button
                             onClick={() => navigate('/roadmap/list')}
-                            className="px-6 py-3 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                            className="px-6 py-3 bg-gray-100 dark:bg-charcoal text-gray-900 dark:text-white rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-charcoalMuted transition-colors"
                         >
                             Go to Learning Path
                         </button>
@@ -213,13 +213,13 @@ export default function RoadmapView() {
                                 className="relative pl-16"
                             >
                                 {/* Timeline Dot - Left aligned */}
-                                <div className={`absolute left-0 top-6 w-10 h-10 rounded-full border-4 border-white dark:border-gray-900 shadow-lg z-10 flex items-center justify-center ${milestone.is_completed ? "bg-gradient-to-r from-green-400 to-emerald-500" : `bg-gradient-to-r ${IconConfig.color}`}`}>
+                                <div className={`absolute left-0 top-6 w-10 h-10 rounded-full border-4 border-white dark:border-charcoalMuted shadow-lg z-10 flex items-center justify-center ${milestone.is_completed ? "bg-gradient-to-r from-green-400 to-emerald-500" : `bg-gradient-to-r ${IconConfig.color}`}`}>
                                     <IconComponent className="text-white text-sm" />
                                 </div>
 
                                 <div className={`border-2 rounded-2xl transition-all duration-300 overflow-hidden ${milestone.is_completed
                                     ? "border-green-200 dark:border-green-900/30 bg-green-50/50 dark:bg-green-900/10"
-                                    : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-xl hover:border-indigo-200 dark:hover:border-indigo-800"
+                                    : "border-gray-200 dark:border-charcoalMuted bg-white dark:bg-charcoal hover:shadow-xl hover:border-indigo-200 dark:hover:border-indigo-800"
                                     }`}>
                                     {/* Milestone Header */}
                                     <div className="p-6 flex items-center gap-6">
@@ -234,7 +234,7 @@ export default function RoadmapView() {
                                         <div className="flex-1 cursor-pointer" onClick={() => toggleMilestone(milestone.id)}>
                                             <div className="flex items-center gap-3 mb-1">
                                                 <span className={`font-mono text-xs uppercase tracking-wider px-2 py-0.5 rounded bg-gradient-to-r ${IconConfig.color} text-white`}>Phase {index + 1}</span>
-                                                <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                                                <span className="text-xs bg-gray-100 dark:bg-charcoalMuted text-gray-500 dark:text-gray-300 px-2 py-1 rounded-full font-medium flex items-center gap-1">
                                                     <FaClock className="text-xs" /> {milestone.duration}
                                                 </span>
                                             </div>
@@ -245,7 +245,7 @@ export default function RoadmapView() {
 
                                         <button
                                             onClick={() => toggleMilestone(milestone.id)}
-                                            className="p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+                                            className="p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-charcoalMuted rounded-full transition-colors"
                                         >
                                             {expandedMilestone === milestone.id ? <FaChevronUp /> : <FaChevronDown />}
                                         </button>
@@ -258,7 +258,7 @@ export default function RoadmapView() {
                                                 initial={{ height: 0, opacity: 0 }}
                                                 animate={{ height: "auto", opacity: 1 }}
                                                 exit={{ height: 0, opacity: 0 }}
-                                                className="overflow-hidden border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50"
+                                                className="overflow-hidden border-t border-gray-100 dark:border-charcoalMuted bg-gray-50/50 dark:bg-charcoalDark/50"
                                             >
                                                 <div className="p-8 space-y-8">
                                                     <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg">{milestone.description}</p>
@@ -268,7 +268,7 @@ export default function RoadmapView() {
                                                         <h4 className="font-bold text-gray-400 text-xs uppercase tracking-widest mb-4">Key Concepts</h4>
                                                         <div className="grid gap-3">
                                                             {(milestone.topics || []).map((topic, i) => (
-                                                                <div key={i} className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                                                <div key={i} className="bg-white dark:bg-charcoal p-4 rounded-xl border border-gray-200 dark:border-charcoalMuted shadow-sm">
                                                                     <div className="flex items-center gap-2 mb-2">
                                                                         <div className="w-2 h-2 rounded-full bg-blue-400" />
                                                                         <span className="font-medium text-sm text-gray-900 dark:text-white">
@@ -291,7 +291,7 @@ export default function RoadmapView() {
                                                             <h4 className="font-bold text-gray-400 text-xs uppercase tracking-widest mb-4">Practical Application</h4>
                                                             <div className="grid gap-4">
                                                                 {(milestone.projects || []).map((project) => (
-                                                                    <div key={project.id} className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                                                    <div key={project.id} className="bg-white dark:bg-charcoal p-6 rounded-xl border border-gray-200 dark:border-charcoalMuted shadow-sm">
                                                                         <div className="flex justify-between items-start mb-2">
                                                                             <h5 className="font-bold text-lg text-gray-900 dark:text-white">{project.title}</h5>
                                                                             <span className={`text-xs px-3 py-1 rounded-full font-bold uppercase ${project.difficulty === 'easy' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
@@ -304,7 +304,7 @@ export default function RoadmapView() {
                                                                         <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">{project.description}</p>
                                                                         <div className="flex flex-wrap gap-2">
                                                                             {(project.tech_stack || []).map((tech, t) => (
-                                                                                <span key={t} className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded border border-gray-200 dark:border-gray-600">
+                                                                                <span key={t} className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-charcoalMuted px-2 py-1 rounded border border-gray-200 dark:border-charcoalMuted">
                                                                                     {tech}
                                                                                 </span>
                                                                             ))}
@@ -326,15 +326,15 @@ export default function RoadmapView() {
                                                                         href={resource.url}
                                                                         target="_blank"
                                                                         rel="noopener noreferrer"
-                                                                        className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md transition-all group"
+                                                                        className="flex items-center justify-between p-4 bg-white dark:bg-charcoal rounded-xl border border-gray-200 dark:border-charcoalMuted hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md transition-all group"
                                                                     >
                                                                         <div className="flex items-center gap-3">
-                                                                            <div className="p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
+                                                                            <div className="p-2 bg-blue-50 dark:bg-charcoal/30 text-blue-600 dark:text-blue-400 rounded-lg group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
                                                                                 <FaExternalLinkAlt className="text-sm" />
                                                                             </div>
                                                                             <span className="font-medium text-gray-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{resource.title}</span>
                                                                         </div>
-                                                                        <span className="text-xs font-bold uppercase tracking-wider text-gray-400 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded">
+                                                                        <span className="text-xs font-bold uppercase tracking-wider text-gray-400 bg-gray-50 dark:bg-charcoalMuted px-2 py-1 rounded">
                                                                             {resource.type}
                                                                         </span>
                                                                     </a>
@@ -354,14 +354,14 @@ export default function RoadmapView() {
 
                 {/* FAQ Section */}
                 {roadmap.faqs && roadmap.faqs.length > 0 && (
-                    <div className="mt-20 border-t border-gray-100 dark:border-gray-800 pt-12">
+                    <div className="mt-20 border-t border-gray-100 dark:border-charcoalMuted pt-12">
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 text-center flex items-center justify-center gap-3">
                             <FaQuestionCircle className="text-gray-300 dark:text-gray-600" />
                             Frequently Asked Questions
                         </h2>
                         <div className="space-y-4">
                             {roadmap.faqs.map((faq, index) => (
-                                <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
+                                <div key={index} className="border border-gray-200 dark:border-charcoalMuted rounded-xl overflow-hidden bg-white dark:bg-charcoal hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
                                     <button
                                         onClick={() => toggleFAQ(index)}
                                         className="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none"
@@ -377,7 +377,7 @@ export default function RoadmapView() {
                                                 initial={{ height: 0, opacity: 0 }}
                                                 animate={{ height: "auto", opacity: 1 }}
                                                 exit={{ height: 0, opacity: 0 }}
-                                                className="bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700"
+                                                className="bg-gray-50 dark:bg-charcoalDark border-t border-gray-100 dark:border-charcoalMuted"
                                             >
                                                 <div className="px-6 py-4 text-gray-600 dark:text-gray-300 leading-relaxed">
                                                     {faq.answer}

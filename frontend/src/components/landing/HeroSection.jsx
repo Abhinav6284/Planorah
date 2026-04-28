@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  ArrowRight,
-  CheckCircle2,
-  Target,
-  Trophy,
-  Cpu,
-  Flame,
-  Star,
-} from "lucide-react";
+import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ArrowRight, Zap, TrendingUp, CheckCircle2, Sparkles } from "lucide-react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import {
+  Float,
+  Environment,
+  ContactShadows,
+  PresentationControls,
+  MeshTransmissionMaterial,
+} from "@react-three/drei";
 
 const avatarData = [
   { initials: "P", bg: "bg-violet-400" },
@@ -211,23 +211,51 @@ export default function HeroSection() {
   const [currentIdx, setCurrentIdx] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIdx((prev) => (prev + 1) % mockupStates.length);
-    }, 3500);
-    return () => clearInterval(interval);
+    const update = () => setIsSmall(window.innerWidth < 1024);
+    window.addEventListener("resize", update, { passive: true });
+    return () => window.removeEventListener("resize", update);
   }, []);
+  return isSmall;
+}
 
-  const active = mockupStates[currentIdx];
+function PlanoraSphere() {
+  const groupRef = useRef();
+  useFrame((state) => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y = state.clock.elapsedTime * 0.18;
+      groupRef.current.rotation.x =
+        Math.sin(state.clock.elapsedTime * 0.28) * 0.15;
+    }
+  });
 
   return (
     <section className="relative overflow-hidden bg-[#f7f6f2] pt-36 pb-24 md:pt-48 md:pb-36 dark:bg-[#090a0f]">
       <div className="absolute inset-0 z-0 pointer-events-none bg-[#f7f6f2] dark:bg-[#090a0f]" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
+function MobileOrbFallback() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none">
+      <div className="absolute w-80 h-80 rounded-full bg-terracotta/10 blur-3xl" />
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 16, repeat: Infinity, ease: "linear" }}
+        className="absolute w-64 h-64 rounded-full"
+        style={{ border: "2.5px dashed rgba(217,108,74,0.30)" }}
+      />
+      <motion.div
+        animate={{ rotate: -360 }}
+        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+        className="absolute w-44 h-44 rounded-full"
+        style={{ border: "1.5px solid rgba(217,108,74,0.50)" }}
+      />
 
-          {/* ── Left: Text ── */}
-          <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+      {/* Inner ring */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+        className="absolute w-28 h-28 rounded-full"
+        style={{ border: "1px solid rgba(217,108,74,0.40)" }}
+      />
 
             {/* Announcement badge */}
             <motion.div
@@ -252,28 +280,33 @@ export default function HeroSection() {
               <span className="text-gray-700 dark:text-gray-300">to unstoppable.</span>
             </motion.h1>
 
-            {/* Subheadline */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
-              className="text-lg md:text-xl text-gray-500 dark:text-gray-400 font-medium leading-relaxed max-w-[490px] mx-auto lg:mx-0 mb-10"
-            >
-              Planorah builds your personalized AI learning roadmap, breaks it
-              into daily tasks, and keeps you consistent — until you actually
-              reach your goal.
-            </motion.p>
+// ── Main component ────────────────────────────────────────────────────────────
+export default function HeroSection() {
+  const isMobile = useIsSmallScreen();
 
-            {/* CTAs */}
+  return (
+    <section className="relative py-10 px-4 sm:px-6 bg-[#F5F1E8] dark:bg-charcoalDark overflow-hidden">
+      {/* Ambient blobs */}
+      <div className="absolute top-0 right-0 w-[45vw] h-[45vw] bg-terracotta/8 blur-[140px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[35vw] h-[35vw] bg-charcoal/5 dark:bg-white/3 blur-[140px] rounded-full pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto">
+        {/* Hero Card */}
+        <div className="mb-12 sm:mb-20 rounded-2xl sm:rounded-3xl border border-white/10 bg-charcoal dark:bg-charcoalMuted p-6 sm:p-10 shadow-darkSoft lg:p-14">
+          <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+
+            {/* ── Left Column ── */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.26, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-10 w-full sm:w-auto"
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-col gap-5 sm:gap-6"
             >
-              <Link
-                to="/register"
-                className="group px-7 py-3.5 bg-gray-950 dark:bg-white text-white dark:text-gray-950 rounded-xl font-semibold text-[15px] flex items-center justify-center gap-2 hover:bg-black dark:hover:bg-gray-100 transition-all duration-200 hover:scale-[1.02] shadow-[0_8px_28px_-6px_rgba(0,0,0,0.32)] dark:shadow-[0_8px_28px_-6px_rgba(255,255,255,0.15)]"
+              {/* Badge */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
               >
                 Build My Free Roadmap
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
@@ -282,40 +315,42 @@ export default function HeroSection() {
                 href="#how-it-works"
                 className="px-7 py-3.5 bg-white text-gray-700 rounded-xl font-semibold text-[15px] border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all duration-200 shadow-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700"
               >
-                See how it works
-              </a>
-            </motion.div>
+                Master Your<br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-terracotta to-[#E8956A]">
+                  Daily Progress.
+                </span>
+              </motion.h1>
 
-            {/* Social proof */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.34, ease: [0.22, 1, 0.36, 1] }}
-              className="flex items-center justify-center lg:justify-start gap-4"
-            >
-              <div className="flex -space-x-2.5">
-                {avatarData.map((a, i) => (
-                  <div
-                    key={i}
-                    className={`w-9 h-9 rounded-full ${a.bg} border-2 border-white dark:border-gray-950 flex items-center justify-center text-white text-xs font-bold shadow-sm`}
+              {/* Sub-heading */}
+              <motion.p
+                className="text-base sm:text-lg text-gray-300 max-w-lg leading-relaxed font-outfit"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.8 }}
+              >
+                AI-powered goal planning, structured daily tasks, real results.
+                Transform ambitions into achievements with intelligent productivity.
+              </motion.p>
+
+              {/* CTA Buttons - BOLD & PROMINENT */}
+              <motion.div
+                className="flex flex-col sm:flex-row gap-4 sm:gap-5 mt-6 sm:mt-8"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+              >
+                {/* PRIMARY CTA - MASSIVE, GLOWING */}
+                <Link to="/register" className="w-full sm:w-auto flex-1">
+                  <motion.button
+                    whileHover={{ scale: 1.05, boxShadow: "0 0 60px rgba(217, 108, 74, 0.8)" }}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-full px-10 py-5 text-lg font-bold bg-gradient-to-r from-terracotta to-[#E8956A] text-white rounded-full shadow-2xl hover:shadow-terracotta/50 transition-all duration-300 flex items-center justify-center gap-3 group font-outfit relative overflow-hidden"
                   >
-                    {a.initials}
-                  </div>
-                ))}
-              </div>
-              <div>
-                <div className="flex items-center gap-0.5 mb-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                  ))}
-                  <span className="text-xs text-gray-500 dark:text-gray-500 font-medium ml-1">4.9</span>
-                </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
-                  <span className="font-bold text-gray-800 dark:text-gray-200">14,000+</span>{" "}
-                  students already on their path
-                </p>
-              </div>
-            </motion.div>
+                    <Sparkles className="w-5 h-5 group-hover:animate-spin" />
+                    Start Free Now
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                  </motion.button>
+                </Link>
 
             {/* Trust signals */}
             <motion.p
@@ -328,15 +363,26 @@ export default function HeroSection() {
             </motion.p>
           </div>
 
-          {/* ── Right: Animated App Mockup ── */}
-          <motion.div
-            initial={{ opacity: 0, x: 32, scale: 0.96 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            transition={{ duration: 0.75, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className="relative hidden lg:block"
-          >
-            {/* Ambient glow */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-sky-200/40 dark:from-sky-900/20 via-violet-100/25 dark:via-violet-900/15 to-amber-100/40 dark:to-amber-900/10 blur-3xl rounded-3xl scale-110 pointer-events-none" />
+              {/* Trust badges below buttons */}
+              <motion.div
+                className="flex flex-wrap gap-3 sm:gap-4 mt-6 text-sm"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7 }}
+              >
+                <div className="flex items-center gap-2 text-gray-300">
+                  <CheckCircle2 className="w-5 h-5 text-terracotta" />
+                  <span>No credit card required</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-300">
+                  <CheckCircle2 className="w-5 h-5 text-terracotta" />
+                  <span>Free forever plan</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-300">
+                  <CheckCircle2 className="w-5 h-5 text-terracotta" />
+                  <span>Cancel anytime</span>
+                </div>
+              </motion.div>
 
             {/* Floating notification — top right */}
             <motion.div
@@ -355,7 +401,7 @@ export default function HeroSection() {
               </div>
             </motion.div>
 
-            {/* Floating streak badge — bottom left */}
+            {/* ── Right Column — 3-D Canvas (desktop) / CSS orb (mobile) ── */}
             <motion.div
               animate={{ y: [0, 9, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
@@ -391,9 +437,9 @@ export default function HeroSection() {
                             : "w-2 bg-gray-200 dark:bg-white/[0.15]"
                         }`}
                     />
-                  ))}
+                  </Canvas>
                 </div>
-              </div>
+              )}
 
               {/* Body */}
               <div className="flex">
@@ -413,6 +459,7 @@ export default function HeroSection() {
                     </div>
                   ))}
                 </div>
+              </motion.div>
 
                 {/* Content area */}
                 <div className="flex-1 p-5 bg-white h-[340px] relative overflow-hidden dark:bg-gray-900">
@@ -442,9 +489,27 @@ export default function HeroSection() {
                     </motion.div>
                   </AnimatePresence>
                 </div>
+              </motion.div>
+            </motion.div>
+
+          </div>
+        </div>
+
+        {/* Trusted by */}
+        <div className="text-center space-y-4 sm:space-y-6">
+          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-outfit">
+            Trusted by ambitious people at
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 lg:gap-16">
+            {["Google", "Microsoft", "Apple", "Amazon", "Meta"].map((company) => (
+              <div
+                key={company}
+                className="text-gray-500 dark:text-gray-400 font-bold text-sm sm:text-base font-outfit"
+              >
+                {company}
               </div>
-            </div>
-          </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

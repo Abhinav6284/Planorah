@@ -31,12 +31,12 @@ export default function InterviewSetup() {
     };
 
     return (
-        <div className="flex min-h-[calc(100vh-80px)] bg-gray-50 dark:bg-gray-900 font-sans items-center justify-center">
+        <div className="flex min-h-[calc(100vh-80px)] bg-gray-50 dark:bg-charcoalDark font-sans items-center justify-center">
             <div className="w-full p-8 flex justify-center">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="bg-white dark:bg-gray-800 p-10 rounded-3xl shadow-xl w-full max-w-lg border border-gray-100 dark:border-gray-700"
+                    className="bg-white dark:bg-charcoal p-10 rounded-3xl shadow-xl w-full max-w-lg border border-gray-100 dark:border-charcoalMuted"
                 >
                     <div className="text-center mb-10">
                         <div className="text-6xl mb-4">🎤</div>
@@ -53,7 +53,7 @@ export default function InterviewSetup() {
                                 onChange={(e) => setJobRole(e.target.value)}
                                 placeholder="e.g. Product Manager, Software Engineer"
                                 required
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-black dark:focus:ring-white outline-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-charcoalMuted bg-gray-50 dark:bg-charcoalMuted text-gray-900 dark:text-white focus:ring-2 focus:ring-black dark:focus:ring-white outline-none"
                             />
                         </div>
 
@@ -62,7 +62,7 @@ export default function InterviewSetup() {
                             <select
                                 value={topic}
                                 onChange={(e) => setTopic(e.target.value)}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-black dark:focus:ring-white outline-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-charcoalMuted bg-gray-50 dark:bg-charcoalMuted text-gray-900 dark:text-white focus:ring-2 focus:ring-black dark:focus:ring-white outline-none"
                             >
                                 <option>General Behavioral</option>
                                 <option>Technical Data Structures</option>

@@ -4,7 +4,7 @@ import { FaCode, FaRocket, FaClock } from 'react-icons/fa';
 
 const CodeSpace = () => {
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gray-50 dark:bg-charcoalDark flex items-center justify-center p-4">
             <div className="max-w-2xl w-full text-center">
                 <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
@@ -13,7 +13,7 @@ const CodeSpace = () => {
                     className="mb-8 relative inline-block"
                 >
                     <div className="absolute inset-0 bg-blue-500 blur-3xl opacity-20 rounded-full"></div>
-                    <div className="relative bg-white dark:bg-gray-800 w-32 h-32 rounded-3xl flex items-center justify-center shadow-xl mx-auto border border-gray-100 dark:border-gray-700">
+                    <div className="relative bg-white dark:bg-charcoal w-32 h-32 rounded-3xl flex items-center justify-center shadow-xl mx-auto border border-gray-100 dark:border-charcoalMuted">
                         <FaCode className="text-6xl text-blue-500" />
                     </div>
                     <motion.div
@@ -56,7 +56,7 @@ const CodeSpace = () => {
                     </button>
                     <button
                         onClick={() => window.history.back()}
-                        className="px-8 py-4 bg-transparent border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-all flex items-center gap-2"
+                        className="px-8 py-4 bg-transparent border-2 border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-100 dark:hover:bg-charcoalMuted transition-all flex items-center gap-2"
                     >
                         Go Back
                     </button>
@@ -66,23 +66,23 @@ const CodeSpace = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.6 }}
-                    className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-800 grid grid-cols-1 md:grid-cols-3 gap-8"
+                    className="mt-16 pt-8 border-t border-gray-200 dark:border-charcoalMuted grid grid-cols-1 md:grid-cols-3 gap-8"
                 >
-                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700">
-                        <div className="bg-blue-100 dark:bg-blue-900/30 w-10 h-10 rounded-lg flex items-center justify-center mb-3 mx-auto text-blue-600 dark:text-blue-400">
+                    <div className="p-4 rounded-2xl bg-white dark:bg-charcoal shadow-sm border border-gray-100 dark:border-charcoalMuted">
+                        <div className="bg-blue-100 dark:bg-charcoal/30 w-10 h-10 rounded-lg flex items-center justify-center mb-3 mx-auto text-blue-600 dark:text-blue-400">
                             <FaCode />
                         </div>
                         <h3 className="font-bold text-gray-900 dark:text-white mb-1">VS Code Engine</h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400">Powered by Monaco Editor for a familiar experience</p>
                     </div>
-                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700">
+                    <div className="p-4 rounded-2xl bg-white dark:bg-charcoal shadow-sm border border-gray-100 dark:border-charcoalMuted">
                         <div className="bg-purple-100 dark:bg-purple-900/30 w-10 h-10 rounded-lg flex items-center justify-center mb-3 mx-auto text-purple-600 dark:text-purple-400">
                             <FaRocket />
                         </div>
                         <h3 className="font-bold text-gray-900 dark:text-white mb-1">Instant Deploy</h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400">Push to GitHub and deploy in one click</p>
                     </div>
-                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700">
+                    <div className="p-4 rounded-2xl bg-white dark:bg-charcoal shadow-sm border border-gray-100 dark:border-charcoalMuted">
                         <div className="bg-green-100 dark:bg-green-900/30 w-10 h-10 rounded-lg flex items-center justify-center mb-3 mx-auto text-green-600 dark:text-green-400">
                             <FaClock />
                         </div>

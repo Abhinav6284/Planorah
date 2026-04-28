@@ -68,36 +68,24 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def activate(self, request):
-        """Activate a subscription after payment."""
-        serializer = SubscriptionCreateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        """
+        DISABLED: Subscriptions are ONLY created via secure webhook.
 
-        plan = Plan.objects.get(id=serializer.validated_data['plan_id'])
-        payment_id = serializer.validated_data.get('payment_id', '')
+        This endpoint is disabled for security reasons.
 
-        # Check for existing active subscription
-        existing = Subscription.get_active_subscription(request.user)
-        if existing and existing.is_active:
-            return Response(
-                {"error": "You already have an active subscription"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        To activate a subscription:
+        1. User initiates payment via /billing/payments/create_order/
+        2. User completes payment with payment gateway (Razorpay/Stripe)
+        3. Payment gateway sends webhook to /billing/webhooks/razorpay/
+        4. Webhook is verified (signature must match RAZORPAY_WEBHOOK_SECRET)
+        5. Subscription is automatically created only after successful verification
 
-        # Create new subscription
-        subscription = Subscription.objects.create(
-            user=request.user,
-            plan=plan,
-            start_date=timezone.now(),
-            status='active',
-            payment_id=payment_id
-        )
-
-        # Activate portfolio if exists
-        if hasattr(request.user, 'portfolio'):
-            request.user.portfolio.transition_to_active()
-
-        serializer = SubscriptionSerializer(subscription)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        Subscriptions are NEVER created by client requests.
+        """
+        return Response({
+            'error': 'Subscriptions cannot be created directly. '
+                    'Complete payment with the payment gateway instead.'
+        }, status=status.HTTP_403_FORBIDDEN)
 
     @action(detail=False, methods=['post'])
     def renew(self, request):

@@ -74,7 +74,7 @@ const Header = () => {
             type: "dropdown",
             items: [
                 { path: "/subscription", label: "Subscription" },
-                { path: "/pricing", label: "Pricing" },
+                { path: "/subscription/plans", label: "Pricing" },
                 { path: "/billing/history", label: "Billing History" },
             ]
         },
@@ -90,8 +90,11 @@ const Header = () => {
         <header className={`sticky top-0 z-50 flex items-center justify-between px-4 py-2.5 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] md:px-6 md:py-3 ${isScrolled ? 'bg-transparent pointer-events-none' : 'bg-transparent'}`}>
             {/* Logo - hides on scroll */}
             <div className={`flex items-center gap-2 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isScrolled ? 'opacity-0 -translate-x-8 pointer-events-none' : 'opacity-100 translate-x-0'}`}>
-                <Link to="/dashboard" className="whitespace-nowrap text-xl font-serif font-bold tracking-tight text-gray-900 dark:text-white md:text-[1.7rem]">
-                    Planorah<span className="text-gray-400">.</span>
+                <Link to="/dashboard" className="flex items-center gap-2.5 group">
+                    <div className="w-8 h-8 rounded-full bg-white dark:bg-white overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-200">
+                        <img src="/planorah_logo.png" alt="Planorah" className="w-full h-full object-contain" />
+                    </div>
+                    <span className="whitespace-nowrap text-xl font-cormorant font-bold tracking-tight text-gray-900 dark:text-white">Planorah</span>
                 </Link>
             </div>
 
@@ -109,7 +112,7 @@ const Header = () => {
                                 to={group.path}
                                 className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-medium transition-all duration-200 ${isActive
                                     ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm"
-                                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-charcoalMuted"
                                     }`}
                             >
                                 {group.icon && (
@@ -126,8 +129,8 @@ const Header = () => {
                         <div key={index} className="relative group">
                             <button
                                 className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-medium transition-all duration-200 ${isActive
-                                    ? "text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-700"
-                                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    ? "text-gray-900 dark:text-white bg-gray-100 dark:bg-charcoalMuted"
+                                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-charcoalMuted"
                                     }`}
                             >
                                 {group.label}
@@ -137,12 +140,12 @@ const Header = () => {
                             </button>
 
                             {/* Dropdown Menu */}
-                            <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 p-1.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left z-50">
+                            <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-charcoal rounded-xl shadow-xl border border-gray-100 dark:border-charcoalMuted p-1.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left z-50">
                                 {group.items.map((item) => (
                                     <Link
                                         key={item.path}
                                         to={item.path}
-                                        className="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
+                                        className="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-charcoalMuted hover:text-gray-900 dark:hover:text-white transition-colors"
                                     >
                                         {item.label}
                                     </Link>
@@ -156,7 +159,7 @@ const Header = () => {
             {/* Mobile Menu Button - visible only on mobile */}
             <button
                 onClick={() => setMobileMenuOpen(true)}
-                className={`md:hidden flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 transition-all ${isScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                className={`md:hidden flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-charcoal border border-gray-200 dark:border-charcoalMuted transition-all ${isScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
             >
                 <svg className="w-5 h-5 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -167,7 +170,7 @@ const Header = () => {
             <div className={`relative hidden items-center gap-2.5 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] md:flex ${isScrolled ? 'pointer-events-none absolute right-8 translate-x-8 opacity-0' : 'translate-x-0 opacity-100'}`}>
                 {/* Settings Dropdown */}
                 <div className="relative group">
-                    <button className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition-transform hover:scale-105 hover:text-gray-900 dark:border-white/10 dark:bg-[#1C1C1E] dark:text-gray-400 dark:hover:text-white" title="Settings">
+                    <button className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition-transform hover:scale-105 hover:text-gray-900 dark:border-white/10 dark:bg-charcoal dark:text-gray-400 dark:hover:text-white" title="Settings">
                         <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -175,13 +178,13 @@ const Header = () => {
                     </button>
 
                     {/* Dropdown Menu */}
-                    <div className="absolute top-full right-0 mt-3 w-60 bg-white dark:bg-[#1C1C1E] rounded-2xl shadow-xl border border-gray-100 dark:border-white/10 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right z-50">
+                    <div className="absolute top-full right-0 mt-3 w-60 bg-white dark:bg-charcoal rounded-2xl shadow-xl border border-gray-100 dark:border-white/10 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right z-50">
                         <div className="px-4 py-3 border-b border-gray-100 dark:border-white/5 mb-1">
                             <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{displayName}</p>
                             <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email || "support@planorah.me"}</p>
                         </div>
                         <Link
-                            to="/profile"
+                            to="/settings"
                             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition-colors"
                         >
                             <span className="w-8 h-8 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center"><User className="w-4 h-4 text-gray-600 dark:text-gray-300" /></span>
@@ -229,7 +232,7 @@ const Header = () => {
                         <h4 className="text-[13px] font-bold leading-tight text-gray-900 dark:text-white">{displayName}</h4>
                         <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{userRole}</span>
                     </div>
-                    <Link to="/profile" className="relative group cursor-pointer">
+                    <Link to="/settings" className="relative group cursor-pointer">
                         <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 p-[2px] transition-all hover:shadow-lg">
                             <div className="w-full h-full rounded-full bg-white dark:bg-black p-[2px]">
                                 <img
@@ -272,16 +275,19 @@ const Header = () => {
                             animate={{ x: 0 }}
                             exit={{ x: '-100%' }}
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className="fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-white dark:bg-gray-900 z-50 overflow-y-auto shadow-2xl"
+                            className="fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-white dark:bg-charcoalDark z-50 overflow-y-auto shadow-2xl"
                         >
                             {/* Drawer Header */}
-                            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800">
-                                <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className="text-xl font-serif font-bold text-gray-900 dark:text-white">
-                                    Planorah<span className="text-gray-400">.</span>
+                            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-charcoalMuted">
+                                <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5 group">
+                                    <div className="w-7 h-7 rounded-full bg-white overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                                        <img src="/planorah_logo.png" alt="Planorah" className="w-full h-full object-contain" />
+                                    </div>
+                                    <span className="text-xl font-cormorant font-bold text-gray-900 dark:text-white">Planorah</span>
                                 </Link>
                                 <button
                                     onClick={() => setMobileMenuOpen(false)}
-                                    className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center"
+                                    className="w-10 h-10 rounded-full bg-gray-100 dark:bg-charcoal flex items-center justify-center"
                                 >
                                     <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -290,7 +296,7 @@ const Header = () => {
                             </div>
 
                             {/* User Info */}
-                            <div className="p-6 border-b border-gray-100 dark:border-gray-800">
+                            <div className="p-6 border-b border-gray-100 dark:border-charcoalMuted">
                                 <div className="flex items-center gap-4">
                                     <div className="w-14 h-14 rounded-full p-[2px] bg-gradient-to-tr from-indigo-500 to-purple-500">
                                         <div className="w-full h-full rounded-full bg-white dark:bg-black p-[2px]">
@@ -314,7 +320,7 @@ const Header = () => {
                                                 onClick={() => setMobileMenuOpen(false)}
                                                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${location.pathname === group.path
                                                     ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
-                                                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-charcoalMuted'
                                                     }`}
                                             >
                                                 {group.icon && (
@@ -335,8 +341,8 @@ const Header = () => {
                                                         to={item.path}
                                                         onClick={() => setMobileMenuOpen(false)}
                                                         className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${location.pathname.startsWith(item.path)
-                                                            ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
-                                                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                                                            ? 'bg-gray-100 dark:bg-charcoal text-gray-900 dark:text-white'
+                                                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-charcoalMuted/50'
                                                             }`}
                                                     >
                                                         <span>{item.label}</span>
@@ -349,10 +355,10 @@ const Header = () => {
                             </div>
 
                             {/* Bottom Actions */}
-                            <div className="p-4 border-t border-gray-100 dark:border-gray-800 mt-auto">
+                            <div className="p-4 border-t border-gray-100 dark:border-charcoalMuted mt-auto">
                                 <button
                                     onClick={toggleTheme}
-                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-charcoalMuted transition-colors"
                                 >
                                     <span className="text-xl flex items-center justify-center">{theme === 'light' ? <Moon className="w-5 h-5 text-gray-700 dark:text-gray-300" /> : <Sun className="w-5 h-5 text-yellow-400" />}</span>
                                     <span className="font-medium">{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>

@@ -1,8 +1,12 @@
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
+import logging
 
 from .models import Payment, Invoice, Coupon, CouponUsage
 from .serializers import (
@@ -13,7 +17,11 @@ from .serializers import (
     CouponSerializer,
     ApplyCouponSerializer
 )
+from .webhook_verification import verify_webhook_signature
+from .webhook_handler import WebhookHandler
 from plans.models import Plan
+
+logger = logging.getLogger(__name__)
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
@@ -75,67 +83,40 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def verify(self, request):
-        """Verify payment completion and activate subscription."""
+        """
+        CHECK PAYMENT STATUS (READ-ONLY).
+
+        IMPORTANT: This endpoint NO LONGER creates subscriptions.
+        Subscriptions are ONLY created via webhook from payment gateway.
+
+        This endpoint checks if a payment has been processed by the gateway,
+        but does NOT grant any access.
+        """
         serializer = VerifyPaymentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
+
         order_id = serializer.validated_data['order_id']
-        payment_id = serializer.validated_data['payment_id']
-        signature = serializer.validated_data['signature']
-        
-        # Find payment by receipt number
+        payment_id = serializer.validated_data.get('payment_id')
+
+        # Find payment
         try:
             payment = Payment.objects.get(
                 receipt_number=order_id,
-                user=request.user,
-                status='pending'
+                user=request.user
             )
         except Payment.DoesNotExist:
             return Response({
                 'error': 'Payment order not found'
             }, status=status.HTTP_404_NOT_FOUND)
-        
-        # In production, verify signature with payment gateway
-        # For now, assume verification passes
-        
-        # Mark payment as completed
-        payment.mark_completed(payment_id, signature)
-        
-        # Create subscription
-        from subscriptions.models import Subscription
-        subscription = Subscription.objects.create(
-            user=request.user,
-            plan=payment.plan,
-            start_date=timezone.now(),
-            status='active',
-            payment_id=payment_id
-        )
-        
-        payment.subscription = subscription
-        payment.save()
-        
-        # Create invoice
-        tax_rate = 18.00  # GST in India
-        subtotal = float(payment.amount) / 1.18
-        tax_amount = float(payment.amount) - subtotal
-        
-        Invoice.objects.create(
-            payment=payment,
-            billing_name=request.user.get_full_name() or request.user.username,
-            billing_email=request.user.email,
-            subtotal=round(subtotal, 2),
-            tax_rate=tax_rate,
-            tax_amount=round(tax_amount, 2),
-            total=float(payment.amount)
-        )
-        
-        # Activate portfolio if exists
-        if hasattr(request.user, 'portfolio'):
-            request.user.portfolio.transition_to_active()
-        
+
+        # Return payment status only (no activation)
         return Response({
-            'message': 'Payment verified and subscription activated',
-            'subscription_id': subscription.id
+            'order_id': payment.receipt_number,
+            'status': payment.status,
+            'message': (
+                'Payment activation happens automatically via secure webhook. '
+                'Check your subscription status in /subscriptions/current/'
+            )
         })
 
     @action(detail=False, methods=['get'])
@@ -197,3 +178,72 @@ class CouponViewSet(viewsets.ViewSet):
             'discounted_price': discounted_price,
             'discount_amount': discount_amount
         })
+
+
+# ============================================================================
+# WEBHOOK ENDPOINTS - Only authorized place where subscriptions are activated
+# ============================================================================
+
+@csrf_exempt  # Webhooks don't have CSRF tokens
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def razorpay_webhook(request):
+    """
+    Razorpay webhook endpoint for payment notifications.
+
+    SECURITY CRITICAL:
+    - Verifies webhook signature using RAZORPAY_WEBHOOK_SECRET
+    - Only processes events with valid signatures
+    - Only creates subscriptions via this webhook, never via client requests
+    - Implements idempotency to prevent duplicate processing
+    """
+    try:
+        # Get raw request body for signature verification
+        raw_body = request.body.decode('utf-8')
+        signature = request.headers.get('X-Razorpay-Signature', '')
+
+        if not signature:
+            logger.warning("Razorpay webhook missing signature")
+            return JsonResponse({
+                'error': 'Missing signature'
+            }, status=400)
+
+        # Verify signature
+        if not verify_webhook_signature('razorpay', raw_body, signature):
+            logger.error("Razorpay webhook signature verification failed")
+            return JsonResponse({
+                'error': 'Invalid signature'
+            }, status=401)
+
+        # Parse payload
+        payload = json.loads(raw_body)
+        event_id = payload.get('id')
+
+        if not event_id:
+            logger.warning("Razorpay webhook missing event ID")
+            return JsonResponse({
+                'error': 'Missing event ID'
+            }, status=400)
+
+        # Handle webhook event
+        success = WebhookHandler.handle_razorpay_webhook(event_id, payload)
+
+        if success:
+            return JsonResponse({
+                'status': 'ok'
+            }, status=200)
+        else:
+            return JsonResponse({
+                'error': 'Failed to process webhook'
+            }, status=500)
+
+    except json.JSONDecodeError:
+        logger.error("Razorpay webhook invalid JSON")
+        return JsonResponse({
+            'error': 'Invalid JSON'
+        }, status=400)
+    except Exception as e:
+        logger.exception(f"Razorpay webhook error: {e}")
+        return JsonResponse({
+            'error': 'Server error'
+        }, status=500)

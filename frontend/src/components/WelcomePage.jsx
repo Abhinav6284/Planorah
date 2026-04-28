@@ -7,11 +7,11 @@ export default function WelcomePage() {
     const { theme, toggleTheme } = useTheme();
 
     return (
-        <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col items-center justify-center p-6 font-sans overflow-hidden relative">
+        <div className="min-h-screen bg-white dark:bg-charcoalDark flex flex-col items-center justify-center p-6 font-sans overflow-hidden relative">
             {/* Theme Toggle Button */}
             <button
                 onClick={toggleTheme}
-                className="absolute top-6 right-6 z-50 p-3 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors shadow-lg"
+                className="absolute top-6 right-6 z-50 p-3 rounded-full bg-gray-100 dark:bg-charcoal hover:bg-gray-200 dark:hover:bg-charcoalMuted transition-colors shadow-lg"
                 aria-label="Toggle theme"
             >
                 <span className="text-2xl">{theme === 'light' ? '🌙' : '☀️'}</span>
@@ -32,7 +32,7 @@ export default function WelcomePage() {
                     opacity: [0.3, 0.5, 0.3]
                 }}
                 transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 4 }}
-                className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-100 dark:bg-blue-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-30"
+                className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-100 dark:bg-charcoal/30 rounded-full mix-blend-multiply filter blur-3xl opacity-30"
             />
 
             <div className="relative z-10 text-center max-w-2xl mx-auto">
@@ -41,7 +41,7 @@ export default function WelcomePage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
                 >
-                    <span className="inline-block px-4 py-1.5 rounded-full bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-sm font-medium mb-8 tracking-wide">
+                    <span className="inline-block px-4 py-1.5 rounded-full bg-gray-50 dark:bg-charcoal text-gray-500 dark:text-gray-400 text-sm font-medium mb-8 tracking-wide">
                         Ready to begin?
                     </span>
 

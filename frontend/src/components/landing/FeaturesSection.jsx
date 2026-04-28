@@ -1,61 +1,79 @@
-import React from "react";
-import { motion } from "framer-motion";
-import {
-  Route,
-  TrendingUp,
-  MessageSquare,
-  Target,
-  CalendarCheck,
-  Sparkles,
-} from "lucide-react";
+import { Brain, Map, Zap, BarChart3, Target, Zap as ZapIcon, Briefcase, Users, BookOpen, RotateCw, Award, Eye } from "lucide-react";
 
 const features = [
   {
-    icon: Route,
-    title: "AI Roadmap Generator",
-    description:
-      "Describe your goal — get a complete, structured learning path in seconds. Personalized to your skill level, timeline, and career target.",
+    id: 1,
+    title: "Brain Dump",
+    description: "What's inside your head rn? Dump raw thoughts, goals, and confusion. AI converts messy ideas into clear direction.",
+    icon: Brain,
   },
   {
-    icon: TrendingUp,
-    title: "Progress Tracking",
-    description:
-      "Visualize your momentum. Track daily completions, milestone streaks, and overall progress so you always know exactly how far you've come.",
+    id: 2,
+    title: "Life Map",
+    description: "Your life, but structured. Build roadmaps for career, study, skills. Visual paths with milestones like a game.",
+    icon: Map,
   },
   {
-    icon: MessageSquare,
-    title: "AI Mentor",
-    description:
-      "Stuck on a concept? Get real-time explanations, code reviews, and guidance from an AI mentor available 24/7 — no waiting for office hours.",
+    id: 3,
+    title: "Locked In Mode",
+    description: "No distractions. Just execution. Timer, focus, streaks with dopamine UI. Where users become addicted.",
+    icon: Zap,
   },
   {
+    id: 4,
+    title: "Reality Check",
+    description: "Are you actually doing something? Analytics show progress, missed days, weekly performance. Brutally honest.",
+    icon: BarChart3,
+  },
+  {
+    id: 5,
+    title: "Next Move",
+    description: "Don't think. Just do this. AI suggests your next step, removes decision fatigue. Daily mission style.",
     icon: Target,
-    title: "Goal-Based Learning",
-    description:
-      "Set your career objective — data scientist, full-stack engineer, designer — and we break it into a clear, actionable daily plan.",
   },
   {
-    icon: CalendarCheck,
-    title: "Daily Task Engine",
-    description:
-      "Eliminate decision fatigue. Wake up every morning with a pre-built, optimized schedule tailored to where you are in your roadmap.",
+    id: 6,
+    title: "Build Yourself",
+    description: "Upgrade your character. Skills tracker, XP system, levels from Beginner → Pro → Elite. Gamified AF.",
+    icon: ZapIcon,
   },
   {
-    icon: Sparkles,
-    title: "Smart Adaptation",
-    description:
-      "Falling behind? Moving faster than expected? Planorah continuously adjusts your plan so you're always learning at the perfect pace.",
+    id: 7,
+    title: "Future You",
+    description: "The version you're chasing. Resume builder, portfolio, job prep. Emotional + aspirational.",
+    icon: Briefcase,
   },
+  {
+    id: 8,
+    title: "Inner Circle",
+    description: "You're not alone. Friends, accountability, shared streaks. Social = retention multiplier.",
+    icon: Users,
+  },
+  {
+    id: 9,
+    title: "Prep Zone",
+    description: "Exam mode activated. Study plans, revision tracking, mock tests. Built for students.",
+    icon: BookOpen,
+  },
+  {
+    id: 10,
+    title: "Reset Room",
+    description: "You messed up. It's fine. Break mode, mental reset, soft motivational UI. Underrated but powerful.",
+    icon: RotateCw,
+  },
+  {
+    id: 11,
+    title: "Proof of Work",
+    description: "Show what you've done. Projects, certificates, achievements timeline. Connects to hiring + portfolio.",
+    icon: Award,
+  },
+  {
+    id: 12,
+    title: "Mirror",
+    description: "Who are you becoming? Weekly reflection, AI behavior patterns. Deep, slightly scary, memorable.",
+    icon: Eye,
+  }
 ];
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (i) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.08, duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-  }),
-};
 
 export default function FeaturesSection() {
   return (
@@ -68,40 +86,34 @@ export default function FeaturesSection() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
 
-        {/* Section header */}
-        <div className="text-center max-w-2xl mx-auto mb-20">
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="text-[11px] font-bold text-indigo-500 dark:text-indigo-400 uppercase tracking-[0.22em] mb-5"
-          >
-            Features
-          </motion.p>
+        {/* Features Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {features.map((feature, idx) => {
+            const Icon = feature.icon;
+            return (
+              <div
+                key={feature.id}
+                className="group h-full"
+              >
+                <div className="h-full bg-white dark:bg-charcoalDark border border-beigeMuted dark:border-gray-700 rounded-2xl p-6 hover:border-terracotta/30 transition-all duration-300 shadow-sm dark:shadow-none">
+                  {/* Icon */}
+                  <div className="mb-4 inline-flex p-3 rounded-lg bg-[#EBE6DA] dark:bg-gray-800">
+                    <Icon className="w-6 h-6 text-gray-950 dark:text-white" />
+                  </div>
 
-          <motion.h2
-            initial={{ opacity: 0, y: 22 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ delay: 0.08, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-            className="text-4xl md:text-5xl font-bold font-serif tracking-[-0.025em] text-gray-900 dark:text-white mb-5"
-          >
-            Everything you need.
-            <br />
-            <span className="text-gray-400 dark:text-gray-600">Nothing you don't.</span>
-          </motion.h2>
+                  {/* Title */}
+                  <h3 className="text-xl font-outfit font-semibold text-gray-950 dark:text-white mb-3">
+                    {feature.title}
+                  </h3>
 
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ delay: 0.16, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-            className="text-lg text-gray-500 dark:text-gray-400 font-medium leading-relaxed"
-          >
-            A focused environment built to remove friction, keep you in flow,
-            and guarantee you make progress every single day.
-          </motion.p>
+                  {/* Description */}
+                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                    {feature.description}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Feature cards */}
@@ -119,14 +131,8 @@ export default function FeaturesSection() {
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-50 to-sky-50 border border-slate-100 dark:bg-gray-700 dark:border-gray-600 flex items-center justify-center mb-7 group-hover:scale-110 transition-transform duration-300">
                 <feature.icon className="w-5 h-5 text-gray-800 dark:text-gray-300" strokeWidth={1.5} />
               </div>
-              <h3 className="text-[1.125rem] font-bold text-gray-900 dark:text-white mb-3">
-                {feature.title}
-              </h3>
-              <p className="text-gray-500 dark:text-gray-400 leading-relaxed font-medium text-[15px]">
-                {feature.description}
-              </p>
-            </motion.div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>

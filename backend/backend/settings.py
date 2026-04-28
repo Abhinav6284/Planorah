@@ -101,6 +101,8 @@ INSTALLED_APPS = [
     'codespace',  # Real terminal / IDE backend
     'ai_calls',   # AI outbound call system (onboarding guide)
     'ai_mentoring',  # Reusable AI Mentoring Engine
+    'saas_admin',    # SaaS Admin Panel
+    'sessions',      # Session booking
 ]
 
 # WSGI Application (using WSGI for development instead of ASGI due to Python 3.13 compatibility)
@@ -144,18 +146,21 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',  # Must be before CommonMiddleware
-    # 'whitenoise.middleware.WhiteNoiseMiddleware',  # Only needed for production
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Serves static files (admin CSS/JS)
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'saas_admin.middleware.StaffOnlyMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "https://api.planorah.me",
@@ -169,6 +174,8 @@ CORS_ALLOWED_ORIGINS = [
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
     "https://api.planorah.me",
     "https://planorah.me",
     "https://www.planorah.me",
@@ -241,9 +248,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Use ManifestStaticFilesStorage in production (whitenoise middleware is disabled due to Python 3.13 compatibility)
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage' if not DEBUG else 'django.contrib.staticfiles.storage.StaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -342,6 +350,32 @@ SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID', '')
 SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET', '')
 SPOTIFY_REDIRECT_URI = os.getenv(
     'SPOTIFY_REDIRECT_URI', 'https://planorah.me/auth/spotify/callback')
+
+# Assistant v2 pipeline feature flags/config
+AI_PIPELINE_ENABLED = _env_bool('AI_PIPELINE_ENABLED', False)
+AI_PIPELINE_CHANNELS = _env_str('AI_PIPELINE_CHANNELS', 'voice,text')
+AI_PIPELINE_ACTIONS_ENABLED = _env_bool('AI_PIPELINE_ACTIONS_ENABLED', True)
+AI_PIPELINE_FALLBACK_REALTIME_ENABLED = _env_bool('AI_PIPELINE_FALLBACK_REALTIME_ENABLED', True)
+AI_PIPELINE_DEFAULT_LANGUAGE = _env_str('AI_PIPELINE_DEFAULT_LANGUAGE', 'hinglish')
+AI_PIPELINE_MAX_FRONTEND_CONTEXT_BYTES = _env_int('AI_PIPELINE_MAX_FRONTEND_CONTEXT_BYTES', 12000)
+AI_PIPELINE_MAX_BACKEND_CONTEXT_BYTES = _env_int('AI_PIPELINE_MAX_BACKEND_CONTEXT_BYTES', 32000)
+AI_PIPELINE_MAX_SESSION_TURNS = _env_int('AI_PIPELINE_MAX_SESSION_TURNS', 12)
+AI_PIPELINE_MAX_AUDIO_MB = _env_int('AI_PIPELINE_MAX_AUDIO_MB', 8)
+AI_PIPELINE_STT_TIMEOUT_SEC = _env_int('AI_PIPELINE_STT_TIMEOUT_SEC', 30)
+AI_PIPELINE_LLM_TIMEOUT_SEC = _env_int('AI_PIPELINE_LLM_TIMEOUT_SEC', 35)
+AI_PIPELINE_TTS_TIMEOUT_SEC = _env_int('AI_PIPELINE_TTS_TIMEOUT_SEC', 35)
+GEMINI_STT_MODEL = _env_str('GEMINI_STT_MODEL', 'gemini-2.5-flash')
+GEMINI_LLM_MODEL = _env_str('GEMINI_LLM_MODEL', 'gemini-2.5-flash')
+GEMINI_TTS_MODEL = _env_str('GEMINI_TTS_MODEL', 'gemini-2.5-flash-preview-tts')
+GEMINI_DEFAULT_VOICE = _env_str('GEMINI_DEFAULT_VOICE', 'Kore')
+
+# Celery + Redis for async assistant actions
+CELERY_BROKER_URL = _env_str('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = _env_str('CELERY_RESULT_BACKEND', CELERY_BROKER_URL)
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
 
 # Logging Configuration
 LOGGING = {

@@ -5,13 +5,23 @@ const ExamModePanel = ({ plan, loading, onGenerate }) => {
     const [pattern, setPattern] = useState('');
 
     return (
-        <div className="rounded-3xl border border-white/10 bg-[#111723] p-5 text-white">
-            <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Exam Mode</h3>
-                <span className="text-xs px-2 py-1 rounded-full bg-rose-400/20 text-rose-100 border border-rose-300/30">Major Feature</span>
+    return (
+        <div style={{ 
+            borderRadius: 16, border: '1px solid var(--el-border)', background: 'var(--el-bg)', 
+            padding: 32, boxShadow: 'var(--el-shadow-card)', color: 'var(--el-text)'
+        }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                <div>
+                    <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--el-text)', letterSpacing: '-0.02em' }}>Exam Mode</h3>
+                    <p style={{ fontSize: 13, color: 'var(--el-text-muted)', marginTop: 4 }}>Structured planning for high-stakes evaluations.</p>
+                </div>
+                <span style={{ 
+                    fontSize: 10, fontWeight: 700, textTransform: 'uppercase', padding: '4px 10px', 
+                    borderRadius: 20, background: 'var(--el-bg-secondary)', color: 'var(--el-text-secondary)', border: '1px solid var(--el-border-subtle)'
+                }}>Advanced</span>
             </div>
 
-            <div className="mt-4 grid gap-3">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <textarea
                     value={syllabus}
                     onChange={(e) => setSyllabus(e.target.value)}
@@ -27,17 +37,22 @@ const ExamModePanel = ({ plan, loading, onGenerate }) => {
                 <button
                     onClick={() => onGenerate({ syllabus_text: syllabus, exam_pattern: pattern })}
                     disabled={loading || !syllabus.trim()}
-                    className="w-fit px-4 py-2 rounded-xl bg-cyan-300 text-[#052231] text-sm font-bold disabled:opacity-50"
+                    style={{
+                        width: 'fit-content', padding: '10px 24px', borderRadius: 10, 
+                        background: 'var(--el-text)', color: '#fff', fontSize: 13, fontWeight: 700, 
+                        border: 'none', cursor: 'pointer', opacity: loading || !syllabus.trim() ? 0.5 : 1,
+                        transition: 'all 0.1s'
+                    }}
                 >
-                    {loading ? 'Generating Plan...' : 'Generate Exam Plan'}
+                    {loading ? 'Analyzing...' : 'Generate Roadmap'}
                 </button>
             </div>
 
             {plan && (
-                <div className="mt-5 grid gap-4 lg:grid-cols-2">
+                <div style={{ marginTop: 32, display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
                     <div>
-                        <p className="text-xs uppercase tracking-wider text-slate-400 mb-2">Topics</p>
-                        <div className="space-y-2 max-h-[220px] overflow-auto pr-1">
+                        <h4 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: 'var(--el-text-muted)', marginBottom: 12 }}>Identified Topics</h4>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 300, overflowY: 'auto', paddingRight: 8 }}>
                             {(plan.topics || []).map((topic, idx) => (
                                 <div key={`${topic.topic}-${idx}`} className="rounded-xl border border-gray-300 bg-gray-100 p-2.5 dark:border-gray-600 dark:bg-gray-800">
                                     <p className="text-sm font-medium">{topic.topic}</p>
@@ -48,13 +63,16 @@ const ExamModePanel = ({ plan, loading, onGenerate }) => {
                     </div>
 
                     <div>
-                        <p className="text-xs uppercase tracking-wider text-slate-400 mb-2">Revision Tracker</p>
-                        <div className="space-y-2 max-h-[220px] overflow-auto pr-1">
+                        <h4 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: 'var(--el-text-muted)', marginBottom: 12 }}>Revision Schedule</h4>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 300, overflowY: 'auto', paddingRight: 8 }}>
                             {(plan.revision_schedule || []).map((item, idx) => (
-                                <div key={`${item.day}-${idx}`} className="rounded-xl border border-cyan-300/20 bg-cyan-500/5 p-2.5">
-                                    <p className="text-sm font-medium">{item.day}</p>
-                                    <p className="text-xs text-slate-200 mt-1">{item.focus}</p>
-                                    <p className="text-xs text-slate-400 mt-1">{item.duration}</p>
+                                <div key={idx} style={{ 
+                                    padding: 16, borderRadius: 12, border: '1px solid var(--el-border-subtle)',
+                                    background: 'var(--el-bg)'
+                                }}>
+                                    <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--el-text)', marginBottom: 4 }}>{item.day}</p>
+                                    <p style={{ fontSize: 13, color: 'var(--el-text-secondary)' }}>{item.focus}</p>
+                                    <p style={{ fontSize: 12, color: 'var(--el-text-muted)', marginTop: 4 }}>Duration: {item.duration}</p>
                                 </div>
                             ))}
                         </div>

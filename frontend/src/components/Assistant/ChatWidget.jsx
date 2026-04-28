@@ -1,82 +1,177 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { assistantService } from '../../api/assistantService';
+import { assistantPipelineService } from '../../api/assistantPipelineService';
+import env from '../../config/env';
+import { buildFrontendAssistantContext, getContextSourceFromPath } from '../../utils/assistantContext';
+
+const createMessageId = () => Date.now() + Math.floor(Math.random() * 1000);
 
 export default function ChatWidget() {
-    const [isOpen, setIsOpen] = useState(false);
-    const [messages, setMessages] = useState([
-        {
-            id: 1,
-            role: 'assistant',
-            content: "Hi! 👋 I'm your **Planorah Assistant**. Ask me about your roadmaps, tasks, or anything related to your learning journey!"
-        }
-    ]);
-    const [input, setInput] = useState('');
-    const [loading, setLoading] = useState(false);
-    const messagesEndRef = useRef(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      role: 'assistant',
+      content: "Hi! 👋 I'm your **Planorah Assistant**. Ask me about your roadmaps, tasks, or anything related to your learning journey!",
+      proposals: [],
+    },
+  ]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [conversationId, setConversationId] = useState(null);
+  const messagesEndRef = useRef(null);
+  const pipelineEnabled = env.AI_PIPELINE_ENABLED && env.AI_PIPELINE_CHANNELS.includes('text');
 
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
-    const handleSend = async (e) => {
-        e?.preventDefault();
-        if (!input.trim() || loading) return;
+  const appendAssistant = useCallback((content, proposals = []) => {
+    setMessages((prev) => [...prev, { id: createMessageId(), role: 'assistant', content, proposals }]);
+  }, []);
 
-        const userMessage = {
-            id: Date.now(),
-            role: 'user',
-            content: input.trim()
-        };
+  const handleSend = useCallback(async (e, presetText = '') => {
+    e?.preventDefault();
+    const content = String(presetText || input || '').trim();
+    if (!content || loading) return;
 
-        setMessages(prev => [...prev, userMessage]);
-        setInput('');
-        setLoading(true);
+    setMessages((prev) => [...prev, { id: createMessageId(), role: 'user', content, proposals: [] }]);
+    setInput('');
+    setLoading(true);
 
+    try {
+      if (pipelineEnabled) {
         try {
-            const response = await assistantService.sendMessage(userMessage.content);
+          const pathname = typeof window !== 'undefined' ? window.location.pathname : '/dashboard';
+          const frontendContext = buildFrontendAssistantContext({
+            pathname,
+            visiblePanel: 'chat_widget',
+            metadata: { channel: 'text' },
+          });
 
-            setMessages(prev => [...prev, {
-                id: Date.now() + 1,
-                role: 'assistant',
-                content: response.message || "I'm not sure how to help with that. Try asking about your tasks or roadmaps!"
-            }]);
-        } catch (error) {
-            console.error('Chat error:', error);
-            setMessages(prev => [...prev, {
-                id: Date.now() + 1,
-                role: 'assistant',
-                content: "Sorry, I encountered an error. Please try again."
-            }]);
-        } finally {
-            setLoading(false);
+          const response = await assistantPipelineService.sendTextTurn({
+            message: content,
+            contextSource: getContextSourceFromPath(pathname),
+            frontendContext,
+            conversationId,
+            languagePreference: 'hinglish',
+          });
+          if (response?.conversation_id) setConversationId(response.conversation_id);
+          appendAssistant(
+            response?.assistant_text || "I'm not sure how to help with that yet.",
+            response?.action_proposals || []
+          );
+        } catch (pipelineError) {
+          if (!env.AI_PIPELINE_FALLBACK_REALTIME_ENABLED) {
+            throw pipelineError;
+          }
+          const fallbackResponse = await assistantService.sendMessage(content);
+          appendAssistant(
+            fallbackResponse?.message || "I'm not sure how to help with that. Try asking about your tasks or roadmaps!",
+            []
+          );
         }
-    };
+      } else {
+        const response = await assistantService.sendMessage(content);
+        appendAssistant(
+          response?.message || "I'm not sure how to help with that. Try asking about your tasks or roadmaps!",
+          []
+        );
+      }
+    } catch (error) {
+      console.error('Chat error:', error);
+      appendAssistant('Sorry, I encountered an error. Please try again.', []);
+    } finally {
+      setLoading(false);
+    }
+  }, [appendAssistant, conversationId, input, loading, pipelineEnabled]);
 
-    const quickQuestions = [
-        "What should I study today?",
-        "How am I progressing?",
-        "What's my next task?"
-    ];
+  const handleProposal = useCallback(async (messageId, proposalId, confirmed) => {
+    if (!pipelineEnabled || !conversationId || !proposalId) return;
+    setLoading(true);
+    try {
+      const response = await assistantPipelineService.confirmAction({
+        conversationId,
+        proposalId,
+        confirmed,
+        idempotencyKey: `${conversationId}:${proposalId}:${confirmed ? 'yes' : 'no'}`,
+      });
+      setMessages((prev) => prev.map((msg) => (
+        msg.id === messageId
+          ? { ...msg, proposals: (msg.proposals || []).filter((proposal) => proposal.proposal_id !== proposalId) }
+          : msg
+      )));
+      if (response?.assistant_text) appendAssistant(response.assistant_text, []);
+      if (response?.job_id) {
+        const pollJob = async () => {
+          try {
+            const job = await assistantPipelineService.getJobStatus(response.job_id);
+            if (job?.status === 'queued' || job?.status === 'running') {
+              setTimeout(pollJob, 2000);
+              return;
+            }
+            if (job?.status === 'succeeded') {
+              appendAssistant('Action complete ho gaya.', []);
+            } else {
+              appendAssistant(job?.error || 'Action failed while processing.', []);
+            }
+          } catch (pollErr) {
+            console.error('Assistant job polling failed', pollErr);
+          }
+        };
+        setTimeout(pollJob, 1500);
+      }
+    } catch (err) {
+      console.error('Action confirmation failed', err);
+      appendAssistant('Action confirmation failed. Please retry.', []);
+    } finally {
+      setLoading(false);
+    }
+  }, [appendAssistant, conversationId, pipelineEnabled]);
 
-    return (
-        <>
-            {/* Floating Button */}
-            <motion.button
-                onClick={() => setIsOpen(!isOpen)}
-                className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-full shadow-lg shadow-indigo-500/30 flex items-center justify-center z-50 hover:scale-110 transition-transform"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-            >
-                {isOpen ? (
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                ) : (
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+  const quickQuestions = [
+    'What should I study today?',
+    'How am I progressing?',
+    "What's my next task?",
+  ];
+
+  return (
+    <>
+      <motion.button
+        onClick={() => setIsOpen(!isOpen)}
+        className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-full shadow-lg shadow-indigo-500/30 flex items-center justify-center z-50 hover:scale-110 transition-transform"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        {isOpen ? (
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          </svg>
+        )}
+      </motion.button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-24 right-6 w-96 h-[500px] bg-white dark:bg-charcoalDark rounded-2xl shadow-2xl shadow-indigo-500/10 border border-gray-200 dark:border-charcoalMuted flex flex-col z-50 overflow-hidden"
+          >
+            <div className="px-5 py-4 bg-gradient-to-r from-indigo-500 to-violet-600 text-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-indigo-300 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
                 )}
             </motion.button>
@@ -176,32 +271,89 @@ export default function ChatWidget() {
                             </div>
                         )}
 
-                        {/* Input */}
-                        <form onSubmit={handleSend} className="p-4 border-t border-gray-100 dark:border-gray-800">
+                    {msg.role === 'assistant' && Array.isArray(msg.proposals) && msg.proposals.length > 0 && (
+                      <div className="mt-3 space-y-2">
+                        {msg.proposals.map((proposal) => (
+                          <div key={proposal.proposal_id} className="rounded-lg border border-indigo-200 dark:border-indigo-700 p-2">
+                            <p className="text-xs font-semibold mb-2">{proposal.summary}</p>
                             <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    placeholder="Ask about your tasks..."
-                                    className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-800 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                    disabled={loading}
-                                />
-                                <button
-                                    type="submit"
-                                    disabled={loading || !input.trim()}
-                                    className="px-4 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                    </svg>
-                                </button>
+                              <button
+                                type="button"
+                                onClick={() => handleProposal(msg.id, proposal.proposal_id, true)}
+                                className="px-2.5 py-1 text-xs rounded bg-emerald-600 text-white hover:bg-emerald-700"
+                              >
+                                Confirm
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleProposal(msg.id, proposal.proposal_id, false)}
+                                className="px-2.5 py-1 text-xs rounded bg-gray-200 dark:bg-charcoalMuted hover:bg-gray-300 dark:hover:bg-charcoalMuted"
+                              >
+                                Cancel
+                              </button>
                             </div>
-                        </form>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </>
-    );
-}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
 
+              {loading && (
+                <div className="flex justify-start">
+                  <div className="bg-gray-100 dark:bg-charcoal px-4 py-3 rounded-2xl rounded-bl-md">
+                    <div className="flex gap-1">
+                      <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {messages.length <= 2 && (
+              <div className="px-4 pb-2">
+                <div className="flex gap-2 flex-wrap">
+                  {quickQuestions.map((q, i) => (
+                    <button
+                      key={i}
+                      onClick={(event) => handleSend(event, q)}
+                      className="text-xs px-3 py-1.5 bg-gray-100 dark:bg-charcoal text-gray-600 dark:text-gray-400 rounded-full hover:bg-indigo-100 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleSend} className="p-4 border-t border-gray-100 dark:border-charcoalMuted">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ask about your tasks..."
+                  className="flex-1 px-4 py-3 bg-gray-100 dark:bg-charcoal rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  disabled={loading}
+                />
+                <button
+                  type="submit"
+                  disabled={loading || !input.trim()}
+                  className="px-4 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}

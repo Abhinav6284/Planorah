@@ -3,20 +3,28 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { subscriptionService } from '../../api/subscriptionService';
 
+const FeatureRow = ({ label, value }) => (
+    <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-white/10 last:border-b-0">
+        <span className="text-sm text-gray-600 dark:text-gray-400">{label}</span>
+        <span className="text-sm font-medium text-gray-900 dark:text-white">{value}</span>
+    </div>
+);
+
 const UsageMeter = ({ used, limit, label }) => {
     const isUnlimited = limit === -1;
-    const percentage = isUnlimited ? 0 : Math.min((used / limit) * 100, 100);
+    const safeLimit = typeof limit === 'number' && limit > 0 ? limit : 0;
+    const percentage = isUnlimited || safeLimit === 0 ? 0 : Math.min((used / safeLimit) * 100, 100);
     const isNearLimit = percentage > 80;
-    
+
     return (
         <div className="space-y-2">
             <div className="flex justify-between text-sm">
                 <span className="text-gray-600 dark:text-gray-400">{label}</span>
                 <span className={`font-medium ${isNearLimit ? 'text-red-500' : 'text-gray-900 dark:text-white'}`}>
-                    {isUnlimited ? 'Unlimited' : `${used} / ${limit}`}
+                    {isUnlimited ? 'Unlimited' : safeLimit === 0 ? 'Not included' : `${used} / ${safeLimit}`}
                 </span>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+            <div className="w-full bg-gray-200 dark:bg-white/10 rounded-full h-2">
                 <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: isUnlimited ? '0%' : `${percentage}%` }}
@@ -56,13 +64,13 @@ export default function SubscriptionStatus() {
             case 'active': return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
             case 'grace': return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
             case 'expired': return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
-            default: return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400';
+            default: return 'bg-gray-100 text-gray-700 dark:bg-white/10 dark:text-gray-400';
         }
     };
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center">
+            <div className="flex items-center justify-center">
                 <div className="text-gray-500 dark:text-gray-400">Loading subscription...</div>
             </div>
         );
@@ -70,12 +78,12 @@ export default function SubscriptionStatus() {
 
     if (!subscription) {
         return (
-            <div className="min-h-screen bg-gray-50 dark:bg-black transition-colors duration-300 font-sans pb-20">
+            <div className="font-sans pb-20">
                 <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-12">
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-8 text-center"
+                        className="bg-white dark:bg-[#1a1a1a] border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] rounded-2xl p-8 text-center"
                     >
                         <div className="text-5xl mb-4">📋</div>
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
@@ -85,7 +93,7 @@ export default function SubscriptionStatus() {
                             Get started with a plan to unlock roadmaps, projects, resume builder, and more.
                         </p>
                         <button
-                            onClick={() => navigate('/pricing')}
+                            onClick={() => navigate('/subscription/plans')}
                             className="px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-semibold hover:opacity-90 transition-all"
                         >
                             View Plans
@@ -97,10 +105,10 @@ export default function SubscriptionStatus() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-black transition-colors duration-300 font-sans pb-20">
+        <div className="font-sans pb-20">
             <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-12">
                 {/* Header */}
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-8"
@@ -114,10 +122,10 @@ export default function SubscriptionStatus() {
                 </motion.div>
 
                 {/* Status Card */}
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 mb-6"
+                    className="bg-white dark:bg-[#1a1a1a] border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] rounded-2xl p-6 mb-6"
                 >
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                         <div>
@@ -147,7 +155,7 @@ export default function SubscriptionStatus() {
                             <span>Started {new Date(subscription.start_date).toLocaleDateString()}</span>
                             <span>Expires {new Date(subscription.end_date).toLocaleDateString()}</span>
                         </div>
-                        <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+                        <div className="w-full bg-gray-200 dark:bg-white/10 rounded-full h-2">
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${Math.max(0, 100 - (subscription.days_remaining / subscription.plan_details?.validity_days) * 100)}%` }}
@@ -168,7 +176,7 @@ export default function SubscriptionStatus() {
                     {subscription.status === 'grace' && subscription.grace_end_date && (
                         <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-900/50 rounded-xl">
                             <p className="text-sm text-yellow-700 dark:text-yellow-400">
-                                ⚠️ Your subscription has expired. You're in a grace period until {new Date(subscription.grace_end_date).toLocaleDateString()}. 
+                                ⚠️ Your subscription has expired. You're in a grace period until {new Date(subscription.grace_end_date).toLocaleDateString()}.
                                 Renew now to continue creating content.
                             </p>
                         </div>
@@ -177,54 +185,84 @@ export default function SubscriptionStatus() {
 
                 {/* Usage Section */}
                 {usage && (
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 mb-6"
+                        className="bg-white dark:bg-[#1a1a1a] border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] rounded-2xl p-6 mb-6"
                     >
                         <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Usage</h3>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <UsageMeter 
-                                used={usage.roadmaps_used} 
-                                limit={usage.roadmap_limit} 
-                                label="Roadmaps" 
+                        <div className="grid md:grid-cols-2 gap-6 mb-6">
+                            <UsageMeter
+                                used={usage.roadmaps_used}
+                                limit={usage.roadmap_limit}
+                                label="Roadmaps"
                             />
-                            <UsageMeter 
-                                used={usage.projects_used} 
-                                limit={usage.project_limit} 
-                                label="Projects" 
+                            <UsageMeter
+                                used={usage.ats_scans_used}
+                                limit={usage.ats_scan_limit}
+                                label="ATS Scans"
                             />
-                            <UsageMeter 
-                                used={usage.resumes_used} 
-                                limit={usage.resume_limit} 
-                                label="Resumes" 
-                            />
-                            <UsageMeter 
-                                used={usage.ats_scans_used} 
-                                limit={usage.ats_scan_limit} 
-                                label="ATS Scans" 
-                            />
+                        </div>
+
+                        <div className="rounded-xl bg-gray-50 dark:bg-white/5 p-4">
+                            <div className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Plan Limits</div>
+                            <div className="space-y-0">
+                                <FeatureRow
+                                    label="Quicky AI"
+                                    value={usage.quicky_ai_daily_limit === -1 ? 'Unlimited' : `${usage.quicky_ai_daily_limit}/day`}
+                                />
+                                <FeatureRow
+                                    label="Job Finder"
+                                    value={usage.job_finder_unlimited ? 'Unlimited' : 'Limited listings'}
+                                />
+                                <FeatureRow
+                                    label="Resume Generator"
+                                    value={usage.resume_full ? 'Full' : 'Basic'}
+                                />
+                                <FeatureRow
+                                    label="Task & Project Management"
+                                    value={usage.has_project_management ? 'Included' : 'Basic'}
+                                />
+                                <FeatureRow
+                                    label="Resources Hub"
+                                    value={usage.has_resources_hub ? 'Included' : 'Not included'}
+                                />
+                                <FeatureRow
+                                    label="Portfolio Live"
+                                    value={usage.has_portfolio_live
+                                        ? (Number(usage.portfolio_addon_price_inr) > 0 ? `Addon (₹${usage.portfolio_addon_price_inr})` : 'Included')
+                                        : 'Not included'
+                                    }
+                                />
+                                <FeatureRow
+                                    label="1:1 Sessions"
+                                    value={(usage.sessions_per_month ?? 0) > 0
+                                        ? `${usage.sessions_per_month}/month (${usage.session_duration_minutes} min)`
+                                        : 'Not included'
+                                    }
+                                />
+                            </div>
                         </div>
                     </motion.div>
                 )}
 
                 {/* Actions */}
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
                     className="flex flex-col sm:flex-row gap-4"
                 >
                     <button
-                        onClick={() => navigate('/pricing')}
+                        onClick={() => navigate('/subscription/plans')}
                         className="flex-1 px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-semibold hover:opacity-90 transition-all text-center"
                     >
                         {subscription.status === 'active' ? 'Upgrade Plan' : 'Renew Subscription'}
                     </button>
                     <button
                         onClick={() => navigate('/billing/history')}
-                        className="flex-1 px-6 py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-900 transition-all text-center"
+                        className="flex-1 px-6 py-3 border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-charcoalDark transition-all text-center"
                     >
                         Billing History
                     </button>

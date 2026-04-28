@@ -1,0 +1,214 @@
+{% extends "saas_admin/base.html" %}
+{% block content %}
+
+<!-- Charts Row -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+  <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+    <h3 class="text-sm font-semibold text-slate-900 mb-1">Daily Signups</h3>
+    <p class="text-xs text-slate-500 mb-4">New users per day — last 30 days</p>
+    <div class="h-52">
+      <canvas id="signupChart"></canvas>
+    </div>
+  </div>
+  <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+    <h3 class="text-sm font-semibold text-slate-900 mb-1">Daily Active Users</h3>
+    <p class="text-xs text-slate-500 mb-4">Users with activity streak — last 30 days</p>
+    <div class="h-52">
+      <canvas id="dauChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Plan Breakdown + Top Users -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+  <!-- Plan Distribution -->
+  <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+    <h3 class="text-sm font-semibold text-slate-900 mb-4">Active Plan Distribution</h3>
+    {% if plan_breakdown %}
+    <div class="space-y-3">
+      {% for item in plan_breakdown %}
+      <div class="flex items-center justify-between">
+        <span class="text-sm text-slate-700">{{ item.plan__display_name }}</span>
+        <div class="flex items-center gap-2">
+          <div class="w-24 bg-slate-100 rounded-full h-1.5">
+            <div class="bg-brand-500 h-1.5 rounded-full" style="width: {{ item.count }}0%"></div>
+          </div>
+          <span class="text-xs font-semibold text-slate-900 w-6 text-right">{{ item.count }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-sm text-slate-400 text-center py-6">No active subscriptions</p>
+    {% endif %}
+  </div>
+
+  <!-- Top Users by XP -->
+  <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100">
+      <h3 class="text-sm font-semibold text-slate-900">Top Users by XP</h3>
+    </div>
+    <table class="w-full data-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>User</th>
+          <th>XP</th>
+          <th>Streak</th>
+          <th>Lifecycle</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for profile in top_users %}
+        <tr>
+          <td class="text-slate-400 text-xs">{{ forloop.counter }}</td>
+          <td>
+            <a href="{% url 'saas_admin:user_detail' profile.user.id %}"
+               class="font-medium text-slate-900 hover:text-brand-600 text-sm">
+              {{ profile.user.first_name|default:profile.user.username }}
+            </a>
+            <p class="text-xs text-slate-400">{{ profile.user.email }}</p>
+          </td>
+          <td>
+            <span class="font-bold text-brand-600">{{ profile.xp_points }}</span>
+          </td>
+          <td>
+            <div class="flex items-center gap-1">
+              <span class="text-amber-500">🔥</span>
+              <span class="text-sm font-medium text-slate-700">{{ profile.streak_count }}d</span>
+            </div>
+          </td>
+          <td>
+            <span class="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+              {{ profile.lifecycle_state|default:"ONBOARDING" }}
+            </span>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center py-8 text-slate-400">No user profiles found</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Roadmap Leaders + Drop-off Users -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+  <!-- Roadmap Stats -->
+  {% if roadmap_stats %}
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100">
+      <h3 class="text-sm font-semibold text-slate-900">Roadmaps per User (Top 10)</h3>
+    </div>
+    <table class="w-full data-table">
+      <thead>
+        <tr><th>User</th><th>Roadmaps</th></tr>
+      </thead>
+      <tbody>
+        {% for item in roadmap_stats %}
+        <tr>
+          <td>
+            <p class="font-medium text-slate-900 text-sm">{{ item.user__username|default:"—" }}</p>
+            <p class="text-xs text-slate-400">{{ item.user__email|default:"" }}</p>
+          </td>
+          <td>
+            <div class="flex items-center gap-2">
+              <div class="w-16 bg-slate-100 rounded-full h-1.5">
+                <div class="bg-amber-400 h-1.5 rounded-full" style="width: {{ item.count }}0%"></div>
+              </div>
+              <span class="text-sm font-bold text-slate-900">{{ item.count }}</span>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <!-- Drop-off Users -->
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100">
+      <h3 class="text-sm font-semibold text-slate-900">Drop-off Users</h3>
+      <p class="text-xs text-slate-500 mt-0.5">Inactive for 14+ days, had prior activity</p>
+    </div>
+    <table class="w-full data-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Last Active</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in dropout_users %}
+        <tr>
+          <td>
+            <a href="{% url 'saas_admin:user_detail' user.id %}"
+               class="font-medium text-slate-900 hover:text-brand-600 text-sm">
+              {{ user.first_name|default:user.username }}
+            </a>
+            <p class="text-xs text-slate-400">{{ user.email }}</p>
+          </td>
+          <td class="text-xs text-slate-500">
+            {{ user.profile.last_activity_date|date:"M d, Y"|default:"—" }}
+          </td>
+          <td>
+            <a href="{% url 'saas_admin:user_detail' user.id %}" class="text-xs text-brand-600 hover:text-brand-800 font-medium">View →</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3" class="text-center py-8 text-emerald-500">
+            <p class="font-medium">All users are engaged!</p>
+            <p class="text-xs text-slate-400 mt-1">No drop-offs in the last 14 days</p>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const signupData = {{ signup_chart|safe }};
+  const dauData = {{ dau_chart|safe }};
+
+  const opts = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#94a3b8' } },
+      y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 }, color: '#94a3b8' } }
+    }
+  };
+
+  new Chart(document.getElementById('signupChart'), {
+    type: 'bar',
+    data: {
+      labels: signupData.labels,
+      datasets: [{ data: signupData.values, backgroundColor: '#818cf8', borderRadius: 4 }]
+    },
+    options: opts
+  });
+
+  new Chart(document.getElementById('dauChart'), {
+    type: 'line',
+    data: {
+      labels: dauData.labels,
+      datasets: [{
+        data: dauData.values,
+        borderColor: '#f59e0b',
+        backgroundColor: 'rgba(245,158,11,0.1)',
+        borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0
+      }]
+    },
+    options: opts
+  });
+</script>
+{% endblock %}

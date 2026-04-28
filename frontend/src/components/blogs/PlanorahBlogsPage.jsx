@@ -1,64 +1,38 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, BookOpen, Sparkles } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { planorahBlogs } from "../../data/planorahBlogs";
-
-const tierStyles = {
-  1: {
-    dot: "bg-rose-500",
-    badge: "border-rose-200/80 bg-rose-100/70 text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-300",
-  },
-  2: {
-    dot: "bg-amber-500",
-    badge: "border-amber-200/80 bg-amber-100/70 text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-300",
-  },
-  3: {
-    dot: "bg-sky-500",
-    badge: "border-sky-200/80 bg-sky-100/70 text-sky-700 dark:border-sky-500/30 dark:bg-sky-500/15 dark:text-sky-300",
-  },
-  4: {
-    dot: "bg-emerald-500",
-    badge: "border-emerald-200/80 bg-emerald-100/70 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-300",
-  },
-};
-
-const tierOrder = [1, 2, 3, 4];
 
 export default function PlanorahBlogsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const requestedSlug = searchParams.get("article");
 
-  const initialIndex = useMemo(() => {
-    if (!requestedSlug) {
-      return 0;
-    }
-    const foundIndex = planorahBlogs.findIndex((item) => item.slug === requestedSlug);
-    return foundIndex >= 0 ? foundIndex : 0;
+  const isArticleView = !!requestedSlug;
+
+  const activeArticleIndex = useMemo(() => {
+    if (!requestedSlug) return -1;
+    return planorahBlogs.findIndex((item) => item.slug === requestedSlug);      
   }, [requestedSlug]);
 
-  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const activeBlog = activeArticleIndex >= 0 ? planorahBlogs[activeArticleIndex] : null;
 
   useEffect(() => {
-    setCurrentIndex(initialIndex);
-  }, [initialIndex]);
-
-  const activeBlog = planorahBlogs[currentIndex] || planorahBlogs[0];
-
-  const groupedBlogs = useMemo(() => {
-    return tierOrder.map((tier) => ({
-      tier,
-      label: planorahBlogs.find((item) => item.tier === tier)?.tierLabel || `Tier ${tier}`,
-      items: planorahBlogs
-        .map((item, index) => ({ ...item, index }))
-        .filter((item) => item.tier === tier),
-    }));
-  }, []);
-
-  const selectBlog = (index) => {
-    const bounded = Math.max(0, Math.min(index, planorahBlogs.length - 1));
-    setCurrentIndex(bounded);
-    setSearchParams({ article: planorahBlogs[bounded].slug }, { replace: true });
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [requestedSlug]);
+
+  const openArticle = (slug) => {
+    setSearchParams({ article: slug });
+  };
+
+  const goBackToList = () => {
+    setSearchParams({});
+  };
+
+  const selectNextArticle = (offset) => {
+    const newIdx = activeArticleIndex + offset;
+    if (newIdx >= 0 && newIdx < planorahBlogs.length) {
+      setSearchParams({ article: planorahBlogs[newIdx].slug });
+    }
   };
 
   return (
@@ -120,10 +94,26 @@ export default function PlanorahBlogsPage() {
                       <span className="mr-2 text-[11px] font-bold opacity-70">
                         {String(blog.index + 1).padStart(2, "0")}
                       </span>
-                      {blog.title}
-                    </button>
-                  ))}
-                </div>
+                      <span className="text-xs font-semibold text-[var(--fg-muted)] tracking-wider uppercase">
+                        {Math.ceil(parseInt(String(planorahBlogs[0].words || "800").replace(/\D/g, '') || 800, 10) / 200)} MIN READ
+                      </span>
+                    </div>
+                    <h2 className="font-cal-sans text-3xl md:text-4xl font-bold tracking-tight text-[var(--fg-deep)] mb-6 group-hover:underline decoration-2 underline-offset-4">
+                      {planorahBlogs[0].title}
+                    </h2>
+                    <p className="text-base text-[var(--fg-muted)] leading-relaxed mb-8">
+                      {planorahBlogs[0].metaDesc}
+                    </p>
+                    <div className="flex items-center text-sm font-bold text-[var(--fg)] uppercase tracking-widest">
+                      Read Article <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </div>
+                  </div>
+                  <div className="hidden md:flex w-2/5 border-l border-[var(--border-subtle)] bg-[var(--bg)] items-center justify-center relative overflow-hidden">
+                     <span className="text-[10rem] font-bold text-[var(--fg-muted)] opacity-10 -rotate-12 transition-transform duration-700 group-hover:scale-110">
+                       01
+                     </span>
+                  </div>
+                </button>
               </div>
             ))}
           </div>
@@ -198,8 +188,8 @@ export default function PlanorahBlogsPage() {
               disabled={currentIndex === 0}
               className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-500"
             >
-              <ArrowLeft className="h-4 w-4" />
-              Previous
+              <ChevronLeft className="h-4 w-4 mr-1 transition-transform group-hover:-translate-x-1" />
+              Back to Journal
             </button>
 
             <span className="text-sm font-medium text-slate-500 dark:text-slate-400">

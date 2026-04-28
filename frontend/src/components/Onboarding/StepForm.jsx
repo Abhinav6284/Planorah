@@ -193,16 +193,8 @@ export default function StepForm() {
         } catch (error) {
             console.error("Error updating profile:", error);
 
-            // Handle Auth Errors
-            if (error.response?.status === 401 || error.response?.data?.code === "token_not_valid") {
-                alert("Your session has expired. Please login again.");
-                localStorage.removeItem("access_token");
-                localStorage.removeItem("refresh_token");
-                sessionStorage.removeItem("access_token");
-                sessionStorage.removeItem("refresh_token");
-                navigate("/login");
-                return;
-            }
+            // 401 is handled by the axios interceptor (token refresh + retry);
+            // if it propagates here the interceptor already redirected to /login.
 
             if (error.response) {
                 console.error("Response data:", error.response.data);
@@ -235,13 +227,13 @@ export default function StepForm() {
                     <div className="grid grid-cols-2 gap-6">
                         {stepData.fields.map((field) => (
                             <div key={field.name} className={field.colSpan === 2 ? "col-span-2" : "col-span-2 md:col-span-1"}>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">{field.label}</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{field.label}</label>
                                 {field.options ? (
                                     <select
                                         name={field.name}
                                         value={formData[field.name]}
                                         onChange={handleChange}
-                                        className="onboarding-select"
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white/30"
                                     >
                                         {field.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                     </select>
@@ -252,7 +244,7 @@ export default function StepForm() {
                                         value={formData[field.name]}
                                         onChange={handleChange}
                                         placeholder={field.placeholder}
-                                        className="onboarding-input"
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white/30"
                                     />
                                 )}
                             </div>

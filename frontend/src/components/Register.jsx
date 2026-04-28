@@ -1,48 +1,219 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "../api/axios";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useGoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from "@react-oauth/google";
 import { setTokens } from "../utils/auth";
-import { useTheme } from "../context/ThemeContext";
 import env from "../config/env";
+import { Eye, EyeOff, CheckCircle2, AlertCircle } from "lucide-react";
+
+// ── Shared icons ──────────────────────────────────────────────────────────
+
+const GridBackdrop = () => (
+  <svg width="100%" height="100%" style={{ position: "absolute", inset: 0, opacity: 0.1, pointerEvents: "none" }}>
+    <defs>
+      <pattern id="authGrid2" width="44" height="44" patternUnits="userSpaceOnUse">
+        <path d="M44 0H0V44" fill="none" stroke="var(--fg-muted)" strokeWidth="1" />
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#authGrid2)" />
+  </svg>
+);
+
+const CheckIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 12l4 4L19 7" />
+  </svg>
+);
+
+const ArrowRightIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 12h14M13 5l7 7-7 7" />
+  </svg>
+);
+
+const GoogleIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 48 48">
+    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+  </svg>
+);
+
+const GitHubIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+    <path fillRule="evenodd" clipRule="evenodd" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+  </svg>
+);
+
+// ── Password strength meter ───────────────────────────────────────────────
+
+const PwStrength = ({ value }) => {
+  const score = (() => {
+    let s = 0;
+    if (value.length >= 8) s++;
+    if (/[A-Z]/.test(value)) s++;
+    if (/[0-9]/.test(value)) s++;
+    if (/[^A-Za-z0-9]/.test(value)) s++;
+    return s;
+  })();
+  const label = ["Too short", "Weak", "Okay", "Strong", "Excellent"][score] || "";
+  
+  // Semantic colors based on score level
+  const colorMap = {
+    1: "#ef4444", // Red (Weak)
+    2: "#f59e0b", // Orange (Okay)
+    3: "#10b981", // Green (Strong)
+    4: "#059669", // Dark Green (Excellent)
+  };
+  const activeColor = colorMap[score] || "var(--charcoal)";
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 4, marginBottom: 8 }}>
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} style={{
+            flex: 1, height: 3, borderRadius: 2,
+            background: i < score ? activeColor : "var(--border-subtle)",
+            transition: "background 0.25s ease",
+          }} />
+        ))}
+      </div>
+      <div style={{ fontSize: 12, color: activeColor !== "var(--charcoal)" ? activeColor : "var(--fg-muted)", marginTop: 4, fontWeight: score > 2 ? 500 : 400 }}>
+        {value ? label : <span style={{ color: "var(--fg-muted)" }}>8+ characters recommended, with a number or symbol.</span>}
+      </div>
+    </div>
+  );
+};
+
+// ── Brand panel (register variant) ───────────────────────────────────────
+
+const BrandPanel = () => (
+  <div
+    className="hidden lg:flex flex-col justify-between overflow-y-auto"
+    style={{
+      position: "relative",
+      background: "var(--surface)",
+      color: "var(--fg)",
+      padding: "28px 40px",
+      overflow: "hidden",
+    }}
+  >
+    <GridBackdrop />
+
+    {/* Logo */}
+    <div style={{ position: "relative", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <Link to="/" style={{ display: "inline-flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+        <div style={{
+          width: 28, height: 28, borderRadius: 7,
+          background: "var(--fg-deep)",
+          display: "inline-flex", alignItems: "center", justifyContent: "center",
+          overflow: 'hidden'
+        }}>
+          <img 
+            src="/planorah_logo.png" 
+            alt="P" 
+            style={{ 
+              width: 18, 
+              height: 18, 
+              objectFit: 'contain',
+              filter: 'invert(1)' // Always invert since container is var(--fg-deep)
+            }} 
+          />
+        </div>
+        <span style={{ fontFamily: "'Cal Sans', sans-serif", fontWeight: 600, fontSize: 18, letterSpacing: "-0.01em", color: "var(--fg-deep)" }}>Planorah</span>
+      </Link>
+      <Link to="/" style={{ fontSize: 13, color: "var(--fg-muted)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
+        ← Back to site
+      </Link>
+    </div>
+
+    {/* Headline + bullets */}
+    <div style={{ position: "relative", maxWidth: 440 }}>
+      <div style={{
+        fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: "0.18em",
+        textTransform: "uppercase", color: "var(--fg-muted)", marginBottom: 12,
+      }}>
+        Start for free
+      </div>
+      <div style={{
+        fontFamily: "'Cal Sans', sans-serif", fontWeight: 600,
+        fontSize: 34, lineHeight: 1.08, letterSpacing: "-0.025em", marginBottom: 18,
+      }}>
+        Master your time.<br />Maximize your learning.
+      </div>
+      <div style={{ color: "var(--fg-muted)", fontSize: 14, lineHeight: 1.5, marginBottom: 20 }}>
+        Join thousands of students who turned a semester of chaos into a calm weekly plan.
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {[
+          "Free for students — no credit card",
+          "Import your syllabi in under a minute",
+          "AI study assistant grounded in your plan",
+        ].map((line) => (
+          <div key={line} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 14, color: "var(--fg)" }}>
+            <span style={{
+              width: 20, height: 20, borderRadius: "50%",
+              border: "1px solid var(--border-subtle)",
+              background: "var(--light-gray)",
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              color: "var(--fg-deep)", flexShrink: 0,
+            }}>
+              <CheckIcon />
+            </span>
+            {line}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Testimonial */}
+    <div style={{ position: "relative", borderTop: "1px solid var(--border-subtle)", paddingTop: 16 }}>
+      <div style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: 15, lineHeight: 1.4, marginBottom: 10, maxWidth: 460 }}>
+        "I stopped keeping a bullet journal. Planorah does the hard part — deciding what to work on — so I can just work."
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "var(--fg-muted)" }}>
+        <div style={{
+          width: 28, height: 28, borderRadius: "50%",
+          background: "var(--light-gray)",
+          display: "inline-flex", alignItems: "center", justifyContent: "center",
+          fontSize: 11, fontWeight: 600,
+        }}>MS</div>
+        Maya S. · Junior, Comp Sci — UC Berkeley
+      </div>
+    </div>
+  </div>
+);
+
+// ── Main component ────────────────────────────────────────────────────────
 
 export default function Register() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { theme, toggleTheme } = useTheme();
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ username: "", email: "", password: "" });
+  const [agree, setAgree] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const prefillEmail = location.state?.prefillEmail;
-    if (prefillEmail) {
-      setFormData((prev) => ({ ...prev, email: prefillEmail }));
-    }
+    if (prefillEmail) setFormData((prev) => ({ ...prev, email: prefillEmail }));
   }, [location.state]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!agree) { setMessage("Please agree to the terms to continue."); return; }
     setLoading(true);
     try {
       const res = await axios.post(`/api/users/register/`, formData);
       const responseMessage = res.data.message || "OTP sent successfully!";
       setMessage(`success:${responseMessage}`);
       if (res.data.verify_required || /otp/i.test(responseMessage)) {
-        setTimeout(
-          () => navigate("/verify-otp", { state: { email: res.data.email || formData.email } }),
-          1200
-        );
+        setTimeout(() => navigate("/verify-otp", { state: { email: res.data.email || formData.email } }), 1200);
       }
     } catch (err) {
       const serverMsg = err.response?.data?.error || err.response?.data?.message;
@@ -52,159 +223,212 @@ export default function Register() {
     }
   };
 
-  const login = useGoogleLogin({
+  const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
-      setLoading(true);
-      setMessage("");
+      setLoading(true); setMessage("");
       try {
-        const res = await axios.post(`/api/users/google/login/`, {
-          token: tokenResponse.access_token,
-          mode: "signup"
-        });
-
-        // Handle 2FA if required
+        const res = await axios.post(`/api/users/google/login/`, { token: tokenResponse.access_token, mode: "signup" });
         if (res.data.two_factor_required) {
-          navigate("/verify-otp", {
-            state: {
-              email: res.data.email,
-              isLogin: true
-            }
-          });
+          navigate("/verify-otp", { state: { email: res.data.email, isLogin: true } });
           return;
         }
-
-        // Use sessionStorage for new registrations (no remember me by default)
         setTokens(res.data.access, res.data.refresh, false);
         setMessage("success:Google signup successful!");
-        if (res.data.onboarding_complete) {
-          setTimeout(() => navigate("/dashboard"), 1500);
-        } else {
-          setTimeout(() => navigate("/onboarding"), 1500);
-        }
+        setTimeout(() => navigate(res.data.onboarding_complete ? "/dashboard" : "/onboarding"), 1400);
       } catch (err) {
-        console.error('Google OAuth Error:', err.response?.data);
-        const serverMsg = err.response?.data?.error || err.response?.data?.message;
-        const details = err.response?.data?.details ? ` (${err.response.data.details})` : '';
-        setMessage(serverMsg ? `${serverMsg}${details}` : "Google login failed.");
-      } finally {
-        setLoading(false);
-      }
+        const d = err.response?.data;
+        const details = d?.details ? ` (${d.details})` : "";
+        setMessage(d?.error ? `${d.error}${details}` : "Google signup failed.");
+      } finally { setLoading(false); }
     },
-    onError: () => {
-      setMessage("Google login failed. Please try again.");
-      setLoading(false);
-    }
+    onError: () => { setMessage("Google signup failed."); setLoading(false); },
   });
 
+  const handleGitHub = () => {
+    const clientId = env.GITHUB_CLIENT_ID;
+    const redirectUri = encodeURIComponent(window.location.origin + "/auth/github/callback");
+    const scope = encodeURIComponent("read:user user:email");
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${encodeURIComponent("signup")}`;
+  };
 
+  const isSuccess = message.startsWith("success:");
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-sans selection:bg-yellow-100 dark:selection:bg-yellow-900 flex flex-col justify-between p-4 md:p-6 lg:p-12 transition-colors duration-300">
-      {/* Header */}
-      <header className="flex justify-between items-center w-full max-w-7xl mx-auto">
-        <Link to="/" className="text-xl md:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Planorah.</Link>
-        <div className="flex items-center gap-3 md:gap-6">
-          <Link to="/login" className="hidden md:block text-sm font-medium hover:opacity-70 text-gray-700 dark:text-gray-300">Already have an account?</Link>
-          <Link to="/login" className="text-sm font-medium hover:opacity-70 text-gray-700 dark:text-gray-300 md:hidden">Sign In</Link>
-          <button
-            onClick={toggleTheme}
-            className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-          >
-            {theme === 'light' ? (
-              <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            )}
-          </button>
-        </div>
-      </header>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className="grid grid-cols-1 lg:grid-cols-2 min-h-screen lg:h-screen w-full"
+      style={{ background: "var(--bg)" }}
+    >
+      <BrandPanel />
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center w-full max-w-6xl mx-auto mt-12 md:mt-0">
+      {/* ── Form panel ── */}
+      <div className="overflow-y-auto" style={{ display: "flex", flexDirection: "column", background: "var(--bg)", height: "100%" }}>
 
-        {/* Hero Section */}
-        <div className="text-center mb-16 relative">
-          <span className="inline-block py-1 px-3 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-xs font-medium text-yellow-800 dark:text-yellow-300 mb-6">
-            Join the community
-          </span>
-          <h1 className="text-5xl md:text-7xl font-serif max-w-4xl mx-auto leading-tight relative z-10 text-gray-900 dark:text-white">
-            Create Your New <br />
-            <span className="relative inline-block">
-              Account
-              <motion.svg
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
-                className="absolute -bottom-2 left-0 w-full h-4 text-yellow-300 -z-10"
-                viewBox="0 0 100 10"
-                preserveAspectRatio="none"
-              >
-                <path d="M0 5 Q 50 10 100 5" fill="none" stroke="currentColor" strokeWidth="8" />
-              </motion.svg>
-            </span>
-          </h1>
-          <p className="mt-6 text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
-            Start organizing your academic life and collaborating with ease.
-          </p>
-        </div>
+        {/* Top bar */}
+        <header style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: "12px 24px", gap: 16 }}>
+          <span style={{ fontSize: 13, color: "var(--fg-muted)" }}>Already have an account?</span>
+          <Link to="/login" style={{
+            fontSize: 13, fontWeight: 500,
+            color: "var(--fg-deep)", textDecoration: "none",
+            borderBottom: "1px solid var(--fg-deep)",
+          }}>
+            Sign in →
+          </Link>
+        </header>
 
-        {/* Split Layout Form */}
-        <div className="flex flex-col md:flex-row items-stretch justify-between w-full gap-12 md:gap-20">
+        {/* Form body */}
+        <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px 24px" }}>
+          <div style={{ width: "100%", maxWidth: 400 }}>
 
-          {/* Left Column: Manual Register */}
-          <div className="flex-1 w-full space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  placeholder="Choose a Username"
-                  className="w-full px-8 py-5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-sm text-lg text-gray-900 dark:text-white"
-                  required
-                />
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Email Address"
-                  className="w-full px-8 py-5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-sm text-lg text-gray-900 dark:text-white"
-                  required
-                />
-                <div className="relative">
+            <h2 style={{
+              fontFamily: "'Cal Sans', sans-serif", fontWeight: 600,
+              fontSize: 28, lineHeight: 1.1, letterSpacing: "-0.02em",
+              marginBottom: 6, color: "var(--fg-deep)",
+            }}>
+              Create your account
+            </h2>
+            <p style={{ fontSize: 13, color: "var(--fg-muted)", marginBottom: 20 }}>
+              Takes less than a minute. Free while you're a student.
+            </p>
+
+            {/* SSO */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
+              <button type="button" className="sso-btn" onClick={() => googleLogin()}>
+                <GoogleIcon />
+                Sign up with Google
+              </button>
+              <button type="button" className="sso-btn" onClick={handleGitHub}>
+                <GitHubIcon />
+                Sign up with GitHub
+              </button>
+            </div>
+
+            {/* Divider */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, color: "var(--fg-muted)", fontSize: 12, marginBottom: 14 }}>
+              <div style={{ flex: 1, height: 1, background: "var(--border-subtle)" }} />
+              <span style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                or with email
+              </span>
+              <div style={{ flex: 1, height: 1, background: "var(--border-subtle)" }} />
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+
+              {/* Username */}
+              <div>
+                <label htmlFor="register-username" style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--fg-deep)", marginBottom: 4 }}>
+                  Username
+                </label>
+                <div className="auth-input-wrap">
                   <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    value={formData.password}
+                    id="register-username"
+                    className="auth-input"
+                    type="text"
+                    name="username"
+                    placeholder="alex_rivera"
+                    autoComplete="username"
+                    value={formData.username}
                     onChange={handleChange}
-                    placeholder="Create Password"
-                    className="w-full px-8 py-5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-sm text-lg pr-14 text-gray-900 dark:text-white"
-                    required
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors p-1"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
-                    ) : (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                    )}
-                  </button>
                 </div>
               </div>
 
+              {/* Email */}
+              <div>
+                <label htmlFor="register-email" style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--fg-deep)", marginBottom: 4 }}>
+                  Email
+                </label>
+                <div className="auth-input-wrap">
+                  <input
+                    id="register-email"
+                    className="auth-input"
+                    type="email"
+                    name="email"
+                    placeholder="you@example.com"
+                    autoComplete="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div>
+                <label htmlFor="register-password" style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--fg-deep)", marginBottom: 4 }}>
+                  Password
+                </label>
+                <div className="auth-input-wrap" style={{ position: "relative" }}>
+                  <input
+                    id="register-password"
+                    className="auth-input"
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    placeholder="At least 8 characters"
+                    autoComplete="new-password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    style={{ paddingRight: 56 }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    style={{
+                      position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                      background: "transparent", border: 0, cursor: "pointer",
+                      color: "var(--fg-muted)", padding: "4px 8px",
+                    }}
+                  >
+                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
+                <div style={{ marginTop: 8 }}>
+                  <PwStrength value={formData.password} />
+                </div>
+              </div>
+
+              {/* Terms checkbox */}
+              <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "var(--fg-deep)", cursor: "pointer", userSelect: "none", lineHeight: 1.5, marginTop: 12 }}>
+                <div style={{ flexShrink: 0, display: "flex", alignItems: "center" }}>
+                  <div
+                    onClick={() => setAgree((v) => !v)}
+                    role="checkbox"
+                    aria-checked={agree}
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setAgree((v) => !v); } }}
+                    style={{
+                      width: 16, height: 16, borderRadius: 4,
+                      boxShadow: "var(--shadow-ring)",
+                      background: agree ? "var(--fg-deep)" : "transparent",
+                      color: "var(--bg)",
+                      display: "inline-flex", alignItems: "center", justifyContent: "center",
+                      cursor: "pointer", transition: "background 0.15s ease",
+                    }}
+                  >
+                    {agree && <CheckIcon />}
+                  </div>
+                </div>
+                <span>
+                  I agree to the{" "}
+                  <Link to="/terms" style={{ color: "var(--fg-deep)", borderBottom: "1px solid var(--border-subtle)", textDecoration: "none" }}>Terms</Link>
+                  {" "}and{" "}
+                  <Link to="/privacy" style={{ color: "var(--fg-deep)", borderBottom: "1px solid var(--border-subtle)", textDecoration: "none" }}>Privacy Policy</Link>.
+                </span>
+              </label>
+
+              {/* Error / success banner */}
               {message && (
-                <div className={`text-sm font-medium ${message.startsWith("success:") ? "text-green-600" : "text-red-500"}`}>
+                <div style={{
+                  padding: "10px 12px",
+                  marginTop: 8,
+                  background: isSuccess ? "rgba(34,197,94,0.08)" : "rgba(239,68,68,0.08)",
+                  borderRadius: 8, fontSize: 13,
+                  color: isSuccess ? "#166534" : "#991b1b",
+                  display: "flex", alignItems: "center", gap: 8,
+                }}>
+                  {isSuccess ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
                   {message.replace("success:", "")}
                 </div>
               )}
@@ -222,19 +446,12 @@ export default function Register() {
                 </span>
               </button>
             </form>
-          </div>
 
-          {/* Divider */}
-          <div className="hidden md:flex flex-col items-center justify-center">
-            <div className="h-full w-px bg-gray-200/50 dark:bg-gray-700/50"></div>
-            <span className="py-4 text-gray-400 dark:text-gray-500 italic font-serif text-xl">/</span>
-            <div className="h-full w-px bg-gray-200/50 dark:bg-gray-700/50"></div>
+            <p style={{ marginTop: 20, fontSize: 11, color: "var(--fg-muted)", textAlign: "center" }}>
+              Protected by industry-standard encryption. Your syllabi never train third-party models.
+            </p>
           </div>
-          <div className="md:hidden flex items-center gap-4 w-full">
-            <div className="h-px bg-gray-200 dark:bg-gray-700 flex-1"></div>
-            <span className="text-gray-400 dark:text-gray-500 italic">or</span>
-            <div className="h-px bg-gray-200 dark:bg-gray-700 flex-1"></div>
-          </div>
+        </main>
 
           {/* Right Column: Social Login */}
           <div className="flex-1 w-full space-y-4 flex flex-col justify-center">
@@ -309,4 +526,3 @@ export default function Register() {
     </div>
   );
 }
-

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "../api/axios";
-import { setTokens, getRememberMePreference, clearRememberMePreference } from "../utils/auth";
+import { setTokens, getRememberMePreference, clearRememberMePreference, setTrustedDeviceToken } from "../utils/auth";
 
 export default function VerifyOTP() {
   const location = useLocation();
@@ -90,15 +90,19 @@ export default function VerifyOTP() {
         endpoint = `/api/users/verify-social-otp/`;
       }
 
+      const rememberMe = getRememberMePreference();
       const response = await axios.post(endpoint, {
         email: email.trim(),
         otp: otpString,
+        ...(location.state?.isLogin && { remember_me: rememberMe }),
       });
 
       if (response.status === 200 || response.status === 201) {
         // Auto-login: Save tokens with rememberMe preference
-        const rememberMe = getRememberMePreference();
         setTokens(response.data.access, response.data.refresh, rememberMe);
+        if (response.data.trusted_device_token) {
+          setTrustedDeviceToken(response.data.trusted_device_token);
+        }
         clearRememberMePreference();
 
         // Check if onboarding is complete to decide redirect destination
@@ -113,9 +117,10 @@ export default function VerifyOTP() {
             setTimeout(() => navigate("/onboarding"), 1500);
           }
         } else {
-          // Email registration OTP verification
-          setMessage({ text: "Verified! Setting up profile...", type: "success" });
-          setTimeout(() => navigate("/complete-profile"), 1500);
+          // Email registration OTP verification — go directly to Quicky onboarding
+          // (Quicky bot collects name/DOB/phone in its 'personal' step)
+          setMessage({ text: "Verified! Let's get you set up...", type: "success" });
+          setTimeout(() => navigate("/onboarding"), 1500);
         }
       }
     } catch (error) {

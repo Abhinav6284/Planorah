@@ -129,7 +129,7 @@ export default function StreakUpdateModal({ streak, onClose }) {
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.8, opacity: 0, y: 20 }}
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                        className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-2xl overflow-hidden text-center"
+                        className="relative w-full max-w-md bg-white dark:bg-charcoalDark rounded-3xl p-8 shadow-2xl overflow-hidden text-center"
                     >
                         {/* Decorative background circles */}
                         <div className="absolute -top-20 -right-20 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl" />

@@ -1,7 +1,7 @@
 import React from 'react';
 
-const inputCls = 'w-full px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-colors text-sm';
-const inputErrCls = 'w-full px-4 py-2.5 bg-white dark:bg-gray-900 border border-red-400 dark:border-red-500 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-red-500 outline-none transition-colors text-sm';
+const inputCls = 'w-full px-4 py-2.5 bg-white dark:bg-charcoalDark border border-gray-200 dark:border-charcoalMuted rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-colors text-sm';
+const inputErrCls = 'w-full px-4 py-2.5 bg-white dark:bg-charcoalDark border border-red-400 dark:border-red-500 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:border-red-500 outline-none transition-colors text-sm';
 
 function FieldError({ error }) {
   if (!error) return null;
@@ -22,10 +22,10 @@ export default function SettingsTab({
   const cls = (field) => fieldErrors[field] ? inputErrCls : inputCls;
   return (
     <div className="space-y-5">
-      <div className="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
+      <div className="bg-white dark:bg-charcoal border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
         <h3 className="text-gray-900 dark:text-white font-semibold mb-5">Display Settings</h3>
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-white/10 rounded-2xl">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-charcoalDark/50 border border-gray-100 dark:border-white/10 rounded-2xl">
             <div>
               <h4 className="text-gray-900 dark:text-white font-medium text-sm">Show Email</h4>
               <p className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">Display your email on portfolio</p>
@@ -33,7 +33,7 @@ export default function SettingsTab({
             <button
               onClick={() => onFieldChange('show_email', !portfolio?.show_email)}
               className={`w-11 h-6 rounded-full transition-all relative ${
-                portfolio?.show_email ? 'bg-emerald-500' : 'bg-gray-200 dark:bg-gray-700'
+                portfolio?.show_email ? 'bg-emerald-500' : 'bg-gray-200 dark:bg-charcoalMuted'
               }`}
             >
               <div
@@ -61,7 +61,7 @@ export default function SettingsTab({
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
+      <div className="bg-white dark:bg-charcoal border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
         <h3 className="text-gray-900 dark:text-white font-semibold mb-5">SEO Settings</h3>
         <div className="space-y-4">
           <div>
@@ -102,20 +102,20 @@ export default function SettingsTab({
       </div>
 
       {canUseSubdomain && (
-        <div className="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
+        <div className="bg-white dark:bg-charcoal border border-gray-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
           <h3 className="text-gray-900 dark:text-white font-semibold mb-5">Custom Subdomain</h3>
           <div className="space-y-4">
             <div>
               <label className="block text-gray-500 dark:text-gray-400 text-xs font-medium mb-1.5 uppercase tracking-wide">Claim your subdomain</label>
               <div className="flex gap-2">
-                <div className="flex-1 flex items-center bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden focus-within:border-indigo-400 transition-colors">
+                <div className="flex-1 flex items-center bg-white dark:bg-charcoalDark border border-gray-200 dark:border-charcoalMuted rounded-xl overflow-hidden focus-within:border-indigo-400 transition-colors">
                   <input
                     value={newSubdomain}
                     onChange={(e) => onNewSubdomainChange(e.target.value)}
                     placeholder={portfolio?.custom_subdomain || 'your-name'}
                     className="flex-1 bg-transparent px-4 py-2.5 text-gray-900 dark:text-white text-sm outline-none"
                   />
-                  <span className="px-3 py-2.5 bg-gray-50 dark:bg-gray-800 text-gray-400 text-xs border-l border-gray-200 dark:border-gray-700">
+                  <span className="px-3 py-2.5 bg-gray-50 dark:bg-charcoal text-gray-400 text-xs border-l border-gray-200 dark:border-charcoalMuted">
                     .{portfolioRootDomain}
                   </span>
                 </div>

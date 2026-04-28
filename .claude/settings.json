@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Read(//c/Users/abhin/.claude/plugins/marketplaces/superpowers-dev/skills/brainstorming/**)",
+      "Read(//c/Users/abhin/.claude/plugins/marketplaces/superpowers-dev/**)",
+      "Bash(scripts/start-server.sh --project-dir \"p:\\\\Planora\")",
+      "Bash(xargs cat:*)",
+      "Read(//c/Users/abhin/.claude/plugins/**)",
+      "Bash(\"C:\\\\Users\\\\abhin\\\\.claude\\\\plugins\\\\marketplaces\\\\superpowers-dev\\\\skills\\\\brainstorming\\\\scripts\\\\start-server.sh\" --project-dir \"p:\\\\Planora\")",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(npm test:*)",
+      "Read(//tmp/**)",
+      "Bash(pkill -f \"npm test\")",
+      "Bash(wait)",
+      "Bash(CI=true npm test -- CompactWidget.test.jsx --testPathPattern=\"CompactWidget\")",
+      "Bash(tee /tmp/test_output.txt)",
+      "Bash(python -m py_compile backend/urls.py)",
+      "Bash(grep -l \"PublicPortfolio\" \"p:/Planora/frontend/src/components/Portfolio\"/*.jsx)",
+      "Bash(xargs ls:*)",
+      "Bash(scripts/start-server.sh --project-dir p:\\\\Planora)",
+      "Bash(C:/Users/abhin/.claude/plugins/cache/superpowers-dev/superpowers/5.0.7/skills/brainstorming/scripts/start-server.sh --project-dir p:/Planora)",
+      "Bash(curl -s http://localhost:60758)"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
+    ]
+  },
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true
+  }
+}

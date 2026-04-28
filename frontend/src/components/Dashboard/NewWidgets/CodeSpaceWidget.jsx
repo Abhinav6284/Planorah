@@ -27,14 +27,14 @@ const CodeSpaceWidget = () => {
 
     if (status.loading) {
         return (
-            <div className="bg-white dark:bg-[#1C1C1E] rounded-[28px] p-5 h-full flex items-center justify-center min-h-[280px]">
+            <div className="bg-white dark:bg-charcoal rounded-[28px] p-5 h-full flex items-center justify-center min-h-[280px]">
                 <div className="text-gray-400 dark:text-gray-500 animate-pulse">Loading...</div>
             </div>
         );
     }
 
     return (
-        <div className="bg-white dark:bg-[#1C1C1E] rounded-[28px] p-6 h-full flex flex-col justify-between relative overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow min-h-[280px]">
+        <div className="bg-white dark:bg-charcoal rounded-[28px] p-6 h-full flex flex-col justify-between relative overflow-hidden border border-gray-100 dark:border-charcoalMuted shadow-sm hover:shadow-md transition-shadow min-h-[280px]">
             {/* Header */}
             <div className="flex justify-between items-start z-10">
                 <div className="w-12 h-12 bg-[#007ACC]/10 rounded-xl flex items-center justify-center text-[#007ACC]">
@@ -59,7 +59,7 @@ const CodeSpaceWidget = () => {
             </div>
 
             {/* Bottom Section */}
-            <div className="z-10 mt-auto pt-4 border-t border-gray-100 dark:border-gray-800">
+            <div className="z-10 mt-auto pt-4 border-t border-gray-100 dark:border-charcoalMuted">
                 <div className="flex items-center justify-between">
                     {status.connected ? (
                         <div className="flex items-center gap-2">

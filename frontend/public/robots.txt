@@ -1,6 +1,10 @@
 # https://www.robotstxt.org/robotstxt.html
+
+# Default: Allow public pages only
 User-agent: *
 Allow: /
+Allow: /support
+Allow: /contact
 
 # Private/authenticated app areas
 Disallow: /dashboard
@@ -20,9 +24,35 @@ Disallow: /subscription
 Disallow: /portfolio/edit
 Disallow: /projects
 
+# Auth routes (public but not indexable)
+Disallow: /login
+Disallow: /register
+Disallow: /verify-otp
+Disallow: /forgot-password
+Disallow: /verify-reset-otp
+Disallow: /reset-password
+Disallow: /home
+
 # OAuth callback/internal flow routes
 Disallow: /auth/github/callback
 Disallow: /auth/spotify/callback
 Disallow: /auth/youtube/callback
 
-Sitemap: https://planorah.me/sitemap.xml
+# Sitemap
+Sitemap: https://www.planorah.me/sitemap.xml
+
+# Allow AI search engines to crawl
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /

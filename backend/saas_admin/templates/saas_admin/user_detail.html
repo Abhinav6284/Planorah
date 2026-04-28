@@ -1,0 +1,336 @@
+{% extends "saas_admin/base.html" %}
+{% block content %}
+
+<!-- Back -->
+<div class="mb-6">
+  <a href="{% url 'saas_admin:users_list' %}" class="text-sm text-slate-500 hover:text-slate-700 flex items-center gap-1">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+    </svg>
+    Back to Users
+  </a>
+</div>
+
+<!-- Profile Header -->
+<div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm mb-6" x-data="{ showPlanModal: false, showTrialModal: false, showDeleteModal: false }">
+  <div class="flex items-start gap-4">
+    <div class="w-14 h-14 bg-gradient-to-br from-brand-500 to-violet-600 rounded-2xl flex items-center justify-center text-white text-xl font-bold">
+      {{ user.email|first|upper }}
+    </div>
+    <div class="flex-1">
+      <div class="flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">
+            {{ user.first_name|default:"" }} {{ user.last_name|default:"" }}
+            {% if not user.first_name %}<span class="text-slate-400">{{ user.username }}</span>{% endif %}
+          </h2>
+          <p class="text-sm text-slate-500">{{ user.email }}</p>
+          <div class="flex items-center gap-2 mt-2 flex-wrap">
+            {% if user.status == 'active' and user.is_active %}
+              <span class="badge badge-green">Active</span>
+            {% elif user.status == 'suspended' %}
+              <span class="badge badge-red">Suspended</span>
+            {% else %}
+              <span class="badge badge-yellow">{{ user.status|capfirst }}</span>
+            {% endif %}
+            {% if user.is_verified %}
+              <span class="badge badge-blue">Verified</span>
+            {% endif %}
+            {% if user.is_staff %}
+              <span class="badge badge-gray">Staff</span>
+            {% endif %}
+            {% if active_sub %}
+              <span class="badge badge-green">{{ active_sub.plan.display_name }}</span>
+            {% else %}
+              <span class="badge badge-gray">Free</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-2 flex-wrap">
+          <button @click="showPlanModal = true" class="btn-primary">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+            </svg>
+            Assign Plan
+          </button>
+          <button @click="showTrialModal = true" class="btn-ghost">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Give Trial
+          </button>
+          <form method="post" action="{% url 'saas_admin:user_action' user.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reset_progress" />
+            <button type="submit" class="btn-ghost" onclick="return confirm('Reset XP and streak?')">
+              Reset Progress
+            </button>
+          </form>
+          {% if user.is_active %}
+          <form method="post" action="{% url 'saas_admin:user_action' user.id %}"
+                onsubmit="return confirm('Suspend this user?')">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="disable" />
+            <button type="submit" class="btn-ghost text-amber-600 hover:text-amber-800">Suspend</button>
+          </form>
+          {% else %}
+          <form method="post" action="{% url 'saas_admin:user_action' user.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="enable" />
+            <button type="submit" class="btn-ghost text-emerald-600">Re-enable</button>
+          </form>
+          {% endif %}
+          <button @click="showDeleteModal = true" class="btn-danger">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Meta Grid -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-100">
+    <div>
+      <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Joined</p>
+      <p class="text-sm font-medium text-slate-800 mt-1">{{ user.created_at|date:"M d, Y" }}</p>
+    </div>
+    <div>
+      <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Last Active</p>
+      <p class="text-sm font-medium text-slate-800 mt-1">
+        {% if user.profile.last_activity_date %}{{ user.profile.last_activity_date|date:"M d, Y" }}{% else %}—{% endif %}
+      </p>
+    </div>
+    <div>
+      <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">XP Points</p>
+      <p class="text-sm font-medium text-slate-800 mt-1">{{ user.profile.xp_points|default:0 }}</p>
+    </div>
+    <div>
+      <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Streak</p>
+      <p class="text-sm font-medium text-slate-800 mt-1">{{ user.profile.streak_count|default:0 }} days</p>
+    </div>
+    <div>
+      <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Total Paid</p>
+      <p class="text-sm font-bold text-emerald-600 mt-1">₹{{ total_paid|floatformat:0 }}</p>
+    </div>
+    <div>
+      <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Lifecycle</p>
+      <p class="text-sm font-medium text-slate-800 mt-1">{{ user.profile.lifecycle_state|default:"ONBOARDING" }}</p>
+    </div>
+    <div>
+      <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Domain</p>
+      <p class="text-sm font-medium text-slate-800 mt-1">{{ user.profile.domain|default:"—"|capfirst }}</p>
+    </div>
+    <div>
+      <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Weekly Hours</p>
+      <p class="text-sm font-medium text-slate-800 mt-1">{{ user.profile.weekly_hours|default:"—" }}h</p>
+    </div>
+  </div>
+
+  <!-- ─── MODALS ─────────────────────────────────────────────────── -->
+
+  <!-- Assign Plan Modal -->
+  <div x-show="showPlanModal" x-cloak
+       class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 w-96 shadow-xl">
+      <h4 class="text-base font-semibold text-slate-900 mb-1">Assign Plan</h4>
+      <p class="text-xs text-slate-500 mb-4">This cancels any active subscription and creates a new one immediately.</p>
+      <form method="post" action="{% url 'saas_admin:user_action' user.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="assign_plan" />
+        <label class="block text-xs font-medium text-slate-700 mb-1">Plan</label>
+        <select name="plan_id" required class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-brand-500">
+          {% for plan in plans %}
+          <option value="{{ plan.id }}">{{ plan.display_name }} — ₹{{ plan.price_inr }} / {{ plan.validity_days }}d</option>
+          {% endfor %}
+        </select>
+        <div class="flex gap-2">
+          <button type="submit" class="btn-primary flex-1 justify-center">Assign Now</button>
+          <button type="button" @click="showPlanModal = false" class="btn-ghost flex-1 justify-center">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Trial Modal -->
+  <div x-show="showTrialModal" x-cloak
+       class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 w-96 shadow-xl">
+      <h4 class="text-base font-semibold text-slate-900 mb-1">Grant Trial Access</h4>
+      <p class="text-xs text-slate-500 mb-4">Give free access to a plan for N days.</p>
+      <form method="post" action="{% url 'saas_admin:user_action' user.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="grant_trial" />
+        <label class="block text-xs font-medium text-slate-700 mb-1">Plan</label>
+        <select name="plan_id" required class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-brand-500">
+          {% for plan in plans %}
+          <option value="{{ plan.id }}">{{ plan.display_name }}</option>
+          {% endfor %}
+        </select>
+        <label class="block text-xs font-medium text-slate-700 mb-1">Trial Days</label>
+        <input type="number" name="trial_days" value="14" min="1" max="90"
+               class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-brand-500" />
+        <div class="flex gap-2">
+          <button type="submit" class="btn-primary flex-1 justify-center">Grant Trial</button>
+          <button type="button" @click="showTrialModal = false" class="btn-ghost flex-1 justify-center">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div x-show="showDeleteModal" x-cloak
+       class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 w-96 shadow-xl border-2 border-red-100">
+      <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center mb-4">
+        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+      </div>
+      <h4 class="text-base font-semibold text-slate-900 mb-1">Delete User Permanently</h4>
+      <p class="text-xs text-slate-500 mb-4">This cannot be undone. All data for <strong>{{ user.email }}</strong> will be erased. Their email will be blocklisted.</p>
+      <form method="post" action="{% url 'saas_admin:user_action' user.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="delete" />
+        <div class="flex gap-2">
+          <button type="submit" class="btn-danger flex-1 justify-center">Delete Forever</button>
+          <button type="button" @click="showDeleteModal = false" class="btn-ghost flex-1 justify-center">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Active Subscription -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+  <div class="lg:col-span-1 bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+    <h3 class="text-sm font-semibold text-slate-900 mb-4">Current Subscription</h3>
+    {% if active_sub %}
+    <div class="space-y-3">
+      <div class="flex justify-between items-center">
+        <span class="text-xs text-slate-500">Plan</span>
+        <span class="badge badge-blue">{{ active_sub.plan.display_name }}</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="text-xs text-slate-500">Status</span>
+        <span class="badge badge-green">{{ active_sub.status|capfirst }}</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="text-xs text-slate-500">Started</span>
+        <span class="text-xs font-medium text-slate-700">{{ active_sub.start_date|date:"M d, Y" }}</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="text-xs text-slate-500">Expires</span>
+        <span class="text-xs font-medium text-slate-700">{{ active_sub.end_date|date:"M d, Y" }}</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="text-xs text-slate-500">Days Left</span>
+        <span class="text-xs font-bold text-brand-600">{{ active_sub.days_remaining }}d</span>
+      </div>
+      <div class="pt-3 border-t border-slate-100">
+        <p class="text-xs text-slate-500 mb-1">Usage</p>
+        <div class="text-xs text-slate-600 space-y-1">
+          <p>Roadmaps: {{ active_sub.roadmaps_used }} / {{ active_sub.plan.roadmap_limit }}</p>
+          <p>Projects: {{ active_sub.projects_used }} / {{ active_sub.plan.project_limit_max }}</p>
+          <p>Resumes: {{ active_sub.resumes_used }}{% if active_sub.plan.resume_limit == -1 %} / ∞{% else %} / {{ active_sub.plan.resume_limit }}{% endif %}</p>
+        </div>
+      </div>
+      <!-- Cancel & Extend Actions -->
+      <div class="pt-3 border-t border-slate-100 flex gap-2">
+        <form method="post" action="{% url 'saas_admin:subscription_action' active_sub.id %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="cancel" />
+          <button type="submit" class="text-xs text-red-600 hover:text-red-800 font-medium"
+                  onclick="return confirm('Cancel subscription?')">Cancel Sub</button>
+        </form>
+        <form method="post" action="{% url 'saas_admin:subscription_action' active_sub.id %}"
+              class="flex items-center gap-2">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="extend" />
+          <input type="number" name="days" value="30" min="1" max="365"
+                 class="w-16 px-2 py-1 text-xs border border-slate-200 rounded-md" />
+          <button type="submit" class="text-xs text-brand-600 hover:text-brand-800 font-medium">+Extend</button>
+        </form>
+      </div>
+    </div>
+    {% else %}
+    <div class="text-center py-6">
+      <p class="text-slate-400 text-sm">No active subscription</p>
+      <p class="text-slate-400 text-xs mt-1">User is on Free tier</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Subscription History -->
+  <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100">
+      <h3 class="text-sm font-semibold text-slate-900">Subscription History</h3>
+    </div>
+    <table class="w-full data-table">
+      <thead>
+        <tr>
+          <th>Plan</th>
+          <th>Status</th>
+          <th>Start</th>
+          <th>End</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sub in subscriptions %}
+        <tr>
+          <td><span class="font-medium text-slate-800">{{ sub.plan.display_name }}</span></td>
+          <td>
+            {% if sub.status == 'active' %}<span class="badge badge-green">Active</span>
+            {% elif sub.status == 'cancelled' %}<span class="badge badge-red">Cancelled</span>
+            {% elif sub.status == 'expired' %}<span class="badge badge-gray">Expired</span>
+            {% else %}<span class="badge badge-yellow">{{ sub.status|capfirst }}</span>{% endif %}
+          </td>
+          <td class="text-slate-500 text-xs">{{ sub.start_date|date:"M d, Y" }}</td>
+          <td class="text-slate-500 text-xs">{{ sub.end_date|date:"M d, Y" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="text-center py-8 text-slate-400">No subscription history</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Payment History -->
+<div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+  <div class="px-6 py-4 border-b border-slate-100">
+    <h3 class="text-sm font-semibold text-slate-900">Payment History</h3>
+  </div>
+  <table class="w-full data-table">
+    <thead>
+      <tr>
+        <th>Receipt</th>
+        <th>Plan</th>
+        <th>Amount</th>
+        <th>Method</th>
+        <th>Status</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for payment in payments %}
+      <tr>
+        <td class="font-mono text-xs text-slate-500">{{ payment.receipt_number }}</td>
+        <td>{{ payment.plan.display_name }}</td>
+        <td class="font-semibold text-emerald-600">₹{{ payment.amount|floatformat:0 }}</td>
+        <td class="text-slate-500">{{ payment.payment_method|default:"—"|upper }}</td>
+        <td>
+          {% if payment.status == 'completed' %}<span class="badge badge-green">Completed</span>
+          {% elif payment.status == 'failed' %}<span class="badge badge-red">Failed</span>
+          {% elif payment.status == 'refunded' %}<span class="badge badge-yellow">Refunded</span>
+          {% else %}<span class="badge badge-gray">{{ payment.status|capfirst }}</span>{% endif %}
+        </td>
+        <td class="text-slate-500 text-xs">{{ payment.created_at|date:"M d, Y H:i" }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="text-center py-8 text-slate-400">No payments found</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

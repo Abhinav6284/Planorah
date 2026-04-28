@@ -38,8 +38,11 @@
     "zustand": "^5.0.12"
   },
   "scripts": {
+    "postinstall": "node scripts/ensure-mediapipe-sourcemap.js",
+    "prestart": "node scripts/ensure-mediapipe-sourcemap.js",
     "start": "react-scripts start",
     "dev": "react-scripts start",
+    "prebuild": "node scripts/ensure-mediapipe-sourcemap.js",
     "build": "react-scripts build",
     "lint": "eslint src --ext .js,.jsx",
     "lint:fix": "eslint src --ext .js,.jsx --fix",
@@ -65,6 +68,7 @@
     ]
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.19",
     "autoprefixer": "^10.4.21",
     "eslint": "^8.57.1",
     "postcss": "^8.5.6",

@@ -1,0 +1,61 @@
+# Planorah - AI Academic Planner
+
+> Planorah is an AI-powered academic planning platform that helps students organize coursework, track deadlines, and build personalized study schedules using artificial intelligence.
+
+## Product
+
+- **Type:** SaaS — AI Academic Planner
+- **Audience:** University and college students
+- **Core Problem:** Fragmented academic planning and missed deadlines
+- **Website:** https://www.planorah.me
+- **Status:** Active, free to start
+
+## Key Features
+
+- **AI-generated study schedules** tailored to enrolled courses
+- **Deadline tracking** and assignment management with smart reminders
+- **Course load balancing** to optimize workload distribution
+- **Personalized study pace recommendations** based on learning patterns
+- **Integrated task scheduler** with calendar synchronization
+- **Progress analytics** to track academic performance
+- **AI assistant** for academic guidance and support
+- **Resume builder** with portfolio showcase
+- **Job finder** with career recommendations
+
+## Technology Stack
+
+- **Frontend:** React with TypeScript
+- **Backend:** Node.js / Python
+- **AI Engine:** GPT-4 integration for personalized recommendations
+- **Database:** Cloud-hosted relational database
+- **Hosting:** Vercel (frontend), cloud infrastructure (backend)
+
+## Use Cases
+
+- College students managing multiple courses
+- Self-paced learners building custom study plans
+- Students with ADHD or executive function challenges
+- Professionals preparing for certifications
+- Graduate students balancing research and coursework
+
+## Pricing
+
+- **Free Plan:** Basic scheduling and task tracking
+- **Premium Plan:** Advanced AI features and priority support
+- **Student Discount:** Available for verified college students
+
+## Support
+
+- **Contact:** https://www.planorah.me/contact
+- **Email:** support@planorah.me
+- **Help Center:** https://www.planorah.me/support
+
+## Legal
+
+- **Privacy Policy:** https://www.planorah.me/privacy-policy
+- **Terms of Service:** https://www.planorah.me/terms-of-service
+- **GDPR Compliant:** Yes (handles student data with care)
+
+## How to Get Started
+
+Visit https://www.planorah.me to sign up for free. No credit card required.

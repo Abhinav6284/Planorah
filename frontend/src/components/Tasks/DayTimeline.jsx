@@ -45,7 +45,7 @@ export default function DayTimeline() {
     const dayProgress = tasks.length > 0 ? (completedCount / tasks.length) * 100 : 0;
 
     return (
-        <div className="min-h-full bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-full bg-gray-50 dark:bg-charcoalDark">
             <div className="p-6 md:p-10">
                 <header className="mb-8">
                     <h1 className="text-3xl font-serif font-medium text-gray-900 dark:text-white mb-2">Day Timeline</h1>
@@ -64,7 +64,7 @@ export default function DayTimeline() {
                                     onClick={() => setSelectedDay(day)}
                                     className={`flex-shrink-0 w-16 h-20 rounded-xl font-medium transition-all ${isSelected
                                         ? 'bg-black dark:bg-white text-white dark:text-black shadow-lg scale-110'
-                                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                        : 'bg-white dark:bg-charcoal text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-charcoalMuted'
                                         }`}
                                 >
                                     <div className="text-xs opacity-60">Day</div>
@@ -76,9 +76,9 @@ export default function DayTimeline() {
                 </div>
 
                 {/* Day Progress */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 mb-6 border border-gray-100 dark:border-gray-700">
+                <div className="bg-white dark:bg-charcoal rounded-2xl p-6 mb-6 border border-gray-100 dark:border-charcoalMuted">
                     <h3 className="font-medium text-gray-900 dark:text-white mb-3">Day {selectedDay} Progress</h3>
-                    <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div className="h-3 bg-gray-100 dark:bg-charcoalMuted rounded-full overflow-hidden">
                         <motion.div
                             className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
                             initial={{ width: 0 }}
@@ -93,16 +93,16 @@ export default function DayTimeline() {
                 {/* Tasks for the Day */}
                 <div className="space-y-3">
                     {loading ? (
-                        <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl">
+                        <div className="text-center py-20 bg-white dark:bg-charcoal rounded-2xl">
                             <p className="text-gray-400">Loading tasks...</p>
                         </div>
                     ) : tasks.length === 0 ? (
-                        <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl">
+                        <div className="text-center py-20 bg-white dark:bg-charcoal rounded-2xl">
                             <p className="text-gray-400">No tasks scheduled for this day</p>
                         </div>
                     ) : (
                         tasks.map(task => (
-                            <div key={task.id} className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-100 dark:border-gray-700">
+                            <div key={task.id} className="bg-white dark:bg-charcoal rounded-xl p-5 border border-gray-100 dark:border-charcoalMuted">
                                 <div className="flex items-start gap-4">
                                     <button
                                         onClick={() => completeTask(task.id)}
@@ -113,7 +113,7 @@ export default function DayTimeline() {
                                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                             </svg>
                                         ) : (
-                                            <div className="w-6 h-6 border-2 border-gray-300 dark:border-gray-600 rounded-full" />
+                                            <div className="w-6 h-6 border-2 border-gray-300 dark:border-charcoalMuted rounded-full" />
                                         )}
                                     </button>
                                     <div className="flex-1">

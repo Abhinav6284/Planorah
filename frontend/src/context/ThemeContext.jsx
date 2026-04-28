@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 const ThemeContext = createContext();
 
@@ -11,12 +11,13 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider = ({ children }) => {
+    const themeTransitionTimerRef = useRef(null);
     const [theme, setTheme] = useState(() => {
-        // Check localStorage first, then system preference
+        // Check localStorage first
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) return savedTheme;
 
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        return 'dark'; // Default to dark theme for all users
     });
 
     useEffect(() => {
@@ -25,14 +26,47 @@ export const ThemeProvider = ({ children }) => {
 
         if (theme === 'dark') {
             root.classList.add('dark');
+            root.classList.remove('light');
         } else {
             root.classList.remove('dark');
+            root.classList.add('light');
         }
 
         localStorage.setItem('theme', theme);
     }, [theme]);
 
+    useEffect(() => {
+        return () => {
+            if (themeTransitionTimerRef.current) {
+                window.clearTimeout(themeTransitionTimerRef.current);
+            }
+        };
+    }, []);
+
+    const startThemeTransition = () => {
+        const root = window.document.documentElement;
+        const body = window.document.body;
+
+        root.classList.add('theme-switching');
+        body.classList.remove('theme-fade-transition');
+
+        // Force reflow so repeated toggles can replay the fade animation.
+        void body.offsetWidth;
+        body.classList.add('theme-fade-transition');
+
+        if (themeTransitionTimerRef.current) {
+            window.clearTimeout(themeTransitionTimerRef.current);
+        }
+
+        themeTransitionTimerRef.current = window.setTimeout(() => {
+            root.classList.remove('theme-switching');
+            body.classList.remove('theme-fade-transition');
+            themeTransitionTimerRef.current = null;
+        }, 520);
+    };
+
     const toggleTheme = () => {
+        startThemeTransition();
         setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
     };
 

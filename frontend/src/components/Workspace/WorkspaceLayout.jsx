@@ -1,0 +1,123 @@
+import React, { Suspense, useEffect } from 'react';
+import { useAuthStore } from '../../stores/authStore';
+import { useWorkspaceStore } from '../../stores/workspaceStore';
+import { useMentorStore } from '../../stores/mentorStore';
+import Sidebar from '../Sidebar';
+import { Navbar } from '../Navbar';
+import DashboardSkeleton from '../common/Skeleton';
+import { MentorPanel } from '../AIMentor';
+
+// Lazy load section components
+const DashboardView = React.lazy(() =>
+  import('../Dashboard/Dashboard').catch(() => ({
+    default: () => <div className="p-4">Dashboard not found</div>
+  }))
+);
+
+const RoadmapView = React.lazy(() =>
+  import('../Roadmap/RoadmapView').catch(() => ({
+    default: () => <div className="p-4">Roadmap not found</div>
+  }))
+);
+
+const BlockEditor = React.lazy(() =>
+  import('../Editor/BlockEditor').catch(() => ({
+    default: () => <div className="p-4">Block Editor not found</div>
+  }))
+);
+
+// Placeholder component for settings
+const SettingsPlaceholder = () => (
+  <div className="p-6">
+    <h1 className="text-2xl font-bold mb-4">Settings</h1>
+    <p className="text-gray-600 dark:text-gray-400">Settings page coming soon</p>
+  </div>
+);
+
+
+
+// Section component mapping
+const SECTION_COMPONENTS = {
+  dashboard: DashboardView,
+  roadmap: RoadmapView,
+  notes: BlockEditor,
+  progress: DashboardView,
+  settings: SettingsPlaceholder,
+};
+
+/**
+ * WorkspaceLayout - Main container orchestrating workspace structure
+ *
+ * Layout:
+ * [Sidebar] | [Navbar + MainContent + MentorPanel]
+ *
+ * Handles:
+ * - User authentication state
+ * - Section routing via currentSection from store
+ * - Loading states during auth
+ * - Suspense boundaries for code-split components
+ */
+const WorkspaceLayout = () => {
+  const user = useAuthStore((state) => state.user);
+  const isLoading = useAuthStore((state) => state.isLoading);
+  const currentSection = useWorkspaceStore((state) => state.currentSection);
+  const setContext = useMentorStore((state) => state.setContext);
+
+  // Update mentor context when section changes
+  useEffect(() => {
+    setContext(currentSection);
+  }, [currentSection, setContext]);
+
+  // Get the component for current section
+  const SectionComponent = SECTION_COMPONENTS[currentSection] || DashboardView;
+
+  // Show loading spinner while user is being fetched
+  if (isLoading) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-white dark:bg-gray-950">
+        <DashboardSkeleton />
+      </div>
+    );
+  }
+
+  // Show login prompt if no user
+  if (!user) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-white dark:bg-gray-950">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            Please log in
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            You need to be logged in to access the workspace
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-screen w-screen overflow-hidden bg-white dark:bg-gray-950 flex">
+      {/* Sidebar */}
+      <Sidebar user={user} />
+
+      {/* Main Content Area */}
+      <div className="flex-1 min-w-0 flex flex-col">
+        {/* Navbar */}
+        <Navbar />
+
+        {/* Content */}
+        <main className="flex-1 overflow-auto">
+          <Suspense fallback={<DashboardSkeleton />}>
+            <SectionComponent />
+          </Suspense>
+        </main>
+      </div>
+
+      {/* Mentor Panel - Floating */}
+      <MentorPanel />
+    </div>
+  );
+};
+
+export default WorkspaceLayout;

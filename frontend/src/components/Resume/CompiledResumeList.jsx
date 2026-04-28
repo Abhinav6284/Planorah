@@ -26,14 +26,14 @@ export default function CompiledResumeList() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+            <div className="min-h-screen bg-gray-50 dark:bg-charcoalDark flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-500 border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+        <div className="min-h-screen bg-gray-50 dark:bg-charcoalDark transition-colors duration-300">
             <div className="max-w-6xl mx-auto p-4 sm:p-8">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -45,7 +45,7 @@ export default function CompiledResumeList() {
                 </div>
 
                 {resumes.length === 0 ? (
-                    <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+                    <div className="text-center py-16 bg-white dark:bg-[#1a1a1a] rounded-2xl border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] transition-all duration-300">
                         <FaFileAlt className="mx-auto text-5xl text-gray-400 mb-4" />
                         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                             No Resumes Yet
@@ -54,8 +54,8 @@ export default function CompiledResumeList() {
                             Complete tasks on a roadmap and generate your first compiled resume
                         </p>
                         <button
-                            onClick={() => navigate('/roadmap')}
-                            className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                            onClick={() => navigate('/roadmap/list')}
+                            className="px-6 py-2 bg-terracotta hover:bg-terracottaHover text-white rounded-lg transition-all duration-150"
                         >
                             View Roadmaps
                         </button>
@@ -69,12 +69,12 @@ export default function CompiledResumeList() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.1 }}
                                 onClick={() => navigate(`/resume/compiled/${resume.version_id}`)}
-                                className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer"
+                                className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_12px_20px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_12px_28px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.1)] hover:-translate-y-1 transition-all duration-150 cursor-pointer"
                             >
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                                            <FaFileAlt className="text-green-600 dark:text-green-400" />
+                                        <div className="w-12 h-12 bg-terracotta/15 dark:bg-terracotta/20 rounded-lg flex items-center justify-center">
+                                            <FaFileAlt className="text-terracotta" />
                                         </div>
                                         <div>
                                             <h3 className="font-semibold text-gray-900 dark:text-white">
@@ -87,7 +87,7 @@ export default function CompiledResumeList() {
                                     </div>
 
                                     {resume.is_latest && (
-                                        <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-medium rounded-full">
+                                        <span className="px-3 py-1 bg-terracotta/20 dark:bg-terracotta/15 text-terracotta text-xs font-medium rounded-full">
                                             Latest
                                         </span>
                                     )}
@@ -114,7 +114,7 @@ export default function CompiledResumeList() {
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <div className="flex items-center gap-2 pt-4 border-t border-gray-100 dark:border-white/5">
                                     {resume.was_eligible ? (
                                         <>
                                             <FaCheckCircle className="text-green-500" />
@@ -133,7 +133,7 @@ export default function CompiledResumeList() {
                                 </div>
 
                                 <button
-                                    className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                                    className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-terracotta/10 dark:bg-terracotta/15 text-terracotta rounded-lg hover:bg-terracotta/20 dark:hover:bg-terracotta/25 transition-colors duration-150"
                                 >
                                     <FaEye />
                                     View Resume

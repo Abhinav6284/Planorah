@@ -159,145 +159,155 @@ const FocusMode = ({ open, task, onClose, onComplete, embedded = false }) => {
     const guidanceTips = guidance?.quick_tips?.length ? guidance.quick_tips : guidance?.best_practices || [];
 
     const panel = (
-        <>
-            <div className="mb-4 flex items-center justify-between">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+            {/* Header Area */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Execution State</p>
-                    <h3 className="text-xl font-semibold text-white">Focus Mode Active</h3>
-                </div>
-                <button onClick={onClose} className="text-sm text-slate-300 hover:text-white">End Session</button>
-            </div>
-
-            <p className="text-sm text-slate-300">Current Mission</p>
-            <p className="mt-1 text-lg font-medium text-white">{task?.title || 'Deep work session'}</p>
-            <p className="mt-1 text-xs text-slate-400">Project estimate: {projectMinutes} min</p>
-
-            <div className="mt-5 flex gap-2">
-                {durationOptions.map((option, index) => (
-                    <motion.button
-                        whileTap={{ scale: 0.96 }}
-                        key={option}
-                        onClick={() => setDuration(option)}
-                        className={`rounded-lg border px-3 py-1.5 text-sm ${duration === option
-                            ? 'border-white/40 bg-white text-black'
-                            : 'border-white/20 text-slate-200 hover:bg-white/10'
-                            }`}
-                    >
-                        {option} min{index === 0 ? ' (project)' : ''}
-                    </motion.button>
-                ))}
-            </div>
-
-            <div className="mt-6">
-                <div className="text-5xl font-bold tracking-tight text-white sm:text-6xl">{minutes}:{seconds}</div>
-                <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
-                    <div className="h-full bg-gradient-to-r from-white to-slate-300 transition-all" style={{ width: `${progress}%` }} />
-                </div>
-            </div>
-
-            <div className="mt-5 grid gap-4 lg:grid-cols-2">
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                    <div className="mb-2 flex items-center gap-2">
-                        <span className="text-sm text-blue-300">●</span>
-                        <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Mission Guidance</h4>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                        <span style={{ 
+                            width: 8, height: 8, borderRadius: '50%', background: '#ef4444', 
+                            boxShadow: '0 0 10px rgba(239, 68, 68, 0.4)' 
+                        }} />
+                        <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)' }}>Focus Session Active</span>
                     </div>
+                    <h2 style={{ fontSize: 28, fontWeight: 800, color: 'var(--el-text)', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+                        {task?.title || 'Execution'}
+                    </h2>
+                </div>
+                <button 
+                    onClick={onClose} 
+                    style={{ 
+                        padding: '10px 20px', borderRadius: 10, fontSize: 13, fontWeight: 700,
+                        background: 'var(--el-bg)', border: '1px solid var(--el-border)', 
+                        color: 'var(--el-text-secondary)', cursor: 'pointer', transition: 'all 0.1s'
+                    }}
+                >
+                    End Session
+                </button>
+            </div>
 
+            {/* Timer Area */}
+            <div style={{ padding: 40, borderRadius: 20, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border-subtle)', textAlign: 'center' }}>
+                <div style={{ fontSize: 80, fontWeight: 800, color: 'var(--el-text)', letterSpacing: '-0.04em', lineHeight: 1, marginBottom: 24 }}>
+                    {minutes}<span style={{ opacity: 0.3 }}>:</span>{seconds}
+                </div>
+                
+                <div style={{ height: 6, width: '100%', maxWidth: 400, margin: '0 auto', background: 'var(--el-border)', borderRadius: 3, overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${progress}%`, background: 'var(--el-text)', transition: 'width 1s linear' }} />
+                </div>
+
+                <div style={{ marginTop: 32, display: 'flex', justifyContent: 'center', gap: 12 }}>
+                    {durationOptions.map((option) => (
+                        <button
+                            key={option}
+                            onClick={() => setDuration(option)}
+                            style={{
+                                padding: '8px 16px', borderRadius: 8, fontSize: 12, fontWeight: 700,
+                                cursor: 'pointer', transition: 'all 0.1s',
+                                background: duration === option ? 'var(--el-text)' : 'var(--el-bg)',
+                                color: duration === option ? '#fff' : 'var(--el-text-secondary)',
+                                border: duration === option ? 'none' : '1px solid var(--el-border)'
+                            }}
+                        >
+                            {option}m
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Content Grid */}
+            <div style={{ display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
+                {/* Guidance */}
+                <div style={{ padding: 24, borderRadius: 16, border: '1px solid var(--el-border)', background: 'var(--el-bg)' }}>
+                    <h4 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: 'var(--el-text-muted)', marginBottom: 16 }}>Guidance</h4>
+                    
                     {guidanceLoading ? (
-                        <div className="flex items-center gap-2 text-sm text-slate-400">
-                            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-slate-400" />
-                            Loading guidance...
-                        </div>
+                        <p style={{ fontSize: 13, color: 'var(--el-text-muted)' }}>Fetching strategic advice...</p>
                     ) : (
-                        <>
-                            <p className="text-sm leading-relaxed text-slate-200">
-                                {guidance?.objective || task?.reason || 'Complete this mission with one concrete, validated output.'}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--el-text)', lineHeight: 1.5 }}>
+                                {guidance?.objective || task?.reason}
                             </p>
-                            {Array.isArray(guidance?.time_breakdown) && guidance.time_breakdown.length > 0 && (
-                                <div className="mt-3 space-y-2">
-                                    <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
-                                        <span>⏱</span> Session Plan
-                                    </p>
-                                    {guidance.time_breakdown.slice(0, 3).map((item, index) => (
-                                        <div key={`${item.duration}-${index}`} className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/20 px-2.5 py-2">
-                                            <span className="rounded bg-white/10 px-1.5 py-0.5 text-[11px] font-semibold text-white">
-                                                {item.duration}
-                                            </span>
-                                            <span className="text-xs text-slate-300">{item.activity}</span>
+                            
+                            {guidance?.time_breakdown?.length > 0 && (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                    {guidance.time_breakdown.map((item, idx) => (
+                                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, borderRadius: 10, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border-subtle)' }}>
+                                            <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--el-text)', minWidth: 40 }}>{item.duration}</span>
+                                            <span style={{ fontSize: 13, color: 'var(--el-text-secondary)' }}>{item.activity}</span>
                                         </div>
                                     ))}
                                 </div>
                             )}
-                        </>
+                        </div>
                     )}
                 </div>
 
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                    <div className="mb-2 flex items-center justify-between">
-                        <h4 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
-                            <span className="text-sm text-emerald-300">✓</span>
-                            Task Checklist
-                        </h4>
-                        <span className="text-xs text-slate-400">{stepCompletion}/{steps.length}</span>
+                {/* Checklist */}
+                <div style={{ padding: 24, borderRadius: 16, border: '1px solid var(--el-border)', background: 'var(--el-bg)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                        <h4 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: 'var(--el-text-muted)' }}>Checklist</h4>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--el-text)' }}>{stepCompletion}/{steps.length}</span>
                     </div>
 
                     {guidanceLoading ? (
-                        <div className="flex items-center gap-2 text-sm text-slate-400">
-                            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-slate-400" />
-                            Preparing checklist...
-                        </div>
-                    ) : steps.length > 0 ? (
-                        <div className="space-y-2">
-                            {steps.slice(0, 4).map((step, index) => {
+                        <p style={{ fontSize: 13, color: 'var(--el-text-muted)' }}>Preparing steps...</p>
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {steps.map((step, index) => {
                                 const stepKey = String(step?.step ?? index + 1);
                                 const done = Boolean(completedSteps[stepKey]);
                                 return (
                                     <button
                                         key={stepKey}
-                                        type="button"
                                         onClick={() => setCompletedSteps((prev) => ({ ...prev, [stepKey]: !prev[stepKey] }))}
-                                        className={`w-full rounded-lg border px-3 py-2 text-left transition ${done
-                                            ? 'border-emerald-400/40 bg-emerald-400/10'
-                                            : 'border-white/10 bg-black/20 hover:bg-black/30'
-                                            }`}
+                                        style={{
+                                            width: '100%', padding: '12px 16px', borderRadius: 12, textAlign: 'left',
+                                            cursor: 'pointer', transition: 'all 0.1s', border: '1px solid var(--el-border-subtle)',
+                                            background: done ? 'var(--el-bg-secondary)' : 'var(--el-bg)',
+                                            opacity: done ? 0.6 : 1
+                                        }}
                                     >
-                                        <div className="flex items-start gap-2">
-                                            <span className={`pt-0.5 text-xs ${done ? 'text-emerald-300' : 'text-slate-500'}`}>
-                                                {done ? '✔' : '○'}
-                                            </span>
-                                            <span className="min-w-0">
-                                                <span className="block text-sm font-medium text-white">{step.title || `Step ${index + 1}`}</span>
-                                                {step.description && (
-                                                    <span className="mt-0.5 block text-xs text-slate-400">{step.description}</span>
-                                                )}
-                                            </span>
+                                        <div style={{ display: 'flex', gap: 12 }}>
+                                            <div style={{ 
+                                                width: 18, height: 18, borderRadius: 4, border: '2px solid var(--el-text)', 
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                                                background: done ? 'var(--el-text)' : 'transparent', marginTop: 2, flexShrink: 0
+                                            }}>
+                                                {done && <span style={{ color: '#fff', fontSize: 12 }}>✓</span>}
+                                            </div>
+                                            <div>
+                                                <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--el-text)', textDecoration: done ? 'line-through' : 'none' }}>{step.title}</p>
+                                                {step.description && !done && <p style={{ fontSize: 12, color: 'var(--el-text-muted)', marginTop: 2 }}>{step.description}</p>}
+                                            </div>
                                         </div>
                                     </button>
                                 );
                             })}
                         </div>
-                    ) : (
-                        <p className="text-sm text-slate-400">No step guide available for this mission yet.</p>
                     )}
 
                     {guidanceTips.length > 0 && (
-                        <div className="mt-3 rounded-lg border border-amber-300/20 bg-amber-300/5 p-2.5">
-                            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">Quick Tip</p>
-                            <p className="mt-1 text-xs text-amber-100">{guidanceTips[0]}</p>
+                        <div style={{ marginTop: 24, padding: 16, borderRadius: 12, background: 'var(--el-bg-secondary)', borderLeft: '4px solid var(--el-text)' }}>
+                            <p style={{ fontSize: 12, color: 'var(--el-text)', fontWeight: 700 }}>Pro Tip</p>
+                            <p style={{ fontSize: 13, color: 'var(--el-text-secondary)', marginTop: 4 }}>{guidanceTips[0]}</p>
                         </div>
                     )}
                 </div>
             </div>
-
-            <p className="mt-4 text-xs text-slate-400">Distraction controls are active. Follow the checklist and finish one validated output.</p>
-        </>
+        </div>
     );
 
     if (embedded) {
         return (
             <motion.div
-                initial={{ opacity: 0, scale: 0.98, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                className="mx-auto max-h-[88vh] w-full max-w-4xl overflow-y-auto rounded-3xl border border-white/15 bg-[#0f0f10] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                style={{ 
+                    width: '100%', maxWidth: 900, margin: '0 auto', 
+                    padding: 32, borderRadius: 24, background: 'var(--el-bg)', border: '1px solid var(--el-border)',
+                    boxShadow: 'var(--el-shadow-card)'
+                }}
             >
                 {panel}
             </motion.div>
@@ -305,11 +315,15 @@ const FocusMode = ({ open, task, onClose, onComplete, embedded = false }) => {
     }
 
     return (
-        <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/75 p-4 backdrop-blur-md">
+        <div style={{ position: 'fixed', inset: 0, zIndex: 130, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', padding: 16 }}>
             <motion.div
-                initial={{ opacity: 0, scale: 0.96, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                className="max-h-[88vh] w-full max-w-4xl overflow-y-auto rounded-3xl border border-white/15 bg-[#0f0f10] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{ 
+                    width: '100%', maxWidth: 900, maxHeight: '90vh', overflowY: 'auto',
+                    padding: 40, borderRadius: 24, background: 'var(--el-bg)', border: '1px solid var(--el-border)',
+                    boxShadow: '0 40px 100px rgba(0,0,0,0.3)'
+                }}
             >
                 {panel}
             </motion.div>

@@ -3,7 +3,54 @@ import { Terminal as XTerm } from 'xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import 'xterm/css/xterm.css';
-import { FaPlus, FaTimes, FaTerminal, FaChevronDown, FaCircle, FaWifi } from 'react-icons/fa';
+import { FaPlus, FaTimes, FaTerminal, FaChevronDown, FaCircle } from 'react-icons/fa';
+
+const TERMINAL_THEME = {
+    dark: {
+        background: '#1e1e1e',
+        foreground: '#cccccc',
+        cursor: '#ffffff',
+        cursorAccent: '#1e1e1e',
+        black: '#000000',
+        red: '#cd3131',
+        green: '#0dbc79',
+        yellow: '#e5e510',
+        blue: '#2472c8',
+        magenta: '#bc3fbc',
+        cyan: '#11a8cd',
+        white: '#e5e5e5',
+        brightBlack: '#666666',
+        brightRed: '#f14c4c',
+        brightGreen: '#23d18b',
+        brightYellow: '#f5f543',
+        brightBlue: '#3b8eea',
+        brightMagenta: '#d670d6',
+        brightCyan: '#29b8db',
+        brightWhite: '#ffffff',
+    },
+    light: {
+        background: '#ffffff',
+        foreground: '#333333',
+        cursor: '#333333',
+        cursorAccent: '#ffffff',
+        black: '#000000',
+        red: '#cd3131',
+        green: '#00bc7c',
+        yellow: '#949800',
+        blue: '#0451a5',
+        magenta: '#bc05bc',
+        cyan: '#0598bc',
+        white: '#555555',
+        brightBlack: '#666666',
+        brightRed: '#cd3131',
+        brightGreen: '#14ce14',
+        brightYellow: '#b5ba00',
+        brightBlue: '#0451a5',
+        brightMagenta: '#bc05bc',
+        brightCyan: '#0598bc',
+        brightWhite: '#a5a5a5',
+    }
+};
 
 const XTerminal = ({
     fileSystem,
@@ -23,60 +70,15 @@ const XTerminal = ({
     const [tabs, setTabs] = useState([{ id: 1, name: 'bash', cwd: '/project' }]);
     const [activeTab, setActiveTab] = useState(1);
     const [connectionStatus, setConnectionStatus] = useState('disconnected'); // connecting, connected, disconnected, fallback
-    const [useSimulated, setUseSimulated] = useState(false);
+    const useSimulatedRef = useRef(false);
+    const currentDirectoryRef = useRef(currentDir);
+    const commandHistoryRef = useRef([]);
+    const historyIndexRef = useRef(-1);
+    const initialThemeRef = useRef(theme);
 
-    // Simulated terminal state
-    const [currentDirectory, setCurrentDirectory] = useState(currentDir);
-    const [commandHistory, setCommandHistory] = useState([]);
-    const [historyIndex, setHistoryIndex] = useState(-1);
-
-    // Terminal theme
-    const terminalTheme = {
-        dark: {
-            background: '#1e1e1e',
-            foreground: '#cccccc',
-            cursor: '#ffffff',
-            cursorAccent: '#1e1e1e',
-            black: '#000000',
-            red: '#cd3131',
-            green: '#0dbc79',
-            yellow: '#e5e510',
-            blue: '#2472c8',
-            magenta: '#bc3fbc',
-            cyan: '#11a8cd',
-            white: '#e5e5e5',
-            brightBlack: '#666666',
-            brightRed: '#f14c4c',
-            brightGreen: '#23d18b',
-            brightYellow: '#f5f543',
-            brightBlue: '#3b8eea',
-            brightMagenta: '#d670d6',
-            brightCyan: '#29b8db',
-            brightWhite: '#ffffff',
-        },
-        light: {
-            background: '#ffffff',
-            foreground: '#333333',
-            cursor: '#333333',
-            cursorAccent: '#ffffff',
-            black: '#000000',
-            red: '#cd3131',
-            green: '#00bc7c',
-            yellow: '#949800',
-            blue: '#0451a5',
-            magenta: '#bc05bc',
-            cyan: '#0598bc',
-            white: '#555555',
-            brightBlack: '#666666',
-            brightRed: '#cd3131',
-            brightGreen: '#14ce14',
-            brightYellow: '#b5ba00',
-            brightBlue: '#0451a5',
-            brightMagenta: '#bc05bc',
-            brightCyan: '#0598bc',
-            brightWhite: '#a5a5a5',
-        }
-    };
+    useEffect(() => {
+        currentDirectoryRef.current = currentDir;
+    }, [currentDir]);
 
     // Get WebSocket URL
     const getWsUrl = () => {
@@ -100,7 +102,7 @@ const XTerminal = ({
 
             wsRef.current.onopen = () => {
                 setConnectionStatus('connected');
-                setUseSimulated(false);
+                useSimulatedRef.current = false;
             };
 
             wsRef.current.onmessage = (event) => {
@@ -119,8 +121,8 @@ const XTerminal = ({
             wsRef.current.onclose = () => {
                 setConnectionStatus('disconnected');
                 // Fallback to simulated mode
-                if (!useSimulated) {
-                    setUseSimulated(true);
+                if (!useSimulatedRef.current) {
+                    useSimulatedRef.current = true;
                     setConnectionStatus('fallback');
                     if (xtermRef.current) {
                         xtermRef.current.writeln('\r\n\x1b[33m⚠ WebSocket disconnected. Using simulated terminal.\x1b[0m\r\n');
@@ -131,13 +133,13 @@ const XTerminal = ({
 
             wsRef.current.onerror = () => {
                 setConnectionStatus('fallback');
-                setUseSimulated(true);
+                useSimulatedRef.current = true;
             };
 
         } catch (error) {
             console.error('WebSocket connection error:', error);
             setConnectionStatus('fallback');
-            setUseSimulated(true);
+            useSimulatedRef.current = true;
         }
     };
 
@@ -151,7 +153,7 @@ const XTerminal = ({
             fontSize: 14,
             fontFamily: '"Cascadia Code", "Fira Code", "JetBrains Mono", Menlo, Monaco, "Courier New", monospace',
             lineHeight: 1.4,
-            theme: terminalTheme[theme],
+            theme: TERMINAL_THEME[initialThemeRef.current] || TERMINAL_THEME.dark,
             allowTransparency: true,
             scrollback: 5000,
         });
@@ -169,7 +171,7 @@ const XTerminal = ({
         fitAddonRef.current = fitAddon;
 
         // Start immediately in simulated mode (no WebSocket needed)
-        setUseSimulated(true);
+        useSimulatedRef.current = true;
         setConnectionStatus('local');
 
         // Show welcome message immediately
@@ -179,6 +181,7 @@ const XTerminal = ({
         term.writeln('\x1b[1;36m╚══════════════════════════════════════════════════════════╝\x1b[0m');
         term.writeln('');
         writePrompt(term);
+        connectWebSocket();
 
         // Handle resize
         const handleResize = () => {
@@ -202,7 +205,7 @@ const XTerminal = ({
             const code = domEvent.keyCode;
 
             // If connected to real terminal, send all input
-            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && !useSimulated) {
+            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && !useSimulatedRef.current) {
                 wsRef.current.send(JSON.stringify({
                     type: 'input',
                     data: key
@@ -214,13 +217,13 @@ const XTerminal = ({
             if (code === 13) { // Enter
                 term.writeln('');
                 if (inputBuffer.trim()) {
-                    setCommandHistory(prev => [...prev, inputBuffer]);
+                    commandHistoryRef.current = [...commandHistoryRef.current, inputBuffer];
                     handleSimulatedCommand(term, inputBuffer.trim());
                 } else {
                     writePrompt(term);
                 }
                 inputBuffer = '';
-                setHistoryIndex(-1);
+                historyIndexRef.current = -1;
             } else if (code === 8) { // Backspace
                 if (inputBuffer.length > 0) {
                     inputBuffer = inputBuffer.slice(0, -1);
@@ -228,29 +231,31 @@ const XTerminal = ({
                 }
             } else if (code === 38) { // Up arrow - history
                 domEvent.preventDefault();
-                if (commandHistory.length > 0) {
-                    const newIndex = historyIndex < commandHistory.length - 1 ? historyIndex + 1 : historyIndex;
-                    setHistoryIndex(newIndex);
-                    const cmd = commandHistory[commandHistory.length - 1 - newIndex] || '';
+                if (commandHistoryRef.current.length > 0) {
+                    const newIndex = historyIndexRef.current < commandHistoryRef.current.length - 1
+                        ? historyIndexRef.current + 1
+                        : historyIndexRef.current;
+                    historyIndexRef.current = newIndex;
+                    const cmd = commandHistoryRef.current[commandHistoryRef.current.length - 1 - newIndex] || '';
                     term.write('\r\x1b[K');
-                    writePrompt(term, false);
+                    writePrompt(term);
                     term.write(cmd);
                     inputBuffer = cmd;
                 }
             } else if (code === 40) { // Down arrow
                 domEvent.preventDefault();
-                if (historyIndex > 0) {
-                    const newIndex = historyIndex - 1;
-                    setHistoryIndex(newIndex);
-                    const cmd = commandHistory[commandHistory.length - 1 - newIndex] || '';
+                if (historyIndexRef.current > 0) {
+                    const newIndex = historyIndexRef.current - 1;
+                    historyIndexRef.current = newIndex;
+                    const cmd = commandHistoryRef.current[commandHistoryRef.current.length - 1 - newIndex] || '';
                     term.write('\r\x1b[K');
-                    writePrompt(term, false);
+                    writePrompt(term);
                     term.write(cmd);
                     inputBuffer = cmd;
-                } else if (historyIndex === 0) {
-                    setHistoryIndex(-1);
+                } else if (historyIndexRef.current === 0) {
+                    historyIndexRef.current = -1;
                     term.write('\r\x1b[K');
-                    writePrompt(term, false);
+                    writePrompt(term);
                     inputBuffer = '';
                 }
             } else if (code === 9) { // Tab - autocomplete
@@ -264,7 +269,7 @@ const XTerminal = ({
                 } else if (matches.length > 1) {
                     term.writeln('');
                     term.writeln(matches.join('  '));
-                    writePrompt(term, false);
+                    writePrompt(term);
                     term.write(inputBuffer);
                 }
             } else if (code === 67 && domEvent.ctrlKey) { // Ctrl+C
@@ -289,19 +294,21 @@ const XTerminal = ({
             term.dispose();
             xtermRef.current = null;
         };
+        // This effect intentionally initializes xterm only once.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Update theme
     useEffect(() => {
         if (xtermRef.current) {
-            xtermRef.current.options.theme = terminalTheme[theme];
+            xtermRef.current.options.theme = TERMINAL_THEME[theme] || TERMINAL_THEME.dark;
         }
     }, [theme]);
 
-    const writePrompt = (term, newLine = true) => {
+    const writePrompt = (term) => {
         const user = 'user';
         const host = 'planorah';
-        const dir = currentDirectory.replace('/project', '~');
+        const dir = currentDirectoryRef.current.replace('/project', '~');
         const prompt = `\x1b[1;32m${user}@${host}\x1b[0m:\x1b[1;34m${dir}\x1b[0m$ `;
         term.write(prompt);
     };
@@ -310,13 +317,13 @@ const XTerminal = ({
     const navigateTo = (path) => {
         if (path.startsWith('/')) return path;
         if (path === '..') {
-            const parts = currentDirectory.split('/').filter(Boolean);
+            const parts = currentDirectoryRef.current.split('/').filter(Boolean);
             parts.pop();
             return '/' + parts.join('/') || '/project';
         }
-        if (path === '.' || path === '') return currentDirectory;
+        if (path === '.' || path === '') return currentDirectoryRef.current;
         if (path === '~') return '/project';
-        return `${currentDirectory}/${path}`.replace(/\/+/g, '/');
+        return `${currentDirectoryRef.current}/${path}`.replace(/\/+/g, '/');
     };
 
     // Get directory contents
@@ -355,7 +362,7 @@ const XTerminal = ({
                 term.clear();
                 break;
             case 'ls':
-                const contents = getDirectoryContents(cmdArgs[0] ? navigateTo(cmdArgs[0]) : currentDirectory);
+                const contents = getDirectoryContents(cmdArgs[0] ? navigateTo(cmdArgs[0]) : currentDirectoryRef.current);
                 if (!contents) {
                     term.writeln(`\x1b[31mls: cannot access '${cmdArgs[0]}': No such directory\x1b[0m`);
                 } else {
@@ -370,14 +377,14 @@ const XTerminal = ({
                 break;
             case 'cd':
                 if (!cmdArgs[0]) {
-                    setCurrentDirectory('/project');
+                    currentDirectoryRef.current = '/project';
                 } else {
                     const newPath = navigateTo(cmdArgs[0]);
-                    setCurrentDirectory(newPath);
+                    currentDirectoryRef.current = newPath;
                 }
                 break;
             case 'pwd':
-                term.writeln(currentDirectory);
+                term.writeln(currentDirectoryRef.current);
                 break;
             case 'cat':
                 if (!cmdArgs[0]) {
@@ -393,13 +400,13 @@ const XTerminal = ({
                 break;
             case 'touch':
                 if (cmdArgs[0]) {
-                    onCreateFile?.(`${currentDirectory.replace(/^\//, '')}/${cmdArgs[0]}`, cmdArgs[0]);
+                    onCreateFile?.(`${currentDirectoryRef.current.replace(/^\//, '')}/${cmdArgs[0]}`, cmdArgs[0]);
                     term.writeln(`\x1b[32m✓\x1b[0m Created: ${cmdArgs[0]}`);
                 }
                 break;
             case 'mkdir':
                 if (cmdArgs[0]) {
-                    onCreateFolder?.(`${currentDirectory.replace(/^\//, '')}/${cmdArgs[0]}`, cmdArgs[0]);
+                    onCreateFolder?.(`${currentDirectoryRef.current.replace(/^\//, '')}/${cmdArgs[0]}`, cmdArgs[0]);
                     term.writeln(`\x1b[32m✓\x1b[0m Created directory: ${cmdArgs[0]}`);
                 }
                 break;
@@ -450,7 +457,7 @@ const XTerminal = ({
                 }
                 break;
             case 'history':
-                commandHistory.forEach((c, i) => term.writeln(`  ${i + 1}  ${c}`));
+                commandHistoryRef.current.forEach((c, i) => term.writeln(`  ${i + 1}  ${c}`));
                 break;
             case 'exit':
                 term.writeln('Goodbye! 👋');

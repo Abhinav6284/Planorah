@@ -4,7 +4,14 @@ export const schedulerService = {
     // Tasks - Fetch roadmap tasks which have proper due_date for filtering
     getTasks: async () => {
         const response = await api.get("tasks/");
-        return response.data;
+        const payload = response?.data;
+        if (Array.isArray(payload)) {
+            return payload;
+        }
+        if (Array.isArray(payload?.tasks)) {
+            return payload.tasks;
+        }
+        return [];
     },
 
     getTaskGuidance: async (taskId) => {

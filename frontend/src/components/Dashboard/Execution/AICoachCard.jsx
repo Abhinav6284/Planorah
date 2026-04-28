@@ -15,26 +15,45 @@ const AICoachCard = ({ coach, onRegenerate, loading }) => {
     }
 
     return (
-        <div className="rounded-3xl border border-white/10 bg-[#121822] p-5 text-white shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
-            <div className="flex items-center justify-between gap-2">
-                <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">AI Coach</p>
+        <div style={{ 
+            background: 'var(--el-bg)', 
+            border: '1px solid var(--el-border)', 
+            borderRadius: 16, 
+            padding: 24, 
+            boxShadow: 'var(--el-shadow-card)',
+            color: 'var(--el-text)'
+        }}>
+            <div style={{ display: 'flex', alignItems: 'center', justify: 'space-between', marginBottom: 20 }}>
+                <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)' }}>AI Assistant</p>
                 <button
                     onClick={onRegenerate}
                     disabled={loading}
-                    className="text-xs px-3 py-1 rounded-lg border border-cyan-300/30 text-cyan-100 hover:bg-cyan-500/10 active:scale-[0.98] transition-transform disabled:opacity-50"
+                    style={{
+                        padding: '6px 12px', borderRadius: 8, fontSize: 11, fontWeight: 600,
+                        background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border)',
+                        color: 'var(--el-text-secondary)', cursor: 'pointer', transition: 'all 0.1s'
+                    }}
                 >
-                    {loading ? 'Generating...' : 'Regenerate सुझाव'}
+                    {loading ? 'Thinking...' : 'Refresh'}
                 </button>
             </div>
 
-            <h3 className="text-lg font-semibold mt-3 leading-snug">{coach?.task || 'Preparing recommendation...'}</h3>
-            <p className="text-sm text-slate-300 mt-2">{coach?.estimated_time || '25 min'} · {(coach?.difficulty || 'medium').toUpperCase()}</p>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--el-text)', lineHeight: 1.4, marginBottom: 8 }}>{coach?.task || 'Preparing recommendation...'}</h3>
+            <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--el-text-muted)' }}>
+                <span>{coach?.estimated_time || '25 min'}</span>
+                <span>•</span>
+                <span style={{ textTransform: 'capitalize' }}>{coach?.difficulty || 'medium'} difficulty</span>
+            </div>
 
             <button
                 onClick={() => setShowReason((prev) => !prev)}
-                className="mt-4 text-sm text-cyan-200 hover:text-cyan-100"
+                style={{
+                    marginTop: 20, padding: 0, background: 'none', border: 'none', 
+                    fontSize: 12, fontWeight: 600, color: 'var(--el-text)', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', gap: 4
+                }}
             >
-                {showReason ? 'Hide Why this?' : 'Why this?'}
+                {showReason ? 'Hide Reasoning' : 'View Reasoning'}
             </button>
 
             {showReason && (
@@ -44,11 +63,14 @@ const AICoachCard = ({ coach, onRegenerate, loading }) => {
             )}
 
             {Array.isArray(coach?.alternatives) && coach.alternatives.length > 0 && (
-                <div className="mt-4">
-                    <p className="text-xs uppercase tracking-wide text-slate-400 mb-2">Alternatives</p>
-                    <div className="flex flex-wrap gap-2">
+                <div style={{ marginTop: 24 }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)', marginBottom: 12 }}>Alternatives</p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                         {coach.alternatives.map((option, idx) => (
-                            <span key={`${option}-${idx}`} className="px-2 py-1 rounded-lg bg-slate-700/60 text-xs text-slate-200 border border-white/10">
+                            <span key={`${option}-${idx}`} style={{ 
+                                padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 600,
+                                background: 'var(--el-bg)', border: '1px solid var(--el-border)', color: 'var(--el-text-secondary)'
+                            }}>
                                 {option}
                             </span>
                         ))}

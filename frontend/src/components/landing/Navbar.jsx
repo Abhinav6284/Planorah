@@ -1,26 +1,29 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Sun, Moon } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useTheme } from "../../context/ThemeContext";
+import { useState, useEffect, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Sun, Moon, Menu, X } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
+
+const NAV_LINKS = [
+  { label: 'Features', to: '/features' },
+  { label: 'Pricing',  to: '/pricing'  },
+  { label: 'Blog',     to: '/blogs'    },
+];
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const location = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const navRef = useRef(null);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const navLinks = [
-    { name: "Features", href: "#features" },
-    { name: "Pricing", href: "#pricing" },
-    { name: "Roadmaps", href: "#showcase" },
-    { name: "Blog", to: "/blogs" },
-  ];
+  // Close mobile menu on route change
+  useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
   return (
     <>
@@ -39,83 +42,47 @@ export default function Navbar() {
             Planorah
           </Link>
 
-          {/* Desktop: Nav Links + Actions */}
-          <div className="hidden md:flex items-center gap-5 lg:gap-6">
-            {navLinks.map((link) => (
-              link.to ? (
-                <Link
-                  key={link.name}
-                  to={link.to}
-                  className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap"
-                >
-                  {link.name}
-                </Link>
-              ) : (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap"
-                >
-                  {link.name}
-                </a>
-              )
+          {/* Desktop nav links — centred */}
+          <div className="lp-nav-links desktop-links" style={{ flex: 1, marginLeft: 28 }}>
+            {NAV_LINKS.map(l => (
+              <Link
+                key={l.to}
+                to={l.to}
+                className={`lp-nav-link${location.pathname === l.to ? ' active' : ''}`}
+              >
+                {l.label}
+              </Link>
             ))}
+          </div>
 
+          {/* Actions */}
+          <div className="lp-nav-links" style={{ gap: 4, marginLeft: 'auto' }}>
             {/* Theme toggle */}
             <button
               onClick={toggleTheme}
               aria-label="Toggle theme"
-              className="p-1.5 rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/60 dark:hover:bg-white/[0.08] transition-all"
+              className="lp-btn lp-btn-sm lp-btn-plain"
+              style={{ padding: '7px 8px' }}
             >
-              {theme === "dark" ? (
-                <Sun className="w-4 h-4" />
-              ) : (
-                <Moon className="w-4 h-4" />
-              )}
+              {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
             </button>
 
-            <Link
-              to="/login"
-              className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap"
-            >
+            <Link to="/login" className="lp-btn lp-btn-sm lp-btn-plain always-show">
               Log in
             </Link>
-            <Link
-              to="/register"
-              className="px-5 py-2 text-sm font-semibold text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-full hover:bg-black dark:hover:bg-gray-100 transition-colors whitespace-nowrap"
-            >
-              Join for free
+            <Link to="/register" className="lp-btn lp-btn-sm lp-btn-primary always-show">
+              Get started →
             </Link>
-          </div>
 
-          {/* Mobile: theme toggle + hamburger */}
-          <div className="md:hidden flex items-center gap-2">
+            {/* Mobile hamburger */}
             <button
-              onClick={toggleTheme}
-              aria-label="Toggle theme"
-              className="p-1.5 rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="lp-btn lp-btn-sm lp-btn-plain lp-mobile-menu-btn"
+              aria-label="Toggle menu"
+              onClick={() => setMobileOpen(v => !v)}
             >
-              {theme === "dark" ? (
-                <Sun className="w-4 h-4" />
-              ) : (
-                <Moon className="w-4 h-4" />
-              )}
-            </button>
-            <button
-              className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-expanded={mobileMenuOpen}
-              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-            >
-              {mobileMenuOpen ? (
-                <X className="w-5 h-5" />
-              ) : (
-                <Menu className="w-5 h-5" />
-              )}
+              {mobileOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
           </div>
-        </nav>
-      </header>
 
       {/* Mobile Menu */}
       <AnimatePresence>

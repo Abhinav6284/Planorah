@@ -1,0 +1,115 @@
+<h2>Technical Architecture</h2>
+<p class="subtitle">Component structure, state management, and performance approach</p>
+
+<div class="section" style="margin-bottom: 24px; padding: 20px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #667eea;">
+  <h3 style="margin-top: 0;">Component Structure</h3>
+  <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; font-family: monospace; font-size: 12px; line-height: 1.6; color: #333;">
+    <div style="color: #667eea; font-weight: 600;">UnifiedAIAssistant.jsx</div>
+    <div style="margin-left: 20px; margin-top: 8px;">
+      <div>├── state: { isOpen, isExpanded, mode, messages }</div>
+      <div>├── Compact Widget</div>
+      <div style="margin-left: 20px;">
+        <div>├── 70×70px circle button</div>
+        <div>├── Hover animations (scale, shadow)</div>
+        <div>└── Click → expand animation</div>
+      </div>
+      <div>├── Expanded Panel (Glassmorphism)</div>
+      <div style="margin-left: 20px;">
+        <div>├── Smooth grow animation (70px → 380px width)</div>
+        <div>├── Header with mode toggle (Text ↔ Voice)</div>
+        <div>├── Content Area (switches based on mode)</div>
+        <div style="margin-left: 20px;">
+          <div>├── TextChat (messages + input)</div>
+          <div>└── VoicePanel (waveform + visualizer)</div>
+        </div>
+        <div>└── Controls & Close button</div>
+      </div>
+      <div>└── useVoiceSession hook (reuse existing)</div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-bottom: 24px; padding: 20px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #667eea;">
+  <h3 style="margin-top: 0;">State Management</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">
+      <h4 style="margin-top: 0;">Component State</h4>
+      <ul style="font-size: 13px; margin: 0; padding-left: 20px;">
+        <li><code>isOpen</code> - Widget visible</li>
+        <li><code>isExpanded</code> - Panel expanded</li>
+        <li><code>mode</code> - 'text' | 'voice'</li>
+        <li><code>messages</code> - Chat history</li>
+        <li><code>isListening</code> - Voice recording</li>
+      </ul>
+    </div>
+    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">
+      <h4 style="margin-top: 0;">Transitions</h4>
+      <ul style="font-size: 13px; margin: 0; padding-left: 20px;">
+        <li>Compact ↔ Expanded (0.3s)</li>
+        <li>Text ↔ Voice (0.2s)</li>
+        <li>Message fade-in (0.15s)</li>
+        <li>Waveform animate (continuous)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-bottom: 24px; padding: 20px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #667eea;">
+  <h3 style="margin-top: 0;">Performance Optimizations</h3>
+  <ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.7;">
+    <li><strong>Lazy load voice module:</strong> Only load audio/waveform logic when voice mode is activated</li>
+    <li><strong>Memoized components:</strong> TextChat and VoicePanel use React.memo to prevent unnecessary re-renders</li>
+    <li><strong>Minimal backdrop blur:</strong> Use CSS backdrop-filter (hardware accelerated) instead of canvas blur</li>
+    <li><strong>Debounced input:</strong> Message input debounced 300ms to reduce API calls</li>
+    <li><strong>Virtual scrolling:</strong> If chat grows large, only render visible messages</li>
+    <li><strong>CSS animations over JS:</strong> Use CSS @keyframes for waveform pulse (60fps, GPU-accelerated)</li>
+  </ul>
+</div>
+
+<div class="section" style="margin-bottom: 24px; padding: 20px; background: #f0fdf4; border-radius: 8px; border-left: 4px solid #22c55e;">
+  <h3 style="margin-top: 0;">Key Features</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+    <div>
+      <h4 style="margin-top: 0; font-size: 14px;">Visual Polish</h4>
+      <ul style="font-size: 13px; margin: 0; padding-left: 20px;">
+        <li>Glassmorphism (backdrop blur + opacity)</li>
+        <li>Gradient accents (purple/indigo)</li>
+        <li>Smooth transitions (all 0.2-0.3s)</li>
+        <li>Animated waveforms (real-time)</li>
+        <li>Hover states on all buttons</li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="margin-top: 0; font-size: 14px;">Interaction Model</h4>
+      <ul style="font-size: 13px; margin: 0; padding-left: 20px;">
+        <li>Click bubble → expand</li>
+        <li>Click X → collapse (not close)</li>
+        <li>Click mode buttons → smooth transition</li>
+        <li>Voice visualizer animates while listening</li>
+        <li>Messages fade in as they arrive</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-bottom: 24px; padding: 20px; background: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b;">
+  <h3 style="margin-top: 0;">Integration Points</h3>
+  <ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.7;">
+    <li><strong>Reuse existing:</strong> AITalkPanel's API calls (assistantPipelineService), mentoringService</li>
+    <li><strong>Reuse existing:</strong> useVoiceSession hook from AIVoicePanel</li>
+    <li><strong>Replace:</strong> Remove old AITalkPanel and AIVoicePanel after this is deployed</li>
+    <li><strong>Layout.jsx:</strong> Drop UnifiedAIAssistant component at app root (floats above everything)</li>
+    <li><strong>No major refactoring needed:</strong> This is additive; old components can coexist during transition</li>
+  </ul>
+</div>
+
+<div class="section" style="margin-bottom: 0; padding: 20px; background: #f0f4ff; border-radius: 8px; border-left: 4px solid #667eea;">
+  <h3 style="margin-top: 0;">Browser Support & Responsiveness</h3>
+  <ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.7;">
+    <li><strong>Desktop:</strong> 380px panel fixed to bottom-right, floats over content</li>
+    <li><strong>Tablet:</strong> 340px panel, positioned bottom-right with safe margins</li>
+    <li><strong>Mobile:</strong> Panel takes 90vw width, positioned at bottom (above keyboard), can slide up if needed</li>
+    <li><strong>Backdrop blur:</strong> Gracefully degrades on older browsers (just uses opacity)</li>
+    <li><strong>Animations:</strong> prefers-reduced-motion respected (disable animations if enabled)</li>
+  </ul>
+</div>

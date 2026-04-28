@@ -1,90 +1,112 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { Twitter, Github, Linkedin } from "lucide-react";
+import { Link } from 'react-router-dom';
+
+const COLS = [
+  {
+    title: 'Product',
+    items: [
+      { label: 'Features', to: '/features' },
+      { label: 'Pricing',  to: '/pricing'  },
+      { label: 'Changelog',to: null        },
+      { label: 'Roadmap',  to: null        },
+    ],
+  },
+  {
+    title: 'Resources',
+    items: [
+      { label: 'Help center',  to: '/support' },
+      { label: 'Blog',         to: '/blogs'   },
+      { label: 'Templates',    to: null       },
+    ],
+  },
+  {
+    title: 'Company',
+    items: [
+      { label: 'About',   to: '/founder' },
+      { label: 'Careers', to: '/careers' },
+      { label: 'Privacy', to: '/privacy' },
+      { label: 'Terms',   to: '/terms'   },
+    ],
+  },
+];
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
-  const pathOverrides = {
-    Blog: "/blogs",
-    Contact: "/support",
-  };
-  const toPath = (label) =>
-    pathOverrides[label] || `/${label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
-
-  const columns = [
-    { title: "Product", links: ["Features", "Roadmaps", "AI Mentor", "Pricing", "Changelog"] },
-    { title: "Resources", links: ["Blog", "Community", "Guides", "Help Center", "API"] },
-    { title: "Company", links: ["About", "Careers", "Contact", "Partners", "Legal"] },
-  ];
-
   return (
-    <footer className="relative overflow-hidden bg-gray-50 dark:bg-[#0a0a0c] border-t border-slate-200/70 dark:border-white/[0.06] pt-16 pb-8">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-20 right-[10%] h-56 w-56 rounded-full bg-cyan-100/30 dark:bg-cyan-900/10 blur-3xl" />
-        <div className="absolute bottom-[-5rem] left-[12%] h-64 w-64 rounded-full bg-amber-100/35 dark:bg-amber-900/10 blur-3xl" />
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12 mb-16">
-
-          {/* Brand Column */}
-          <div className="col-span-2">
-            <Link to="/" className="flex items-center gap-2.5 mb-4">
-              <img src="/planorah-logo.png" alt="Planorah" className="w-9 h-9 object-contain" />
-              <span className="font-bold text-xl md:text-2xl font-serif tracking-tight text-gray-900 dark:text-white whitespace-nowrap">
-                Planorah
-              </span>
+    <footer style={{
+      padding: '64px 0 48px',
+      borderTop: '1px solid var(--lp-border-subtle)',
+    }}>
+      <div className="lp-container">
+        <div className="lp-footer-grid">
+          {/* Brand */}
+          <div>
+            <Link to="/" className="lp-logo" style={{ marginBottom: 16, display: 'inline-flex' }}>
+              <img 
+                src="/planorah_logo.png" 
+                alt="Planorah" 
+                style={{ 
+                  width: 24, 
+                  height: 24, 
+                  objectFit: 'contain',
+                  filter: 'var(--logo-invert)',
+                  marginRight: 8
+                }} 
+              />
+              Planorah
             </Link>
-            <p className="text-gray-500 dark:text-gray-400 font-medium mb-6 max-w-xs">
-              Your personal AI learning roadmap. Structure your knowledge and achieve your goals faster.
+            <p style={{ marginTop: 16, fontSize: 14, maxWidth: 260, color: 'var(--lp-fg-muted)', lineHeight: 1.6 }}>
+              AI academic planning for students who take their time seriously.
             </p>
-            <div className="flex items-center gap-4 text-gray-400 dark:text-gray-600">
-              <a href="https://x.com" target="_blank" rel="noreferrer" aria-label="Planorah on X"
-                className="hover:text-gray-900 dark:hover:text-white transition-colors">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="https://github.com" target="_blank" rel="noreferrer" aria-label="Planorah on GitHub"
-                className="hover:text-gray-900 dark:hover:text-white transition-colors">
-                <Github className="w-5 h-5" />
-              </a>
-              <a href="https://www.linkedin.com" target="_blank" rel="noreferrer" aria-label="Planorah on LinkedIn"
-                className="hover:text-gray-900 dark:hover:text-white transition-colors">
-                <Linkedin className="w-5 h-5" />
-              </a>
-            </div>
           </div>
 
-          {/* Links Columns */}
-          {columns.map((col, idx) => (
-            <div key={idx}>
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-4">{col.title}</h4>
-              <ul className="space-y-3">
-                {col.links.map((link, lIdx) => (
-                  <li key={lIdx}>
+          {/* Link columns */}
+          {COLS.map(col => (
+            <div key={col.title}>
+              <div className="lp-eyebrow" style={{ marginBottom: 14 }}>{col.title}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {col.items.map(item => (
+                  item.to ? (
                     <Link
-                      to={toPath(link)}
-                      className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium transition-colors"
+                      key={item.label}
+                      to={item.to}
+                      style={{
+                        fontSize: 14,
+                        color: 'var(--lp-fg-deep)',
+                        fontFamily: 'var(--lp-font-body)',
+                        transition: 'color 0.15s',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.color = 'var(--lp-fg-muted)'}
+                      onMouseLeave={e => e.currentTarget.style.color = 'var(--lp-fg-deep)'}
                     >
-                      {link}
+                      {item.label}
                     </Link>
-                  </li>
+                  ) : (
+                    <span
+                      key={item.label}
+                      style={{ fontSize: 14, color: 'var(--lp-fg-muted)', cursor: 'default' }}
+                    >
+                      {item.label}
+                    </span>
+                  )
                 ))}
-              </ul>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 border-t border-gray-200 dark:border-white/[0.06] flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500 dark:text-gray-500 font-medium">
-          <p>© {currentYear} Planorah Inc. All rights reserved.</p>
-          <div className="flex gap-6">
-            <Link to="/privacy-policy" className="hover:text-gray-900 dark:hover:text-white transition-colors">
-              Privacy Policy
-            </Link>
-            <Link to="/terms-of-service" className="hover:text-gray-900 dark:hover:text-white transition-colors">
-              Terms of Service
-            </Link>
-          </div>
+        {/* Bottom bar */}
+        <div style={{
+          paddingTop: 24,
+          borderTop: '1px solid var(--lp-border-subtle)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          fontSize: 13,
+          color: 'var(--lp-fg-muted)',
+          gap: 16,
+          flexWrap: 'wrap',
+        }}>
+          <span>© {new Date().getFullYear()} Planorah, Inc.</span>
+          <span>Made for students, in the library, at 2am.</span>
         </div>
       </div>
     </footer>

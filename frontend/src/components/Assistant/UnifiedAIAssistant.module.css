@@ -1,0 +1,490 @@
+/* Container & Layout */
+.compactWidget {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.3);
+  z-index: 50;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.compactWidget:hover {
+  transform: scale(1.05);
+  box-shadow: 0 16px 50px rgba(102, 126, 234, 0.4);
+}
+
+.compactWidget:active {
+  transform: scale(0.98);
+}
+
+.expandedPanel {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 380px;
+  height: 500px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 16px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.15),
+    0 0 1px rgba(255, 255, 255, 0.5) inset;
+  z-index: 51;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: expandIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.expandedPanel.collapsing {
+  animation: expandOut 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes expandIn {
+  from {
+    opacity: 0;
+    transform: scale(0.1);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes expandOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.1);
+  }
+}
+
+/* Header */
+.panelHeader {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 16px 16px 0 0;
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.headerIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+}
+
+.headerLabel {
+  font-size: 12px;
+  color: #999;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.headerTitle h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  gap: 6px;
+}
+
+.headerButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.05);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.headerButton:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Content Area */
+.contentArea {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Text Chat Styles */
+.messageList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: linear-gradient(180deg, rgba(249, 250, 251, 0.8) 0%, rgba(240, 245, 255, 0.5) 100%);
+}
+
+.message {
+  display: flex;
+  animation: messageIn 0.15s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes messageIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.messageUser {
+  justify-content: flex-end;
+}
+
+.messageBubble {
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.messageBubbleUser {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px 12px 4px 12px;
+}
+
+.messageBubbleAssistant {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  color: #333;
+  border-radius: 12px 12px 12px 4px;
+  backdrop-filter: blur(4px);
+}
+
+.textInput {
+  padding: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(240, 245, 255, 0.3) 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.inputField {
+  flex: 1;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  font-family: inherit;
+  color: #333;
+  resize: none;
+}
+
+.inputField::placeholder {
+  color: #999;
+}
+
+.inputField:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.inputActions {
+  display: flex;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.actionButton {
+  flex: 1;
+  padding: 8px;
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 6px;
+  cursor: pointer;
+  color: #667eea;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.actionButton:hover {
+  background: rgba(102, 126, 234, 0.15);
+}
+
+.actionButton:active {
+  transform: scale(0.98);
+}
+
+/* Voice Mode Styles */
+.voiceContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(180deg, rgba(249, 250, 251, 0.8) 0%, rgba(240, 245, 255, 0.5) 100%);
+  gap: 20px;
+}
+
+.voiceLabel {
+  font-size: 12px;
+  color: #999;
+  font-weight: 600;
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+}
+
+.voiceTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Waveform Visualizer */
+.waveformContainer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  height: 80px;
+}
+
+.waveformBar {
+  width: 6px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 3px;
+  animation: pulse 0.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scaleY(0.3);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.waveformBar:nth-child(1) { animation-delay: 0s; }
+.waveformBar:nth-child(2) { animation-delay: 0.1s; }
+.waveformBar:nth-child(3) { animation-delay: 0.2s; }
+.waveformBar:nth-child(4) { animation-delay: 0.3s; }
+.waveformBar:nth-child(5) { animation-delay: 0.4s; }
+.waveformBar:nth-child(6) { animation-delay: 0.5s; }
+.waveformBar:nth-child(7) { animation-delay: 0.6s; }
+
+/* Voice Selector */
+.voiceSelector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.voiceOption {
+  padding: 10px;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+  font-weight: 600;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.voiceOption:hover {
+  background: rgba(102, 126, 234, 0.15);
+}
+
+.voiceOption.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: transparent;
+}
+
+/* Voice Controls */
+.voiceControls {
+  padding: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(240, 245, 255, 0.3) 100%);
+  display: flex;
+  gap: 8px;
+}
+
+.stopButton {
+  flex: 1;
+  padding: 12px;
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.stopButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);
+}
+
+.switchButton {
+  flex: 1;
+  padding: 12px;
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.switchButton:hover {
+  background: rgba(102, 126, 234, 0.15);
+}
+
+/* Responsive Design */
+@media (max-width: 1023px) {
+  .expandedPanel {
+    width: 340px;
+    height: 400px;
+  }
+}
+
+@media (max-width: 767px) {
+  .compactWidget {
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+  }
+
+  .expandedPanel {
+    width: 90vw;
+    height: auto;
+    max-height: 90vh;
+    bottom: auto;
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 16px 16px 0 0;
+    animation: expandUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes expandUp {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+}
+
+/* Dark Mode */
+.expandedPanel.dark {
+  background: rgba(20, 20, 30, 0.95);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.expandedPanel.dark .panelHeader {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.expandedPanel.dark .headerTitle h3 {
+  color: #e0e0e0;
+}
+
+.expandedPanel.dark .messageBubbleAssistant {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border-color: rgba(102, 126, 234, 0.3);
+  color: #e0e0e0;
+}
+
+.expandedPanel.dark .inputField {
+  background: rgba(30, 30, 40, 0.8);
+  color: #e0e0e0;
+  border-color: rgba(102, 126, 234, 0.3);
+}
+
+.expandedPanel.dark .inputField::placeholder {
+  color: #999;
+}
+
+.expandedPanel.dark .messageList {
+  background: linear-gradient(180deg, rgba(25, 25, 35, 0.8) 0%, rgba(30, 30, 50, 0.5) 100%);
+}
+
+.expandedPanel.dark .voiceContainer {
+  background: linear-gradient(180deg, rgba(25, 25, 35, 0.8) 0%, rgba(30, 30, 50, 0.5) 100%);
+}
+
+.expandedPanel.dark .voiceTitle,
+.expandedPanel.dark .messageBubble {
+  color: #e0e0e0;
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

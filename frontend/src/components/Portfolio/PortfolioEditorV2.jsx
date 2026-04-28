@@ -11,11 +11,11 @@ import CompletenessCard from './editor/CompletenessCard';
 import { getLocalCompleteness, parseFieldErrors, tabs, updatePayloadFromPortfolio } from './editor/portfolioEditorUtils';
 
 function getStatusBadge(portfolio) {
-  if (!portfolio) return { badge: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400', label: 'Loading' };
+  if (!portfolio) return { badge: 'bg-gray-100 text-gray-500 dark:bg-charcoal dark:text-gray-400', label: 'Loading' };
   const statuses = {
     active: { badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400', label: '● Live' },
     grace: { badge: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400', label: '● Grace Period' },
-    read_only: { badge: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', label: '● Free Plan' },
+    read_only: { badge: 'bg-blue-100 text-blue-700 dark:bg-charcoal/30 dark:text-blue-400', label: '● Free Plan' },
     archived: { badge: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', label: '○ Archived' },
   };
   return statuses[portfolio.status] || statuses.archived;
@@ -249,7 +249,7 @@ export default function PortfolioEditorV2() {
 
   return (
     <div className="min-h-screen bg-[#F5F5F7] dark:bg-black font-sans">
-      <div className="bg-white dark:bg-[#1C1C1E] border-b border-gray-200 dark:border-white/10">
+      <div className="bg-white dark:bg-charcoal border-b border-gray-200 dark:border-white/10">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
@@ -260,7 +260,7 @@ export default function PortfolioEditorV2() {
                 <h1 className="text-gray-900 dark:text-white font-semibold text-base">{portfolio?.title || 'My Portfolio'}</h1>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusInfo.badge}`}>{statusInfo.label}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${portfolio.is_published ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'}`}>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${portfolio.is_published ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-gray-100 text-gray-600 dark:bg-charcoal dark:text-gray-400'}`}>
                     {portfolio.is_published ? 'Published' : 'Draft'}
                   </span>
                 </div>
@@ -270,7 +270,7 @@ export default function PortfolioEditorV2() {
               <button
                 onClick={() => handlePublishToggle(!portfolio.is_published)}
                 disabled={publishing}
-                className="px-4 py-2 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 text-sm"
+                className="px-4 py-2 border border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-charcoalMuted transition-colors disabled:opacity-50 text-sm"
               >
                 {publishing ? 'Updating...' : portfolio.is_published ? 'Unpublish' : 'Publish'}
               </button>
@@ -286,18 +286,18 @@ export default function PortfolioEditorV2() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#1C1C1E] border-b border-gray-200 dark:border-white/10">
+      <div className="bg-white dark:bg-charcoal border-b border-gray-200 dark:border-white/10">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1.5">Your Portfolio URL</p>
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl">
+                <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-charcoalDark border border-gray-200 dark:border-charcoalMuted rounded-xl">
                   <span className="text-gray-700 dark:text-gray-300 font-mono text-sm">{portfolioUrl}</span>
                 </div>
                 <button
                   onClick={copyToClipboard}
-                  className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                  className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-charcoalMuted rounded-lg transition-colors"
                   title="Copy URL"
                 >
                   {copied ? 'Copied' : 'Copy'}
@@ -309,7 +309,7 @@ export default function PortfolioEditorV2() {
               href={publicUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-charcoalMuted transition-colors text-sm"
             >
               Visit
             </a>

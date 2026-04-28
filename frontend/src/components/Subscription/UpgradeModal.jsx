@@ -46,7 +46,7 @@ export default function UpgradeModal({ feature, isOpen, onClose }) {
 
     const handleUpgrade = () => {
         onClose();
-        navigate('/pricing');
+        navigate('/subscription/plans');
     };
 
     return (
@@ -64,7 +64,7 @@ export default function UpgradeModal({ feature, isOpen, onClose }) {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         onClick={(e) => e.stopPropagation()}
-                        className="bg-white dark:bg-[#1C1C1E] rounded-2xl border border-gray-200 dark:border-gray-800 w-full max-w-md shadow-2xl overflow-hidden"
+                        className="bg-white dark:bg-[#1a1a1a] rounded-2xl border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] w-full max-w-md overflow-hidden transition-all duration-300"
                     >
                         <div className="p-6 text-center">
                             <div className="text-5xl mb-4">{featureInfo.icon}</div>
@@ -74,7 +74,7 @@ export default function UpgradeModal({ feature, isOpen, onClose }) {
                             <p className="text-gray-500 dark:text-gray-400 mb-6">
                                 {featureInfo.message}
                             </p>
-                            
+
                             <div className="space-y-3">
                                 <button
                                     onClick={handleUpgrade}
@@ -84,7 +84,7 @@ export default function UpgradeModal({ feature, isOpen, onClose }) {
                                 </button>
                                 <button
                                     onClick={onClose}
-                                    className="w-full py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                                    className="w-full py-3 border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-white/10 transition-colors"
                                 >
                                     Maybe Later
                                 </button>

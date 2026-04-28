@@ -3,6 +3,42 @@
 from django.db import migrations, models
 
 
+def _rename_indexes_postgresql(apps, schema_editor):
+    if schema_editor.connection.vendor != "postgresql":
+        return
+
+    schema_editor.execute(
+        """
+        ALTER INDEX tasks_eligi_user_id_8f7e5c_idx RENAME TO tasks_eligi_user_id_d3624b_idx;
+        ALTER INDEX tasks_eligi_roadmap_7a2d3b_idx RENAME TO tasks_eligi_roadmap_ed8a86_idx;
+        ALTER INDEX tasks_remed_user_id_e8f05a_idx RENAME TO tasks_remed_user_id_f1d0f3_idx;
+        ALTER INDEX tasks_remed_status_9c9e2a_idx RENAME TO tasks_remed_status_56ecf0_idx;
+        ALTER INDEX tasks_resum_resume__6g7h8i_idx RENAME TO tasks_resum_resume__e9f5d3_idx;
+        ALTER INDEX tasks_resum_source__9j0k1l_idx RENAME TO tasks_resum_source__c8840d_idx;
+        ALTER INDEX tasks_resum_user_id_0a1b2c_idx RENAME TO tasks_resum_user_id_d4bddf_idx;
+        ALTER INDEX tasks_resum_roadmap_3d4e5f_idx RENAME TO tasks_resum_roadmap_89ae75_idx;
+        """
+    )
+
+
+def _rename_indexes_postgresql_reverse(apps, schema_editor):
+    if schema_editor.connection.vendor != "postgresql":
+        return
+
+    schema_editor.execute(
+        """
+        ALTER INDEX tasks_eligi_user_id_d3624b_idx RENAME TO tasks_eligi_user_id_8f7e5c_idx;
+        ALTER INDEX tasks_eligi_roadmap_ed8a86_idx RENAME TO tasks_eligi_roadmap_7a2d3b_idx;
+        ALTER INDEX tasks_remed_user_id_f1d0f3_idx RENAME TO tasks_remed_user_id_e8f05a_idx;
+        ALTER INDEX tasks_remed_status_56ecf0_idx RENAME TO tasks_remed_status_9c9e2a_idx;
+        ALTER INDEX tasks_resum_resume__e9f5d3_idx RENAME TO tasks_resum_resume__6g7h8i_idx;
+        ALTER INDEX tasks_resum_source__c8840d_idx RENAME TO tasks_resum_source__9j0k1l_idx;
+        ALTER INDEX tasks_resum_user_id_d4bddf_idx RENAME TO tasks_resum_user_id_0a1b2c_idx;
+        ALTER INDEX tasks_resum_roadmap_89ae75_idx RENAME TO tasks_resum_roadmap_3d4e5f_idx;
+        """
+    )
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -12,28 +48,10 @@ class Migration(migrations.Migration):
     operations = [
         migrations.SeparateDatabaseAndState(
             database_operations=[
-                migrations.RunSQL(
-                    """
-                        ALTER INDEX tasks_eligi_user_id_8f7e5c_idx RENAME TO tasks_eligi_user_id_d3624b_idx;
-                        ALTER INDEX tasks_eligi_roadmap_7a2d3b_idx RENAME TO tasks_eligi_roadmap_ed8a86_idx;
-                        ALTER INDEX tasks_remed_user_id_e8f05a_idx RENAME TO tasks_remed_user_id_f1d0f3_idx;
-                        ALTER INDEX tasks_remed_status_9c9e2a_idx RENAME TO tasks_remed_status_56ecf0_idx;
-                        ALTER INDEX tasks_resum_resume__6g7h8i_idx RENAME TO tasks_resum_resume__e9f5d3_idx;
-                        ALTER INDEX tasks_resum_source__9j0k1l_idx RENAME TO tasks_resum_source__c8840d_idx;
-                        ALTER INDEX tasks_resum_user_id_0a1b2c_idx RENAME TO tasks_resum_user_id_d4bddf_idx;
-                        ALTER INDEX tasks_resum_roadmap_3d4e5f_idx RENAME TO tasks_resum_roadmap_89ae75_idx;
-                        """,
-                    reverse_sql="""
-                        ALTER INDEX tasks_eligi_user_id_d3624b_idx RENAME TO tasks_eligi_user_id_8f7e5c_idx;
-                        ALTER INDEX tasks_eligi_roadmap_ed8a86_idx RENAME TO tasks_eligi_roadmap_7a2d3b_idx;
-                        ALTER INDEX tasks_remed_user_id_f1d0f3_idx RENAME TO tasks_remed_user_id_e8f05a_idx;
-                        ALTER INDEX tasks_remed_status_56ecf0_idx RENAME TO tasks_remed_status_9c9e2a_idx;
-                        ALTER INDEX tasks_resum_resume__e9f5d3_idx RENAME TO tasks_resum_resume__6g7h8i_idx;
-                        ALTER INDEX tasks_resum_source__c8840d_idx RENAME TO tasks_resum_source__9j0k1l_idx;
-                        ALTER INDEX tasks_resum_user_id_d4bddf_idx RENAME TO tasks_resum_user_id_0a1b2c_idx;
-                        ALTER INDEX tasks_resum_roadmap_89ae75_idx RENAME TO tasks_resum_roadmap_3d4e5f_idx;
-                        """
-                ),
+                migrations.RunPython(
+                    code=_rename_indexes_postgresql,
+                    reverse_code=_rename_indexes_postgresql_reverse,
+                )
             ],
             state_operations=[
                 migrations.RenameIndex(

@@ -747,9 +747,12 @@ def _build_execution_task_guidance(task):
         'generated': True,
         'objective': objective,
         'time_breakdown': [
-            {'duration': f'{setup_minutes} min', 'activity': 'Review objective and gather required context'},
-            {'duration': f'{execute_minutes} min', 'activity': 'Execute deep work on the main deliverable'},
-            {'duration': f'{wrap_minutes} min', 'activity': 'Validate output and capture follow-up actions'},
+            {'duration': f'{setup_minutes} min',
+                'activity': 'Review objective and gather required context'},
+            {'duration': f'{execute_minutes} min',
+                'activity': 'Execute deep work on the main deliverable'},
+            {'duration': f'{wrap_minutes} min',
+                'activity': 'Validate output and capture follow-up actions'},
         ],
         'steps': base_steps,
         'best_practices': [
@@ -773,24 +776,146 @@ def _build_execution_task_guidance(task):
     }
 
 
+def _roadmap_status_to_execution_status(status_value):
+    status_value = str(status_value or '').strip().lower()
+    mapping = {
+        'not_started': 'pending',
+        'in_progress': 'in_progress',
+        'pending_validation': 'in_progress',
+        'needs_revision': 'pending',
+        'completed': 'completed',
+    }
+    return mapping.get(status_value, 'pending')
+
+
+def _execution_status_to_roadmap_status(status_value):
+    status_value = str(status_value or '').strip().lower()
+    mapping = {
+        'completed': 'completed',
+        'in_progress': 'in_progress',
+        'pending': 'not_started',
+        'skipped': 'not_started',
+    }
+    return mapping.get(status_value, 'not_started')
+
+
+def _sync_roadmap_tasks_into_execution(user):
+    """
+    Mirror roadmap tasks (tasks.Task) into execution tasks so dashboard and focus mode
+    stay aligned with day-wise roadmap scheduling.
+    """
+    try:
+        from tasks.models import Task as RoadmapTask
+    except Exception:
+        return
+
+    roadmap_tasks = RoadmapTask.objects.filter(
+        user=user).select_related('roadmap', 'milestone')
+    for source_task in roadmap_tasks:
+        estimated_minutes = max(1, int(source_task.estimated_minutes or 25))
+        status = _roadmap_status_to_execution_status(source_task.status)
+        completed_at = source_task.completed_at if status == 'completed' else None
+
+        ExecutionTask.objects.update_or_create(
+            id=source_task.task_id,
+            user=user,
+            defaults={
+                'title': source_task.title,
+                'task_type': 'learning',
+                'status': status,
+                'priority': 'medium',
+                'difficulty': 'medium',
+                'estimated_time': f'{estimated_minutes} min',
+                'estimated_minutes': estimated_minutes,
+                'reason': source_task.objective or source_task.description or '',
+                'ai_generated': False,
+                'metadata': {
+                    'source': 'roadmap_task',
+                    'roadmap_id': source_task.roadmap_id,
+                    'milestone_id': source_task.milestone_id,
+                    'day': source_task.day,
+                },
+                'scheduled_for': source_task.due_date,
+                'completed_at': completed_at,
+            },
+        )
+
+
+def _sync_execution_status_to_roadmap_task(user, execution_task):
+    """
+    When mirrored execution tasks are updated from dashboard/focus mode,
+    propagate status back to the source roadmap task.
+    """
+    try:
+        from tasks.models import Task as RoadmapTask
+        source_task = RoadmapTask.objects.get(
+            task_id=execution_task.id, user=user)
+    except Exception:
+        return
+
+    next_status = _execution_status_to_roadmap_status(execution_task.status)
+    update_fields = []
+
+    if source_task.status != next_status:
+        source_task.status = next_status
+        update_fields.append('status')
+
+    next_completed_at = execution_task.completed_at if next_status == 'completed' else None
+    if source_task.completed_at != next_completed_at:
+        source_task.completed_at = next_completed_at
+        update_fields.append('completed_at')
+
+    if update_fields:
+        source_task.save(update_fields=update_fields + ['updated_at'])
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_today_task(request):
     try:
+        _sync_roadmap_tasks_into_execution(request.user)
         today = dj_timezone.localdate()
+        all_pending_qs = ExecutionTask.objects.filter(
+            user=request.user,
+            status__in=['pending', 'in_progress'],
+        )
+        real_pending_qs = all_pending_qs.filter(ai_generated=False)
+        pending_qs = real_pending_qs if real_pending_qs.exists() else all_pending_qs
 
         today_task = ExecutionTask.objects.filter(
             user=request.user,
             scheduled_for=today,
             status__in=['pending', 'in_progress'],
+            ai_generated=False,
         ).order_by('created_at').first()
 
         if not today_task:
-            stats = _get_or_create_user_stats(request.user)
-            pending = ExecutionTask.objects.filter(
+            nearest_scheduled_task = pending_qs.exclude(
+                scheduled_for__isnull=True
+            ).order_by('scheduled_for', 'created_at').first()
+
+            if nearest_scheduled_task:
+                today_task = nearest_scheduled_task
+
+        if not today_task:
+            unscheduled_task = pending_qs.filter(
+                scheduled_for__isnull=True
+            ).order_by('-priority', 'created_at').first()
+
+            if unscheduled_task:
+                today_task = unscheduled_task
+
+        if not today_task:
+            today_task = ExecutionTask.objects.filter(
                 user=request.user,
+                scheduled_for=today,
                 status__in=['pending', 'in_progress'],
-            ).order_by('-priority', 'created_at')[:5]
+                ai_generated=True,
+            ).order_by('created_at').first()
+
+        if not today_task:
+            stats = _get_or_create_user_stats(request.user)
+            pending = pending_qs.order_by('-priority', 'created_at')[:5]
 
             profile = UserProfile.objects.filter(user=request.user).first()
             payload = {
@@ -904,6 +1029,7 @@ def ai_coach(request):
 def execution_tasks(request):
     try:
         if request.method == 'GET':
+            _sync_roadmap_tasks_into_execution(request.user)
             task_type = request.query_params.get('type')
             queryset = ExecutionTask.objects.filter(user=request.user)
             if task_type in {'learning', 'exam'}:
@@ -938,6 +1064,8 @@ def execution_tasks(request):
                     updated_task.completed_at = dj_timezone.now()
                     updated_task.save(update_fields=['completed_at'])
                     _apply_completion_rewards(request.user, updated_task)
+                _sync_execution_status_to_roadmap_task(
+                    request.user, updated_task)
 
             return Response(ExecutionTaskSerializer(updated_task).data, status=status.HTTP_200_OK)
 

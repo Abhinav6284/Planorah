@@ -141,12 +141,12 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
     ];
 
     return (
-        <div className={`bg-white dark:bg-gray-900 rounded-2xl md:rounded-[30px] ${compact ? 'p-3 md:p-4' : 'p-4 md:p-6'} h-full relative overflow-hidden transition-colors`}>
+        <div className={`bg-white dark:bg-charcoalDark rounded-2xl md:rounded-[30px] ${compact ? 'p-3 md:p-4' : 'p-4 md:p-6'} h-full relative overflow-hidden transition-colors`}>
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
                 <button
                     onClick={() => navigateMonth(-1)}
-                    className="px-2 md:px-3 py-1 md:py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full text-[10px] md:text-xs font-medium text-gray-600 dark:text-gray-400 transition-colors"
+                    className="px-2 md:px-3 py-1 md:py-1.5 bg-gray-100 dark:bg-charcoal hover:bg-gray-200 dark:hover:bg-charcoalMuted rounded-full text-[10px] md:text-xs font-medium text-gray-600 dark:text-gray-400 transition-colors"
                 >
                     <span className="hidden sm:inline">{prevMonth}</span>
                     <span className="sm:hidden">←</span>
@@ -154,7 +154,7 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                 <h3 className="text-gray-900 dark:text-white font-serif text-sm md:text-lg font-medium">{currentMonth}</h3>
                 <button
                     onClick={() => navigateMonth(1)}
-                    className="px-2 md:px-3 py-1 md:py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full text-[10px] md:text-xs font-medium text-gray-600 dark:text-gray-400 transition-colors"
+                    className="px-2 md:px-3 py-1 md:py-1.5 bg-gray-100 dark:bg-charcoal hover:bg-gray-200 dark:hover:bg-charcoalMuted rounded-full text-[10px] md:text-xs font-medium text-gray-600 dark:text-gray-400 transition-colors"
                 >
                     <span className="hidden sm:inline">{nextMonth}</span>
                     <span className="sm:hidden">→</span>
@@ -173,7 +173,7 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                     </button>
                     <button
                         onClick={() => setCurrentDate(new Date())}
-                        className="px-2 md:px-3 py-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white text-xs md:text-sm rounded-lg transition-colors"
+                        className="px-2 md:px-3 py-1 bg-gray-100 dark:bg-charcoal hover:bg-gray-200 dark:hover:bg-charcoalMuted text-gray-900 dark:text-white text-xs md:text-sm rounded-lg transition-colors"
                     >
                         Today
                     </button>
@@ -223,7 +223,7 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                         {weekDays.map((_, i) => (
                             <div
                                 key={i}
-                                className="border-l border-dashed border-gray-200 dark:border-gray-700 first:border-l-0"
+                                className="border-l border-dashed border-gray-200 dark:border-charcoalMuted first:border-l-0"
                             />
                         ))}
                     </div>
@@ -233,7 +233,7 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
                         {displayedTimeSlots.map((_, i) => (
                             <div
                                 key={i}
-                                className={`border-t border-dashed border-gray-100 dark:border-gray-800 ${compact ? 'h-8 md:h-10' : 'h-10 md:h-[60px]'}`}
+                                className={`border-t border-dashed border-gray-100 dark:border-charcoalMuted ${compact ? 'h-8 md:h-10' : 'h-10 md:h-[60px]'}`}
                             />
                         ))}
                     </div>
