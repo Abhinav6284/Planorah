@@ -1,48 +1,112 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
+
+const COLS = [
+  {
+    title: 'Product',
+    items: [
+      { label: 'Features', to: '/features' },
+      { label: 'Pricing',  to: '/pricing'  },
+      { label: 'Changelog',to: null        },
+      { label: 'Roadmap',  to: null        },
+    ],
+  },
+  {
+    title: 'Resources',
+    items: [
+      { label: 'Help center',  to: '/support' },
+      { label: 'Blog',         to: '/blogs'   },
+      { label: 'Templates',    to: null       },
+    ],
+  },
+  {
+    title: 'Company',
+    items: [
+      { label: 'About',   to: '/founder' },
+      { label: 'Careers', to: '/careers' },
+      { label: 'Privacy', to: '/privacy' },
+      { label: 'Terms',   to: '/terms'   },
+    ],
+  },
+];
 
 export default function Footer() {
   return (
-    <footer className="bg-[#F5F1E8] dark:bg-charcoalDark border-t border-gray-300 dark:border-charcoalMuted py-16 px-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-12">
+    <footer style={{
+      padding: '64px 0 48px',
+      borderTop: '1px solid var(--lp-border-subtle)',
+    }}>
+      <div className="lp-container">
+        <div className="lp-footer-grid">
+          {/* Brand */}
           <div>
-            <Link to="/" className="flex items-center gap-2.5 mb-4 group">
-              <div className="w-8 h-8 rounded-full bg-white overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-300">
-                <img src="/planorah_logo.png" alt="Planorah" className="w-full h-full object-contain" />
-              </div>
-              <span className="font-bold text-gray-950 dark:text-white font-cormorant text-lg">Planorah</span>
+            <Link to="/" className="lp-logo" style={{ marginBottom: 16, display: 'inline-flex' }}>
+              <img 
+                src="/planorah_logo.png" 
+                alt="Planorah" 
+                style={{ 
+                  width: 24, 
+                  height: 24, 
+                  objectFit: 'contain',
+                  filter: 'var(--logo-invert)',
+                  marginRight: 8
+                }} 
+              />
+              Planorah
             </Link>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Master your daily progress with AI-powered planning.</p>
+            <p style={{ marginTop: 16, fontSize: 14, maxWidth: 260, color: 'var(--lp-fg-muted)', lineHeight: 1.6 }}>
+              AI academic planning for students who take their time seriously.
+            </p>
           </div>
-          <div>
-            <h4 className="font-semibold text-gray-950 dark:text-white mb-4">Product</h4>
-            <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-              <li><a href="#features" className="hover:text-gray-950 dark:hover:text-white transition">Features</a></li>
-              <li><a href="#how-it-works" className="hover:text-gray-950 dark:hover:text-white transition">How It Works</a></li>
-              <li><a href="#pricing" className="hover:text-gray-950 dark:hover:text-white transition">Pricing</a></li>
-              <li><a href="#resources" className="hover:text-gray-950 dark:hover:text-white transition">Resources</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold text-gray-950 dark:text-white mb-4">Company</h4>
-            <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-              <li><Link to="/founder" className="hover:text-gray-950 dark:hover:text-white transition">Founder</Link></li>
-              <li><Link to="/careers" className="hover:text-gray-950 dark:hover:text-white transition">Careers</Link></li>
-              <li><Link to="/contact" className="hover:text-gray-950 dark:hover:text-white transition">Contact</Link></li>
-              <li><Link to="/blogs" className="hover:text-gray-950 dark:hover:text-white transition">Blog</Link></li>
-              <li><Link to="/support" className="hover:text-gray-950 dark:hover:text-white transition">Support</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold text-gray-950 dark:text-white mb-4">Legal</h4>
-            <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-              <li><Link to="/privacy" className="hover:text-gray-950 dark:hover:text-white transition">Privacy</Link></li>
-              <li><Link to="/terms" className="hover:text-gray-950 dark:hover:text-white transition">Terms</Link></li>
-            </ul>
-          </div>
+
+          {/* Link columns */}
+          {COLS.map(col => (
+            <div key={col.title}>
+              <div className="lp-eyebrow" style={{ marginBottom: 14 }}>{col.title}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {col.items.map(item => (
+                  item.to ? (
+                    <Link
+                      key={item.label}
+                      to={item.to}
+                      style={{
+                        fontSize: 14,
+                        color: 'var(--lp-fg-deep)',
+                        fontFamily: 'var(--lp-font-body)',
+                        transition: 'color 0.15s',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.color = 'var(--lp-fg-muted)'}
+                      onMouseLeave={e => e.currentTarget.style.color = 'var(--lp-fg-deep)'}
+                    >
+                      {item.label}
+                    </Link>
+                  ) : (
+                    <span
+                      key={item.label}
+                      style={{ fontSize: 14, color: 'var(--lp-fg-muted)', cursor: 'default' }}
+                    >
+                      {item.label}
+                    </span>
+                  )
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
-        <div className="border-t border-gray-300 dark:border-charcoalMuted pt-8 text-center text-sm text-gray-600 dark:text-gray-400">
-          <p>© 2024 Planorah. All rights reserved.</p>
+
+        {/* Bottom bar */}
+        <div style={{
+          paddingTop: 24,
+          borderTop: '1px solid var(--lp-border-subtle)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          fontSize: 13,
+          color: 'var(--lp-fg-muted)',
+          gap: 16,
+          flexWrap: 'wrap',
+        }}>
+          <span>© {new Date().getFullYear()} Planorah, Inc.</span>
+          <span>Made for students, in the library, at 2am.</span>
         </div>
       </div>
     </footer>

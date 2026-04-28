@@ -184,7 +184,7 @@ const Header = () => {
                             <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email || "support@planorah.me"}</p>
                         </div>
                         <Link
-                            to="/profile"
+                            to="/settings"
                             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition-colors"
                         >
                             <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center"><User className="w-4 h-4 text-gray-600 dark:text-gray-300" /></span>
@@ -232,7 +232,7 @@ const Header = () => {
                         <h4 className="text-[13px] font-bold leading-tight text-gray-900 dark:text-white">{displayName}</h4>
                         <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{userRole}</span>
                     </div>
-                    <Link to="/profile" className="relative group cursor-pointer">
+                    <Link to="/settings" className="relative group cursor-pointer">
                         <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 p-[2px] transition-all hover:shadow-lg">
                             <div className="w-full h-full rounded-full bg-white dark:bg-black p-[2px]">
                                 <img

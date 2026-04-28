@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { Check, ArrowRight, User, Phone, Calendar, Target, Award, TrendingUp, Sparkles, X, ChevronLeft, ArrowUpRight } from 'lucide-react';
 import api from "../../api/axios";
+import { useTheme } from "../../context/ThemeContext";
 
 const DISABLE_ONBOARDING_SUBMIT = false;
 
@@ -46,59 +48,123 @@ function QuickyMessage({ stepId, fd }) {
     const message = getMessage();
     if (!message) return null;
 
-    return (
-        <AnimatePresence mode="wait">
-            <motion.div
-                key={message}
-                initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.8, y: -20 }}
-                transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                className="flex items-end gap-3 mb-8"
-            >
-                <div className="w-14 h-14 shrink-0 relative flex items-center justify-center bg-terracotta/10 rounded-full border-2 border-terracotta/30 shadow-[0_4px_0_0_rgba(217,108,74,0.2)]">
-                    <motion.div
-                        animate={{ y: [0, -4, 0] }}
-                        transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                        className="text-3xl"
-                    >
-                        🦉
-                    </motion.div>
-                </div>
-                <div className="bg-white dark:bg-charcoal border-2 border-borderMuted dark:border-white/10 rounded-2xl rounded-bl-sm px-4 py-3 shadow-[0_4px_0_0_rgba(234,230,219,1)] dark:shadow-none relative flex-1">
-                    <p className="text-[15px] font-bold text-textPrimary dark:text-white leading-snug font-outfit">{message}</p>
-                </div>
-            </motion.div>
-        </AnimatePresence>
-    );
+    // Completely removed the playful bubble. Microcopy is now handled in the main render.
+    return null;
 }
 
 // ─── Option Card ────────────────────────────────────────────────────────────────
-function OptionCard({ emoji, iconText, label, sublabel, selected, onClick }) {
+// ─── Premium Design System Tokens ───────────────────────────────────────────
+// ─── Premium Design System Tokens ───────────────────────────────────────────
+const PREMIUM_THEME = {
+    bg: '#0d0d0d',
+    bgGradient: 'radial-gradient(circle at 80% 20%, #1a1a1a 0%, #0d0d0d 100%)',
+    cardBg: '#141414',
+    cardSelected: 'rgba(255,255,255,0.03)',
+    border: 'rgba(255,255,255,0.06)',
+    borderHover: 'rgba(255,255,255,0.15)',
+    borderActive: 'rgba(255,255,255,0.4)',
+    textMuted: 'rgba(255,255,255,0.25)',
+    textSupport: 'rgba(255,255,255,0.45)',
+    radius: 24,
+    spacing: {
+        cinematicPadding: 80,
+        clusterGap: 24
+    }
+};
+
+// ─── Option Tile (Premium Identity Card) ────────────────────────────────────
+function OptionCard({ emoji, iconText, label, subtitle, meta, selected, onClick, index }) {
     return (
         <motion.button
             type="button"
-            whileTap={{ scale: 0.98, y: 2 }}
+            variants={{
+                hidden: { opacity: 0, y: 24, scale: 0.97 },
+                visible: { opacity: 1, y: 0, scale: 1 }
+            }}
+            whileHover={{
+                borderColor: PREMIUM_THEME.borderHover,
+                y: -4,
+                background: 'rgba(255,255,255,0.02)'
+            }}
+            whileTap={{ scale: 0.98 }}
             onClick={onClick}
-            className={`w-full p-4 rounded-2xl border-2 border-b-4 text-left transition-colors duration-200 focus:outline-none flex items-center gap-4 ${selected
-                ? "border-terracotta bg-terracotta/5 border-b-terracottaHover"
-                : "border-borderMuted dark:border-white/10 bg-white dark:bg-charcoal hover:border-terracotta/40 border-b-beigeMuted dark:border-b-charcoalMuted hover:bg-beigeSecondary dark:hover:bg-charcoalMuted"
-                }`}
+            style={{
+                width: '100%',
+                maxWidth: 320,
+                aspectRatio: '1 / 0.9',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                padding: '32px',
+                background: selected ? PREMIUM_THEME.cardSelected : PREMIUM_THEME.cardBg,
+                border: `1px solid ${selected ? PREMIUM_THEME.borderActive : PREMIUM_THEME.border}`,
+                borderRadius: PREMIUM_THEME.radius,
+                cursor: 'pointer',
+                transition: 'all 0.6s cubic-bezier(0.2, 0, 0, 1)',
+                textAlign: 'left',
+                position: 'relative',
+                overflow: 'hidden',
+                boxShadow: selected ? '0 20px 40px -10px rgba(0,0,0,0.6), inset 0 0 20px rgba(255,255,255,0.02)' : '0 10px 30px -10px rgba(0,0,0,0.4)'
+            }}
         >
-            {(emoji || iconText) && (
-                <div className={`w-12 h-12 shrink-0 rounded-xl flex items-center justify-center text-2xl bg-beigePrimary dark:bg-charcoalDark shadow-sm border ${selected ? "border-terracotta/30" : "border-borderMuted dark:border-white/10"}`}>
-                    {iconText ? (
-                        <span className={`font-black text-xl ${selected ? "text-terracotta" : "text-textSecondary dark:text-gray-400"}`}>{iconText}</span>
-                    ) : (
-                        emoji
-                    )}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
+                <div style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: 16,
+                    background: 'rgba(255,255,255,0.03)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 26,
+                    color: 'var(--el-text)',
+                    border: '1px solid rgba(255,255,255,0.05)',
+                }}>
+                    {iconText || emoji}
                 </div>
-            )}
+                
+                {selected && (
+                    <motion.div
+                        layoutId="active-indicator"
+                        style={{
+                            width: 12, height: 12, borderRadius: 99,
+                            background: '#fff',
+                            boxShadow: '0 0 15px rgba(255,255,255,0.5)'
+                        }}
+                    />
+                )}
+            </div>
+            
             <div>
-                <div className="font-bold text-[17px] leading-tight text-textPrimary dark:text-white">{label}</div>
-                {sublabel && (
-                    <div className={`text-sm mt-1 font-medium ${selected ? "text-terracotta/80" : "text-textSecondary dark:text-gray-400"}`}>
-                        {sublabel}
+                <div style={{
+                    fontSize: 20,
+                    fontWeight: 500,
+                    color: 'var(--el-text)',
+                    letterSpacing: '-0.02em',
+                    marginBottom: 8
+                }}>
+                    {label}
+                </div>
+                <div style={{
+                    fontSize: 13,
+                    fontWeight: 400,
+                    color: PREMIUM_THEME.textSupport,
+                    lineHeight: 1.4,
+                    marginBottom: 12
+                }}>
+                    {subtitle}
+                </div>
+                {meta && (
+                    <div style={{
+                        fontSize: 10,
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.08em',
+                        color: PREMIUM_THEME.textMuted,
+                        borderTop: '1px solid rgba(255,255,255,0.05)',
+                        paddingTop: 12
+                    }}>
+                        {meta}
                     </div>
                 )}
             </div>
@@ -222,14 +288,21 @@ function mapToBackend(fd) {
 // ─── Screen definitions ─────────────────────────────────────────────────────────
 const SCREENS = {
     life_stage: {
-        q: "Where are you right now?",
         field: "life_stage",
+        q: "Where are you academically positioned today?",
+        sub: "Planorah utilizes this context to calibrate timelines, filter opportunities, and map your execution intensity across strategic pathways.",
+        micro: "USER PROFILING",
         options: [
-            { value: "school", label: "School", emoji: "🏫" },
-            { value: "college", label: "College", emoji: "🎓" },
-            { value: "postgrad", label: "Postgrad", emoji: "📚" },
-            { value: "working", label: "Working", emoji: "💼" },
+            { label: "School", subtitle: "Early academic foundation", meta: "Long-horizon planning", value: "school", emoji: "🏫" },
+            { label: "College", subtitle: "Building future direction", meta: "Career alignment stage", value: "college", emoji: "🎓" },
+            { label: "Postgraduate", subtitle: "Specializing with intent", meta: "Advanced positioning", value: "pg", emoji: "🧩" },
+            { label: "Working", subtitle: "Career advancement focus", meta: "Strategic transition mapping", value: "working", emoji: "💼" },
         ],
+        bullets: [
+            "Timeline calibration",
+            "Opportunity filtering",
+            "Goal intensity mapping"
+        ]
     },
     school_class: {
         q: "You're in?",
@@ -250,6 +323,18 @@ const SCREENS = {
             { value: "arts", label: "Arts", emoji: "🎨" },
             { value: "undecided", label: "Still deciding", emoji: "🤔" },
         ],
+    },
+    school_competitive: {
+        field: "wants_competitive",
+        q: "Are competitive exams part of your long-term plan?",
+        sub: "This helps Planora shape preparation timelines, intensity, and alternate strategic pathways.",
+        micro: "Long-term ambition mapping",
+        options: [
+            { label: "Yes, actively preparing", subtitle: "Competitive exams are a current focus", value: "yes", emoji: "🎯" },
+            { label: "Considering seriously", subtitle: "Exploring suitable exam directions", value: "considering", emoji: "🔍" },
+            { label: "Still evaluating", subtitle: "Decision is not finalized yet", value: "evaluating", emoji: "⏳" },
+            { label: "Not in my plan", subtitle: "Focusing on non-exam opportunities", value: "no", emoji: "🛤️" }
+        ]
     },
     competitive_direction: {
         q: "Are competitive exams part of your plan?",
@@ -436,7 +521,6 @@ export default function UniversalOnboarding() {
         higher_targeting: "", higher_prep_stage: "",
         career_shift_intent: "", career_stuck_response: "",
         daily_time: "", dream_vs_effort: "", pressure_response: "",
-        // commitment lock
         committed: false,
         gender: "",
         name: "", phone_number: "", date_of_birth: "",
@@ -446,10 +530,8 @@ export default function UniversalOnboarding() {
 
     const currentStepId = steps[stepIndex] || "life_stage";
     const totalSteps = steps.length;
-    // Calculate progress as a percentage
     const progress = totalSteps > 1 ? (stepIndex / (totalSteps - 1)) * 100 : 0;
 
-    // Set a field and clear downstream dependency paths based on newly selected value
     const set = (field, value) => {
         if (field === "life_stage") {
             setFd(prev => ({
@@ -471,7 +553,6 @@ export default function UniversalOnboarding() {
         }
     };
 
-    // Auto-advance after tap with a slight delay for option screens
     const pick = (field, value) => {
         set(field, value);
         const newFd = { ...fd, [field]: value };
@@ -518,117 +599,159 @@ export default function UniversalOnboarding() {
             navigate("/dashboard");
         } catch (err) {
             console.error("Onboarding error:", err);
-            window.dispatchEvent(new CustomEvent("app-error", { detail: { message: "Failed to complete onboarding. Please try again." } }));
         } finally {
             setLoading(false);
         }
     };
 
-    // ─── Render Step ─────────────────────────────────────────────────────────────
     const screen = SCREENS[currentStepId];
     const isLastStep = stepIndex === totalSteps - 1;
     const isManualStep = currentStepId === "commitment_lock" || currentStepId === "personal";
 
     const renderCurrentStep = () => {
-        // Option Tap Screens
         if (screen) {
             let optionsToRender = screen.options;
-
-            // Special rule: 12th graders shouldn't see "Still deciding" for streams
             if (currentStepId === "school_stream" && fd.school_class === "12") {
                 optionsToRender = optionsToRender.filter(opt => opt.value !== "undecided");
             }
 
             return (
-                <div className="space-y-4">
-                    {optionsToRender.map(opt => (
+                <motion.div 
+                    variants={{
+                        visible: { transition: { staggerChildren: 0.12, delayChildren: 0.2 } }
+                    }}
+                    initial="hidden"
+                    animate="visible"
+                    style={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: 'repeat(2, 1fr)', 
+                        gap: PREMIUM_THEME.spacing.clusterGap,
+                        padding: '40px'
+                    }}
+                >
+                    {optionsToRender.map((opt, i) => (
                         <OptionCard
                             key={opt.value}
+                            index={i}
                             emoji={opt.emoji}
                             iconText={opt.iconText}
                             label={opt.label}
+                            subtitle={opt.subtitle}
+                            meta={opt.meta}
                             selected={fd[screen.field] === opt.value}
                             onClick={() => pick(screen.field, opt.value)}
                         />
                     ))}
-                </div>
+                </motion.div>
             );
         }
 
-        // Summary Screen
         if (currentStepId === "commitment_lock") {
             const { strength, growth, direction } = buildSummary(fd);
             return (
-                <div className="space-y-6">
-                    <div className="bg-white border-2 border-gray-200 shadow-[0_4px_0_0_rgba(229,231,235,1)] rounded-2xl p-6 space-y-5">
-                        <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ type: "spring", bounce: 0.6 }}
-                            className="text-center text-4xl mb-4"
-                        >
-                            🏆
-                        </motion.div>
-                        {[
-                            { icon: "🔥", label: "Strength", value: strength },
-                            { icon: "⚠️", label: "Growth Area", value: growth },
-                            { icon: "🎯", label: "Direction", value: direction },
-                        ].map(row => (
-                            <div key={row.label} className="flex items-start gap-4">
-                                <span className="text-2xl mt-0.5">{row.icon}</span>
-                                <div>
-                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{row.label}</p>
-                                    <p className="text-gray-900 font-bold text-[15px] leading-snug">{row.value}</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+                    <div style={{
+                        background: 'rgba(255,255,255,0.02)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: 24,
+                        padding: 48,
+                        textAlign: 'center',
+                    }}>
+                        <div style={{ fontSize: 48, marginBottom: 24, opacity: 0.8 }}>🏆</div>
+                        <h3 style={{ fontSize: 22, fontWeight: 500, color: 'var(--el-text)', marginBottom: 40, letterSpacing: '-0.02em' }}>Personalised Strategy</h3>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 32, textAlign: 'left' }}>
+                            {[
+                                { icon: Sparkles, label: "Strength", value: strength, color: 'rgba(255,255,255,0.6)' },
+                                { icon: TrendingUp, label: "Growth Area", value: growth, color: 'rgba(255,255,255,0.6)' },
+                                { icon: Target, label: "Focus", value: direction, color: 'rgba(255,255,255,0.6)' }
+                            ].map(({ icon: Icon, label, value, color }) => (
+                                <div key={label} style={{ display: 'flex', gap: 20 }}>
+                                    <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(255,255,255,0.05)' }}>
+                                        <Icon style={{ width: 18, height: 18, color: '#fff' }} />
+                                    </div>
+                                    <div>
+                                        <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>{label}</p>
+                                        <p style={{ fontSize: 15, fontWeight: 400, color: 'var(--el-text)', lineHeight: 1.4 }}>{value}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
-                    <label className="flex items-start gap-4 p-5 rounded-2xl border-2 border-gray-200 cursor-pointer hover:border-blue-400 transition bg-white shadow-sm">
+
+                    <label style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 16,
+                        padding: '24px',
+                        background: fd.committed ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)',
+                        border: fd.committed ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: 16,
+                        cursor: 'pointer',
+                        transition: 'all 0.3s',
+                    }}>
                         <input
                             type="checkbox"
                             checked={fd.committed}
                             onChange={e => setFd(prev => ({ ...prev, committed: e.target.checked }))}
-                            className="w-6 h-6 mt-0.5 accent-blue-600 cursor-pointer rounded-md"
+                            style={{ width: 20, height: 20, cursor: 'pointer', accentColor: 'var(--el-text)' }}
                         />
-                        <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
-                            <span className="font-bold text-gray-900 block mb-1">I'm ready for structured guidance.</span>
-                            I'll commit to honest progress tracking and give my very best.
-                        </p>
+                        <div>
+                            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--el-text)', margin: 0 }}>I'm ready for structured guidance</p>
+                            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', margin: '4px 0 0 0' }}>I commit to honest tracking and effort.</p>
+                        </div>
                     </label>
                 </div>
             );
         }
 
-        // Personal Info
         if (currentStepId === "personal") {
+            const PERSONAL_INPUTS = [
+                { label: "Full Name", field: "name", type: "text", placeholder: "e.g. John Doe", icon: User },
+                { label: "Phone Number", field: "phone_number", type: "tel", placeholder: "e.g. +91 9876543210", icon: Phone },
+                { label: "Date of Birth", field: "date_of_birth", type: "date", placeholder: "", icon: Calendar },
+            ];
             return (
-                <div className="space-y-5">
-                    {[
-                        { label: "Full Name", field: "name", type: "text", placeholder: "e.g. John Doe" },
-                        { label: "Phone Number", field: "phone_number", type: "tel", placeholder: "e.g. +91 9876543210" },
-                        { label: "Date of Birth", field: "date_of_birth", type: "date", placeholder: "" },
-                    ].map(inp => (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                    {PERSONAL_INPUTS.map(inp => (
                         <div key={inp.field}>
-                            <label className="block text-[15px] font-bold text-gray-800 mb-2">{inp.label}</label>
-                            <input
-                                type={inp.type}
-                                value={fd[inp.field]}
-                                onChange={e => setFd(prev => ({ ...prev, [inp.field]: e.target.value }))}
-                                placeholder={inp.placeholder}
-                                className="w-full px-4 py-4 rounded-2xl border-2 border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none text-[16px] font-medium transition shadow-sm dark:border-charcoalMuted dark:bg-charcoalDark dark:text-white dark:placeholder:text-gray-400"
-                            />
+                            <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>{inp.label}</label>
+                            <div style={{ position: 'relative' }}>
+                                <div style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.2)' }}>
+                                    <inp.icon style={{ width: 14, height: 14 }} />
+                                </div>
+                                <input
+                                    type={inp.type}
+                                    value={fd[inp.field]}
+                                    onChange={e => setFd(prev => ({ ...prev, [inp.field]: e.target.value }))}
+                                    placeholder={inp.placeholder}
+                                    style={{
+                                        width: '100%', padding: '14px 14px 14px 44px', borderRadius: 12,
+                                        background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)',
+                                        color: 'var(--el-text)', fontSize: 14, fontWeight: 400,
+                                        outline: 'none', transition: 'all 0.3s cubic-bezier(0.2, 0, 0, 1)',
+                                    }}
+                                />
+                            </div>
                         </div>
                     ))}
                     <div>
-                        <label className="block text-[15px] font-bold text-gray-800 mb-2">Gender</label>
+                        <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Gender</label>
                         <select
                             value={fd.gender}
                             onChange={e => setFd(prev => ({ ...prev, gender: e.target.value }))}
-                            className="w-full px-4 py-4 rounded-2xl border-2 border-gray-200 bg-white text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none text-[16px] font-medium transition shadow-sm dark:border-charcoalMuted dark:bg-charcoalDark dark:text-white"
+                            style={{
+                                width: '100%', padding: '14px', borderRadius: 12,
+                                background: 'var(--el-bg)', border: '1px solid var(--el-border)',
+                                color: 'var(--el-text)', fontSize: 15, fontWeight: 500,
+                                outline: 'none', cursor: 'pointer',
+                                boxShadow: 'var(--el-shadow-inset)',
+                            }}
                         >
                             <option value="">Select gender</option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
+                            <option value="other">Other</option>
                         </select>
                     </div>
                 </div>
@@ -638,93 +761,165 @@ export default function UniversalOnboarding() {
         return null;
     };
 
-    const questionText = screen?.q
-        || (currentStepId === "commitment_lock" ? "Your Personalised Plan is Ready!" : "Almost there — a few last details");
-
     return (
-        <div className="min-h-screen bg-beigePrimary dark:bg-charcoalDark flex flex-col font-outfit">
-            {/* Progress Header */}
-            <div className="px-5 py-5 flex items-center justify-between mx-auto w-full max-w-xl">
-                <button
-                    type="button"
-                    onClick={handleBack}
-                    disabled={stepIndex === 0}
-                    className={`shrink-0 w-10 h-10 flex items-center justify-center rounded-full transition ${stepIndex === 0 ? "text-borderMuted dark:text-charcoalMuted cursor-not-allowed" : "text-textSecondary dark:text-gray-400 hover:bg-beigeMuted dark:hover:bg-charcoalMuted active:scale-90"
-                        }`}
-                >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M19 12H5M12 19l-7-7 7-7" />
-                    </svg>
-                </button>
-                <div className="flex-1 px-4">
-                    <div className="bg-beigeMuted dark:bg-charcoalMuted h-3 w-full rounded-full overflow-hidden">
+        <div style={{
+            position: 'fixed',
+            inset: 0,
+            background: PREMIUM_THEME.bg,
+            color: 'var(--el-text)',
+            fontFamily: "'Inter', sans-serif",
+            display: 'flex',
+            overflow: 'hidden',
+            zIndex: 1000,
+        }}>
+            {/* LEFT ZONE: Context & Editorial */}
+            <div style={{
+                flex: '0 0 45%',
+                padding: PREMIUM_THEME.spacing.cinematicPadding,
+                display: 'flex',
+                flexDirection: 'column',
+                borderRight: '1px solid rgba(255,255,255,0.06)',
+                background: 'linear-gradient(160deg, #111111 0%, #0a0a0a 100%)',
+                zIndex: 10,
+                overflowY: 'auto',
+            }}>
+                <header style={{ marginBottom: 80 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginBottom: 32 }}>
+                        <button
+                            onClick={handleBack}
+                            disabled={stepIndex === 0}
+                            style={{
+                                width: 36, height: 36, borderRadius: 99,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                background: 'transparent', border: '1px solid rgba(255,255,255,0.08)',
+                                color: 'var(--el-text)', cursor: stepIndex === 0 ? 'default' : 'pointer',
+                                opacity: stepIndex === 0 ? 0 : 0.6, transition: 'all 0.3s',
+                            }}
+                        >
+                            <ChevronLeft style={{ width: 14, height: 14 }} />
+                        </button>
+                        <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.05)' }}>
+                            <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${progress}%` }}
+                                style={{ height: '100%', background: 'var(--el-text)', opacity: 0.3 }}
+                            />
+                        </div>
+                    </div>
+                    
+                    <div style={{ 
+                        fontSize: 10, 
+                        fontWeight: 700, 
+                        color: PREMIUM_THEME.textMuted, 
+                        letterSpacing: '0.15em',
+                        textTransform: 'uppercase',
+                        marginBottom: 12
+                    }}>
+                        {String(stepIndex + 1).padStart(2, '0')} / {String(totalSteps).padStart(2, '0')} — {screen?.micro || "USER PROFILING"}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{ width: 4, height: 4, borderRadius: 99, background: '#fff', opacity: 0.5 }} />
+                        <span style={{ fontSize: 10, color: PREMIUM_THEME.textMuted, letterSpacing: '0.05em' }}>
+                            Adaptive roadmap variables configuring
+                        </span>
+                    </div>
+                </header>
+
+                <div style={{ flex: 1 }}>
+                    <AnimatePresence mode="wait">
                         <motion.div
-                            className="bg-terracotta h-full rounded-full"
-                            animate={{ width: `${progress}%` }}
-                            transition={{ type: "spring", stiffness: 60, damping: 14 }}
-                        />
-                    </div>
-                </div>
-                <div className="w-10 flex items-center justify-end">
-                    <span className="text-sm font-semibold text-textSecondary dark:text-gray-400">{stepIndex + 1}/{totalSteps}</span>
-                </div>
-            </div>
+                            key={currentStepId}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 20 }}
+                            transition={{ duration: 0.5, ease: [0.2, 0, 0, 1] }}
+                        >
+                            <h1 style={{
+                                fontSize: 48,
+                                fontWeight: 400,
+                                color: 'var(--el-text)',
+                                letterSpacing: '-0.05em',
+                                lineHeight: 1.05,
+                                margin: '0 0 32px 0'
+                            }}>
+                                {screen?.q}
+                            </h1>
+                            <p style={{
+                                fontSize: 16,
+                                color: PREMIUM_THEME.textSupport,
+                                lineHeight: 1.7,
+                                marginBottom: 40,
+                                maxWidth: 440
+                            }}>
+                                {screen?.sub}
+                            </p>
 
-            {/* Content Area */}
-            <div className="flex-1 px-5 pb-8 mx-auto w-full max-w-xl flex flex-col">
-                <QuickyMessage stepId={currentStepId} fd={fd} />
+                            {screen?.bullets && (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                                    {screen.bullets.map(b => (
+                                        <div key={b} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                            <div style={{ width: 12, height: 1, background: 'rgba(255,255,255,0.2)' }} />
+                                            <span style={{ fontSize: 11, color: PREMIUM_THEME.textMuted, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{b}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </motion.div>
+                    </AnimatePresence>
+                </div>
 
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={currentStepId}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ type: "spring", stiffness: 220, damping: 20 }}
+                {isManualStep && (
+                    <button
+                        onClick={handleContinue}
+                        disabled={!canProceed() || loading}
+                        style={{
+                            width: 'fit-content',
+                            padding: '14px 40px',
+                            borderRadius: 99,
+                            background: 'var(--el-text)',
+                            color: '#000',
+                            fontSize: 14,
+                            fontWeight: 600,
+                            border: 'none',
+                            cursor: (canProceed() && !loading) ? 'pointer' : 'default',
+                            opacity: (canProceed() && !loading) ? 1 : 0.2,
+                            transition: 'all 0.3s cubic-bezier(0.2, 0, 0, 1)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 12,
+                        }}
                     >
-                        {/* Question Title */}
-                        <h2 className="text-[26px] font-bold text-textPrimary dark:text-white mb-6 leading-tight font-cormorant">
-                            {questionText}
-                        </h2>
-
-                        {/* Step Details */}
-                        {renderCurrentStep()}
-                    </motion.div>
-                </AnimatePresence>
+                        {loading ? 'Processing...' : isLastStep ? 'Complete Setup' : 'Proceed'}
+                        {!loading && <ArrowRight style={{ width: 16, height: 16 }} />}
+                    </button>
+                )}
             </div>
 
-            {/* Bottom CTA */}
-            {isManualStep && (
-                <div className="border-t border-borderMuted dark:border-white/10 bg-beigePrimary/95 dark:bg-charcoalDark/95 backdrop-blur-sm p-5 sticky bottom-0 z-10 w-full">
-                    <div className="max-w-xl mx-auto">
-                        {isLastStep ? (
-                            <button
-                                type="button"
-                                onClick={handleContinue}
-                                disabled={!canProceed() || loading}
-                                className={`w-full py-4 rounded-2xl font-bold text-[16px] tracking-wide transition-all ${canProceed() && !loading
-                                    ? "bg-terracotta text-white hover:bg-terracottaHover shadow-md shadow-terracotta/20 active:scale-[0.98]"
-                                    : "bg-beigeMuted dark:bg-charcoalMuted text-textSecondary dark:text-gray-500 cursor-not-allowed"
-                                    }`}
-                            >
-                                {loading ? "Setting up..." : "Start Journey →"}
-                            </button>
-                        ) : (
-                            <button
-                                type="button"
-                                onClick={handleContinue}
-                                disabled={!canProceed() || loading}
-                                className={`w-full py-4 rounded-2xl font-bold text-[16px] tracking-wide transition-all ${canProceed()
-                                    ? "bg-terracotta text-white hover:bg-terracottaHover shadow-md shadow-terracotta/20 active:scale-[0.98]"
-                                    : "bg-beigeMuted dark:bg-charcoalMuted text-textSecondary dark:text-gray-500 cursor-not-allowed"
-                                    }`}
-                            >
-                                Continue
-                            </button>
-                        )}
-                    </div>
+            {/* RIGHT ZONE: Decision Cluster */}
+            <div style={{
+                flex: 1,
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: PREMIUM_THEME.spacing.cinematicPadding,
+                background: 'radial-gradient(circle at 60% 40%, #161616 0%, #0d0d0d 70%)',
+                overflowY: 'auto',
+            }}>
+                <div style={{ width: '100%', maxWidth: 800 }}>
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={currentStepId}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 1.1 }}
+                            transition={{ duration: 0.6, ease: [0.2, 0, 0, 1] }}
+                        >
+                            {renderCurrentStep()}
+                        </motion.div>
+                    </AnimatePresence>
                 </div>
-            )}
+            </div>
         </div>
     );
 }

@@ -17,11 +17,17 @@ const ProgressReframeCard = ({ stats, weeklyCompleted }) => {
     }
 
     return (
-        <div className="rounded-3xl border border-cyan-400/20 bg-[#09131b] p-5">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Progress</p>
-            <h3 className={`mt-2 text-xl font-semibold ${tone}`}>{message}</h3>
-            <p className="text-sm text-slate-300 mt-2">{completed} tasks completed overall</p>
-            <p className="text-xs text-slate-400 mt-1">{weeklyCompleted || 0} done in the last 7 days</p>
+        <div style={{ 
+            borderRadius: 16, border: '1px solid var(--el-border)', background: 'var(--el-bg)', 
+            padding: 24, boxShadow: 'var(--el-shadow-card)', color: 'var(--el-text)'
+        }}>
+            <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)', marginBottom: 8 }}>Operational Status</p>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--el-text)', letterSpacing: '-0.02em' }}>{message}</h3>
+            
+            <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <p style={{ fontSize: 13, color: 'var(--el-text-secondary)', fontWeight: 500 }}>{completed} Total Objectives Met</p>
+                <p style={{ fontSize: 11, color: 'var(--el-text-muted)' }}>{weeklyCompleted || 0} completions in current cycle</p>
+            </div>
         </div>
     );
 };

@@ -99,9 +99,9 @@ export default function FeaturesSection() {
                 key={feature.id}
                 className="group h-full"
               >
-                <div className="h-full bg-white dark:bg-charcoalDark border border-beigeMuted dark:border-white/[0.08] rounded-2xl p-6 hover:border-terracotta/30 dark:hover:border-white/[0.12] transition-all duration-300">
+                <div className="h-full bg-white dark:bg-charcoalDark border border-beigeMuted dark:border-gray-700 rounded-2xl p-6 hover:border-terracotta/30 transition-all duration-300 shadow-sm dark:shadow-none">
                   {/* Icon */}
-                  <div className="mb-4 inline-flex p-3 rounded-lg bg-[#EBE6DA] dark:bg-white/[0.06]">
+                  <div className="mb-4 inline-flex p-3 rounded-lg bg-[#EBE6DA] dark:bg-gray-800">
                     <Icon className="w-6 h-6 text-gray-950 dark:text-white" />
                   </div>
 
@@ -121,13 +121,13 @@ export default function FeaturesSection() {
         </div>
 
         {/* MVP Highlight */}
-        <div className="mt-16 pt-12 border-t border-beigeMuted dark:border-white/[0.08]">
+        <div className="mt-16 pt-12 border-t border-beigeMuted dark:border-gray-700">
           <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-6">
             Core MVP (The Clean Stack)
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             {['Brain Dump', 'Life Map', 'Locked In Mode', 'Next Move', 'Reality Check'].map((item) => (
-              <div key={item} className="px-4 py-2 rounded-full bg-[#EBE6DA] dark:bg-white/[0.06] border border-beigeMuted dark:border-white/[0.08] text-sm text-gray-700 dark:text-gray-300">
+              <div key={item} className="px-4 py-2 rounded-full bg-[#EBE6DA] dark:bg-gray-800 border border-beigeMuted dark:border-gray-700 text-sm text-gray-700 dark:text-gray-300">
                 {item}
               </div>
             ))}

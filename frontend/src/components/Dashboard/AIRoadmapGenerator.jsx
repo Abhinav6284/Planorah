@@ -551,8 +551,8 @@ export default function AIRoadmapGenerator() {
                                                     <div
                                                         key={project.id}
                                                         className={`p-4 border-2 ${milestone.completed
-                                                            ? "border-white/50 bg-white/10"
-                                                            : "border-black/20 bg-black/5"
+                                                            ? "border-gray-400 bg-gray-100"
+                                                            : "border-gray-200 bg-gray-50"
                                                             }`}
                                                     >
                                                         <div className="flex items-start justify-between mb-3">

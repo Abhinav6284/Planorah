@@ -121,37 +121,37 @@ Last Updated: April 9, 2026`,
   ];
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-charcoalDark text-white' : 'bg-beigePrimary text-textPrimary'}`}>
+    <main>
       {/* Header */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className={`px-6 py-20 ${isDark ? 'bg-charcoal' : 'bg-beigeSecondary'}`}
+        style={{ padding: "80px 24px", background: "var(--surface)", borderBottom: "1px solid var(--border-subtle)" }}
       >
-        <div className="max-w-4xl mx-auto">
-          <h1 className="font-playfair text-5xl md:text-6xl font-bold mb-4">Terms of Service</h1>
-          <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-textSecondary'}`}>
+        <div style={{ maxWidth: 896, margin: "0 auto" }}>
+          <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(40px, 6vw, 60px)", fontWeight: 700, marginBottom: 16 }}>Terms of Service</h1>
+          <p style={{ fontSize: 18, color: "var(--fg-muted)" }}>
             Last updated: April 9, 2026
           </p>
         </div>
       </motion.section>
 
       {/* Content */}
-      <section className="px-6 py-20 max-w-4xl mx-auto">
-        <div className="space-y-12">
+      <section style={{ padding: "80px 24px", maxWidth: 896, margin: "0 auto" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 48 }}>
           {sections.map((section, idx) => (
             <motion.div
               key={idx}
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.05, duration: 0.5 }}
+              transition={{ delay: Math.min(idx * 0.05, 0.5), duration: 0.5 }}
               viewport={{ once: true }}
             >
-              <h2 className="font-playfair text-3xl font-bold mb-4 text-terracotta">{section.title}</h2>
-              <div className={`space-y-3 text-base leading-relaxed ${isDark ? 'text-gray-300' : 'text-textSecondary'}`}>
+              <h2 style={{ fontFamily: "var(--font-display)", fontSize: 30, fontWeight: 700, marginBottom: 16, color: "var(--fg-deep)" }}>{section.title}</h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, fontSize: 16, lineHeight: 1.6, color: "var(--fg-muted)" }}>
                 {section.content.split('\n\n').map((paragraph, i) => (
-                  <p key={i}>{paragraph}</p>
+                  <p key={i} style={{ whiteSpace: "pre-wrap" }}>{paragraph}</p>
                 ))}
               </div>
             </motion.div>
@@ -164,14 +164,14 @@ Last Updated: April 9, 2026`,
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
-          className={`mt-16 p-6 rounded-lg border-2 border-terracotta/20 ${isDark ? 'bg-charcoal' : 'bg-beigeSecondary'}`}
+          style={{ marginTop: 64, padding: 24, borderRadius: 12, border: "1px solid var(--border-subtle)", background: "var(--surface)" }}
         >
-          <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-textSecondary'}`}>
+          <p style={{ fontSize: 14, color: "var(--fg-muted)", lineHeight: 1.6 }}>
             These Terms of Service are effective as of April 9, 2026, and may be updated from time to time. We will notify you of any material changes by posting the new Terms on this page and updating the "Last updated" date. Your continued use of Planorah constitutes your acceptance of these updated Terms.
           </p>
         </motion.div>
       </section>
-    </div>
+    </main>
   );
 };
 

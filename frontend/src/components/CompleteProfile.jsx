@@ -48,14 +48,14 @@ export default function CompleteProfile() {
         }
     };
 
-    const inputClass = "w-full px-5 py-3.5 rounded-xl bg-white dark:bg-charcoalMuted border border-borderMuted dark:border-white/10 text-textPrimary dark:text-white placeholder-textSecondary dark:placeholder-gray-500 text-[15px] font-outfit focus:outline-none focus:border-terracotta dark:focus:border-terracotta focus:ring-2 focus:ring-terracotta/10 transition-all";
+    const inputClass = "w-full px-5 py-3.5 rounded-xl bg-white dark:bg-charcoalMuted border border-borderMuted dark:border-gray-600 text-textPrimary dark:text-white placeholder-textSecondary dark:placeholder-gray-500 text-[15px] font-outfit focus:outline-none focus:border-terracotta dark:focus:border-terracotta focus:ring-2 focus:ring-terracotta/10 transition-all";
     const labelClass = "block text-[13px] font-semibold text-textSecondary dark:text-gray-400 uppercase tracking-wider mb-2 font-outfit";
 
     return (
         <div className="min-h-screen bg-beigePrimary dark:bg-charcoalDark font-outfit flex flex-col">
 
             {/* Header */}
-            <header className="fixed top-0 left-0 w-full px-8 py-5 z-50 bg-beigePrimary/80 dark:bg-charcoalDark/80 backdrop-blur-md border-b border-borderMuted dark:border-white/5">
+            <header className="fixed top-0 left-0 w-full px-8 py-5 z-50 bg-beigePrimary dark:bg-charcoalDark border-b border-borderMuted dark:border-gray-700">
                 <span className="text-xl font-bold font-cormorant tracking-tight text-textPrimary dark:text-white">
                     Planorah<span className="text-terracotta">.</span>
                 </span>
@@ -87,7 +87,7 @@ export default function CompleteProfile() {
                     </div>
 
                     {/* Form card */}
-                    <div className="bg-beigeSecondary dark:bg-charcoal border border-borderMuted dark:border-white/5 rounded-2xl p-8 shadow-soft dark:shadow-darkDepth">
+                    <div className="bg-beigeSecondary dark:bg-charcoal border border-borderMuted dark:border-gray-700 rounded-2xl p-8 shadow-soft dark:shadow-darkDepth">
                         <form onSubmit={handleSubmit} className="space-y-5">
 
                             <div>
@@ -148,8 +148,8 @@ export default function CompleteProfile() {
 
                             {message && (
                                 <div className={`text-center px-4 py-3 rounded-xl text-sm font-medium ${message.startsWith("success:")
-                                        ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-800/30"
-                                        : "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-800/30"
+                                    ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-800/30"
+                                    : "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-800/30"
                                     }`}>
                                     {message.replace("success:", "")}
                                 </div>

@@ -1,10 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
-  darkMode: "class",
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
+        // ── Cal.com design system tokens ────────────────────────
+        charcoal:     '#242424',
+        'mid-gray':   '#898989',
+        'border-gray':'#E8E7E7',
+
         // Design System Accent Colors
         indigo: {
           50: "#eef2ff",
@@ -53,6 +58,10 @@ module.exports = {
       },
 
       fontFamily: {
+        // ── Cal.com fonts ────────────────────────────────────────
+        'cal-sans': ['Cal Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        inter:      ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        // Legacy
         outfit: ['"Outfit"', "sans-serif"],
         cormorant: ['"Cormorant Garamond"', "serif"],
         space: ['"Space Mono"', "monospace"],
@@ -76,6 +85,11 @@ module.exports = {
       },
 
       boxShadow: {
+        // ── Cal.com multi-layer shadows ───────────────────────────
+        'level-2-card':
+          'rgba(19,19,22,0.7) 0px 1px 5px -4px, rgba(34,42,53,0.08) 0px 0px 0px 1px, rgba(34,42,53,0.05) 0px 4px 8px 0px',
+        'level-4-highlight':
+          'rgba(255,255,255,0.12) 0px 1px 0px inset, rgba(0,0,0,0.2) 0px 1px 2px 0px',
         // Refined shadow system
         sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
         md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",

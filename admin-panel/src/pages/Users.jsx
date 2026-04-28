@@ -1,6 +1,9 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Filter, ChevronLeft, ChevronRight, Eye, UserX, Trash2, MoreHorizontal, RefreshCw } from 'lucide-react'
+import {
+  Search, Filter, ChevronLeft, ChevronRight,
+  Eye, UserX, Trash2, MoreHorizontal, RefreshCw,
+} from 'lucide-react'
 import { adminApi } from '../services/api'
 import { useToast } from '../context/ToastContext'
 import Badge from '../components/ui/Badge'
@@ -9,50 +12,95 @@ import Button from '../components/ui/Button'
 
 const PAGE_SIZE = 20
 
-function Sk() {
+// ─── Avatar ───────────────────────────────────────────────────────────────────
+function Avatar({ name }) {
+  return (
+    <div className="w-8 h-8 rounded-full bg-charcoal text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+      {name?.[0]?.toUpperCase() ?? '?'}
+    </div>
+  )
+}
+
+// ─── Skeleton row ─────────────────────────────────────────────────────────────
+function SkRow() {
   return (
     <tr>
-      {[1,2,3,4,5,6].map(i => (
-        <td key={i} className="px-4 py-3">
-          <div className="skeleton h-4 rounded-md" style={{ width: `${50 + i*8}%` }} />
+      {[180, 200, 80, 80, 100, 60].map((w, i) => (
+        <td key={i} className="px-6 py-4">
+          <div className="h-4 bg-gray-100 rounded animate-pulse" style={{ width: w }} />
         </td>
       ))}
     </tr>
   )
 }
 
-function Avatar({ user }) {
-  const colors = ['#6366F1','#F59E0B','#22C55E','#EC4899','#3B82F6','#8B5CF6']
-  const color = colors[(user.name.charCodeAt(0) || 0) % colors.length]
+// ─── Action menu item ─────────────────────────────────────────────────────────
+function ActionItem({ icon, label, onClick, danger }) {
   return (
-    <div
-      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-      style={{ background: color, color: '#080A0F' }}
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-2.5 w-full px-4 py-2.5 font-inter text-sm transition-colors cursor-pointer ${
+        danger ? 'text-red-600 hover:bg-red-50' : 'text-charcoal hover:bg-gray-50'
+      }`}
     >
-      {user.name[0]?.toUpperCase()}
-    </div>
+      {icon}
+      {label}
+    </button>
+  )
+}
+
+// ─── Pagination button ────────────────────────────────────────────────────────
+function PagBtn({ children, active, disabled, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-inter font-medium transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
+        active
+          ? 'bg-charcoal text-white'
+          : 'bg-white text-mid-gray border border-border-gray hover:border-charcoal hover:text-charcoal'
+      }`}
+    >
+      {children}
+    </button>
+  )
+}
+
+// ─── Filter chip ──────────────────────────────────────────────────────────────
+function FilterChip({ label, active, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-3 py-1.5 rounded-lg text-xs font-inter font-medium transition-all cursor-pointer ${
+        active
+          ? 'bg-charcoal text-white'
+          : 'bg-white text-mid-gray border border-border-gray hover:border-charcoal hover:text-charcoal'
+      }`}
+    >
+      {label || 'All'}
+    </button>
   )
 }
 
 export default function Users() {
   const { addToast } = useToast()
-  const [users,      setUsers]      = useState([])
-  const [loading,    setLoading]    = useState(true)
-  const [total,      setTotal]      = useState(0)
-  const [totalPages, setTotalPages] = useState(1)
-  const [search,     setSearch]     = useState('')
-  const [planFilter, setPlanFilter] = useState('')
+  const [users,        setUsers]        = useState([])
+  const [loading,      setLoading]      = useState(true)
+  const [total,        setTotal]        = useState(0)
+  const [totalPages,   setTotalPages]   = useState(1)
+  const [search,       setSearch]       = useState('')
+  const [planFilter,   setPlanFilter]   = useState('')
   const [statusFilter, setStatusFilter] = useState('')
-  const [page,       setPage]       = useState(1)
-  const [selected,   setSelected]   = useState(null)
-  const [menuId,     setMenuId]     = useState(null)
+  const [page,         setPage]         = useState(1)
+  const [selected,     setSelected]     = useState(null)
+  const [menuId,       setMenuId]       = useState(null)
 
   const fetchUsers = useCallback(async (params = {}) => {
     setLoading(true)
     try {
       const p = { page, page_size: PAGE_SIZE, ...params }
-      if (search) p.q = search
-      if (planFilter) p.plan = planFilter
+      if (search)       p.q      = search
+      if (planFilter)   p.plan   = planFilter
       if (statusFilter) p.status = statusFilter
       const data = await adminApi.getUsers(p)
       setUsers(data.results)
@@ -67,7 +115,6 @@ export default function Users() {
 
   useEffect(() => { fetchUsers() }, [page, planFilter, statusFilter]) // eslint-disable-line
 
-  // Debounce search
   useEffect(() => {
     const t = setTimeout(() => { setPage(1); fetchUsers({ page: 1 }) }, 400)
     return () => clearTimeout(t)
@@ -77,9 +124,7 @@ export default function Users() {
     try {
       await adminApi.userAction(id, 'suspend')
       addToast('User suspended.', 'warning')
-      setMenuId(null)
-      setSelected(null)
-      fetchUsers()
+      setMenuId(null); setSelected(null); fetchUsers()
     } catch (e) { addToast(e.message, 'error') }
   }
 
@@ -87,9 +132,7 @@ export default function Users() {
     try {
       await adminApi.userAction(id, 'enable')
       addToast('User re-enabled.', 'success')
-      setMenuId(null)
-      setSelected(null)
-      fetchUsers()
+      setMenuId(null); setSelected(null); fetchUsers()
     } catch (e) { addToast(e.message, 'error') }
   }
 
@@ -103,85 +146,79 @@ export default function Users() {
     } catch (e) { addToast(e.message, 'error') }
   }
 
-  const PLANS   = ['', 'Free', 'Explorer', 'Starter', 'Career Ready', 'Placement Pro']
+  const PLANS    = ['', 'Free', 'Explorer', 'Starter', 'Career Ready', 'Placement Pro']
   const STATUSES = ['', 'active', 'suspended', 'pending']
 
   return (
     <div>
-      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-6 flex items-end justify-between">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8 flex items-end justify-between"
+      >
         <div>
-          <h1 className="font-display font-bold text-2xl" style={{ color: 'var(--text-primary)' }}>Users</h1>
-          <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
+          <h1 className="font-cal-sans font-semibold text-4xl text-charcoal tracking-tight">Users</h1>
+          <p className="text-sm font-inter text-mid-gray mt-2">
             {total} user{total !== 1 ? 's' : ''} total
           </p>
         </div>
-        <button onClick={() => fetchUsers()} className="p-2 rounded-xl" style={{ background: 'var(--bg-elevated)', color: 'var(--text-muted)' }}>
-          <RefreshCw size={14} />
+        <button
+          onClick={() => fetchUsers()}
+          className="p-2.5 rounded-lg border border-border-gray text-mid-gray hover:text-charcoal hover:border-charcoal transition-colors"
+          title="Refresh"
+        >
+          <RefreshCw size={15} />
         </button>
       </motion.div>
 
       {/* Filters */}
       <motion.div
-        initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-        className="card p-4 mb-4 flex flex-wrap items-center gap-3"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.08 }}
+        className="bg-white rounded-lg p-4 shadow-level-2-card mb-4 flex flex-wrap items-center gap-3"
       >
+        {/* Search */}
         <div className="relative flex-1 min-w-[200px]">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-mid-gray" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search by name or email…"
-            className="w-full pl-9 pr-3 py-2 rounded-xl text-sm outline-none transition-all"
-            style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
-            onFocus={e  => (e.target.style.borderColor = 'rgba(245,158,11,0.4)')}
-            onBlur={e   => (e.target.style.borderColor = 'var(--border)')}
+            className="w-full pl-9 pr-3 py-2 rounded-lg text-sm font-inter outline-none border border-border-gray text-charcoal placeholder-mid-gray focus:border-charcoal transition-colors bg-white"
           />
         </div>
 
-        <div className="flex items-center gap-1">
-          <Filter size={12} style={{ color: 'var(--text-muted)' }} />
+        {/* Plan filter */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <Filter size={12} className="text-mid-gray" />
           {PLANS.map(p => (
-            <button
-              key={p || 'all'}
-              onClick={() => { setPlanFilter(p); setPage(1) }}
-              className="px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer"
-              style={{
-                background: planFilter === p ? 'rgba(245,158,11,0.15)' : 'var(--bg-elevated)',
-                border:     planFilter === p ? '1px solid rgba(245,158,11,0.3)' : '1px solid var(--border)',
-                color:      planFilter === p ? 'var(--accent)' : 'var(--text-muted)',
-              }}
-            >{p || 'All'}</button>
+            <FilterChip key={p || 'all-plan'} label={p || 'All'} active={planFilter === p} onClick={() => { setPlanFilter(p); setPage(1) }} />
           ))}
         </div>
 
-        <div className="flex items-center gap-1">
+        {/* Status filter */}
+        <div className="flex items-center gap-1.5 flex-wrap">
           {STATUSES.map(s => (
-            <button
-              key={s || 'all'}
-              onClick={() => { setStatusFilter(s); setPage(1) }}
-              className="px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer capitalize"
-              style={{
-                background: statusFilter === s ? 'rgba(99,102,241,0.15)' : 'var(--bg-elevated)',
-                border:     statusFilter === s ? '1px solid rgba(99,102,241,0.3)' : '1px solid var(--border)',
-                color:      statusFilter === s ? '#818CF8' : 'var(--text-muted)',
-              }}
-            >{s || 'All'}</button>
+            <FilterChip key={s || 'all-status'} label={s ? s.charAt(0).toUpperCase() + s.slice(1) : 'All'} active={statusFilter === s} onClick={() => { setStatusFilter(s); setPage(1) }} />
           ))}
         </div>
       </motion.div>
 
       {/* Table */}
       <motion.div
-        initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-        className="card overflow-hidden"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.14 }}
+        className="bg-white rounded-lg shadow-level-2-card overflow-hidden"
       >
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['User','Email','Status','Plan','Last Login','Actions'].map(h => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide"
-                    style={{ color: 'var(--text-muted)' }}>
+              <tr className="border-b border-border-gray">
+                {['User', 'Email', 'Status', 'Plan', 'Last Login', 'Actions'].map(h => (
+                  <th key={h} className="px-6 py-3.5 text-left text-xs font-inter font-semibold uppercase tracking-wide text-mid-gray">
                     {h}
                   </th>
                 ))}
@@ -189,76 +226,68 @@ export default function Users() {
             </thead>
             <tbody>
               {loading
-                ? [0,1,2,3,4].map(i => <Sk key={i} />)
+                ? [0, 1, 2, 3, 4].map(i => <SkRow key={i} />)
                 : users.map((user, i) => (
-                  <motion.tr
-                    key={user.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: i * 0.03 }}
-                    className="row-hover group"
-                    style={{ borderBottom: '1px solid var(--border)' }}
-                  >
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2.5">
-                        <Avatar user={user} />
-                        <div>
-                          <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{user.name}</p>
-                          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>#{user.id}</p>
+                    <motion.tr
+                      key={user.id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: i * 0.025 }}
+                      className="row-hover border-b border-border-gray last:border-b-0 group"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <Avatar name={user.name} />
+                          <div>
+                            <p className="text-sm font-inter font-medium text-charcoal">{user.name}</p>
+                            <p className="text-xs text-mid-gray font-inter">#{user.id}</p>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-sm" style={{ color: 'var(--text-secondary)' }}>{user.email}</td>
-                    <td className="px-4 py-3"><Badge type="status" value={user.status} /></td>
-                    <td className="px-4 py-3"><Badge type="plan" value={user.plan} /></td>
-                    <td className="px-4 py-3 text-sm" style={{ color: 'var(--text-muted)' }}>{user.last_login}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1 relative">
-                        <button
-                          onClick={() => setSelected(user)}
-                          className="p-1.5 rounded-lg transition-colors"
-                          style={{ color: 'var(--text-muted)' }}
-                          onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
-                          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                          title="View"
-                        >
-                          <Eye size={14} />
-                        </button>
-                        <button
-                          onClick={() => setMenuId(menuId === user.id ? null : user.id)}
-                          className="p-1.5 rounded-lg transition-colors"
-                          style={{ color: 'var(--text-muted)' }}
-                          onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
-                          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                        >
-                          <MoreHorizontal size={14} />
-                        </button>
+                      </td>
+                      <td className="px-6 py-4 text-sm font-inter text-mid-gray">{user.email}</td>
+                      <td className="px-6 py-4"><Badge type="status" value={user.status} /></td>
+                      <td className="px-6 py-4"><Badge type="plan" value={user.plan} /></td>
+                      <td className="px-6 py-4 text-sm font-inter text-mid-gray">{user.last_login}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-1 relative">
+                          <button
+                            onClick={() => setSelected(user)}
+                            className="p-1.5 rounded-lg text-mid-gray hover:text-charcoal hover:bg-gray-50 transition-colors"
+                            title="View"
+                          >
+                            <Eye size={14} />
+                          </button>
+                          <button
+                            onClick={() => setMenuId(menuId === user.id ? null : user.id)}
+                            className="p-1.5 rounded-lg text-mid-gray hover:text-charcoal hover:bg-gray-50 transition-colors"
+                          >
+                            <MoreHorizontal size={14} />
+                          </button>
 
-                        <AnimatePresence>
-                          {menuId === user.id && (
-                            <>
-                              <div className="fixed inset-0 z-20" onClick={() => setMenuId(null)} />
-                              <motion.div
-                                initial={{ opacity: 0, scale: 0.92, y: -4 }}
-                                animate={{ opacity: 1, scale: 1,    y: 0  }}
-                                exit={{    opacity: 0, scale: 0.92, y: -4 }}
-                                transition={{ duration: 0.14 }}
-                                className="absolute right-0 top-full mt-1 rounded-xl overflow-hidden shadow-2xl z-30 w-40"
-                                style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-bright)' }}
-                              >
-                                {user.status === 'active'
-                                  ? <ActionItem icon={<UserX size={13} />} label="Suspend" onClick={() => suspendUser(user.id)} />
-                                  : <ActionItem icon={<UserX size={13} />} label="Enable"  onClick={() => enableUser(user.id)} />
-                                }
-                                <ActionItem icon={<Trash2 size={13} />} label="Delete" onClick={() => deleteUser(user.id)} danger />
-                              </motion.div>
-                            </>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    </td>
-                  </motion.tr>
-                ))
+                          <AnimatePresence>
+                            {menuId === user.id && (
+                              <>
+                                <div className="fixed inset-0 z-20" onClick={() => setMenuId(null)} />
+                                <motion.div
+                                  initial={{ opacity: 0, scale: 0.94, y: -4 }}
+                                  animate={{ opacity: 1, scale: 1,    y: 0  }}
+                                  exit={{   opacity: 0, scale: 0.94, y: -4 }}
+                                  transition={{ duration: 0.14 }}
+                                  className="absolute right-0 top-full mt-1 rounded-lg overflow-hidden shadow-level-2-card z-30 w-40 bg-white"
+                                >
+                                  {user.status === 'active'
+                                    ? <ActionItem icon={<UserX size={13} />}  label="Suspend" onClick={() => suspendUser(user.id)} />
+                                    : <ActionItem icon={<UserX size={13} />}  label="Enable"  onClick={() => enableUser(user.id)} />
+                                  }
+                                  <ActionItem icon={<Trash2 size={13} />} label="Delete" onClick={() => deleteUser(user.id)} danger />
+                                </motion.div>
+                              </>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </td>
+                    </motion.tr>
+                  ))
               }
             </tbody>
           </table>
@@ -266,8 +295,8 @@ export default function Users() {
 
         {/* Pagination */}
         {!loading && (
-          <div className="px-4 py-3 flex items-center justify-between" style={{ borderTop: '1px solid var(--border)' }}>
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+          <div className="px-6 py-4 flex items-center justify-between border-t border-border-gray">
+            <p className="text-xs font-inter text-mid-gray">
               {((page - 1) * PAGE_SIZE) + 1}–{Math.min(page * PAGE_SIZE, total)} of {total}
             </p>
             <div className="flex items-center gap-1">
@@ -286,24 +315,24 @@ export default function Users() {
         )}
       </motion.div>
 
-      {/* User detail modal */}
+      {/* Detail modal */}
       <Modal open={!!selected} onClose={() => setSelected(null)} title="User Details">
         {selected && (
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-3 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-bold"
-                style={{ background: '#6366F1', color: '#080A0F' }}>
+          <div className="flex flex-col gap-5">
+            <div className="flex items-center gap-4 pb-4 border-b border-border-gray">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold bg-charcoal text-white">
                 {selected.name[0]?.toUpperCase()}
               </div>
               <div>
-                <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>{selected.name}</p>
-                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{selected.email}</p>
+                <p className="font-inter font-semibold text-charcoal">{selected.name}</p>
+                <p className="text-sm font-inter text-mid-gray">{selected.email}</p>
               </div>
               <div className="ml-auto flex gap-2">
                 <Badge type="status" value={selected.status} />
                 <Badge type="plan"   value={selected.plan}   />
               </div>
             </div>
+
             <div className="grid grid-cols-2 gap-3">
               {[
                 ['ID',         `#${selected.id}`],
@@ -313,16 +342,17 @@ export default function Users() {
                 ['XP',         (selected.xp ?? 0).toLocaleString()],
                 ['Country',    selected.country || '—'],
               ].map(([k, v]) => (
-                <div key={k} className="p-3 rounded-xl" style={{ background: 'var(--bg-elevated)' }}>
-                  <p className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>{k}</p>
-                  <p className="text-sm font-medium capitalize" style={{ color: 'var(--text-primary)' }}>{v}</p>
+                <div key={k} className="p-3 rounded-lg bg-gray-50 border border-border-gray">
+                  <p className="text-xs font-inter text-mid-gray mb-1">{k}</p>
+                  <p className="text-sm font-inter font-medium text-charcoal capitalize">{v}</p>
                 </div>
               ))}
             </div>
-            <div className="flex gap-2 pt-2">
+
+            <div className="flex gap-3 pt-1">
               {selected.status === 'active'
-                ? <Button variant="danger" size="sm" icon={<UserX size={13} />} onClick={() => suspendUser(selected.id)} className="flex-1">Suspend</Button>
-                : <Button variant="primary" size="sm" icon={<UserX size={13} />} onClick={() => enableUser(selected.id)} className="flex-1">Enable</Button>
+                ? <Button variant="secondary" size="sm" icon={<UserX size={13} />} onClick={() => suspendUser(selected.id)} className="flex-1">Suspend</Button>
+                : <Button variant="primary"   size="sm" icon={<UserX size={13} />} onClick={() => enableUser(selected.id)}  className="flex-1">Enable</Button>
               }
               <Button variant="danger" size="sm" icon={<Trash2 size={13} />} onClick={() => deleteUser(selected.id)} className="flex-1">
                 Delete
@@ -332,34 +362,5 @@ export default function Users() {
         )}
       </Modal>
     </div>
-  )
-}
-
-function ActionItem({ icon, label, onClick, danger }) {
-  return (
-    <button
-      onClick={onClick}
-      className="flex items-center gap-2 w-full px-3 py-2 text-sm transition-colors cursor-pointer"
-      style={{ color: danger ? '#EF4444' : 'var(--text-secondary)' }}
-      onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
-      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-    >
-      {icon}{label}
-    </button>
-  )
-}
-
-function PagBtn({ children, active, disabled, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className="w-7 h-7 flex items-center justify-center rounded-lg text-xs font-medium transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
-      style={{
-        background: active ? 'var(--accent)' : 'var(--bg-elevated)',
-        color:      active ? '#080A0F' : 'var(--text-secondary)',
-        border:     active ? 'none' : '1px solid var(--border)',
-      }}
-    >{children}</button>
   )
 }

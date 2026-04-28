@@ -21,90 +21,74 @@ import {
   Calendar,
   CreditCard,
   Tag,
-  Receipt
+  Receipt,
+  Menu,
+  Plus,
+  ChevronRight,
 } from 'lucide-react';
 import { getUserAvatar } from '../utils/avatar';
 
+/**
+ * ElevenLabs-inspired dark sidebar navigation
+ * 
+ * Design: Dark charcoal (#0f0f0f) sidebar with muted white text,
+ * collapsible sections, warm hover states, and a clean minimal structure.
+ */
+
 const navSections = [
   {
-    type: 'standalone',
-    path: '/dashboard',
-    label: 'Dashboard',
-    icon: LayoutDashboard,
+    section: 'Configure',
+    items: [
+      { path: '/lab',              label: 'Virtual Lab',      icon: Beaker },
+      { path: '/roadmap/list',     label: 'Learning Path',    icon: MapPin },
+      { path: '/roadmap/projects', label: 'My Projects',      icon: FolderOpen },
+      { path: '/planora',          label: 'Study Platform',   icon: BookOpen },
+    ],
   },
   {
-    section: 'LEARN',
+    section: 'Monitor',
     items: [
-      { path: '/lab', label: 'Virtual Lab', icon: Beaker },
-      { path: '/roadmap/list', label: 'Learning Path', icon: MapPin },
-      { path: '/roadmap/projects', label: 'My Projects', icon: FolderOpen },
-      { path: '/planora', label: 'Study Platform', icon: BookOpen },
-    ]
+      { path: '/tasks',     label: 'Tasks',     icon: CheckSquare },
+      { path: '/scheduler', label: 'Calendar',  icon: Calendar },
+    ],
   },
   {
-    section: 'CAREER',
+    section: 'Career',
     items: [
-      { path: '/resume', label: 'Resume Builder', icon: FileText },
+      { path: '/resume',          label: 'Resume Builder',   icon: FileText },
       { path: '/resume/compiled', label: 'Compiled Resumes', icon: Files },
-      { path: '/ats', label: 'Find Your Fit', icon: Search },
-      { path: '/jobs', label: 'Job Finder', icon: Briefcase },
-      { path: '/interview', label: 'Mock Interview', icon: MessageSquare },
-      { path: '/portfolio/edit', label: 'Portfolio', icon: Globe },
-    ]
+      { path: '/ats',             label: 'Find Your Fit',    icon: Search },
+      { path: '/jobs',            label: 'Job Finder',       icon: Briefcase },
+      { path: '/interview',       label: 'Mock Interview',   icon: MessageSquare },
+      { path: '/portfolio/edit',  label: 'Portfolio',        icon: Globe },
+    ],
   },
-  {
-    section: 'TOOLS',
-    items: [
-      { path: '/tasks', label: 'Tasks', icon: CheckSquare },
-      { path: '/scheduler', label: 'Calendar', icon: Calendar },
-    ]
-  },
-  {
-    section: 'ACCOUNT',
-    items: [
-      { path: '/subscription', label: 'Subscription', icon: CreditCard },
-      { path: '/subscription/plans', label: 'Pricing', icon: Tag },
-      { path: '/billing/history', label: 'Billing History', icon: Receipt },
-    ]
-  },
+
 ];
 
-const navItemBaseClass = 'flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-[13px] leading-tight transition-all duration-200';
-const navItemActiveClass = 'bg-gradient-to-r from-terracotta/20 to-terracotta/8 text-terracotta dark:text-terracotta shadow-[0_6px_14px_rgba(202,96,58,0.14)]';
-const navItemDefaultClass = 'text-gray-700 dark:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-white/5';
-
-const isPathMatch = (pathname, navPath) => pathname === navPath || pathname.startsWith(`${navPath}/`);
+const isPathMatch = (pathname, navPath) =>
+  pathname === navPath || pathname.startsWith(`${navPath}/`);
 
 const getActiveNavPath = (pathname) => {
-  const allNavPaths = navSections.flatMap((section) => {
-    if (section.path) return [section.path];
-    if (section.items) return section.items.map((item) => item.path);
-    return [];
-  });
-
-  const matchedPaths = allNavPaths.filter((navPath) => isPathMatch(pathname, navPath));
-  if (!matchedPaths.length) return null;
-
-  // Prefer the most specific route (longest path) so nested routes don't double-highlight.
-  return matchedPaths.sort((a, b) => b.length - a.length)[0];
+  const allPaths = ['/dashboard', ...navSections.flatMap((s) => s.items.map((i) => i.path))];
+  const matched = allPaths.filter((p) => isPathMatch(pathname, p));
+  if (!matched.length) return null;
+  return matched.sort((a, b) => b.length - a.length)[0];
 };
 
-const SidebarContent = ({ onNavClick = () => { }, user = null }) => {
+// ─── SidebarContent ──────────────────────────────────────────────────────────
+const SidebarContent = ({ onNavClick = () => {}, user = null }) => {
   const location = useLocation();
   const activeNavPath = getActiveNavPath(location.pathname);
   const [expandedSections, setExpandedSections] = useState(() =>
-    navSections.slice(1).reduce((acc, section) => {
-      acc[section.section] = true;
+    navSections.reduce((acc, s) => {
+      acc[s.section] = true;
       return acc;
     }, {})
   );
 
-  const toggleSection = (sectionName) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [sectionName]: !prev[sectionName],
-    }));
-  };
+  const toggleSection = (name) =>
+    setExpandedSections((prev) => ({ ...prev, [name]: !prev[name] }));
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
@@ -112,227 +96,370 @@ const SidebarContent = ({ onNavClick = () => { }, user = null }) => {
     window.location.href = '/login';
   };
 
-  const getUserName = () => {
-    if (user?.user?.first_name) {
-      return user.user.first_name;
-    }
-    if (user?.profile?.first_name) {
-      return user.profile.first_name;
-    }
-    return 'User';
-  };
-
-  const getUserRole = () => {
-    if (user?.profile?.role) return user.profile.role;
-    return 'Student';
-  };
-
-  const getUserLevel = () => {
-    if (user?.profile?.level) return user.profile.level;
-    if (user?.statistics?.level) return user.statistics.level;
-    return 'Beginner';
-  };
-
-  const userAvatar = getUserAvatar(user);
-
   return (
-    <>
-      {/* Logo */}
-      <div className="px-4 py-4 border-b border-gray-200 dark:border-white/10 bg-white/95 dark:bg-charcoalDark">
-        <Link to="/dashboard" className="text-xl font-bold tracking-tight text-gray-900 dark:text-white font-serif hover:text-terracotta transition-colors">
-          Planorah<span className="text-terracotta">.</span>
+    <div className="flex flex-col h-full" style={{ background: 'var(--el-sidebar-bg)', color: 'var(--el-sidebar-text)' }}>
+      {/* ── Brand ── */}
+      <div style={{ padding: '24px 20px 20px' }}>
+        <Link
+          to="/dashboard"
+          onClick={onNavClick}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            textDecoration: 'none',
+            color: 'var(--el-sidebar-active)',
+          }}
+        >
+          <img
+            src="/planorah_logo.png"
+            alt="Planorah"
+            style={{
+              width: 24,
+              height: 24,
+              objectFit: 'contain',
+              filter: 'invert(1)',
+              flexShrink: 0,
+            }}
+          />
+          <span style={{
+            fontSize: 18,
+            fontWeight: 300,
+            letterSpacing: '-0.04em',
+            fontFamily: "'Inter', sans-serif",
+            color: 'var(--el-sidebar-active)'
+          }}>
+            Planorah
+          </span>
         </Link>
       </div>
 
-      {/* User Profile Section */}
-      <div className="px-4 py-4 border-b border-gray-200 dark:border-white/10 bg-white/95 dark:bg-charcoalDark">
-        <div className="flex items-center gap-2.5">
-          <img
-            src={userAvatar}
-            alt="Profile"
-            className="h-10 w-10 rounded-full object-cover flex-shrink-0 ring-2 ring-terracotta/20"
-          />
-          <div className="min-w-0 flex-1">
-            <p className="font-semibold text-gray-900 dark:text-white text-[13px] truncate">
-              {getUserName()}
-            </p>
-            <div className="flex items-center gap-1.5 mt-1">
-              <p className="text-[11px] text-gray-600 dark:text-gray-400 truncate">
-                {getUserRole()}
-              </p>
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-terracotta/20 dark:bg-terracotta/20 text-terracotta font-semibold">
-                {getUserLevel()}
-              </span>
-            </div>
-          </div>
-        </div>
+      {/* ── Workspace Selector ── */}
+      <div style={{ padding: '0 12px 16px' }}>
+        <button
+          type="button"
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '8px 12px',
+            borderRadius: 10,
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.06)',
+            color: 'var(--el-sidebar-active)',
+            fontSize: 13,
+            fontWeight: 500,
+            fontFamily: "'Inter', sans-serif",
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
+          }}
+        >
+          <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              width: 18, height: 18, borderRadius: 4,
+              background: '#fff',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 10, fontWeight: 800, color: '#000',
+            }}>P</div>
+            My Workspace
+          </span>
+          <ChevronDown style={{ width: 14, height: 14, opacity: 0.4 }} />
+        </button>
       </div>
 
-      {/* Navigation Sections */}
-      <nav className="flex-1 overflow-y-auto py-3 px-2.5 bg-white/95 dark:bg-charcoalDark space-y-4">
-        {/* Dashboard Link */}
-        <motion.div
-          initial={{ opacity: 0, y: -5 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
+      {/* ── Home Link ── */}
+      <div style={{ padding: '0 12px 4px' }}>
+        <Link
+          to="/dashboard"
+          onClick={onNavClick}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            padding: '10px 12px',
+            borderRadius: 10,
+            fontSize: 14,
+            fontWeight: activeNavPath === '/dashboard' ? 500 : 400,
+            fontFamily: "'Inter', sans-serif",
+            textDecoration: 'none',
+            transition: 'all 0.2s',
+            background: activeNavPath === '/dashboard' ? 'rgba(255,255,255,0.08)' : 'transparent',
+            color: activeNavPath === '/dashboard' ? 'var(--el-sidebar-active)' : 'var(--el-sidebar-text)',
+            boxShadow: activeNavPath === '/dashboard' ? 'inset 0 1px 1px rgba(255,255,255,0.05)' : 'none'
+          }}
         >
-          <Link
-            to="/dashboard"
-            onClick={onNavClick}
-            className={`${navItemBaseClass} ${activeNavPath === '/dashboard'
-              ? navItemActiveClass
-              : navItemDefaultClass
-              }`}
-          >
-            <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
-            <span className="truncate">Dashboard</span>
-          </Link>
-        </motion.div>
+          <LayoutDashboard style={{ width: 16, height: 16, opacity: activeNavPath === '/dashboard' ? 1 : 0.6 }} />
+          Home
+        </Link>
+      </div>
 
-        {/* Section Groups */}
-        {navSections.slice(1).map((section, sectionIdx) => {
-          const sectionId = `sidebar-section-${section.section.toLowerCase()}`;
+      {/* ── Sections ── */}
+      <nav style={{ flex: 1, overflowY: 'auto', padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {navSections.map((section) => {
           const isExpanded = !!expandedSections[section.section];
+          const sectionId = `el-sb-${section.section.toLowerCase()}`;
 
           return (
-            <motion.div
-              key={section.section}
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: (sectionIdx + 1) * 0.05 }}
-            >
-              <div>
-                <button
-                  type="button"
-                  onClick={() => toggleSection(section.section)}
-                  aria-expanded={isExpanded}
-                  aria-controls={sectionId}
-                  className="w-full flex items-center justify-between px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                >
-                  <span>{section.section}</span>
-                  <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
-                </button>
+            <div key={section.section}>
+              {/* Section header */}
+              <button
+                type="button"
+                onClick={() => toggleSection(section.section)}
+                aria-expanded={isExpanded}
+                aria-controls={sectionId}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 10px 6px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: 11,
+                  fontWeight: 500,
+                  fontFamily: "'Inter', sans-serif",
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  color: 'var(--el-sidebar-section)',
+                  transition: 'color 0.15s',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = 'var(--el-sidebar-text)'}
+                onMouseLeave={(e) => e.currentTarget.style.color = 'var(--el-sidebar-section)'}
+              >
+                <span>{section.section}</span>
+                <ChevronDown
+                  style={{
+                    width: 12, height: 12,
+                    transition: 'transform 0.2s',
+                    transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                  }}
+                />
+              </button>
 
-                <AnimatePresence initial={false}>
-                  {isExpanded && (
-                    <motion.div
-                      id={sectionId}
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2, ease: 'easeInOut' }}
-                      className="overflow-hidden"
-                    >
-                      <div className="space-y-1">
-                        {section.items.map((item, itemIdx) => {
-                          const itemActive = activeNavPath === item.path;
-                          const IconComponent = item.icon;
-                          return (
-                            <motion.div
-                              key={item.path}
-                              initial={{ opacity: 0, x: -10 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ duration: 0.2, delay: (sectionIdx + 1) * 0.05 + itemIdx * 0.03 }}
-                              whileHover={{ x: 4 }}
-                            >
-                              <Link
-                                to={item.path}
-                                onClick={onNavClick}
-                                className={`${navItemBaseClass} ${itemActive
-                                  ? navItemActiveClass
-                                  : navItemDefaultClass
-                                  }`}
-                              >
-                                <IconComponent className="h-4 w-4 flex-shrink-0" />
-                                <span className="truncate">{item.label}</span>
-                              </Link>
-                            </motion.div>
-                          );
-                        })}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </motion.div>
+              {/* Section items */}
+              <AnimatePresence initial={false}>
+                {isExpanded && (
+                  <motion.div
+                    id={sectionId}
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.18, ease: 'easeInOut' }}
+                    style={{ overflow: 'hidden' }}
+                  >
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      {section.items.map((item) => {
+                        const active = activeNavPath === item.path;
+                        const Icon = item.icon;
+                        return (
+                          <Link
+                            key={item.path}
+                            to={item.path}
+                            onClick={onNavClick}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 12,
+                              padding: '8px 12px',
+                              borderRadius: 10,
+                              fontSize: 13.5,
+                              fontWeight: active ? 500 : 400,
+                              fontFamily: "'Inter', sans-serif",
+                              textDecoration: 'none',
+                              transition: 'all 0.2s',
+                              background: active ? 'rgba(255,255,255,0.08)' : 'transparent',
+                              color: active ? 'var(--el-sidebar-active)' : 'var(--el-sidebar-text)',
+                              boxShadow: active ? 'inset 0 1px 1px rgba(255,255,255,0.05)' : 'none'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!active) {
+                                e.currentTarget.style.background = 'var(--el-sidebar-hover-bg)';
+                                e.currentTarget.style.color = 'var(--el-sidebar-active)';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!active) {
+                                e.currentTarget.style.background = 'transparent';
+                                e.currentTarget.style.color = 'var(--el-sidebar-text)';
+                              }
+                            }}
+                          >
+                            <Icon style={{ width: 15, height: 15, opacity: active ? 1 : 0.5, flexShrink: 0 }} />
+                            <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</span>
+                            {item.badge && (
+                              <span style={{
+                                marginLeft: 'auto',
+                                fontSize: 10,
+                                fontWeight: 700,
+                                padding: '1px 8px',
+                                borderRadius: 9999,
+                                background: 'rgba(255,255,255,0.1)',
+                                color: 'var(--el-sidebar-active)',
+                                letterSpacing: '0.02em'
+                              }}>
+                                {item.badge}
+                              </span>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           );
         })}
       </nav>
 
-      {/* Bottom Actions */}
-      <div className="px-2.5 py-3 border-t border-gray-200 dark:border-white/10 bg-white/95 dark:bg-charcoalDark space-y-1.5">
-        <motion.div
-          whileHover={{ x: 2 }}
+      {/* ── Bottom ── */}
+      <div style={{
+        padding: '12px',
+        borderTop: '1px solid rgba(255,255,255,0.06)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 1,
+      }}>
+        <Link
+          to="/settings"
+          onClick={onNavClick}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            padding: '7px 10px',
+            borderRadius: 7,
+            fontSize: 13.5,
+            fontWeight: 400,
+            fontFamily: "'Inter', sans-serif",
+            textDecoration: 'none',
+            color: 'var(--el-sidebar-text)',
+            transition: 'all 0.15s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'var(--el-sidebar-hover-bg)';
+            e.currentTarget.style.color = 'var(--el-sidebar-active)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent';
+            e.currentTarget.style.color = 'var(--el-sidebar-text)';
+          }}
         >
-          <Link
-            to="/profile"
-            onClick={onNavClick}
-            className={`${navItemBaseClass} ${navItemDefaultClass}`}
-          >
-            <Settings className="h-4 w-4" />
-            <span className="truncate">Settings</span>
-          </Link>
-        </motion.div>
+          <Settings style={{ width: 15, height: 15, opacity: 0.65 }} />
+          Settings
+        </Link>
 
-        <motion.button
+        <button
           onClick={handleLogout}
-          whileHover={{ x: 2 }}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] leading-tight text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/10 transition-all duration-200 font-medium"
+          type="button"
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            padding: '7px 10px',
+            borderRadius: 7,
+            fontSize: 13.5,
+            fontWeight: 400,
+            fontFamily: "'Inter', sans-serif",
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: 'rgba(239,68,68,0.7)',
+            transition: 'all 0.15s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(239,68,68,0.08)';
+            e.currentTarget.style.color = 'rgba(239,68,68,0.9)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent';
+            e.currentTarget.style.color = 'rgba(239,68,68,0.7)';
+          }}
         >
-          <LogOut className="h-4 w-4" />
-          <span className="truncate">Logout</span>
-        </motion.button>
+          <LogOut style={{ width: 15, height: 15 }} />
+          Logout
+        </button>
       </div>
-    </>
+    </div>
   );
 };
 
-const Sidebar = ({ mobileOpen = false, onMobileClose = () => { }, user = null }) => {
-  return (
-    <>
-      {/* Desktop Sidebar */}
-      <aside className="w-56 flex-shrink-0 hidden lg:flex flex-col h-screen sticky top-0 bg-gradient-to-b from-white to-[#f8f7f4] dark:from-charcoalDark dark:to-[#131313] border-r border-gray-200 dark:border-white/10 shadow-[0_10px_30px_rgba(15,23,42,0.08)] dark:shadow-lg overflow-y-auto">
-        <SidebarContent onNavClick={() => { }} user={user} />
-      </aside>
+// ─── Sidebar ─────────────────────────────────────────────────────────────────
+const Sidebar = ({ mobileOpen = false, onMobileClose = () => {}, user = null }) => (
+  <>
+    {/* Desktop — fixed dark sidebar */}
+    <aside
+      className="hidden lg:flex flex-col h-screen sticky top-0 overflow-y-auto"
+      style={{
+        width: 240,
+        flexShrink: 0,
+        background: 'var(--el-sidebar-bg)',
+        borderRight: '1px solid rgba(255,255,255,0.06)',
+      }}
+    >
+      <SidebarContent user={user} />
+    </aside>
 
-      {/* Mobile Sidebar Overlay */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              onClick={onMobileClose}
-              className="fixed inset-0 bg-black/70 backdrop-blur-md z-40 lg:hidden"
-            />
-            <motion.div
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed top-0 left-0 bottom-0 w-64 max-w-[82vw] z-50 lg:hidden flex flex-col bg-gradient-to-b from-white to-[#f8f7f4] dark:from-charcoalDark dark:to-[#131313] border-r border-gray-200 dark:border-white/10 overflow-y-auto shadow-xl"
-            >
-              <div className="absolute top-4 right-4">
-                <motion.button
-                  onClick={onMobileClose}
-                  whileHover={{ scale: 1.1, rotate: 90 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center justify-center w-9 h-9 rounded-lg border border-gray-300 dark:border-white/10 bg-gray-100 dark:bg-white/5 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/10 transition-all"
-                >
-                  <X className="h-4 w-4" />
-                </motion.button>
-              </div>
-              <div className="pt-12">
-                <SidebarContent onNavClick={onMobileClose} user={user} />
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-    </>
-  );
-};
+    {/* Mobile overlay */}
+    <AnimatePresence>
+      {mobileOpen && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={onMobileClose}
+            className="fixed inset-0 z-40 lg:hidden"
+            style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}
+          />
+          <motion.div
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            className="fixed top-0 left-0 bottom-0 z-50 lg:hidden flex flex-col overflow-y-auto"
+            style={{
+              width: 280,
+              maxWidth: '85vw',
+              background: 'var(--el-sidebar-bg)',
+            }}
+          >
+            <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10 }}>
+              <button
+                onClick={onMobileClose}
+                type="button"
+                style={{
+                  width: 32, height: 32,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  borderRadius: 8,
+                  background: 'rgba(255,255,255,0.08)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--el-sidebar-text)',
+                  transition: 'background 0.15s',
+                }}
+              >
+                <X style={{ width: 16, height: 16 }} />
+              </button>
+            </div>
+            <SidebarContent onNavClick={onMobileClose} user={user} />
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  </>
+);
 
 export default Sidebar;

@@ -1,212 +1,173 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import {
-    ArrowRight,
-    Briefcase,
-    CheckCircle2,
-    Headphones,
-    Mail,
-    MessageSquare,
-    Send,
-    Sparkles,
-} from "lucide-react";
 import { Link } from "react-router-dom";
-import PublicSiteNav from "./public/PublicSiteNav";
-import PublicSiteFooter from "./public/PublicSiteFooter";
+import { ArrowRight, Briefcase, CheckCircle2, Headphones, Mail, MessageSquare, Send } from "lucide-react";
 
 export default function ContactPage() {
-    const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
-    const [submitted, setSubmitted] = useState(false);
+  const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
+  const [submitted, setSubmitted] = useState(false);
 
-    const handleChange = (e) => {
-        setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    };
+  const handleChange = (e) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const body = [
-            `Name: ${formData.name || "Not provided"}`,
-            `Email: ${formData.email || "Not provided"}`,
-            "",
-            formData.message,
-        ].join("\n");
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const body = [
+      `Name: ${formData.name || "Not provided"}`,
+      `Email: ${formData.email || "Not provided"}`,
+      "",
+      formData.message,
+    ].join("\n");
 
-        const mailtoHref = `mailto:support@planorah.me?subject=${encodeURIComponent(formData.subject || "Planorah Contact")}&body=${encodeURIComponent(body)}`;
-        window.location.href = mailtoHref;
-        setSubmitted(true);
-    };
+    const mailtoHref = `mailto:support@planorah.me?subject=${encodeURIComponent(formData.subject || "Planorah Contact")}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoHref;
+    setSubmitted(true);
+  };
 
-    return (
-        <div className="min-h-screen bg-beigePrimary text-textPrimary dark:bg-charcoalDark dark:text-white">
-            <PublicSiteNav />
+  const cards = [
+    {
+      icon: Headphones,
+      title: "Product Support",
+      text: "Get help with account issues, features, and setup.",
+      ctaLabel: "Go to Support",
+      href: "/support",
+      isMail: false,
+    },
+    {
+      icon: MessageSquare,
+      title: "Partnerships",
+      text: "For collaborations, growth partnerships, and community programs.",
+      ctaLabel: "Email Partnerships",
+      href: "mailto:support@planorah.me?subject=Partnership%20Inquiry",
+      isMail: true,
+    },
+    {
+      icon: Briefcase,
+      title: "Hiring",
+      text: "Interested in joining us? Explore open roles and apply.",
+      ctaLabel: "View Careers",
+      href: "/careers",
+      isMail: false,
+    },
+  ];
 
-            <main className="pt-32">
-                <section className="relative overflow-hidden px-6 pb-16">
-                    <div className="pointer-events-none absolute -left-20 top-10 h-72 w-72 rounded-full bg-terracotta/15 blur-3xl" />
-                    <div className="pointer-events-none absolute right-0 top-24 h-80 w-80 rounded-full bg-sage/20 blur-3xl" />
-
-                    <div className="relative mx-auto max-w-6xl rounded-3xl border border-beigeMuted bg-white/80 p-8 shadow-soft backdrop-blur-xl dark:border-charcoalMuted dark:bg-charcoal/80 sm:p-12">
-                        <div className="max-w-3xl">
-                            <div className="inline-flex items-center gap-2 rounded-full border border-terracotta/30 bg-terracotta/10 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-terracotta">
-                                <Sparkles className="h-4 w-4" />
-                                Contact Planorah
-                            </div>
-
-                            <h1 className="mt-5 font-playfair text-4xl font-bold leading-tight sm:text-5xl">
-                                Reach out and get support from the team
-                            </h1>
-                            <p className="mt-4 text-base leading-relaxed text-textSecondary dark:text-gray-300 sm:text-lg">
-                                Have a question, partnership idea, or product feedback? Send us a message and we will get back to you. For technical help, you can also use our support center.
-                            </p>
-
-                            <div className="mt-8 flex flex-wrap gap-3">
-                                <Link
-                                    to="/support"
-                                    className="inline-flex items-center gap-2 rounded-full bg-charcoal px-6 py-3 text-sm font-semibold text-beigePrimary transition-colors hover:bg-charcoalMuted dark:bg-beigePrimary dark:text-charcoal dark:hover:bg-beigeSecondary"
-                                >
-                                    Open Help Center
-                                    <ArrowRight className="h-4 w-4" />
-                                </Link>
-                                <a
-                                    href="mailto:support@planorah.me"
-                                    className="inline-flex items-center gap-2 rounded-full border border-beigeMuted bg-beigePrimary px-6 py-3 text-sm font-semibold text-textPrimary transition-colors hover:border-terracotta/40 hover:text-terracotta dark:border-charcoalMuted dark:bg-charcoal dark:text-gray-200 dark:hover:border-terracotta/50 dark:hover:text-orange-300"
-                                >
-                                    <Mail className="h-4 w-4" />
-                                    support@planorah.me
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section className="px-6 pb-20">
-                    <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
-                        {[
-                            {
-                                icon: Headphones,
-                                title: "Product Support",
-                                text: "Get help with account issues, features, and setup.",
-                                ctaLabel: "Go to Support",
-                                href: "/support",
-                                isMail: false,
-                            },
-                            {
-                                icon: MessageSquare,
-                                title: "Partnerships",
-                                text: "For collaborations, growth partnerships, and community programs.",
-                                ctaLabel: "Email Partnerships",
-                                href: "mailto:support@planorah.me?subject=Partnership%20Inquiry",
-                                isMail: true,
-                            },
-                            {
-                                icon: Briefcase,
-                                title: "Hiring",
-                                text: "Interested in joining us? Explore open roles and apply.",
-                                ctaLabel: "View Careers",
-                                href: "/careers",
-                                isMail: false,
-                            },
-                        ].map((card) => {
-                            const Icon = card.icon;
-                            return (
-                                <motion.article
-                                    key={card.title}
-                                    whileHover={{ y: -4 }}
-                                    className="rounded-2xl border border-beigeMuted bg-white p-6 shadow-soft dark:border-charcoalMuted dark:bg-charcoal"
-                                >
-                                    <div className="mb-4 inline-flex rounded-xl bg-terracotta/15 p-3 text-terracotta">
-                                        <Icon className="h-5 w-5" />
-                                    </div>
-                                    <h2 className="font-outfit text-xl font-semibold">{card.title}</h2>
-                                    <p className="mt-2 text-sm text-textSecondary dark:text-gray-400">{card.text}</p>
-                                    {card.isMail ? (
-                                        <a href={card.href} className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-terracotta hover:text-terracottaHover">
-                                            {card.ctaLabel}
-                                            <ArrowRight className="h-4 w-4" />
-                                        </a>
-                                    ) : (
-                                        <Link to={card.href} className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-terracotta hover:text-terracottaHover">
-                                            {card.ctaLabel}
-                                            <ArrowRight className="h-4 w-4" />
-                                        </Link>
-                                    )}
-                                </motion.article>
-                            );
-                        })}
-                    </div>
-                </section>
-
-                <section className="border-y border-beigeMuted bg-beigeSecondary px-6 py-20 dark:border-charcoalMuted dark:bg-charcoal">
-                    <div className="mx-auto max-w-3xl rounded-3xl border border-beigeMuted bg-white p-8 shadow-soft dark:border-charcoalMuted dark:bg-charcoalDark sm:p-10">
-                        <h2 className="font-playfair text-3xl font-bold">Send a direct message</h2>
-                        <p className="mt-2 text-sm text-textSecondary dark:text-gray-400">
-                            This form opens your default email app with your message prefilled so you can send it instantly.
-                        </p>
-
-                        {submitted && (
-                            <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
-                                <div className="flex items-center gap-2">
-                                    <CheckCircle2 className="h-4 w-4" />
-                                    Draft opened in your email app. Send it to complete your request.
-                                </div>
-                            </div>
-                        )}
-
-                        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-                            <div className="grid gap-4 sm:grid-cols-2">
-                                <input
-                                    type="text"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    placeholder="Your name"
-                                    className="w-full rounded-xl border border-beigeMuted bg-beigePrimary px-4 py-3 text-sm text-textPrimary placeholder:text-textSecondary focus:outline-none focus:ring-2 focus:ring-terracotta/30 dark:border-charcoalMuted dark:bg-charcoal dark:text-white"
-                                    required
-                                />
-                                <input
-                                    type="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    placeholder="Your email"
-                                    className="w-full rounded-xl border border-beigeMuted bg-beigePrimary px-4 py-3 text-sm text-textPrimary placeholder:text-textSecondary focus:outline-none focus:ring-2 focus:ring-terracotta/30 dark:border-charcoalMuted dark:bg-charcoal dark:text-white"
-                                    required
-                                />
-                            </div>
-
-                            <input
-                                type="text"
-                                name="subject"
-                                value={formData.subject}
-                                onChange={handleChange}
-                                placeholder="Subject"
-                                className="w-full rounded-xl border border-beigeMuted bg-beigePrimary px-4 py-3 text-sm text-textPrimary placeholder:text-textSecondary focus:outline-none focus:ring-2 focus:ring-terracotta/30 dark:border-charcoalMuted dark:bg-charcoal dark:text-white"
-                                required
-                            />
-
-                            <textarea
-                                name="message"
-                                value={formData.message}
-                                onChange={handleChange}
-                                placeholder="How can we help?"
-                                rows={5}
-                                className="w-full rounded-xl border border-beigeMuted bg-beigePrimary px-4 py-3 text-sm text-textPrimary placeholder:text-textSecondary focus:outline-none focus:ring-2 focus:ring-terracotta/30 dark:border-charcoalMuted dark:bg-charcoal dark:text-white"
-                                required
-                            />
-
-                            <button
-                                type="submit"
-                                className="inline-flex items-center gap-2 rounded-full bg-terracotta px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-terracottaHover"
-                            >
-                                <Send className="h-4 w-4" />
-                                Send Message
-                            </button>
-                        </form>
-                    </div>
-                </section>
-            </main>
-
-            <PublicSiteFooter />
+  return (
+    <main>
+      {/* Hero */}
+      <section style={{ padding: '96px 0 48px' }}>
+        <div className="container" style={{ textAlign: 'center' }}>
+          <div className="eyebrow" style={{ marginBottom: 16 }}>Contact Planorah</div>
+          <h1 style={{ marginBottom: 20, maxWidth: 820, marginInline: 'auto' }}>
+            Reach out and get support from the team
+          </h1>
+          <p style={{ fontSize: 18, maxWidth: 600, margin: '0 auto', color: 'var(--fg-muted)', lineHeight: 1.6 }}>
+            Have a question, partnership idea, or product feedback? Send us a message and we will get back to you. For technical help, you can also use our support center.
+          </p>
+          <div style={{ marginTop: 32, display: 'flex', justifyContent: 'center', gap: 16 }}>
+            <Link to="/support" className="btn" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              Open Help Center <ArrowRight size={16} />
+            </Link>
+            <a href="mailto:support@planorah.me" className="btn btn-plain" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              <Mail size={16} /> support@planorah.me
+            </a>
+          </div>
         </div>
-    );
+      </section>
+
+      {/* Cards */}
+      <section className="section">
+        <div className="container">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+            {cards.map((card, i) => {
+              const Icon = card.icon;
+              return (
+                <div key={i} className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ background: 'var(--surface)', display: 'inline-flex', padding: 12, borderRadius: 12, marginBottom: 20, alignSelf: 'flex-start' }}>
+                    <Icon size={24} color="var(--fg-deep)" />
+                  </div>
+                  <h2 style={{ fontSize: 20, marginBottom: 12 }}>{card.title}</h2>
+                  <p style={{ fontSize: 15, color: 'var(--fg-muted)', lineHeight: 1.6, marginBottom: 24, flex: 1 }}>{card.text}</p>
+                  
+                  {card.isMail ? (
+                    <a href={card.href} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 600, color: 'var(--fg-deep)', textDecoration: 'none' }}>
+                      {card.ctaLabel} <ArrowRight size={14} />
+                    </a>
+                  ) : (
+                    <Link to={card.href} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 600, color: 'var(--fg-deep)', textDecoration: 'none' }}>
+                      {card.ctaLabel} <ArrowRight size={14} />
+                    </Link>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Form */}
+      <section className="section-sm">
+        <div className="container-narrow">
+          <div className="card" style={{ padding: 48 }}>
+            <h2 style={{ fontSize: 32, marginBottom: 12 }}>Send a direct message</h2>
+            <p style={{ fontSize: 15, color: 'var(--fg-muted)', marginBottom: 32 }}>
+              This form opens your default email app with your message prefilled so you can send it instantly.
+            </p>
+
+            {submitted && (
+              <div style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', padding: '12px 16px', borderRadius: 8, fontSize: 14, display: 'flex', alignItems: 'center', gap: 8, marginBottom: 24 }}>
+                <CheckCircle2 size={16} /> Draft opened in your email app. Send it to complete your request.
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Your name"
+                  required
+                  style={{ width: '100%', padding: '14px 16px', borderRadius: 10, border: '1px solid var(--border-subtle)', background: 'var(--surface)', color: 'var(--fg-deep)', fontSize: 15 }}
+                />
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Your email"
+                  required
+                  style={{ width: '100%', padding: '14px 16px', borderRadius: 10, border: '1px solid var(--border-subtle)', background: 'var(--surface)', color: 'var(--fg-deep)', fontSize: 15 }}
+                />
+              </div>
+
+              <input
+                type="text"
+                name="subject"
+                value={formData.subject}
+                onChange={handleChange}
+                placeholder="Subject"
+                required
+                style={{ width: '100%', padding: '14px 16px', borderRadius: 10, border: '1px solid var(--border-subtle)', background: 'var(--surface)', color: 'var(--fg-deep)', fontSize: 15 }}
+              />
+
+              <textarea
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
+                placeholder="How can we help?"
+                rows={5}
+                required
+                style={{ width: '100%', padding: '14px 16px', borderRadius: 10, border: '1px solid var(--border-subtle)', background: 'var(--surface)', color: 'var(--fg-deep)', fontSize: 15, fontFamily: 'inherit' }}
+              />
+
+              <button type="submit" className="btn" style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+                <Send size={16} /> Send Message
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
 }

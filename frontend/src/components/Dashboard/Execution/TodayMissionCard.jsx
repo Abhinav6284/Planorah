@@ -8,30 +8,34 @@ const difficultyStyles = {
 };
 
 const MissionSkeleton = () => (
-    <div className="rounded-3xl border border-cyan-500/20 bg-[#07131b] p-6 animate-pulse">
-        <div className="h-3 w-28 rounded bg-cyan-100/10 mb-4" />
-        <div className="h-8 w-2/3 rounded bg-cyan-100/10 mb-4" />
-        <div className="flex gap-2 mb-4">
-            <div className="h-7 w-20 rounded-full bg-cyan-100/10" />
-            <div className="h-7 w-20 rounded-full bg-cyan-100/10" />
+    <div style={{ borderRadius: 16, border: '1px solid var(--el-border)', background: 'var(--el-bg)', padding: 32, opacity: 0.6 }}>
+        <div style={{ height: 12, width: 112, borderRadius: 4, background: 'var(--el-bg-secondary)', marginBottom: 16 }} />
+        <div style={{ height: 32, width: '66%', borderRadius: 4, background: 'var(--el-bg-secondary)', marginBottom: 16 }} />
+        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+            <div style={{ height: 28, width: 80, borderRadius: 20, background: 'var(--el-bg-secondary)' }} />
+            <div style={{ height: 28, width: 80, borderRadius: 20, background: 'var(--el-bg-secondary)' }} />
         </div>
-        <div className="h-20 rounded-2xl bg-cyan-100/10 mb-4" />
-        <div className="flex gap-2">
-            <div className="h-10 w-28 rounded-xl bg-cyan-100/10" />
-            <div className="h-10 w-28 rounded-xl bg-cyan-100/10" />
+        <div style={{ height: 80, borderRadius: 12, background: 'var(--el-bg-secondary)', marginBottom: 16 }} />
+        <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ height: 40, width: 112, borderRadius: 10, background: 'var(--el-bg-secondary)' }} />
+            <div style={{ height: 40, width: 112, borderRadius: 10, background: 'var(--el-bg-secondary)' }} />
         </div>
     </div>
 );
 
 const TodayMissionCard = ({ task, loading, onStart, onChangeTask }) => {
     if (loading) {
-        return <MissionSkeleton />;
+        return (
+            <div style={{ padding: 40, borderRadius: 16, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border)', textAlign: 'center' }}>
+                <p style={{ fontSize: 14, color: 'var(--el-text-muted)', fontWeight: 600 }}>Calculating strategic mission...</p>
+            </div>
+        );
     }
 
     if (!task) {
         return (
-            <div className="rounded-3xl border border-cyan-500/20 bg-[#07131b] p-6 text-cyan-100">
-                <p className="text-sm">No mission found. Generating your next mission...</p>
+            <div style={{ padding: 32, borderRadius: 16, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border)', textAlign: 'center' }}>
+                <p style={{ fontSize: 14, color: 'var(--el-text-muted)' }}>No mission available. Try refreshing or generating one.</p>
             </div>
         );
     }
@@ -43,39 +47,52 @@ const TodayMissionCard = ({ task, loading, onStart, onChangeTask }) => {
             layout
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-3xl border border-cyan-400/20 bg-[radial-gradient(circle_at_15%_20%,rgba(34,211,238,0.2),transparent_40%),linear-gradient(140deg,#07131b,#0d1f2b_55%,#10212a)] p-5 sm:p-6 shadow-[0_24px_60px_rgba(0,0,0,0.45)]"
+            style={{ 
+                borderRadius: 16, border: '1px solid var(--el-border)', background: 'var(--el-bg)', 
+                padding: 40, boxShadow: 'var(--el-shadow-card)', color: 'var(--el-text)'
+            }}
         >
-            <p className="text-[11px] uppercase tracking-[0.2em] text-cyan-200/70 mb-3">Today Mission</p>
-            <h2 className="text-xl sm:text-3xl font-semibold text-white leading-snug">{task.title}</h2>
+            <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)', marginBottom: 12 }}>Active Mission</p>
+            <h2 style={{ fontSize: 28, fontWeight: 800, color: 'var(--el-text)', letterSpacing: '-0.02em', lineHeight: 1.1 }}>{task.title}</h2>
 
-            <div className="flex flex-wrap items-center gap-2 mt-4">
-                <span className="px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs text-cyan-50">{task.estimated_time || '25 min'}</span>
-                <span className={`px-3 py-1 rounded-full border text-xs ${difficultyStyles[level] || difficultyStyles.medium}`}>
-                    {level}
-                </span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 20 }}>
+                <span style={{ 
+                    padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700, 
+                    background: 'var(--el-bg-secondary)', color: 'var(--el-text-secondary)', border: '1px solid var(--el-border-subtle)'
+                }}>{task.estimated_time || '25 min'}</span>
+                <span style={{ 
+                    padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
+                    background: 'var(--el-bg-secondary)', color: 'var(--el-text-secondary)', border: '1px solid var(--el-border-subtle)'
+                }}>{level}</span>
             </div>
 
-            <div className="mt-4 rounded-2xl border border-cyan-300/15 bg-black/20 p-3">
-                <p className="text-[11px] uppercase tracking-wide text-cyan-200/70">AI Reasoning</p>
-                <p className="text-sm text-slate-100 mt-1 leading-relaxed">{task.reason || 'This mission is selected for momentum and consistency.'}</p>
+            <div style={{ marginTop: 24, padding: 24, borderRadius: 12, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border-subtle)' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: 'var(--el-text-muted)', marginBottom: 8 }}>AI Rationale</p>
+                <p style={{ fontSize: 14, color: 'var(--el-text-secondary)', lineHeight: 1.6 }}>{task.reason || 'This mission is specifically generated to target your high-impact areas and ensure consistent progress towards your performance peaks.'}</p>
             </div>
 
-            <div className="mt-5 flex flex-wrap gap-2">
+            <div style={{ marginTop: 40, display: 'flex', flexWrap: 'wrap', gap: 12 }}>
                 <motion.button
-                    whileHover={{ y: -1, scale: 1.02 }}
-                    whileTap={{ scale: 0.97 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={onStart}
-                    className="px-5 py-2.5 rounded-xl bg-cyan-300 text-[#062231] text-sm font-bold hover:bg-cyan-200 transition-colors"
+                    style={{ 
+                        padding: '12px 32px', borderRadius: 12, background: 'var(--el-text)', color: '#fff', 
+                        fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.1s'
+                    }}
                 >
-                    Start Now
+                    Start Mission
                 </motion.button>
                 <motion.button
-                    whileHover={{ y: -1 }}
-                    whileTap={{ scale: 0.97 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={onChangeTask}
-                    className="px-4 py-2.5 rounded-xl border border-cyan-300/40 text-cyan-100 text-sm font-semibold hover:bg-cyan-500/10 transition-colors"
+                    style={{ 
+                        padding: '12px 24px', borderRadius: 12, background: 'var(--el-bg)', border: '1px solid var(--el-border)', 
+                        color: 'var(--el-text-secondary)', fontSize: 14, fontWeight: 700, cursor: 'pointer', transition: 'all 0.1s'
+                    }}
                 >
-                    Change Task
+                    New Strategy
                 </motion.button>
             </div>
         </motion.div>

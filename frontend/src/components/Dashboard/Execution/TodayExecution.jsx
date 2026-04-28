@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Play, RefreshCw, Plus } from 'lucide-react';
+import { Play, RefreshCw, Plus, Timer } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const toDateKey = (dateValue) => {
@@ -66,131 +66,155 @@ const TodayExecution = React.memo(({
     const isNewUser = !loading && (!tasks || tasks.length === 0);
 
     return (
-        <section className="bg-gradient-to-br from-white to-gray-50/80 dark:from-[#1a1a1a] dark:to-[#151515] rounded-2xl border-0 p-6 transition-all duration-300 shadow-[0_10px_24px_rgba(0,0,0,0.06)] dark:shadow-[0_10px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_0_0_1px_rgba(217,108,74,0.2)]">
+        <section 
+            style={{ 
+                background: 'var(--el-bg)', 
+                border: '1px solid var(--el-border)', 
+                borderRadius: 12, 
+                padding: 24, 
+                boxShadow: 'var(--el-shadow-card)',
+                transition: 'all 0.3s ease'
+            }}
+        >
             {/* New user empty state */}
             {isNewUser ? (
-                <div className="flex flex-col lg:flex-row lg:items-center gap-8 py-2">
-                    <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className="w-1.5 h-1.5 bg-terracotta rounded-full" />
-                            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Getting Started</p>
-                        </div>
-                        <h2 className="text-2xl font-bold text-gray-950 dark:text-white leading-tight mb-2">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+                    <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)', marginBottom: 12 }}>Getting Started</p>
+                        <h2 style={{ fontSize: 28, fontWeight: 300, color: 'var(--el-text)', letterSpacing: '-0.02em', marginBottom: 8 }}>
                             Create your first task
                         </h2>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-6">
+                        <p style={{ fontSize: 14, color: 'var(--el-text-muted)', lineHeight: 1.6, marginBottom: 24, maxWidth: 500 }}>
                             Add a task or generate a learning roadmap to get your personalized plan.
                         </p>
-                        <div className="flex items-center gap-3">
+                        <div style={{ display: 'flex', gap: 12 }}>
                             <Link
                                 to="/tasks"
-                                className="flex items-center gap-2 px-6 py-3 bg-terracotta text-white text-sm font-semibold rounded-xl hover:bg-terracottaHover hover:shadow-lg hover:shadow-terracotta/25 hover:scale-[1.02] active:scale-[0.98] transition-all duration-150"
+                                style={{
+                                    display: 'flex', alignItems: 'center', gap: 8, padding: '10px 24px', 
+                                    background: 'var(--el-text)', color: 'var(--el-bg)', fontSize: 13, fontWeight: 700, 
+                                    borderRadius: 9999, textDecoration: 'none', transition: 'opacity 0.2s',
+                                    boxShadow: 'var(--el-shadow-button)'
+                                }}
                             >
-                                <Plus className="w-4 h-4" />
+                                <Plus style={{ width: 16, height: 16 }} />
                                 Add a Task
                             </Link>
                             <Link
                                 to="/roadmap/generate"
-                                className="flex items-center gap-2 px-5 py-3 text-sm text-gray-600 dark:text-gray-400 font-medium border border-gray-200 dark:border-white/10 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition-all duration-150"
+                                style={{
+                                    display: 'flex', alignItems: 'center', gap: 8, padding: '10px 24px', 
+                                    background: 'var(--el-bg)', border: '1px solid var(--el-border)', 
+                                    color: 'var(--el-text)', fontSize: 13, fontWeight: 600, 
+                                    borderRadius: 9999, textDecoration: 'none',
+                                    boxShadow: 'var(--el-shadow-inset)'
+                                }}
                             >
                                 Generate Roadmap
                             </Link>
                         </div>
-                    </div>
-                    <div className="hidden lg:flex flex-col items-center gap-3 pt-2 min-w-[180px]">
-                        <div className="w-32 h-32 rounded-full border-4 border-dashed border-gray-200 dark:border-white/10 flex items-center justify-center">
-                            <Plus className="w-10 h-10 text-gray-300 dark:text-gray-600" />
-                        </div>
-                        <p className="text-xs text-gray-400 dark:text-gray-500 text-center">No tasks yet</p>
                     </div>
                 </div>
             ) : null}
 
             {/* Mission Card */}
             {!isNewUser && todayTask ? (
-                <div className="flex flex-col lg:flex-row lg:items-start gap-8">
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 40, alignItems: 'center' }}>
                     {/* Left: Task Content */}
-                    <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className="w-1.5 h-1.5 bg-terracotta rounded-full" />
-                            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Focus Task</p>
-                        </div>
-                        <h2 className="text-2xl font-bold text-gray-950 dark:text-white leading-tight mb-2">
+                    <div style={{ flex: 1, minWidth: 280 }}>
+                        <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)', marginBottom: 12 }}>Focus Task</p>
+                        <h2 style={{ fontSize: 26, fontWeight: 300, color: 'var(--el-text)', letterSpacing: '-0.02em', marginBottom: 6 }}>
                             {todayTask.title}
                         </h2>
                         {todayTask.reason && (
-                            <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-6">
+                            <p style={{ fontSize: 15, color: 'var(--el-text-muted)', lineHeight: 1.6, marginBottom: 20 }}>
                                 {todayTask.reason}
                             </p>
                         )}
 
                         {/* Progress bar */}
-                        <div className="mb-6">
-                            <div className="flex justify-between mb-2 text-xs text-gray-400 dark:text-gray-500">
-                                <span>Progress</span>
-                                <span>{completedCount}/{totalCount}</span>
+                        <div style={{ marginBottom: 24 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 12, fontWeight: 600 }}>
+                                <span style={{ color: 'var(--el-text-muted)' }}>Daily Progress</span>
+                                <span style={{ color: 'var(--el-text)' }}>{completedCount}/{totalCount}</span>
                             </div>
-                            <div className="h-1 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
+                            <div style={{ height: 6, background: 'var(--el-bg-secondary)', borderRadius: 10, overflow: 'hidden' }}>
                                 <div
-                                    className="h-full bg-terracotta rounded-full transition-all duration-500"
-                                    style={{ width: `${pct}%` }}
+                                    style={{ 
+                                        height: '100%', 
+                                        background: 'var(--el-text)', 
+                                        borderRadius: 10, 
+                                        width: `${pct}%`,
+                                        transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)' 
+                                    }}
                                 />
                             </div>
                         </div>
 
                         {/* CTA Buttons */}
-                        <div className="flex items-center gap-3">
+                        <div style={{ display: 'flex', gap: 12 }}>
                             <button
                                 onClick={() => onStartFocus(todayTask)}
                                 disabled={!todayTask || loading}
-                                className="flex items-center gap-2 px-6 py-3 bg-terracotta text-white text-sm font-semibold rounded-xl hover:bg-terracottaHover hover:shadow-lg hover:shadow-terracotta/25 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-150"
+                                style={{
+                                    display: 'flex', alignItems: 'center', gap: 8, padding: '10px 28px', 
+                                    background: 'var(--el-text)', color: 'var(--el-bg)', fontSize: 13, fontWeight: 700, 
+                                    borderRadius: 9999, border: 'none', cursor: 'pointer', opacity: loading ? 0.6 : 1,
+                                    boxShadow: 'var(--el-shadow-button)'
+                                }}
                             >
-                                <Play className="w-4 h-4 fill-current" />
+                                <Play style={{ width: 15, height: 15, fill: 'currentColor' }} />
                                 Start Session
                             </button>
                             <button
                                 onClick={onChangeTask}
-                                className="flex items-center gap-2 px-5 py-3 text-sm text-gray-600 dark:text-gray-400 font-medium border border-gray-200 dark:border-white/10 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition-all duration-150"
+                                style={{
+                                    display: 'flex', alignItems: 'center', gap: 8, padding: '10px 24px', 
+                                    background: 'var(--el-bg)', border: '1px solid var(--el-border)', 
+                                    color: 'var(--el-text)', fontSize: 13, fontWeight: 600, 
+                                    borderRadius: 9999, cursor: 'pointer',
+                                    boxShadow: 'var(--el-shadow-inset)'
+                                }}
                             >
-                                <RefreshCw className="w-3.5 h-3.5" />
+                                <RefreshCw style={{ width: 14, height: 14 }} />
                                 Swap Task
                             </button>
                         </div>
                     </div>
 
-                    {/* Right: Circular Progress Ring — hidden on mobile */}
-                    <div className="hidden lg:flex flex-col items-center gap-3 pt-2 min-w-[180px]">
-                        <div className="relative w-32 h-32">
-                            <svg className={`w-32 h-32 -rotate-90 ${pct > 0 ? 'filter drop-shadow-[0_0_12px_rgba(217,108,74,0.3)]' : ''}`} viewBox="0 0 128 128">
+                    {/* Right: Circular Progress Ring */}
+                    <div style={{ display: 'flex', flexDirection: 'column', items: 'center', gap: 16, textAlign: 'center' }}>
+                        <div style={{ position: 'relative', width: 120, height: 120 }}>
+                            <svg style={{ width: 120, height: 120, transform: 'rotate(-90deg)' }} viewBox="0 0 120 120">
                                 <circle
-                                    cx="64"
-                                    cy="64"
-                                    r="52"
-                                    stroke="currentColor"
-                                    strokeWidth="6"
-                                    fill="none"
-                                    className="text-gray-100 dark:text-white/10"
+                                    cx="60" cy="60" r="54"
+                                    stroke="var(--el-bg-secondary)" strokeWidth="8" fill="none"
                                 />
                                 <circle
-                                    cx="64"
-                                    cy="64"
-                                    r="52"
-                                    stroke="#D96C4A"
-                                    strokeWidth="6"
-                                    fill="none"
+                                    cx="60" cy="60" r="54"
+                                    stroke="var(--el-text)" strokeWidth="8" fill="none"
                                     strokeLinecap="round"
-                                    strokeDasharray={`${(2 * Math.PI * 52).toFixed(2)}`}
-                                    strokeDashoffset={`${(2 * Math.PI * 52 * (1 - pct / 100)).toFixed(2)}`}
-                                    className="transition-all duration-700"
+                                    strokeDasharray={`${(2 * Math.PI * 54).toFixed(2)}`}
+                                    strokeDashoffset={`${(2 * Math.PI * 54 * (1 - pct / 100)).toFixed(2)}`}
+                                    style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
                                 />
                             </svg>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                <span className="text-2xl font-bold text-gray-950 dark:text-white">{pct}%</span>
-                                <span className="text-xs text-gray-400 dark:text-gray-500">done</span>
+                            <div style={{ 
+                                position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', 
+                                alignItems: 'center', justifyContent: 'center' 
+                            }}>
+                                <span style={{ fontSize: 28, fontWeight: 300, color: 'var(--el-text)', letterSpacing: '-0.04em' }}>{pct}%</span>
+                                <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--el-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Done</span>
                             </div>
                         </div>
                         {todayTask.estimated_time && (
-                            <p className="text-xs text-gray-400 dark:text-gray-500 text-center">{todayTask.estimated_time}</p>
+                            <div style={{ 
+                                display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px',
+                                background: 'var(--el-bg-secondary)', borderRadius: 20, fontSize: 11, fontWeight: 600, color: 'var(--el-text-secondary)'
+                            }}>
+                                <Timer style={{ width: 12, height: 12 }} />
+                                {todayTask.estimated_time}
+                            </div>
                         )}
                     </div>
                 </div>
@@ -198,9 +222,9 @@ const TodayExecution = React.memo(({
 
             {/* Fallback: has tasks but no today task yet */}
             {!isNewUser && !todayTask && (
-                <div className="text-center py-12">
-                    <p className="text-sm text-gray-400 dark:text-gray-500">No task scheduled for today.</p>
-                    <Link to="/tasks" className="text-xs text-terracotta hover:underline mt-1 inline-block">+ Add a task</Link>
+                <div style={{ textAlign: 'center', padding: '32px 0' }}>
+                    <p style={{ fontSize: 14, color: 'var(--el-text-muted)', marginBottom: 12 }}>No task scheduled for today.</p>
+                    <Link to="/tasks" style={{ fontSize: 13, fontWeight: 700, color: 'var(--el-text)', textDecoration: 'none' }}>+ Add a task</Link>
                 </div>
             )}
         </section>

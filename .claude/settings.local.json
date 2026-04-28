@@ -42,7 +42,14 @@
       "Bash(python manage.py test users.tests.TrustedDeviceTests.test_logout_deletes_trusted_device -v 2)",
       "Bash(python backend/manage.py test users.tests.TrustedDeviceTests.test_logout_deletes_trusted_device users.tests.TrustedDeviceTests -v 2.)",
       "Bash(python backend/manage.py test users -v 2)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "WebFetch(domain:api.anthropic.com)",
+      "Bash(tar -xf \"webfetch-1776918864092-dzdnmw.bin\" -C .)",
+      "Bash(grep \"^\\\\.auth-input {$\\\\|^\\\\.auth-input-wrap {$\\\\|^\\\\.sso-btn {$\\\\|^\\\\.auth-primary-btn {$\" /p/Planorah/frontend/src/index.css)",
+      "Bash(git *)",
+      "Bash(grep -v \"//\")",
+      "Bash(curl *)",
+      "Bash(npx react-scripts *)"
     ]
   }
 }

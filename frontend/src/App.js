@@ -14,6 +14,7 @@ import { userService } from "./api/userService";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Layout from './components/Layout';
+import MarketingLayout from './components/MarketingLayout';
 
 // Lazy-loaded (non-critical, code-split)
 const WelcomePage = lazy(() => import("./components/WelcomePage"));
@@ -47,7 +48,7 @@ const CompiledResumeView = lazy(() => import('./components/Resume/CompiledResume
 const CompiledResumeList = lazy(() => import('./components/Resume/CompiledResumeList'));
 const JobFinder = lazy(() => import('./components/Jobs/JobFinder'));
 const MockInterviewComingSoon = lazy(() => import('./components/Interview/MockInterviewComingSoon'));
-const ProfilePage = lazy(() => import('./components/Settings/ProfilePage'));
+const Settings = lazy(() => import('./components/Settings/Settings'));
 const GitHubCallback = lazy(() => import('./components/GitHubCallback'));
 const AIAssistant = lazy(() => import('./components/Assistant/AIAssistant'));
 const SupportPage = lazy(() => import('./components/Support/SupportPage'));
@@ -75,6 +76,14 @@ const ContactPage = lazy(() => import('./components/ContactPage'));
 const CareersPage = lazy(() => import('./components/CareersPage'));
 const PrivacyPage = lazy(() => import('./components/legal/PrivacyPage'));
 const TermsPage = lazy(() => import('./components/legal/TermsPage'));
+// New website blueprint pages
+const HowItWorksPage = lazy(() => import('./components/HowItWorksPage'));
+const DemoPage = lazy(() => import('./components/DemoPage'));
+const StudentsPage = lazy(() => import('./components/StudentsPage'));
+const FAQPage = lazy(() => import('./components/FAQPage'));
+const TemplatesPage = lazy(() => import('./components/TemplatesPage'));
+const FeatureDetailPage = lazy(() => import('./components/FeatureDetailPage'));
+const ComparisonPage = lazy(() => import('./components/ComparisonPage'));
 
 /**
  * AppInner - Handles user loading and routes based on auth state
@@ -158,8 +167,32 @@ function AppInner() {
       <ErrorBoundary>
         <Suspense fallback={<DashboardSkeleton />}>
           <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/blogs" element={<PlanorahBlogsPage />} />
+            {/* Marketing / Public Routes */}
+            <Route element={<MarketingLayout />}>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/support" element={<SupportPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/careers" element={<CareersPage />} />
+              <Route path="/career" element={<Navigate to="/careers" replace />} />
+              <Route path="/features" element={<FeaturesPage />} />
+              <Route path="/features/:slug" element={<FeatureDetailPage />} />
+              <Route path="/pricing" element={<PricingPublicPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/founder" element={<AboutPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/privacy-policy" element={<Navigate to="/privacy" replace />} />
+              <Route path="/terms-of-service" element={<Navigate to="/terms" replace />} />
+              <Route path="/blogs" element={<PlanorahBlogsPage />} />
+              {/* New blueprint pages */}
+              <Route path="/how-it-works" element={<HowItWorksPage />} />
+              <Route path="/demo" element={<DemoPage />} />
+              <Route path="/students" element={<StudentsPage />} />
+              <Route path="/faq" element={<FAQPage />} />
+              <Route path="/templates" element={<TemplatesPage />} />
+              <Route path="/compare/:slug" element={<ComparisonPage />} />
+            </Route>
+
             <Route path="/home" element={<WelcomePage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -176,21 +209,6 @@ function AppInner() {
 
             {/* Public Portfolio Route - No Auth Required */}
             <Route path="/p/:slug" element={<PublicPortfolio />} />
-
-            {/* Public Pages - No Auth Required */}
-            <Route path="/support" element={<SupportPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/careers" element={<CareersPage />} />
-            <Route path="/career" element={<Navigate to="/careers" replace />} />
-            <Route path="/features" element={<FeaturesPage />} />
-            <Route path="/pricing" element={<PricingPublicPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/founder" element={<AboutPage />} />
-            <Route path="/privacy" element={<PrivacyPage />} />
-            <Route path="/terms" element={<TermsPage />} />
-            {/* Backward-compatible legacy legal paths */}
-            <Route path="/privacy-policy" element={<Navigate to="/privacy" replace />} />
-            <Route path="/terms-of-service" element={<Navigate to="/terms" replace />} />
 
             {/* Protected App Routes */}
             <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
@@ -217,14 +235,14 @@ function AppInner() {
               <Route path="/tasks/day" element={<DayTimeline />} />
               <Route path="/tasks/focus" element={<FocusMode />} />
               <Route path="/tasks/analytics" element={<Analytics />} />
-              <Route path="/settings" element={<ProfilePage />} />
-              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/profile" element={<Navigate to="/settings#profile" replace />} />
               <Route path="/assistant" element={<AIAssistant />} />
               {/* Subscription & Billing Routes */}
-              <Route path="/subscription/plans" element={<PricingPage />} />
-              <Route path="/subscription" element={<SubscriptionStatus />} />
+              <Route path="/subscription/plans" element={<Navigate to="/settings#plans" replace />} />
+              <Route path="/subscription" element={<Navigate to="/settings#subscription" replace />} />
               <Route path="/billing/checkout" element={<CheckoutPage />} />
-              <Route path="/billing/history" element={<PaymentHistory />} />
+              <Route path="/billing/history" element={<Navigate to="/settings#billing" replace />} />
               <Route path="/portfolio/edit" element={<PortfolioEditor />} />
               <Route path="/projects" element={<ProjectManager />} />
               {/* Planora – AI Study Platform */}

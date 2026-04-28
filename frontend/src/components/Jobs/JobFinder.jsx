@@ -61,7 +61,7 @@ export default function JobFinder() {
                                 type="text"
                                 value={role}
                                 onChange={(e) => setRole(e.target.value)}
-                                className="w-full px-5 py-4 bg-white dark:bg-white/10 border-0 rounded-2xl text-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-terracotta outline-none shadow-sm"
+                                className="w-full px-5 py-4 bg-white dark:bg-gray-700 border-0 rounded-2xl text-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-terracotta outline-none shadow-sm"
                                 placeholder="Frontend Developer"
                             />
                         </div>
@@ -71,7 +71,7 @@ export default function JobFinder() {
                                 type="text"
                                 value={location}
                                 onChange={(e) => setLocation(e.target.value)}
-                                className="w-full px-5 py-4 bg-white dark:bg-white/10 border-0 rounded-2xl text-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-terracotta outline-none shadow-sm"
+                                className="w-full px-5 py-4 bg-white dark:bg-gray-700 border-0 rounded-2xl text-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-terracotta outline-none shadow-sm"
                                 placeholder="Remote"
                             />
                         </div>
@@ -116,8 +116,8 @@ export default function JobFinder() {
 
                             {/* Arrow */}
                             <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${role
-                                ? 'bg-gray-100 dark:bg-white/10 group-hover:bg-terracotta group-hover:text-white text-gray-400'
-                                : 'bg-gray-100 dark:bg-white/10 text-gray-300'
+                                ? 'bg-gray-100 dark:bg-gray-700 group-hover:bg-terracotta group-hover:text-white text-gray-400'
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-300'
                                 }`}>
                                 →
                             </div>
