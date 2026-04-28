@@ -279,7 +279,7 @@ const WeeklyCalendar = ({ compact = false, onEventClick }) => {
 
                     {/* Loading Overlay */}
                     {loading && (
-                        <div className="absolute inset-0 bg-white/50 dark:bg-gray-900/50 flex items-center justify-center z-20">
+                        <div className="absolute inset-0 bg-gray-300 dark:bg-gray-600 flex items-center justify-center z-20">
                             <div className="text-gray-500 dark:text-gray-400 text-xs md:text-sm animate-pulse">Loading events...</div>
                         </div>
                     )}

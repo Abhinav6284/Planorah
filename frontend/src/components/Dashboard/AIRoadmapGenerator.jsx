@@ -236,7 +236,7 @@ export default function AIRoadmapGenerator() {
                                         <span>{roadmap.completion_percentage}% Complete</span>
                                     </div>
 
-                                    <div className="mt-4 h-2 bg-black/10">
+                                    <div className="mt-4 h-2 bg-gray-300 dark:bg-gray-700">
                                         <div
                                             className="h-full bg-black transition-all duration-500"
                                             style={{ width: `${roadmap.completion_percentage}%` }}
@@ -341,7 +341,7 @@ export default function AIRoadmapGenerator() {
                                 onClick={generateRoadmap}
                                 disabled={loading}
                                 className={`w-full py-6 font-black text-xl tracking-widest uppercase transition-all duration-200 ${loading
-                                    ? "bg-black/50 text-white cursor-not-allowed"
+                                    ? "bg-gray-500 text-white cursor-not-allowed"
                                     : "bg-black text-white hover:bg-white hover:text-black hover:border-4 hover:border-black"
                                     }`}
                             >
@@ -551,8 +551,8 @@ export default function AIRoadmapGenerator() {
                                                     <div
                                                         key={project.id}
                                                         className={`p-4 border-2 ${milestone.completed
-                                                            ? "border-white/50 bg-white/10"
-                                                            : "border-black/20 bg-black/5"
+                                                            ? "border-gray-500 bg-gray-200"
+                                                            : "border-gray-300 bg-gray-100"
                                                             }`}
                                                     >
                                                         <div className="flex items-start justify-between mb-3">

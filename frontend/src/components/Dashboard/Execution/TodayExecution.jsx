@@ -32,7 +32,7 @@ const TodayExecution = ({
         const nextMilestone = weekNumber * 7;
         const daysIntoCurrentWeek = currentStreak % 7;
         const progressPercent = currentStreak > 0 ? Math.round((daysIntoCurrentWeek / 7) * 100) : 0;
-        
+
         return {
             current: currentStreak,
             nextMilestone,
@@ -43,7 +43,7 @@ const TodayExecution = ({
     }, [streak]);
 
     return (
-        <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_12px_30px_-24px_rgba(15,23,42,0.55)] dark:border-white/10 dark:bg-[#121212] dark:shadow-none">
+        <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_12px_30px_-24px_rgba(15,23,42,0.55)] dark:border-slate-700 dark:bg-slate-900 dark:shadow-none">
             {/* Background decoration */}
             <div className="absolute right-0 top-0 -mr-20 -mt-20 h-56 w-56 rounded-full bg-blue-500/10 blur-[72px] dark:bg-blue-600/10" />
 
@@ -96,8 +96,8 @@ const TodayExecution = ({
                                 />
                             </div>
                             <p className="mt-1.5 text-xs text-blue-700 dark:text-blue-300">
-                                {milestoneData.daysRemaining === 0 
-                                    ? '🎉 Milestone reached!' 
+                                {milestoneData.daysRemaining === 0
+                                    ? '🎉 Milestone reached!'
                                     : `${milestoneData.daysRemaining} more days to complete this week!`}
                             </p>
                         </div>
@@ -134,7 +134,7 @@ const TodayExecution = ({
 
                     <button
                         onClick={onChangeTask}
-                        className="rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:border-white/15 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"
+                        className="rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
                     >
                         Change Task
                     </button>

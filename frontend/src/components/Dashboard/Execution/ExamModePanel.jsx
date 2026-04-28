@@ -15,13 +15,13 @@ const ExamModePanel = ({ plan, loading, onGenerate }) => {
                 <textarea
                     value={syllabus}
                     onChange={(e) => setSyllabus(e.target.value)}
-                    className="min-h-[110px] rounded-xl border border-white/15 bg-black/25 p-3 text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-cyan-300/50"
+                    className="min-h-[110px] rounded-xl border border-gray-400 bg-gray-200 p-3 text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-blue-400 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400"
                     placeholder="Paste syllabus text or key topics"
                 />
                 <input
                     value={pattern}
                     onChange={(e) => setPattern(e.target.value)}
-                    className="rounded-xl border border-white/15 bg-black/25 p-3 text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-cyan-300/50"
+                    className="rounded-xl border border-gray-400 bg-gray-200 p-3 text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-blue-400 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400"
                     placeholder="Exam pattern (sections, marks, duration)"
                 />
                 <button
@@ -39,7 +39,7 @@ const ExamModePanel = ({ plan, loading, onGenerate }) => {
                         <p className="text-xs uppercase tracking-wider text-slate-400 mb-2">Topics</p>
                         <div className="space-y-2 max-h-[220px] overflow-auto pr-1">
                             {(plan.topics || []).map((topic, idx) => (
-                                <div key={`${topic.topic}-${idx}`} className="rounded-xl border border-white/10 bg-white/5 p-2.5">
+                                <div key={`${topic.topic}-${idx}`} className="rounded-xl border border-gray-300 bg-gray-100 p-2.5 dark:border-gray-600 dark:bg-gray-800">
                                     <p className="text-sm font-medium">{topic.topic}</p>
                                     <p className="text-xs text-slate-300 mt-1">Priority: {topic.priority} · Status: {topic.status}</p>
                                 </div>

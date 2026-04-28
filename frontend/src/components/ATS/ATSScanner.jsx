@@ -179,22 +179,22 @@ export default function ATSScanner() {
                                         </div>
 
                                         <div className="flex-1 w-full grid grid-cols-2 lg:grid-cols-4 gap-4">
-                                            <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-2xl text-center">
+                                            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-2xl text-center">
                                                 <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Keywords</div>
                                                 <div className="text-xl font-bold text-gray-900 dark:text-white">{result.missing_keywords.length > 0 ? "Missing" : "Great"}</div>
                                                 <div className="text-xs text-red-500">{result.missing_keywords.length} alerts</div>
                                             </div>
-                                            <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-2xl text-center">
+                                            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-2xl text-center">
                                                 <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Strengths</div>
                                                 <div className="text-xl font-bold text-green-600">{result.strength_areas.length}</div>
                                                 <div className="text-xs text-green-500">Detected</div>
                                             </div>
-                                            <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-2xl text-center">
+                                            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-2xl text-center">
                                                 <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Improvement</div>
                                                 <div className="text-xl font-bold text-blue-600">{result.improvement_areas.length}</div>
                                                 <div className="text-xs text-blue-500">Tips</div>
                                             </div>
-                                            <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                            <div className="bg-gray-50 dark:bg-gray-700 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors p-4 rounded-2xl text-center">
                                                 <span className="text-2xl">📥</span>
                                                 <span className="text-xs font-bold mt-1">Download</span>
                                             </div>
@@ -216,7 +216,7 @@ export default function ATSScanner() {
                                             </div>
                                             <div className="flex flex-wrap gap-2">
                                                 {result.missing_keywords.map((kw, i) => (
-                                                    <span key={i} className="px-3 py-1 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 rounded-lg text-sm border border-red-100 dark:border-red-900/20">{kw}</span>
+                                                    <span key={i} className="px-3 py-1 bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-300 rounded-lg text-sm border border-red-100 dark:border-red-800">{kw}</span>
                                                 ))}
                                                 {result.missing_keywords.length === 0 && <span className="text-gray-400 italic">None! Good job.</span>}
                                             </div>
@@ -245,7 +245,7 @@ export default function ATSScanner() {
                                         </div>
                                         <ul className="space-y-3">
                                             {result.improvement_areas.map((item, i) => (
-                                                <li key={i} className="flex items-start gap-3 p-3 rounded-xl bg-blue-50/50 dark:bg-blue-900/5">
+                                                <li key={i} className="flex items-start gap-3 p-3 rounded-xl bg-blue-50 dark:bg-blue-900">
                                                     <span className="text-blue-500 mt-0.5">•</span>
                                                     <span className="text-sm text-gray-700 dark:text-gray-200">{item}</span>
                                                 </li>
@@ -255,7 +255,7 @@ export default function ATSScanner() {
 
                                 </motion.div>
                             ) : (
-                                <div className="h-full flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-3xl min-h-[500px] bg-white/50 dark:bg-gray-800/50">
+                                <div className="h-full flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-3xl min-h-[500px] bg-white dark:bg-gray-800 shadow-sm dark:shadow-lg transition-all duration-300">
                                     <div className="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-6 text-4xl">
                                         📄
                                     </div>

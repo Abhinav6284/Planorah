@@ -126,11 +126,10 @@ export default function PricingSection() {
               )}
 
               <div
-                className={`relative rounded-2xl border ${plan.border} overflow-hidden ${
-                  plan.popular
+                className={`relative rounded-2xl border ${plan.border} overflow-hidden ${plan.popular
                     ? "bg-gradient-to-br from-violet-600 to-indigo-700 text-white shadow-2xl shadow-violet-500/25 pt-6"
                     : `bg-white dark:bg-gray-900 shadow-sm pt-0`
-                } p-8 flex flex-col h-full`}
+                  } p-8 flex flex-col h-full`}
               >
                 {/* Plan name & price */}
                 <div className="mb-8">
@@ -156,9 +155,8 @@ export default function PricingSection() {
                 <ul className="space-y-3 mb-8 flex-1">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center ${
-                        plan.popular ? "bg-white/20" : "bg-violet-100 dark:bg-violet-900/40"
-                      }`}>
+                      <div className={`w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center ${plan.popular ? "bg-gray-200 dark:bg-gray-700" : "bg-violet-100 dark:bg-violet-900"
+                        }`}>
                         <svg
                           className={`w-3 h-3 ${plan.popular ? "text-white" : "text-violet-600 dark:text-violet-400"}`}
                           fill="none"
@@ -180,11 +178,10 @@ export default function PricingSection() {
                   <motion.button
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
-                    className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all ${
-                      plan.popular
+                    className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all ${plan.popular
                         ? "bg-white text-violet-700 hover:bg-violet-50 shadow-sm"
                         : "bg-violet-600 hover:bg-violet-700 text-white shadow-md shadow-violet-500/20"
-                    }`}
+                      }`}
                   >
                     {plan.cta}
                   </motion.button>
@@ -203,7 +200,7 @@ export default function PricingSection() {
           className="text-center text-sm text-gray-400 dark:text-gray-500 mt-10"
         >
           Need a custom plan?{" "}
-            <a href="mailto:support@planorah.me" className="text-violet-600 dark:text-violet-400 hover:underline font-medium">
+          <a href="mailto:support@planorah.me" className="text-violet-600 dark:text-violet-400 hover:underline font-medium">
             Contact us
           </a>{" "}
           for enterprise pricing.

@@ -35,11 +35,10 @@ const mockupStates = [
           {["Beginner", "Intermediate", "Advanced"].map((lvl, i) => (
             <div
               key={lvl}
-              className={`flex-1 py-2 rounded-xl text-center text-xs font-semibold border-2 transition-all ${
-                i === 0
+              className={`flex-1 py-2 rounded-xl text-center text-xs font-semibold border-2 transition-all ${i === 0
                   ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-gray-900 dark:border-white"
                   : "bg-white dark:bg-transparent text-gray-400 dark:text-gray-500 border-gray-200 dark:border-white/[0.1]"
-              }`}
+                }`}
             >
               {lvl}
             </div>
@@ -98,22 +97,20 @@ const mockupStates = [
         ].map((item, i) => (
           <div
             key={i}
-            className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
-              item.current
+            className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${item.current
                 ? "bg-gray-900 dark:bg-white border-gray-900 dark:border-white"
                 : item.done
-                ? "bg-gray-50 dark:bg-white/[0.04] border-gray-100 dark:border-white/[0.06]"
-                : "bg-white dark:bg-transparent border-gray-100 dark:border-white/[0.07]"
-            }`}
+                  ? "bg-gray-50 dark:bg-white/[0.04] border-gray-100 dark:border-white/[0.06]"
+                  : "bg-white dark:bg-transparent border-gray-100 dark:border-white/[0.07]"
+              }`}
           >
             <div
-              className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${
-                item.done
+              className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${item.done
                   ? "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400"
                   : item.current
-                  ? "bg-white/20 dark:bg-gray-900/20"
-                  : "border-2 border-gray-200 dark:border-white/[0.2]"
-              }`}
+                    ? "bg-gray-200 dark:bg-gray-700"
+                    : "border-2 border-gray-200 dark:border-white/[0.2]"
+                }`}
             >
               {item.done && <CheckCircle2 className="w-3 h-3" />}
               {item.current && (
@@ -121,13 +118,12 @@ const mockupStates = [
               )}
             </div>
             <span
-              className={`text-sm font-medium ${
-                item.done
+              className={`text-sm font-medium ${item.done
                   ? "line-through text-gray-400"
                   : item.current
-                  ? "text-white dark:text-gray-900"
-                  : "text-gray-800 dark:text-gray-200"
-              }`}
+                    ? "text-white dark:text-gray-900"
+                    : "text-gray-800 dark:text-gray-200"
+                }`}
             >
               {item.t}
             </span>
@@ -224,14 +220,8 @@ export default function HeroSection() {
   const active = mockupStates[currentIdx];
 
   return (
-    <section className="relative pt-36 pb-24 md:pt-48 md:pb-36 overflow-hidden">
-      {/* Ambient background — light mode */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute -top-40 left-[4%] h-[38rem] w-[38rem] rounded-full bg-sky-100/55 dark:bg-sky-900/20 blur-3xl" />
-        <div className="absolute top-[10%] right-[2%] h-[30rem] w-[30rem] rounded-full bg-violet-100/35 dark:bg-violet-900/15 blur-3xl" />
-        <div className="absolute bottom-[-4rem] left-[28%] h-[26rem] w-[50rem] rounded-full bg-amber-50/70 dark:bg-amber-900/10 blur-3xl" />
-        <div className="absolute inset-0 opacity-[0.11] dark:opacity-[0.15] [background-image:radial-gradient(rgba(15,23,42,0.1)_1px,transparent_1px)] dark:[background-image:radial-gradient(rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:28px_28px]" />
-      </div>
+    <section className="relative overflow-hidden bg-[#f7f6f2] pt-36 pb-24 md:pt-48 md:pb-36 dark:bg-[#090a0f]">
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[#f7f6f2] dark:bg-[#090a0f]" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
@@ -244,7 +234,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.1] text-sm font-semibold text-gray-700 dark:text-gray-300 mb-10 shadow-sm"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-gray-200 text-sm font-semibold text-gray-700 mb-10 shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
               Planorah 2.0 — AI Roadmaps are live
@@ -259,9 +249,7 @@ export default function HeroSection() {
             >
               From confused
               <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-800 via-gray-600 to-gray-400 dark:from-gray-200 dark:via-gray-400 dark:to-gray-600">
-                to unstoppable.
-              </span>
+              <span className="text-gray-700 dark:text-gray-300">to unstoppable.</span>
             </motion.h1>
 
             {/* Subheadline */}
@@ -292,7 +280,7 @@ export default function HeroSection() {
               </Link>
               <a
                 href="#how-it-works"
-                className="px-7 py-3.5 bg-white dark:bg-white/[0.06] text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-[15px] border border-gray-200 dark:border-white/[0.1] flex items-center justify-center hover:bg-gray-50 dark:hover:bg-white/[0.1] transition-all duration-200 shadow-sm"
+                className="px-7 py-3.5 bg-white text-gray-700 rounded-xl font-semibold text-[15px] border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all duration-200 shadow-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700"
               >
                 See how it works
               </a>
@@ -334,7 +322,7 @@ export default function HeroSection() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.44 }}
-              className="mt-5 text-xs text-gray-400 dark:text-gray-500 font-medium"
+              className="mt-5 text-xs text-gray-500 dark:text-gray-400 font-medium"
             >
               No credit card required · Free to start · Results in days
             </motion.p>
@@ -354,7 +342,7 @@ export default function HeroSection() {
             <motion.div
               animate={{ y: [0, -7, 0] }}
               transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -top-5 -right-5 bg-white dark:bg-[#1e2030] border border-gray-100/80 dark:border-white/[0.08] shadow-xl shadow-gray-200/50 dark:shadow-black/40 rounded-2xl px-4 py-2.5 z-20 flex items-center gap-3"
+              className="absolute -top-5 -right-5 bg-white border border-gray-200 shadow-xl shadow-gray-200/50 rounded-2xl px-4 py-2.5 z-20 flex items-center gap-3 dark:bg-gray-800 dark:border-gray-700 dark:shadow-black/40"
             >
               <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/50 rounded-xl flex items-center justify-center flex-shrink-0">
                 <Target className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -371,7 +359,7 @@ export default function HeroSection() {
             <motion.div
               animate={{ y: [0, 9, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
-              className="absolute -bottom-5 -left-5 bg-white dark:bg-[#1e2030] border border-gray-100/80 dark:border-white/[0.08] shadow-xl shadow-gray-200/50 dark:shadow-black/40 rounded-2xl px-4 py-2.5 z-20 flex items-center gap-2"
+              className="absolute -bottom-5 -left-5 bg-white border border-gray-200 shadow-xl shadow-gray-200/50 rounded-2xl px-4 py-2.5 z-20 flex items-center gap-2 dark:bg-gray-800 dark:border-gray-700 dark:shadow-black/40"
             >
               <Flame className="w-5 h-5 text-orange-500" />
               <span className="text-sm font-bold text-gray-900 dark:text-white">12-day streak 🔥</span>
@@ -381,7 +369,7 @@ export default function HeroSection() {
             <div className="relative bg-white dark:bg-[#13151f] border border-gray-200/60 dark:border-white/[0.08] rounded-[1.5rem] shadow-[0_32px_80px_-16px_rgba(0,0,0,0.12)] dark:shadow-[0_32px_80px_-16px_rgba(0,0,0,0.5)] overflow-hidden">
 
               {/* Browser chrome */}
-              <div className="h-11 border-b border-gray-100 dark:border-white/[0.06] flex items-center px-4 gap-2 bg-gray-50/80 dark:bg-white/[0.03]">
+              <div className="h-11 border-b border-gray-100 flex items-center px-4 gap-2 bg-gray-50 dark:bg-white/[0.03]">
                 <div className="flex gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-red-400/75" />
                   <div className="w-3 h-3 rounded-full bg-amber-400/75" />
@@ -396,13 +384,12 @@ export default function HeroSection() {
                   {mockupStates.map((_, i) => (
                     <div
                       key={i}
-                      className={`h-1 rounded-full transition-all duration-500 ${
-                        i === currentIdx
+                      className={`h-1 rounded-full transition-all duration-500 ${i === currentIdx
                           ? "w-5 bg-gray-900 dark:bg-white"
                           : i < currentIdx
-                          ? "w-2 bg-gray-400 dark:bg-gray-600"
-                          : "w-2 bg-gray-200 dark:bg-white/[0.15]"
-                      }`}
+                            ? "w-2 bg-gray-400 dark:bg-gray-700"
+                            : "w-2 bg-gray-200 dark:bg-white/[0.15]"
+                        }`}
                     />
                   ))}
                 </div>
@@ -415,13 +402,12 @@ export default function HeroSection() {
                   {[Target, Cpu, CheckCircle2, Flame, Trophy].map((Icon, i) => (
                     <div
                       key={i}
-                      className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-300 ${
-                        i === currentIdx
+                      className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-300 ${i === currentIdx
                           ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm"
                           : i < currentIdx
-                          ? "bg-gray-100 dark:bg-white/[0.08] text-gray-500 dark:text-gray-400"
-                          : "text-gray-300 dark:text-gray-700"
-                      }`}
+                            ? "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+                            : "text-gray-300 dark:text-gray-700"
+                        }`}
                     >
                       <Icon className="w-3.5 h-3.5" />
                     </div>
@@ -429,7 +415,7 @@ export default function HeroSection() {
                 </div>
 
                 {/* Content area */}
-                <div className="flex-1 p-5 bg-white dark:bg-transparent h-[340px] relative overflow-hidden">
+                <div className="flex-1 p-5 bg-white h-[340px] relative overflow-hidden dark:bg-gray-900">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={active.id}

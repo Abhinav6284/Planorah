@@ -26,7 +26,7 @@ export default function CTASection() {
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-          className="relative overflow-hidden rounded-[2.5rem] border border-slate-200/70 dark:border-white/[0.08] bg-white/80 dark:bg-white/[0.03] backdrop-blur-xl px-8 py-16 md:px-16 md:py-24 shadow-[0_28px_72px_-24px_rgba(15,23,42,0.26)] dark:shadow-[0_28px_72px_-24px_rgba(0,0,0,0.5)]"
+          className="relative overflow-hidden rounded-[2.5rem] border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-8 py-16 md:px-16 md:py-24 shadow-[0_28px_72px_-24px_rgba(15,23,42,0.26)] dark:shadow-[0_28px_72px_-24px_rgba(0,0,0,0.5)]"
         >
           {/* Corner glows */}
           <div className="pointer-events-none absolute -top-14 -right-14 h-52 w-52 rounded-full bg-sky-100/60 dark:bg-sky-900/20 blur-2xl" />

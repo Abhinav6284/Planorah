@@ -102,13 +102,13 @@ export default function ChatWidget() {
                                     </div>
                                     <div>
                                         <h3 className="font-semibold">Planorah Assistant</h3>
-                                        <p className="text-xs text-white/80">Ask about your learning journey</p>
+                                        <p className="text-xs text-indigo-100">Ask about your learning journey</p>
                                     </div>
                                 </div>
                                 <Link
                                     to="/assistant"
                                     onClick={() => setIsOpen(false)}
-                                    className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                                    className="p-2 hover:bg-violet-500 rounded-lg transition-colors"
                                     title="Open full chat"
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

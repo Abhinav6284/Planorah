@@ -67,10 +67,10 @@ const TaskDetailModal = ({ task, isOpen, onClose, onStartFocus }) => {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         onClick={(e) => e.stopPropagation()}
-                        className="relative z-[101] w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl dark:border-white/10 dark:bg-[#121212]"
+                        className="relative z-[101] w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900"
                     >
                         {/* Header */}
-                        <div className="sticky top-0 z-10 flex items-start justify-between border-b border-slate-200 bg-white px-6 py-5 dark:border-white/10 dark:bg-[#121212]">
+                        <div className="sticky top-0 z-10 flex items-start justify-between border-b border-slate-200 bg-white px-6 py-5 dark:border-slate-700 dark:bg-slate-900">
                             <div className="flex-1 pr-4">
                                 <div className="mb-1 flex items-center gap-2">
                                     <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">
@@ -110,7 +110,7 @@ const TaskDetailModal = ({ task, isOpen, onClose, onStartFocus }) => {
                             ) : guidance ? (
                                 <div className="space-y-6">
                                     {/* Objective */}
-                                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/5">
+                                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
                                         <div className="mb-2 flex items-center gap-2">
                                             <Target className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                                             <h3 className="text-sm font-bold uppercase tracking-wide text-slate-700 dark:text-slate-300">
@@ -133,7 +133,7 @@ const TaskDetailModal = ({ task, isOpen, onClose, onStartFocus }) => {
                                                 {guidance.time_breakdown.map((item, idx) => (
                                                     <div
                                                         key={idx}
-                                                        className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 dark:border-white/10 dark:bg-[#1a1a1a]"
+                                                        className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800"
                                                     >
                                                         <span className="flex h-8 w-16 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100 text-xs font-bold text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">
                                                             {item.duration}

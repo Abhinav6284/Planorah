@@ -19,7 +19,7 @@ import { roadmapService } from '../../api/roadmapService';
 import { planoraService } from '../../api/planoraService';
 import { useMissionFlow } from '../../hooks/useMissionFlow';
 
-const shellCardClass = 'rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_12px_30px_-24px_rgba(15,23,42,0.55)] dark:border-white/10 dark:bg-[#121212] dark:shadow-none';
+const shellCardClass = 'rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_12px_30px_-24px_rgba(15,23,42,0.55)] dark:border-slate-700 dark:bg-slate-900 dark:shadow-none';
 
 const buildDateKey = (dateValue) => {
     if (!dateValue) {
@@ -293,7 +293,7 @@ const ExecutionDashboard = () => {
                 {currentState === 'IN_PROGRESS' && (
                     <motion.div
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 p-6 backdrop-blur-sm"
+                        className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black p-6"
                     >
                         <FocusMode
                             open={true}
@@ -324,7 +324,7 @@ const ExecutionDashboard = () => {
                     {/* LEFT COLUMN: Main Activities */}
                     <div className="space-y-4 lg:col-span-8">
                         {/* Mode Switcher Block */}
-                        <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-3 dark:border-white/10 dark:bg-[#121212]">
+                        <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
                             <div className="flex items-center gap-3">
                                 <ModeSwitch mode={mode} onChange={setMode} />
                                 <span className="text-xs font-medium text-slate-500 dark:text-slate-400 sm:text-sm">
@@ -333,7 +333,7 @@ const ExecutionDashboard = () => {
                             </div>
                             <button
                                 onClick={() => setVoicePanelOpen(true)}
-                                className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-200 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 sm:px-3 sm:py-1.5 sm:text-xs"
+                                className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-white dark:hover:bg-slate-600 sm:px-3 sm:py-1.5 sm:text-xs"
                             >
                                 <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5" /> AI Coach
                             </button>
@@ -374,7 +374,7 @@ const ExecutionDashboard = () => {
                                     <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Tasks ({selectedTasks.length})</p>
                                     <div className="flex items-center gap-3">
                                         <div className="h-1.5 w-24 overflow-hidden rounded-full bg-slate-200 dark:bg-[#25242e]">
-                                            <div className="h-full rounded-full bg-slate-500/60 transition-all dark:bg-white/20" style={{ width: `${selectedTaskProgress}%` }} />
+                                            <div className="h-full rounded-full bg-slate-500 transition-all dark:bg-slate-400" style={{ width: `${selectedTaskProgress}%` }} />
                                         </div>
                                         <span className="text-xs font-semibold text-slate-500 dark:text-slate-500">{selectedTaskProgress}%</span>
                                     </div>
@@ -414,7 +414,7 @@ const ExecutionDashboard = () => {
                                                     </p>
                                                 </div>
                                                 <div className="flex items-center gap-3">
-                                                    <span className="rounded-full border border-slate-200 px-2.5 py-0.5 text-[10px] font-semibold lowercase tracking-wide text-slate-600 dark:border-white/10 dark:text-slate-400">
+                                                    <span className="rounded-full border border-slate-200 px-2.5 py-0.5 text-[10px] font-semibold lowercase tracking-wide text-slate-600 dark:border-slate-600 dark:text-slate-400">
                                                         {getTaskStatusLabel(card.status)}
                                                     </span>
                                                     <ArrowRight className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
@@ -500,7 +500,7 @@ const ExecutionDashboard = () => {
                         <ProgressPanel tasks={activeTasks} stats={mergedStats} />
 
                         {/* AI Insight Card */}
-                        <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-indigo-50 to-white p-4 dark:border-white/10 dark:from-[#1a1a2e] dark:to-[#121212]">
+                        <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-indigo-50 to-white p-4 dark:border-slate-700 dark:from-indigo-900 dark:to-slate-900">
                             <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
                                 <BrainCircuit className="h-4 w-4" />
                                 <span className="text-[11px] font-bold uppercase tracking-wider">AI Insight</span>

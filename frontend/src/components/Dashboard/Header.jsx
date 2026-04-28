@@ -96,7 +96,7 @@ const Header = () => {
             </div>
 
             {/* Navigation - Centered with consistent sizing */}
-            <nav className="pointer-events-auto absolute left-1/2 hidden -translate-x-1/2 items-center rounded-xl border border-gray-200/50 bg-white/95 px-1 py-1 shadow-md backdrop-blur-md dark:border-gray-700/50 dark:bg-gray-800/95 md:flex">
+            <nav className="pointer-events-auto absolute left-1/2 hidden -translate-x-1/2 items-center rounded-xl border border-gray-300 bg-white px-1 py-1 shadow-md dark:border-gray-600 dark:bg-gray-800 md:flex">
                 {navGroups.map((group, index) => {
                     const isActive = group.type === 'link'
                         ? location.pathname === group.path
@@ -184,13 +184,13 @@ const Header = () => {
                             to="/profile"
                             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition-colors"
                         >
-                            <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center"><User className="w-4 h-4 text-gray-600 dark:text-gray-300" /></span>
+                            <span className="w-8 h-8 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center"><User className="w-4 h-4 text-gray-600 dark:text-gray-300" /></span>
                             <span>My Profile</span>
                         </Link>
                         <button
                             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition-colors"
                         >
-                            <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center"><Bell className="w-4 h-4 text-gray-600 dark:text-gray-300" /></span>
+                            <span className="w-8 h-8 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center"><Bell className="w-4 h-4 text-gray-600 dark:text-gray-300" /></span>
                             <span>Notifications</span>
                         </button>
                         <Link

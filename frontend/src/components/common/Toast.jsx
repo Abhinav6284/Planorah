@@ -57,7 +57,7 @@ const ToastItem = ({ id, type = 'info', message, onDismiss }) => {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, x: 100, scale: 0.95 }}
       transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg backdrop-blur-sm max-w-sm w-full ${bgColors[type] || bgColors.info}`}
+      className={`flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg max-w-sm w-full ${bgColors[type] || bgColors.info}`}
     >
       <div className="flex-shrink-0">{icons[type] || icons.info}</div>
       <p className="text-sm font-medium text-gray-900 dark:text-gray-100 flex-1">{message}</p>

@@ -61,14 +61,10 @@ export default function FeaturesSection() {
   return (
     <section
       id="features"
-      className="relative scroll-mt-36 py-32 md:py-44 overflow-hidden bg-white dark:bg-[#0f1117] border-y border-slate-200/60 dark:border-white/[0.05]"
+      className="relative scroll-mt-36 py-32 md:py-44 overflow-hidden bg-white dark:bg-[#0f1117] border-y border-slate-200 dark:border-gray-700"
     >
       {/* Ambient blobs */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-20 -left-20 h-72 w-72 rounded-full bg-cyan-100/50 dark:bg-cyan-900/15 blur-3xl" />
-        <div className="absolute bottom-0 right-[-5rem] h-80 w-80 rounded-full bg-indigo-100/40 dark:bg-indigo-900/15 blur-3xl" />
-        <div className="absolute inset-0 opacity-[0.08] dark:opacity-[0.14] [background-image:radial-gradient(rgba(15,23,42,0.12)_1px,transparent_1px)] dark:[background-image:radial-gradient(rgba(255,255,255,0.07)_1px,transparent_1px)] [background-size:30px_30px]" />
-      </div>
+      <div className="absolute inset-0 pointer-events-none bg-white dark:bg-[#0f1117]" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
 
@@ -118,9 +114,9 @@ export default function FeaturesSection() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-60px" }}
-              className="group bg-white dark:bg-white/[0.03] rounded-2xl p-9 border border-slate-200/70 dark:border-white/[0.07] shadow-[0_8px_32px_-14px_rgba(15,23,42,0.12)] dark:shadow-none hover:shadow-[0_20px_48px_-16px_rgba(15,23,42,0.2)] dark:hover:bg-white/[0.06] hover:border-slate-300/60 dark:hover:border-white/[0.12] hover:-translate-y-1 transition-all duration-300"
+              className="group bg-white dark:bg-gray-800 rounded-2xl p-9 border border-slate-200 dark:border-gray-700 shadow-[0_8px_32px_-14px_rgba(15,23,42,0.12)] dark:shadow-none hover:shadow-[0_20px_48px_-16px_rgba(15,23,42,0.2)] hover:border-slate-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-300"
             >
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-50 to-sky-50/80 dark:from-white/[0.06] dark:to-white/[0.03] border border-slate-100 dark:border-white/[0.08] flex items-center justify-center mb-7 group-hover:scale-110 transition-transform duration-300">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-50 to-sky-50 border border-slate-100 dark:bg-gray-700 dark:border-gray-600 flex items-center justify-center mb-7 group-hover:scale-110 transition-transform duration-300">
                 <feature.icon className="w-5 h-5 text-gray-800 dark:text-gray-300" strokeWidth={1.5} />
               </div>
               <h3 className="text-[1.125rem] font-bold text-gray-900 dark:text-white mb-3">

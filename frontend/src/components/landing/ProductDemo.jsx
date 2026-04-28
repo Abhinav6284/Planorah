@@ -126,7 +126,7 @@ const TasksContent = () => (
               : "bg-white dark:bg-white/[0.03] border-gray-100 dark:border-white/[0.07] shadow-sm"
             }`}>
           <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${item.done ? "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400"
-            : item.current ? "bg-white/20 dark:bg-gray-900/20 text-white dark:text-gray-900"
+            : item.current ? "bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
               : "border-2 border-gray-200 dark:border-white/[0.2]"
             }`}>
             {item.done ? <CheckCircle2 className="w-4 h-4" /> : item.current ? <span className="w-2 h-2 bg-white dark:bg-gray-900 rounded-full animate-pulse" /> : null}

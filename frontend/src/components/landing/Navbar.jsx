@@ -26,11 +26,10 @@ export default function Navbar() {
     <>
       <header className="fixed top-0 inset-x-0 z-50 flex justify-center px-4 sm:px-6 pt-4">
         <nav
-          className={`flex items-center justify-between gap-6 px-4 md:px-6 py-2.5 rounded-full transition-all duration-500 max-w-6xl w-full ${
-            scrolled
-              ? "bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-lg shadow-gray-200/30 dark:shadow-black/30 border border-gray-200/60 dark:border-white/[0.07]"
-              : "bg-white/80 dark:bg-white/[0.06] backdrop-blur-sm border border-gray-200/40 dark:border-white/[0.06]"
-          }`}
+          className={`flex items-center justify-between gap-6 px-4 md:px-6 py-2.5 rounded-full transition-all duration-500 max-w-6xl w-full ${scrolled
+              ? "bg-white dark:bg-gray-900 shadow-lg shadow-gray-200 dark:shadow-black border border-gray-200 dark:border-gray-700"
+              : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+            }`}
         >
           {/* Brand */}
           <Link
@@ -125,7 +124,7 @@ export default function Navbar() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="fixed top-0 inset-x-0 bottom-0 z-40 bg-white/95 dark:bg-gray-950/97 backdrop-blur-xl pt-28 px-6"
+            className="fixed top-0 inset-x-0 bottom-0 z-40 bg-white dark:bg-gray-900 pt-28 px-6"
           >
             <div className="flex flex-col gap-6 text-lg font-medium text-gray-900 dark:text-white">
               {navLinks.map((link) => (

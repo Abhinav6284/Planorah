@@ -38,7 +38,7 @@ const AICoachCard = ({ coach, onRegenerate, loading }) => {
             </button>
 
             {showReason && (
-                <div className="mt-3 rounded-2xl bg-white/5 border border-white/10 p-3">
+                <div className="mt-3 rounded-2xl bg-gray-100 border border-gray-300 p-3 dark:bg-gray-700 dark:border-gray-600">
                     <p className="text-sm text-slate-200 leading-relaxed">{coach?.reason || 'This recommendation optimizes consistency and impact.'}</p>
                 </div>
             )}
