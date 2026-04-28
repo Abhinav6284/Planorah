@@ -11,10 +11,205 @@ import {
   MeshTransmissionMaterial,
 } from "@react-three/drei";
 
-function useIsSmallScreen() {
-  const [isSmall, setIsSmall] = useState(() =>
-    typeof window !== "undefined" ? window.innerWidth < 1024 : false
-  );
+const avatarData = [
+  { initials: "P", bg: "bg-violet-400" },
+  { initials: "A", bg: "bg-blue-400" },
+  { initials: "M", bg: "bg-emerald-400" },
+  { initials: "S", bg: "bg-amber-400" },
+  { initials: "J", bg: "bg-rose-400" },
+];
+
+const mockupStates = [
+  {
+    id: "goal",
+    label: "01 — Set Goal",
+    header: "What's your learning goal?",
+    sub: "Tell Planorah exactly what you want to achieve.",
+    content: (
+      <div className="space-y-3.5">
+        <div className="h-11 w-full bg-gray-50 dark:bg-white/[0.06] border-2 border-gray-200 dark:border-white/[0.1] rounded-xl flex items-center px-4 text-sm text-gray-900 dark:text-white font-medium">
+          Master Full Stack Development
+          <span className="ml-auto w-0.5 h-5 bg-gray-800 dark:bg-white animate-pulse rounded-full" />
+        </div>
+        <div className="flex gap-2">
+          {["Beginner", "Intermediate", "Advanced"].map((lvl, i) => (
+            <div
+              key={lvl}
+              className={`flex-1 py-2 rounded-xl text-center text-xs font-semibold border-2 transition-all ${i === 0
+                  ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-gray-900 dark:border-white"
+                  : "bg-white dark:bg-transparent text-gray-400 dark:text-gray-500 border-gray-200 dark:border-white/[0.1]"
+                }`}
+            >
+              {lvl}
+            </div>
+          ))}
+        </div>
+        <div className="h-11 w-full bg-gray-900 dark:bg-white rounded-xl flex items-center justify-center text-white dark:text-gray-900 text-sm font-semibold gap-2">
+          <Cpu className="w-4 h-4" /> Generate My Roadmap
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "roadmap",
+    label: "02 — AI Roadmap",
+    header: "Your personalized learning path",
+    sub: "AI-structured milestones based on your level.",
+    content: (
+      <div className="space-y-2.5">
+        {[
+          { m: "M1", title: "HTML, CSS & JavaScript", color: "bg-blue-500" },
+          { m: "M2", title: "React & Component Design", color: "bg-purple-500" },
+          { m: "M3", title: "Node.js & REST APIs", color: "bg-emerald-500" },
+        ].map((item, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: i * 0.1 }}
+            className="bg-gray-50 dark:bg-white/[0.05] rounded-xl border border-gray-100 dark:border-white/[0.07] p-3 flex gap-3 items-center"
+          >
+            <div
+              className={`w-9 h-9 rounded-lg ${item.color} flex items-center justify-center text-white font-bold text-xs flex-shrink-0`}
+            >
+              {item.m}
+            </div>
+            <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              {item.title}
+            </span>
+            <ArrowRight className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600 ml-auto flex-shrink-0" />
+          </motion.div>
+        ))}
+      </div>
+    ),
+  },
+  {
+    id: "tasks",
+    label: "03 — Daily Tasks",
+    header: "Today's tasks",
+    sub: "Wake up knowing exactly what to do.",
+    content: (
+      <div className="space-y-2.5">
+        {[
+          { t: "Read: React Context API", done: true },
+          { t: "Practice: Build Auth Flow", done: false, current: true },
+          { t: "Quiz: State Management", done: false },
+        ].map((item, i) => (
+          <div
+            key={i}
+            className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${item.current
+                ? "bg-gray-900 dark:bg-white border-gray-900 dark:border-white"
+                : item.done
+                  ? "bg-gray-50 dark:bg-white/[0.04] border-gray-100 dark:border-white/[0.06]"
+                  : "bg-white dark:bg-transparent border-gray-100 dark:border-white/[0.07]"
+              }`}
+          >
+            <div
+              className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${item.done
+                  ? "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400"
+                  : item.current
+                    ? "bg-gray-200 dark:bg-gray-700"
+                    : "border-2 border-gray-200 dark:border-white/[0.2]"
+                }`}
+            >
+              {item.done && <CheckCircle2 className="w-3 h-3" />}
+              {item.current && (
+                <span className="w-2 h-2 bg-white dark:bg-gray-900 rounded-full block animate-pulse" />
+              )}
+            </div>
+            <span
+              className={`text-sm font-medium ${item.done
+                  ? "line-through text-gray-400"
+                  : item.current
+                    ? "text-white dark:text-gray-900"
+                    : "text-gray-800 dark:text-gray-200"
+                }`}
+            >
+              {item.t}
+            </span>
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  {
+    id: "progress",
+    label: "04 — Track Progress",
+    header: "Full Stack Masterclass",
+    sub: "72% complete · 12-day streak",
+    content: (
+      <div className="flex items-center gap-6 py-1">
+        <div className="relative w-24 h-24 flex-shrink-0">
+          <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+            <circle
+              cx="50" cy="50" r="40"
+              stroke="currentColor" strokeWidth="9" fill="none"
+              className="text-gray-200 dark:text-white/[0.1]"
+            />
+            <circle
+              cx="50" cy="50" r="40"
+              stroke="#10b981" strokeWidth="9" fill="none"
+              strokeDasharray="251" strokeDashoffset="70" strokeLinecap="round"
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-xl font-bold text-gray-900 dark:text-white">72%</span>
+          </div>
+        </div>
+        <div className="space-y-3.5">
+          <div>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Streak</p>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <Flame className="w-4 h-4 text-orange-500" />
+              <span className="text-base font-bold text-gray-900 dark:text-white">12 days</span>
+            </div>
+          </div>
+          <div>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Tasks Done</p>
+            <span className="text-base font-bold text-gray-900 dark:text-white">
+              186 <span className="text-sm text-gray-400 font-normal">of 259</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "mastery",
+    label: "05 — Achieve Mastery",
+    header: "Goal Accomplished!",
+    sub: "Full Stack Development mastered in 5 months.",
+    content: (
+      <div className="flex flex-col items-center py-1 gap-4">
+        <motion.div
+          initial={{ scale: 0.5 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", bounce: 0.5 }}
+          className="w-14 h-14 bg-gradient-to-br from-yellow-300 to-amber-400 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-200/40 rotate-3"
+        >
+          <Trophy className="w-7 h-7 text-white" />
+        </motion.div>
+        <div className="flex gap-2">
+          {[
+            { label: "Gold Learner", color: "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-500/30" },
+            { label: "30-Day Streak", color: "bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-500/30" },
+          ].map((b, i) => (
+            <span key={i} className={`px-3 py-1 rounded-full text-xs font-semibold border ${b.color}`}>
+              {b.label}
+            </span>
+          ))}
+        </div>
+        <button className="px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl text-sm font-semibold flex items-center gap-2">
+          View Certificate <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
+    ),
+  },
+];
+
+export default function HeroSection() {
+  const [currentIdx, setCurrentIdx] = useState(0);
+
   useEffect(() => {
     const update = () => setIsSmall(window.innerWidth < 1024);
     window.addEventListener("resize", update, { passive: true });
@@ -34,38 +229,8 @@ function PlanoraSphere() {
   });
 
   return (
-    <group ref={groupRef}>
-      <mesh position={[0, 0, 0]}>
-        <torusGeometry args={[2.2, 0.38, 64, 128]} />
-        <MeshTransmissionMaterial
-          backside
-          samples={4}
-          thickness={0.8}
-          chromaticAberration={0.04}
-          anisotropy={0.1}
-          distortion={0.08}
-          distortionScale={0.4}
-          temporalDistortion={0.08}
-          iridescence={0.8}
-          iridescenceIOR={1.2}
-          iridescenceThicknessRange={[0, 1200]}
-          color="#D96C4A"
-        />
-      </mesh>
-      <mesh position={[0, 0, 0]} rotation={[Math.PI / 4, Math.PI / 4, 0]}>
-        <icosahedronGeometry args={[1, 0]} />
-        <MeshTransmissionMaterial
-          backside
-          samples={4}
-          thickness={2}
-          roughness={0.05}
-          chromaticAberration={0.15}
-          color="#1A1A1A"
-        />
-      </mesh>
-    </group>
-  );
-}
+    <section className="relative overflow-hidden bg-[#f7f6f2] pt-36 pb-24 md:pt-48 md:pb-36 dark:bg-[#090a0f]">
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[#f7f6f2] dark:bg-[#090a0f]" />
 
 function MobileOrbFallback() {
   return (
@@ -92,29 +257,28 @@ function MobileOrbFallback() {
         style={{ border: "1px solid rgba(217,108,74,0.40)" }}
       />
 
-      {/* Core glowing sphere */}
-      <motion.div
-        animate={{ scale: [1, 1.07, 1], opacity: [0.88, 1, 0.88] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="w-20 h-20 rounded-full"
-        style={{
-          background:
-            "radial-gradient(circle at 35% 35%, #E8956A, #D96C4A, #B85030)",
-          boxShadow:
-            "0 0 55px rgba(217,108,74,0.55), 0 0 110px rgba(217,108,74,0.18)",
-        }}
-      />
+            {/* Announcement badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-gray-200 text-sm font-semibold text-gray-700 mb-10 shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+              Planorah 2.0 — AI Roadmaps are live
+            </motion.div>
 
-      {/* Charcoal diamond accent (icosahedron stand-in) */}
-      <motion.div
-        animate={{ rotate: [0, 360] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-        className="absolute w-8 h-8 bg-[#1A1A1A]/80"
-        style={{ clipPath: "polygon(50% 0%,100% 50%,50% 100%,0% 50%)" }}
-      />
-    </div>
-  );
-}
+            {/* H1 */}
+            <motion.h1
+              initial={{ opacity: 0, y: 28 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+              className="text-[2.8rem] sm:text-[3.4rem] md:text-[4.4rem] lg:text-[5.25rem] font-bold font-serif tracking-[-0.03em] leading-[0.95] text-gray-950 dark:text-white mb-7"
+            >
+              From confused
+              <br />
+              <span className="text-gray-700 dark:text-gray-300">to unstoppable.</span>
+            </motion.h1>
 
 // ── Main component ────────────────────────────────────────────────────────────
 export default function HeroSection() {
@@ -144,18 +308,12 @@ export default function HeroSection() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2, duration: 0.6 }}
               >
-                <span className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest uppercase text-terracotta bg-terracotta/10 rounded-full border border-terracotta/20">
-                  <Zap className="w-3.5 h-3.5" />
-                  AI-Powered Productivity
-                </span>
-              </motion.div>
-
-              {/* Headline */}
-              <motion.h1
-                className="text-4xl sm:text-5xl lg:text-7xl font-playfair font-bold text-white leading-[1.05] tracking-tight"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                Build My Free Roadmap
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+              </Link>
+              <a
+                href="#how-it-works"
+                className="px-7 py-3.5 bg-white text-gray-700 rounded-xl font-semibold text-[15px] border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all duration-200 shadow-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700"
               >
                 Master Your<br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-terracotta to-[#E8956A]">
@@ -194,18 +352,16 @@ export default function HeroSection() {
                   </motion.button>
                 </Link>
 
-                {/* SECONDARY CTA - PRICING */}
-                <a href="#pricing" className="w-full sm:w-auto">
-                  <motion.button
-                    whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.15)" }}
-                    whileTap={{ scale: 0.95 }}
-                    className="w-full px-10 py-5 text-lg font-bold text-white border-2 border-white/40 rounded-full hover:border-white/70 transition-all duration-300 flex items-center justify-center gap-2 font-outfit backdrop-blur-sm"
-                  >
-                    View Plans & Pricing
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </motion.button>
-                </a>
-              </motion.div>
+            {/* Trust signals */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.44 }}
+              className="mt-5 text-xs text-gray-500 dark:text-gray-400 font-medium"
+            >
+              No credit card required · Free to start · Results in days
+            </motion.p>
+          </div>
 
               {/* Trust badges below buttons */}
               <motion.div
@@ -228,106 +384,110 @@ export default function HeroSection() {
                 </div>
               </motion.div>
 
-              {/* Stats Row - BOLD NUMBERS */}
-              <motion.div
-                className="grid grid-cols-3 gap-4 sm:gap-8 pt-10 sm:pt-12 border-t border-white/10"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8, duration: 0.8 }}
-              >
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  className="text-center"
-                >
-                  <div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-terracotta to-[#E8956A] bg-clip-text text-transparent">5.0★</div>
-                  <div className="text-gray-400 text-xs sm:text-sm mt-2 font-outfit">Avg Rating</div>
-                </motion.div>
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  className="text-center"
-                >
-                  <div className="text-4xl sm:text-5xl font-bold text-white">10K+</div>
-                  <div className="text-gray-400 text-xs sm:text-sm mt-2 font-outfit">Active Users</div>
-                </motion.div>
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  className="text-center"
-                >
-                  <div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-terracotta to-[#E8956A] bg-clip-text text-transparent">42%</div>
-                  <div className="text-gray-400 text-xs sm:text-sm mt-2 font-outfit">Productivity +</div>
-                </motion.div>
-              </motion.div>
+            {/* Floating notification — top right */}
+            <motion.div
+              animate={{ y: [0, -7, 0] }}
+              transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute -top-5 -right-5 bg-white border border-gray-200 shadow-xl shadow-gray-200/50 rounded-2xl px-4 py-2.5 z-20 flex items-center gap-3 dark:bg-gray-800 dark:border-gray-700 dark:shadow-black/40"
+            >
+              <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Target className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-gray-900 dark:text-white leading-none mb-0.5">
+                  Roadmap generated ✓
+                </p>
+                <p className="text-[10px] text-gray-400">Full Stack Dev · 6 months</p>
+              </div>
             </motion.div>
 
             {/* ── Right Column — 3-D Canvas (desktop) / CSS orb (mobile) ── */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-              className="relative h-[320px] sm:h-[400px] lg:h-[580px] w-full"
+              animate={{ y: [0, 9, 0] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
+              className="absolute -bottom-5 -left-5 bg-white border border-gray-200 shadow-xl shadow-gray-200/50 rounded-2xl px-4 py-2.5 z-20 flex items-center gap-2 dark:bg-gray-800 dark:border-gray-700 dark:shadow-black/40"
             >
-              {isMobile ? (
-                /* ── Mobile/tablet: lightweight CSS orb, no WebGL ── */
-                <MobileOrbFallback />
-              ) : (
-                /* ── Desktop: full 3-D scene ── */
-                <div className="absolute inset-0 cursor-grab active:cursor-grabbing z-10">
-                  <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
-                    <Environment preset="city" />
-                    <PresentationControls
-                      global
-                      rotation={[0, 0.3, 0]}
-                      polar={[-0.4, 0.2]}
-                      azimuth={[-1, 0.75]}
-                      config={{ mass: 2, tension: 400 }}
-                      snap={{ mass: 4, tension: 400 }}
-                    >
-                      <Float rotationIntensity={0.6} floatIntensity={1} speed={1.4}>
-                        <PlanoraSphere />
-                      </Float>
-                    </PresentationControls>
-                    <ContactShadows
-                      position={[0, -3.5, 0]}
-                      opacity={0.3}
-                      scale={20}
-                      blur={2}
-                      far={4}
+              <Flame className="w-5 h-5 text-orange-500" />
+              <span className="text-sm font-bold text-gray-900 dark:text-white">12-day streak 🔥</span>
+            </motion.div>
+
+            {/* Mockup card */}
+            <div className="relative bg-white dark:bg-[#13151f] border border-gray-200/60 dark:border-white/[0.08] rounded-[1.5rem] shadow-[0_32px_80px_-16px_rgba(0,0,0,0.12)] dark:shadow-[0_32px_80px_-16px_rgba(0,0,0,0.5)] overflow-hidden">
+
+              {/* Browser chrome */}
+              <div className="h-11 border-b border-gray-100 flex items-center px-4 gap-2 bg-gray-50 dark:bg-white/[0.03]">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-400/75" />
+                  <div className="w-3 h-3 rounded-full bg-amber-400/75" />
+                  <div className="w-3 h-3 rounded-full bg-emerald-400/75" />
+                </div>
+                <div className="flex-1 mx-3">
+                  <div className="h-5 rounded-md bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.08] flex items-center px-3">
+                    <span className="text-[10px] text-gray-400 tracking-wide">app.planorah.me</span>
+                  </div>
+                </div>
+                <div className="flex gap-1 items-center">
+                  {mockupStates.map((_, i) => (
+                    <div
+                      key={i}
+                      className={`h-1 rounded-full transition-all duration-500 ${i === currentIdx
+                          ? "w-5 bg-gray-900 dark:bg-white"
+                          : i < currentIdx
+                            ? "w-2 bg-gray-400 dark:bg-gray-700"
+                            : "w-2 bg-gray-200 dark:bg-white/[0.15]"
+                        }`}
                     />
                   </Canvas>
                 </div>
               )}
 
-              {/* Floating Card 1 — Goals */}
-              <motion.div
-                animate={{ y: [-6, 6, -6] }}
-                transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-                className="absolute left-0 top-6 sm:top-10 z-20 bg-white/10 backdrop-blur-xl border border-white/20 p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-2xl"
-              >
-                <div className="flex gap-2 sm:gap-3 items-center">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-terracotta to-[#E8956A] rounded-full flex items-center justify-center shadow-inner flex-shrink-0">
-                    <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                  </div>
-                  <div>
-                    <div className="text-[11px] sm:text-xs font-semibold text-white/90 font-outfit">Goals Achieved</div>
-                    <div className="text-[10px] sm:text-[11px] text-terracotta mt-0.5 font-outfit">12 this week 🔥</div>
-                  </div>
+              {/* Body */}
+              <div className="flex">
+                {/* Slim sidebar */}
+                <div className="w-12 border-r border-gray-100 dark:border-white/[0.06] bg-gray-50/50 dark:bg-white/[0.02] flex flex-col items-center py-4 gap-3">
+                  {[Target, Cpu, CheckCircle2, Flame, Trophy].map((Icon, i) => (
+                    <div
+                      key={i}
+                      className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-300 ${i === currentIdx
+                          ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm"
+                          : i < currentIdx
+                            ? "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+                            : "text-gray-300 dark:text-gray-700"
+                        }`}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                    </div>
+                  ))}
                 </div>
               </motion.div>
 
-              {/* Floating Card 2 — Roadmap */}
-              <motion.div
-                animate={{ y: [6, -6, 6] }}
-                transition={{ repeat: Infinity, duration: 7, ease: "easeInOut", delay: 1 }}
-                className="absolute right-0 bottom-10 sm:bottom-16 z-20 bg-white/10 backdrop-blur-xl border border-white/20 p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-2xl"
-              >
-                <div className="flex gap-2 sm:gap-3 items-center">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-sage to-[#a3b99a] rounded-full flex items-center justify-center shadow-inner flex-shrink-0">
-                    <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                  </div>
-                  <div>
-                    <div className="text-[11px] sm:text-xs font-semibold text-white/90 font-outfit">AI Roadmap Ready</div>
-                    <div className="text-[10px] sm:text-[11px] text-sage mt-0.5 font-outfit">On track for June ✨</div>
-                  </div>
+                {/* Content area */}
+                <div className="flex-1 p-5 bg-white h-[340px] relative overflow-hidden dark:bg-gray-900">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={active.id}
+                      initial={{ opacity: 0, y: 14 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                      className="absolute inset-5 flex flex-col"
+                    >
+                      <div className="mb-5">
+                        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.15em]">
+                          {active.label}
+                        </span>
+                        <h3 className="text-base font-bold text-gray-900 dark:text-white mt-1">
+                          {active.header}
+                        </h3>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {active.sub}
+                        </p>
+                      </div>
+                      <div className="flex-1 flex flex-col justify-center">
+                        {active.content}
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
                 </div>
               </motion.div>
             </motion.div>

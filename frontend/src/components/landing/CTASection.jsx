@@ -7,11 +7,11 @@ export default function CTASection() {
     <section id="get-started" className="scroll-mt-32 py-32 px-4 sm:px-6 lg:px-8 bg-beigeSecondary dark:bg-charcoal border-y border-beigeMuted dark:border-white/[0.06] overflow-hidden relative">
       <div className="max-w-4xl mx-auto text-center relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="space-y-8"
+          initial={{ opacity: 0, scale: 0.96, y: 20 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+          className="relative overflow-hidden rounded-[2.5rem] border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-8 py-16 md:px-16 md:py-24 shadow-[0_28px_72px_-24px_rgba(15,23,42,0.26)] dark:shadow-[0_28px_72px_-24px_rgba(0,0,0,0.5)]"
         >
           <h2 className="text-3xl sm:text-5xl lg:text-7xl font-playfair font-bold text-gray-950 dark:text-white leading-tight tracking-tight">
             Ready to transform your future?

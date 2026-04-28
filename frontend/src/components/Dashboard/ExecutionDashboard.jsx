@@ -23,19 +23,7 @@ import { planoraService } from '../../api/planoraService';
 import { useMissionFlow } from '../../hooks/useMissionFlow';
 import api from '../../api/axios';
 
-const shellCardClass = 'rounded-2xl p-6 transition-all duration-300';
-const shellCardStyle = {
-    background: 'var(--el-bg)',
-    border: '1px solid var(--el-border)',
-    boxShadow: 'var(--el-shadow-card)',
-};
-
-const getTimeBasedGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
-};
+const shellCardClass = 'rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_12px_30px_-24px_rgba(15,23,42,0.55)] dark:border-slate-700 dark:bg-slate-900 dark:shadow-none';
 
 const buildDateKey = (dateValue) => {
     if (!dateValue) {
@@ -409,8 +397,9 @@ const ExecutionDashboard = () => {
             {/* Focus Mode Overlay */}
             <AnimatePresence>
                 {currentState === 'IN_PROGRESS' && (
-                    <div
-                        className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 p-6 backdrop-blur-sm"
+                    <motion.div
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black p-6"
                     >
                         <FocusMode
                             open={true}
@@ -482,9 +471,9 @@ const ExecutionDashboard = () => {
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
 
                     {/* LEFT COLUMN: Main Activities */}
-                    <div className="space-y-6 lg:col-span-8">
-                        {/* Mode Switcher — compact */}
-                        <div data-tour="mode-switch" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '10px 16px', borderRadius: 16, background: 'var(--el-bg)', border: '1px solid var(--el-border)', boxShadow: 'var(--el-shadow-card)' }}>
+                    <div className="space-y-4 lg:col-span-8">
+                        {/* Mode Switcher Block */}
+                        <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
                             <div className="flex items-center gap-3">
                                 <ModeSwitch mode={mode} onChange={setMode} />
                                 <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--el-text-secondary)' }} className="hidden sm:inline">
@@ -492,9 +481,8 @@ const ExecutionDashboard = () => {
                                 </span>
                             </div>
                             <button
-                                data-tour="ai-coach-btn"
-                                onClick={openVoicePanel}
-                                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 16px', borderRadius: 9999, background: 'var(--el-text)', color: '#fff', fontWeight: 500, fontSize: 13, border: 'none', cursor: 'pointer', transition: 'opacity 0.15s', fontFamily: "'Inter', sans-serif" }}
+                                onClick={() => setVoicePanelOpen(true)}
+                                className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-white dark:hover:bg-slate-600 sm:px-3 sm:py-1.5 sm:text-xs"
                             >
                                 <Sparkles style={{ width: 14, height: 14 }} />
                                 <span className="hidden sm:inline">AI Coach</span>
@@ -538,8 +526,8 @@ const ExecutionDashboard = () => {
                                 <div className="flex items-center justify-between">
                                     <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--el-text)' }}>Tasks ({selectedTasks.length})</p>
                                     <div className="flex items-center gap-3">
-                                        <div style={{ height: 6, width: 96, overflow: 'hidden', borderRadius: 9999, background: 'var(--el-bg-secondary)' }}>
-                                            <div style={{ height: '100%', borderRadius: 9999, background: 'var(--el-text)', transition: 'width 0.3s', width: `${selectedTaskProgress}%` }} />
+                                        <div className="h-1.5 w-24 overflow-hidden rounded-full bg-slate-200 dark:bg-[#25242e]">
+                                            <div className="h-full rounded-full bg-slate-500 transition-all dark:bg-slate-400" style={{ width: `${selectedTaskProgress}%` }} />
                                         </div>
                                         <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--el-text-muted)' }}>{selectedTaskProgress}%</span>
                                     </div>
@@ -578,13 +566,12 @@ const ExecutionDashboard = () => {
                                                         {card.estimatedMinutes} min
                                                     </p>
                                                 </div>
-                                                <span style={{
-                                                    fontSize: 11, padding: '2px 8px', borderRadius: 6, fontWeight: 600, whiteSpace: 'nowrap',
-                                                    background: card.status === 'completed' ? '#ecfdf5' : 'var(--el-bg-secondary)',
-                                                    color: card.status === 'completed' ? '#059669' : card.status === 'in_progress' ? 'var(--el-text)' : 'var(--el-text-muted)',
-                                                }}>
-                                                    {getTaskStatusLabel(card.status)}
-                                                </span>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="rounded-full border border-slate-200 px-2.5 py-0.5 text-[10px] font-semibold lowercase tracking-wide text-slate-600 dark:border-slate-600 dark:text-slate-400">
+                                                        {getTaskStatusLabel(card.status)}
+                                                    </span>
+                                                    <ArrowRight className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
@@ -677,10 +664,10 @@ const ExecutionDashboard = () => {
                         <SessionsSection />
 
                         {/* AI Insight Card */}
-                        <div data-tour="ai-insight" className={shellCardClass} style={{ ...shellCardStyle, padding: 20 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--el-text)', marginBottom: 10 }}>
-                                <BrainCircuit style={{ width: 16, height: 16 }} />
-                                <span style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>AI Insight</span>
+                        <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-indigo-50 to-white p-4 dark:border-slate-700 dark:from-indigo-900 dark:to-slate-900">
+                            <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+                                <BrainCircuit className="h-4 w-4" />
+                                <span className="text-[11px] font-bold uppercase tracking-wider">AI Insight</span>
                             </div>
                             <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--el-text-secondary)', letterSpacing: '0.14px' }}>
                                 {coach?.reason || "Consistency is your superpower. One focused session today beats zero."}

@@ -17,8 +17,8 @@ import { useMissionFlow } from '../../hooks/useMissionFlow';
 import { roadmapService } from '../../api/roadmapService';
 import { planoraService } from '../../api/planoraService';
 
-const shellCardClass = 'rounded-3xl border border-slate-200 bg-white p-4 sm:p-5 shadow-[0_16px_35px_-28px_rgba(15,23,42,0.55)] dark:border-white/10 dark:bg-[#121212] dark:shadow-none';
-const secondaryButtonClass = 'rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-white/20 dark:bg-white/5 dark:text-slate-100 dark:hover:bg-white/10';
+const shellCardClass = 'rounded-3xl border border-slate-200 bg-white p-4 sm:p-5 shadow-[0_16px_35px_-28px_rgba(15,23,42,0.55)] dark:border-slate-700 dark:bg-slate-900 dark:shadow-none';
+const secondaryButtonClass = 'rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700';
 
 const LEAGUE_TIERS = [
     { name: 'Bronze League', min: 0, max: 499, accent: 'text-amber-700', chip: 'bg-amber-100 text-amber-700' },
@@ -397,13 +397,13 @@ const ExecutionDashboard = () => {
                             </div>
                         </div>
 
-                        <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-[#151515]">
+                        <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900">
                             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">Today&apos;s Mission</p>
                             <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{todayMissionProgress.completed}/{todayMissionProgress.total} completed today</p>
                             <div className="mt-3 space-y-2">
                                 {missionTasks.slice(0, 3).map((task, index) => (
-                                    <div key={task.id || index} className="flex items-start gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-white/10 dark:bg-[#1a1a1a]">
-                                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 text-[11px] font-semibold text-slate-700 dark:bg-white/10 dark:text-slate-200">{index + 1}</span>
+                                    <div key={task.id || index} className="flex items-start gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
+                                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 text-[11px] font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-200">{index + 1}</span>
                                         <div>
                                             <p className="text-sm font-semibold text-slate-700 dark:text-slate-100">{task.title}</p>
                                             <p className="text-xs text-slate-500 dark:text-slate-400">{task.estimated_time || '25 min'}</p>
@@ -478,7 +478,7 @@ const ExecutionDashboard = () => {
                                 </div>
                                 <button
                                     onClick={() => setVoicePanelOpen(true)}
-                                    className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-white/20 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+                                    className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                                 >
                                     Open AI Voice
                                 </button>
@@ -523,12 +523,12 @@ const ExecutionDashboard = () => {
                                     {activeCards.map((card) => (
                                         <article key={card.key} className="rounded-3xl border border-slate-200 bg-[#fbfdff] p-4 dark:border-white/10 dark:bg-[#151515]">
                                             <div className="mb-3 flex items-center gap-2">
-                                                <span className="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:bg-white/10 dark:text-white">{card.tag}</span>
-                                                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600 dark:bg-white/10 dark:text-slate-300">{card.type}</span>
+                                                <span className="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900 dark:text-blue-200">{card.tag}</span>
+                                                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300">{card.type}</span>
                                             </div>
                                             <h3 className="text-[21px] font-semibold leading-7 text-slate-800 dark:text-slate-100">{card.title}</h3>
                                             <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-500 dark:text-slate-300">{card.subtitle}</p>
-                                            <Link to={card.ctaTo} className="ml-auto mt-4 flex h-10 w-10 items-center justify-center rounded-full bg-sky-100 text-sky-700 transition hover:bg-sky-200 dark:bg-white/10 dark:text-white dark:hover:bg-white/20">
+                                            <Link to={card.ctaTo} className="ml-auto mt-4 flex h-10 w-10 items-center justify-center rounded-full bg-sky-100 text-sky-700 transition hover:bg-sky-200 dark:bg-sky-900 dark:text-sky-300 dark:hover:bg-sky-800">
                                                 <ArrowRight className="h-4 w-4" />
                                             </Link>
                                         </article>
@@ -578,7 +578,7 @@ const ExecutionDashboard = () => {
                                     </div>
                                     <button
                                         onClick={createExamPlan}
-                                        className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100 dark:border-white/20 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+                                        className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800"
                                     >
                                         {loading.examPlan ? 'Generating...' : activeExamPlan ? 'Regenerate Plan' : 'Generate Plan'}
                                     </button>
@@ -625,7 +625,7 @@ const ExecutionDashboard = () => {
                                 <div className="grid grid-cols-7 gap-1.5">
                                     {weeklyHeatmap.map((day) => (
                                         <div key={day.key} className="text-center">
-                                            <div className={`h-8 rounded-md ${day.count >= 3 ? 'bg-emerald-500/90' : day.count === 2 ? 'bg-emerald-400/70' : day.count === 1 ? 'bg-emerald-300/50' : 'bg-slate-200 dark:bg-white/10'}`} title={`${day.date}: ${day.count} tasks`} />
+                                            <div className={`h-8 rounded-md ${day.count >= 3 ? 'bg-emerald-500' : day.count === 2 ? 'bg-emerald-400' : day.count === 1 ? 'bg-emerald-300' : 'bg-slate-200 dark:bg-slate-700'}`} title={`${day.date}: ${day.count} tasks`} />
                                             <p className="mt-1 text-[10px] text-slate-400">{day.label}</p>
                                         </div>
                                     ))}
@@ -637,8 +637,8 @@ const ExecutionDashboard = () => {
                                     <span className="font-semibold text-slate-700 dark:text-slate-100">XP Progress</span>
                                     <span className="text-slate-500 dark:text-slate-400">{xpPoints} XP</span>
                                 </div>
-                                <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
-                                    <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 dark:from-charcoalMuted dark:to-charcoalMuted" style={{ width: `${xpProgress.percent}%` }} />
+                                <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                                    <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 dark:from-slate-100 dark:to-slate-400" style={{ width: `${xpProgress.percent}%` }} />
                                 </div>
                                 <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{xpProgress.current.level}{xpProgress.next ? ` -> ${xpProgress.next.level}` : ' • Max level reached'}</p>
                             </div>
@@ -689,7 +689,7 @@ const ExecutionDashboard = () => {
                                             <span className="inline-flex items-center gap-1.5"><Flame className="h-4 w-4 text-orange-500" /> {leagueModel.streak} streak</span>
                                         </div>
 
-                                        <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
+                                        <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
                                             <div className="h-full rounded-full bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500" style={{ width: `${leagueModel.progressPercent}%` }} />
                                         </div>
 
@@ -705,7 +705,7 @@ const ExecutionDashboard = () => {
                                             <div
                                                 key={`${entry.rank}-${entry.name}-${index}`}
                                                 className={`flex items-center justify-between rounded-xl border px-3 py-2 text-sm ${entry.isMe
-                                                    ? 'border-blue-200 bg-blue-50 dark:border-white/20 dark:bg-white/10'
+                                                    ? 'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900'
                                                     : 'border-slate-200 bg-white dark:border-white/10 dark:bg-[#151515]'
                                                     }`}
                                             >

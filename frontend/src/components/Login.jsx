@@ -382,11 +382,17 @@ export default function Login() {
                 </div>
               )}
 
-              <button type="submit" className="auth-primary-btn" disabled={loading} style={{ marginTop: 16 }}>
-                {loading
-                  ? <div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.2)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.75s linear infinite" }} />
-                  : <><span>Sign in</span><ArrowRightIcon /></>
-                }
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-5 bg-black dark:bg-white text-white dark:text-black rounded-full font-bold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-between px-8 group disabled:opacity-70"
+              >
+                <span>{loading ? "Signing in..." : "Login to Your Account"}</span>
+                <span className="bg-gray-400 dark:bg-gray-600 p-2 rounded-full group-hover:bg-gray-500 dark:group-hover:bg-gray-500 transition-colors">
+                  <svg className="w-5 h-5 text-white dark:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </span>
               </button>
             </form>
 
@@ -394,7 +400,16 @@ export default function Login() {
               Protected by industry-standard encryption. Your syllabi never train third-party models.
             </p>
           </div>
-        </main>
+        </div>
+
+        {/* Footer Link */}
+        <div className="mt-16 text-center">
+          <Link to="/forgot-password" className="text-lg font-medium text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors border-b-2 border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white pb-0.5">
+            Forgot Passcode?
+          </Link>
+        </div>
+
+      </main>
 
         {/* Footer */}
         <footer style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16, padding: "10px 24px" }}>

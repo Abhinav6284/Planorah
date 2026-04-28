@@ -25,22 +25,14 @@ const ExamModePanel = ({ plan, loading, onGenerate }) => {
                 <textarea
                     value={syllabus}
                     onChange={(e) => setSyllabus(e.target.value)}
-                    style={{
-                        minHeight: 120, borderRadius: 12, border: '1px solid var(--el-border)', 
-                        background: 'var(--el-bg-secondary)', color: 'var(--el-text)', padding: 16, 
-                        fontSize: 14, resize: 'none', outline: 'none'
-                    }}
-                    placeholder="Input syllabus or key topics..."
+                    className="min-h-[110px] rounded-xl border border-gray-400 bg-gray-200 p-3 text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-blue-400 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400"
+                    placeholder="Paste syllabus text or key topics"
                 />
                 <input
                     value={pattern}
                     onChange={(e) => setPattern(e.target.value)}
-                    style={{
-                        borderRadius: 12, border: '1px solid var(--el-border)', 
-                        background: 'var(--el-bg-secondary)', color: 'var(--el-text)', padding: '12px 16px', 
-                        fontSize: 14, outline: 'none'
-                    }}
-                    placeholder="Exam pattern (sections, duration, marks)"
+                    className="rounded-xl border border-gray-400 bg-gray-200 p-3 text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-blue-400 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400"
+                    placeholder="Exam pattern (sections, marks, duration)"
                 />
                 <button
                     onClick={() => onGenerate({ syllabus_text: syllabus, exam_pattern: pattern })}
@@ -62,12 +54,9 @@ const ExamModePanel = ({ plan, loading, onGenerate }) => {
                         <h4 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: 'var(--el-text-muted)', marginBottom: 12 }}>Identified Topics</h4>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 300, overflowY: 'auto', paddingRight: 8 }}>
                             {(plan.topics || []).map((topic, idx) => (
-                                <div key={idx} style={{ 
-                                    padding: 16, borderRadius: 12, border: '1px solid var(--el-border-subtle)',
-                                    background: 'var(--el-bg-secondary)'
-                                }}>
-                                    <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--el-text)', marginBottom: 4 }}>{topic.topic}</p>
-                                    <p style={{ fontSize: 12, color: 'var(--el-text-muted)' }}>Priority: {topic.priority} · {topic.status}</p>
+                                <div key={`${topic.topic}-${idx}`} className="rounded-xl border border-gray-300 bg-gray-100 p-2.5 dark:border-gray-600 dark:bg-gray-800">
+                                    <p className="text-sm font-medium">{topic.topic}</p>
+                                    <p className="text-xs text-slate-300 mt-1">Priority: {topic.priority} · Status: {topic.status}</p>
                                 </div>
                             ))}
                         </div>

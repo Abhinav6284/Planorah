@@ -70,24 +70,14 @@ const TaskDetailModal = ({ task, isOpen, onClose, onStartFocus }) => {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.98, y: 10 }}
                         onClick={(e) => e.stopPropagation()}
-                        style={{
-                            position: 'relative', zIndex: 101, width: '100%', maxWidth: 720, maxHeight: '90vh',
-                            display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRadius: 16,
-                            background: 'var(--el-bg)', border: '1px solid var(--el-border)', boxShadow: '0 20px 50px rgba(0,0,0,0.15)'
-                        }}
+                        className="relative z-[101] w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900"
                     >
                         {/* Header */}
-                        <div style={{ 
-                            padding: '24px 32px', borderBottom: '1px solid var(--el-border-subtle)',
-                            display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'
-                        }}>
-                            <div style={{ flex: 1 }}>
-                                <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-                                    <span style={{ 
-                                        padding: '4px 10px', borderRadius: 20, fontSize: 10, fontWeight: 700, 
-                                        textTransform: 'uppercase', background: 'var(--el-bg-secondary)', color: 'var(--el-text-secondary)' 
-                                    }}>
-                                        {task?.task_type === 'exam' ? 'Exam' : 'Learning'}
+                        <div className="sticky top-0 z-10 flex items-start justify-between border-b border-slate-200 bg-white px-6 py-5 dark:border-slate-700 dark:bg-slate-900">
+                            <div className="flex-1 pr-4">
+                                <div className="mb-1 flex items-center gap-2">
+                                    <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">
+                                        {task?.task_type === 'exam' ? 'Exam Task' : 'Learning Task'}
                                     </span>
                                     {task?.estimated_minutes && (
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 600, color: 'var(--el-text-muted)' }}>
@@ -126,12 +116,12 @@ const TaskDetailModal = ({ task, isOpen, onClose, onStartFocus }) => {
                             ) : guidance ? (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
                                     {/* Objective */}
-                                    <div>
-                                        <h3 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)', marginBottom: 12 }}>Objective</h3>
-                                        <div style={{ padding: 20, borderRadius: 12, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border-subtle)' }}>
-                                            <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--el-text-secondary)' }}>
-                                                {guidance.objective}
-                                            </p>
+                                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
+                                        <div className="mb-2 flex items-center gap-2">
+                                            <Target className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                            <h3 className="text-sm font-bold uppercase tracking-wide text-slate-700 dark:text-slate-300">
+                                                Objective
+                                            </h3>
                                         </div>
                                     </div>
 
@@ -143,10 +133,7 @@ const TaskDetailModal = ({ task, isOpen, onClose, onStartFocus }) => {
                                                 {guidance.time_breakdown.map((item, idx) => (
                                                     <div
                                                         key={idx}
-                                                        style={{ 
-                                                            display: 'flex', alignItems: 'center', gap: 16, padding: '12px 16px',
-                                                            borderRadius: 12, border: '1px solid var(--el-border-subtle)', background: 'var(--el-bg)'
-                                                        }}
+                                                        className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800"
                                                     >
                                                         <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--el-text)', minWidth: 60 }}>
                                                             {item.duration}

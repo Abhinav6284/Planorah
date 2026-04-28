@@ -433,11 +433,17 @@ export default function Register() {
                 </div>
               )}
 
-              <button type="submit" className="auth-primary-btn" disabled={loading} style={{ marginTop: 16 }}>
-                {loading
-                  ? <div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.2)", borderTopColor: "#transparent", borderRadius: "50%", animation: "spin 0.75s linear infinite" }} />
-                  : <><span>Create account</span><ArrowRightIcon /></>
-                }
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-5 bg-black dark:bg-white text-white dark:text-black rounded-full font-bold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-between px-8 group disabled:opacity-70"
+              >
+                <span>{loading ? "Creating Account..." : "Create Account"}</span>
+                <span className="bg-gray-400 dark:bg-gray-600 p-2 rounded-full group-hover:bg-gray-500 dark:group-hover:bg-gray-500 transition-colors">
+                  <svg className="w-5 h-5 text-white dark:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </span>
               </button>
             </form>
 
@@ -447,16 +453,76 @@ export default function Register() {
           </div>
         </main>
 
-        {/* Footer */}
-        <footer style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16, padding: "10px 24px" }}>
-          {[["Privacy", "/privacy"], ["Terms", "/terms"], ["Support", "/support"]].map(([label, to]) => (
-            <Link key={label} to={to} style={{ fontSize: 11.5, color: "var(--fg-muted)", textDecoration: "none" }}>
-              {label}
-            </Link>
-          ))}
-          <span style={{ fontSize: 11.5, color: "var(--auth-border-subtle, rgba(34,42,53,0.3))" }}>© Planorah {new Date().getFullYear()}</span>
-        </footer>
-      </div>
-    </motion.div>
+          {/* Right Column: Social Login */}
+          <div className="flex-1 w-full space-y-4 flex flex-col justify-center">
+            {/* Google Button */}
+            <button
+              onClick={() => login()}
+              className="w-full py-4 px-8 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center justify-start gap-4 group bg-white dark:bg-gray-800/50 shadow-sm hover:shadow-md"
+            >
+              <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-full group-hover:scale-110 transition-transform">
+                <svg className="w-6 h-6" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                </svg>
+              </div>
+              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">Sign up with Gmail Account</span>
+            </button>
+
+
+
+            {/* GitHub Button */}
+            <button
+              onClick={() => {
+                const clientId = env.GITHUB_CLIENT_ID;
+                const redirectUri = encodeURIComponent(window.location.origin + '/auth/github/callback');
+                const scope = encodeURIComponent('read:user user:email');
+                const state = encodeURIComponent('signup');
+                window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
+              }}
+              className="w-full py-4 px-8 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center justify-start gap-4 group bg-white dark:bg-gray-800/50 shadow-sm hover:shadow-md"
+            >
+              <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-full group-hover:scale-110 transition-transform">
+                <svg className="w-6 h-6 text-gray-900 dark:text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                </svg>
+              </div>
+              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">Sign up with GitHub account</span>
+            </button>
+
+            {/* Placeholder for more buttons (Apple, Facebook etc) */}
+            <div className="w-full py-4 px-8 rounded-full border border-gray-100 dark:border-gray-800 flex items-center justify-start gap-4 opacity-50 cursor-not-allowed">
+              <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-full">
+                <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.05 20.28c-.98.95-2.05.88-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.78 1.18-.19 2.31-.89 3.51-.84 1.54.02 2.68.75 3.37 1.74-2.69 1.63-2.12 5.04.5 6.13-.57 1.4-1.31 2.76-2.46 3.16zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.17 2.29-2.08 4.28-3.74 4.25z" />
+                </svg>
+              </div>
+              <span className="text-lg font-medium text-gray-400">Sign up Apple Secure ID</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Link */}
+        <div className="mt-16 text-center">
+          <Link to="/contact" className="text-lg font-medium text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors border-b-2 border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white pb-0.5">
+            Need Help?
+          </Link>
+        </div>
+
+      </main>
+
+      {/* Footer */}
+      <footer className="w-full max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-400 dark:text-gray-500 mt-12 py-4 border-t border-gray-100 dark:border-gray-800 md:border-none">
+        <div className="flex gap-6">
+          <Link to="/privacy">Privacy Policy</Link>
+          <Link to="/terms">Terms & Conditions</Link>
+        </div>
+        <div className="text-center sm:text-right">
+          Copyrights @Planorah 2025
+        </div>
+      </footer>
+    </div>
   );
 }

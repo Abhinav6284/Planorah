@@ -95,21 +95,37 @@ const TasksMockup = () => (
             <span className="text-[11px] font-bold">15 Day Streak</span>
           </div>
         </div>
-        <div className="space-y-3 pt-4">
-          {[
-            { t: "DAG Architecture", d: "45 min", done: true },
-            { t: "Airflow Operator", d: "90 min", current: true },
-            { t: "Optimization", d: "20 min", next: true },
-          ].map((item, i) => (
-            <div key={i} className={`rounded-xl border p-4 flex items-center gap-4 transition-all ${item.current
-              ? "bg-gray-950 dark:bg-white text-white dark:text-gray-950 border-gray-950 dark:border-white shadow-md scale-105 z-10"
-              : "bg-beigeSecondary dark:bg-charcoalDark border-beigeMuted dark:border-white/[0.08] opacity-60"
-              }`}>
-              <div className={`w-5 h-5 rounded-full flex items-center justify-center border-2 transition-colors ${item.done ? "border-[#D96C4A] bg-[#D96C4A] text-white" : "border-beigeMuted dark:border-white/[0.08]"}`}>
-                {item.done && <CheckCircle2 className="w-3 h-3" />}
-              </div>
-              <div className="flex-1 min-w-0 text-[14px] font-bold truncate">{item.t}</div>
-              <p className="text-[11px] opacity-60 font-medium uppercase tracking-wider">{item.d}</p>
+        <div className="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-900/40 px-3 py-1.5 rounded-full border border-amber-100 dark:border-amber-500/30">
+          <Flame className="w-3.5 h-3.5 text-amber-500" />
+          <span className="text-xs font-bold text-amber-700 dark:text-amber-400">5 day streak</span>
+        </div>
+      </div>
+      {[
+        { t: "Read: React Context API", d: "15 min", type: "Reading", icon: BookOpen, done: true },
+        { t: "Practice: Build Auth Wrapper", d: "45 min", type: "Coding", icon: Code2, done: false, current: true },
+        { t: "Quiz: State Management", d: "10 min", type: "Quiz", icon: Brain, done: false },
+      ].map((item, i) => (
+        <motion.div key={i} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08 }}
+          className={`rounded-xl border p-4 flex items-center gap-4 transition-all ${item.current
+            ? "bg-black dark:bg-white text-white dark:text-gray-900 border-black dark:border-white shadow-lg"
+            : item.done
+              ? "bg-gray-50/80 dark:bg-white/[0.04] border-gray-100 dark:border-white/[0.06]"
+              : "bg-white dark:bg-white/[0.03] border-gray-100 dark:border-white/[0.07] shadow-sm"
+            }`}>
+          <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${item.done ? "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400"
+            : item.current ? "bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
+              : "border-2 border-gray-200 dark:border-white/[0.2]"
+            }`}>
+            {item.done ? <CheckCircle2 className="w-4 h-4" /> : item.current ? <span className="w-2 h-2 bg-white dark:bg-gray-900 rounded-full animate-pulse" /> : null}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h5 className={`text-sm font-semibold truncate ${item.done ? "text-gray-400 line-through"
+              : item.current ? "text-white dark:text-gray-900"
+                : "text-gray-900 dark:text-white"
+              }`}>{item.t}</h5>
+            <div className="flex items-center gap-2 mt-0.5">
+              <item.icon className={`w-3 h-3 ${item.current ? "text-white/60 dark:text-gray-900/60" : "text-gray-400"}`} />
+              <span className={`text-xs ${item.current ? "text-white/60 dark:text-gray-900/60" : "text-gray-400"}`}>{item.type} · {item.d}</span>
             </div>
           ))}
         </div>
