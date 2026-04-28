@@ -2,14 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
-  User, 
-  Settings as SettingsIcon, 
-  CreditCard, 
-  Tag, 
-  Receipt, 
-  Check, 
-  Shield, 
-  Monitor, 
+  User,
+  CreditCard,
+  Tag,
+  Receipt,
+  Check,
+  Shield,
   LogOut,
   History,
   Lock,

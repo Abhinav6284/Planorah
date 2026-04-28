@@ -1,56 +1,9 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ArrowRight, User, Phone, Calendar, Target, Award, TrendingUp, Sparkles, X, ChevronLeft, ArrowUpRight } from 'lucide-react';
+import { ArrowRight, User, Phone, Calendar, Target, TrendingUp, Sparkles, ChevronLeft } from 'lucide-react';
 import api from "../../api/axios";
-import { useTheme } from "../../context/ThemeContext";
-
 const DISABLE_ONBOARDING_SUBMIT = false;
-
-// ─── Quicky Mascot ─────────────────────────────────────────────────────────────
-function QuickyMessage({ stepId, fd }) {
-    const getMessage = () => {
-        switch (stepId) {
-            case "life_stage":
-                return "Hi there! I'm Quicky ⚡ Let's build your perfect plan.";
-            case "school_class":
-            case "college_year":
-            case "career_shift_intent":
-                return "Great! Tell me a bit more about where you're at.";
-            case "school_stream":
-                return "Ah, streams! A big decision. 🔬📊🎨";
-            case "competitive_direction":
-                return "Thinking big? Let's figure out your competitive goals!";
-            case "jee_prep_level":
-                return "Aiming for the top! 💪 Where do you stand right now?";
-            case "non_competitive_focus":
-                return "Clarity is super important too! 🎯";
-            case "placement_skills":
-                return "Getting a job requires real skills. Let's see your arsenal! 💼";
-            case "higher_targeting":
-                return "Further studies! Expanding the brain! 🧠";
-            case "daily_time":
-                return "Action time! Be honest, how much time can you actually give? ⏱️";
-            case "dream_vs_effort":
-                if (fd.daily_time === "4plus") return "4+ hours is intense! 🔥 But is it enough for your dreams?";
-                return "Reality check! 🎯 Are your efforts matching your dreams?";
-            case "pressure_response":
-                return "Almost there! Just one more about your mindset. 🧘";
-            case "commitment_lock":
-                return "Here is your plan. Are you ready to level up? 🚀";
-            case "personal":
-                return "Just a few details to personalize your experience! 📝";
-            default:
-                return "Keep going! You're doing great! ✨";
-        }
-    };
-
-    const message = getMessage();
-    if (!message) return null;
-
-    // Completely removed the playful bubble. Microcopy is now handled in the main render.
-    return null;
-}
 
 // ─── Option Card ────────────────────────────────────────────────────────────────
 // ─── Premium Design System Tokens ───────────────────────────────────────────

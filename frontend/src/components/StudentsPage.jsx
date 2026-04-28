@@ -1,6 +1,4 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 
 function useScrollReveal() {
   useEffect(() => {
@@ -15,12 +13,6 @@ function useScrollReveal() {
   }, []);
 }
 
-const IconArrowRight = ({ size = 14 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M5 12h14M13 5l7 7-7 7" />
-  </svg>
-);
 
 const IconCheck = ({ size = 14 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
@@ -58,8 +50,6 @@ const Bullet = ({ text }) => (
 // ─── Main export ──────────────────────────────────────────
 export default function StudentsPage() {
   useScrollReveal();
-  const navigate = useNavigate();
-
   const pains = [
     { title: 'Generic tools, generic results', body: 'Notion, Todoist, and Google Calendar were built for project managers — not for someone juggling 5 courses, a part-time job, and career prep.' },
     { title: 'Planning fatigue is real', body: 'You spend 30 minutes every evening deciding what to study. By the time you start, it\'s already late.' },

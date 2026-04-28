@@ -6,7 +6,7 @@ import WelcomeCoach from './Onboarding/WelcomeCoach';
 import { TourProvider } from './Tour/TourContext';
 import GuidedTour from './Tour/GuidedTour';
 import Sidebar from './Sidebar';
-import { Menu, MessageSquare, Mic, X, Bell, HelpCircle, Search, Sun, Moon } from 'lucide-react';
+import { Menu, MessageSquare, Mic, X, Bell, Search, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { userService } from '../api/userService';
 import { getUserAvatar } from '../utils/avatar';

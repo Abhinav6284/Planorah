@@ -4,8 +4,6 @@ import { useTheme } from '../../context/ThemeContext';
 
 const TermsPage = () => {
   const { theme } = useTheme();
-  const isDark = theme === 'dark';
-
   const sections = [
     {
       title: '1. Acceptance of Terms',

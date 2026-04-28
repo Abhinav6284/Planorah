@@ -55,10 +55,7 @@ const SupportPage = lazy(() => import('./components/Support/SupportPage'));
 const SpotifyCallback = lazy(() => import('./components/Auth/SpotifyCallback'));
 const YouTubeCallback = lazy(() => import('./components/Auth/YouTubeCallback'));
 // Subscription & Billing Components
-const PricingPage = lazy(() => import('./components/Subscription/PricingPage'));
-const SubscriptionStatus = lazy(() => import('./components/Subscription/SubscriptionStatus'));
 const CheckoutPage = lazy(() => import('./components/Billing/CheckoutPage'));
-const PaymentHistory = lazy(() => import('./components/Billing/PaymentHistory'));
 // Portfolio - lazy imported individually since barrel export doesn't support lazy
 const PortfolioEditor = lazy(() => import('./components/Portfolio').then(m => ({ default: m.PortfolioEditor })));
 const ProjectManager = lazy(() => import('./components/Portfolio').then(m => ({ default: m.ProjectManager })));

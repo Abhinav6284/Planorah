@@ -19,14 +19,7 @@ import {
   Globe,
   CheckSquare,
   Calendar,
-  CreditCard,
-  Tag,
-  Receipt,
-  Menu,
-  Plus,
-  ChevronRight,
 } from 'lucide-react';
-import { getUserAvatar } from '../utils/avatar';
 
 /**
  * ElevenLabs-inspired dark sidebar navigation

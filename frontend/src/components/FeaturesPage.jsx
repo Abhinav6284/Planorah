@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
 
 function useScrollReveal() {
   useEffect(() => {
@@ -64,19 +63,6 @@ const LpTag = ({ color, children }) => (
   </span>
 );
 
-const BulletLine = ({ text }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, color: 'var(--fg-deep)' }}>
-    <span style={{
-      width: 18, height: 18, borderRadius: '50%',
-      background: 'var(--light-gray)',
-      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-      flexShrink: 0
-    }}>
-      <IconCheck size={11} stroke={2.2} />
-    </span>
-    {text}
-  </div>
-);
 
 const SmallFeature = ({ icon, title, body }) => (
   <div style={{
@@ -260,41 +246,9 @@ const FeatureRow = ({ eyebrow, title, body, bullets, demo, reverse }) => (
   </div>
 );
 
-// ─── CTA ─────────────────────────────────────────────────
-const HomeCTA = ({ navigate }) => (
-  <section style={{ padding: '24px 0 96px' }}>
-    <div className="container-narrow">
-      <div style={{
-        background: 'var(--fg-deep)', color: 'var(--bg)',
-        borderRadius: 16, padding: '56px 48px',
-        display: 'flex', alignItems: 'center',
-        justifyContent: 'space-between', gap: 32
-      }}>
-        <div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 600,
-            lineHeight: 1.15, marginBottom: 8 }}>
-            Start your semester, not your stress.
-          </div>
-          <div style={{ color: 'var(--fg-muted)', fontSize: 15 }}>
-            Free forever for up to 4 courses. No card.
-          </div>
-        </div>
-        <button
-          className="btn btn-ghost"
-          onClick={() => navigate('/register')}
-          style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
-        >
-          Try Planorah <IconArrowRight size={14} />
-        </button>
-      </div>
-    </div>
-  </section>
-);
-
 // ─── Main export ──────────────────────────────────────────
 export default function FeaturesPage() {
   useScrollReveal();
-  const navigate = useNavigate();
 
   const smallFeatures = [
     { icon: <IconCalendar size={16}/>, title: 'Calendar sync',      body: 'Google & Outlook two-way.'          },

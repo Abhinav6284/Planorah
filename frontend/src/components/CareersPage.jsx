@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Briefcase, Globe, HeartHandshake, Rocket, Sparkles, Users } from 'lucide-react';
+import { ArrowRight, Briefcase, Globe, HeartHandshake, Rocket, Users } from 'lucide-react';
 
 function useScrollReveal() {
   useEffect(() => {

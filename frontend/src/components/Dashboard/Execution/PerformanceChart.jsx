@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { ChevronDown } from 'lucide-react';
 
 // Extract CustomTooltip to module scope to prevent unmount/remount on every render
 const ChartTooltip = ({ active, payload, isApiData }) => {

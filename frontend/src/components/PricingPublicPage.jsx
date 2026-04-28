@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 
 function useScrollReveal() {
   useEffect(() => {
@@ -15,12 +14,6 @@ function useScrollReveal() {
   }, []);
 }
 
-const IconArrowRight = ({ size = 14 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M5 12h14M13 5l7 7-7 7" />
-  </svg>
-);
 
 const CheckDot = () => (
   <svg width={14} height={14} viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>

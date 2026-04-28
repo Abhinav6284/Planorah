@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 function useScrollReveal() {
   useEffect(() => {
@@ -14,8 +13,6 @@ function useScrollReveal() {
 
 export default function DemoPage() {
   useScrollReveal();
-  const navigate = useNavigate();
-
   return (
     <main>
       <section style={{ padding: '96px 0 48px' }}>

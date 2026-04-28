@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   IconArrowRight, IconCheck, IconSparkle, IconMore, IconFlame, 
-  IconTrend, IconZap, IconCalendar, IconBookmark,
+  IconTrend, IconZap,
   IconPlanning, IconPhone, IconCompass, IconHourglass
 } from './shared/Icons';
-import { Pill, Button } from './shared/Primitives';
+import { Button } from './shared/Primitives';
 import { motion } from 'framer-motion';
 // ─── Scroll reveal ────────────────────────────────────────
 function useScrollReveal() {
@@ -36,22 +36,6 @@ const Tag = ({ color, children }) => (
     <span className="tag-dot" />
     {children}
   </span>
-);
-
-const BulletLine = ({ text, dark }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14,
-    color: dark ? 'rgba(255,255,255,0.88)' : 'var(--fg-deep)' }}>
-    <span style={{
-      width: 18, height: 18, borderRadius: '50%',
-      background: dark ? 'rgba(255,255,255,0.12)' : 'var(--light-gray)',
-      border: dark ? '1px solid rgba(255,255,255,0.25)' : 'none',
-      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-      color: dark ? '#ffffff' : 'var(--fg-deep)', flexShrink: 0
-    }}>
-      <IconCheck size={11} stroke={2.2} />
-    </span>
-    {text}
-  </div>
 );
 
 // ─── Course data ──────────────────────────────────────────
@@ -167,129 +151,6 @@ function FloatChip({ top, bottom, left, right, icon, label, tone }) {
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
       }}>{icon}</span>
       {label}
-    </div>
-  );
-}
-
-// ─── Planner Mini Preview ─────────────────────────────────
-function PlannerMiniPreview() {
-  const blocks = [
-    { day: 0, row: 1, span: 2, course: 'cs331', label: 'Algo lecture' },
-    { day: 0, row: 4, span: 2, course: 'ph220', label: 'Lab'          },
-    { day: 1, row: 2, span: 3, course: 'ma241', label: 'Problem set'  },
-    { day: 2, row: 1, span: 2, course: 'en210', label: 'Essay draft'  },
-    { day: 2, row: 4, span: 2, course: 'cs331', label: 'PSet 4'       },
-    { day: 3, row: 3, span: 2, course: 'ec101', label: 'Reading'      },
-    { day: 4, row: 1, span: 3, course: 'ph220', label: 'Study block'  },
-    { day: 4, row: 5, span: 1, course: 'ma241', label: 'Response'     },
-  ];
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-  return (
-    <div className="card" style={{ padding: 20 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg-deep)', fontFamily: 'var(--font-display)' }}>Week of Apr 21</div>
-        <div style={{ fontSize: 12, color: 'var(--fg-muted)' }}>18h planned · 3h buffer</div>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 6 }}>
-        {days.map(d => (
-          <div key={d} style={{ fontSize: 11, color: 'var(--fg-muted)', textAlign: 'center', marginBottom: 4 }}>{d}</div>
-        ))}
-        {days.map((_, col) => (
-          <div key={col} style={{ gridColumn: col+1, gridRow: '2/span 6', display: 'grid',
-            gridTemplateRows: 'repeat(6,32px)', gap: 4, position: 'relative' }}>
-            {[...Array(6)].map((_, r) => (
-              <div key={r} style={{ background: 'var(--light-gray)', borderRadius: 4, opacity: 0.5 }} />
-            ))}
-            {blocks.filter(b => b.day === col).map((b, i) => {
-              const course = COURSES.find(c => c.id === b.course);
-              return (
-                <div key={i} style={{
-                  position: 'absolute', top: (b.row-1)*36, left: 0, right: 0,
-                  height: b.span*32 + (b.span-1)*4,
-                  background: `var(--tag-${course.color}-bg)`,
-                  color: `var(--tag-${course.color})`,
-                  borderRadius: 4, padding: '4px 6px',
-                  fontSize: 10, fontWeight: 500, overflow: 'hidden'
-                }}>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, opacity: 0.8 }}>{course.code}</div>
-                  <div style={{ color: 'var(--fg-deep)', fontSize: 10, marginTop: 2, lineHeight: 1.2 }}>{b.label}</div>
-                </div>
-              );
-            })}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ─── Pomodoro Preview ─────────────────────────────────────
-function PomodoroPreview() {
-  return (
-    <div className="card" style={{ padding: 40, textAlign: 'center' }}>
-      <div style={{ fontSize: 12, color: 'var(--fg-muted)', fontFamily: 'var(--font-mono)',
-        letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 16 }}>Focus session</div>
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: 72, fontWeight: 600,
-        letterSpacing: '-0.03em', color: 'var(--fg-deep)', lineHeight: 1 }}>18:42</div>
-      <div style={{ margin: '20px 0', fontSize: 14, color: 'var(--fg-muted)' }}>CS331 — PSet 4, problems 1–3</div>
-      <div style={{ height: 4, background: 'var(--light-gray)', borderRadius: 2, overflow: 'hidden', marginBottom: 20 }}>
-        <div style={{ width: '25%', height: '100%', background: 'var(--orange)', borderRadius: 2 }} />
-      </div>
-      <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-        <button className="btn btn-primary btn-sm">Pause</button>
-        <button className="btn btn-ghost btn-sm">Skip break</button>
-      </div>
-    </div>
-  );
-}
-
-// ─── Analytics Preview ────────────────────────────────────
-function AnalyticsPreview() {
-  return (
-    <div className="card" style={{ padding: 28 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <div>
-          <div style={{ fontSize: 12, color: 'var(--fg-muted)' }}>This week's focus score</div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 48, fontWeight: 600,
-            color: 'var(--fg-deep)', letterSpacing: '-0.02em' }}>
-            82<span style={{ fontSize: 20, color: 'var(--fg-muted)' }}>/100</span>
-          </div>
-        </div>
-        <div style={{
-          padding: '6px 12px', borderRadius: 999, background: 'var(--tag-green-bg)',
-          color: 'var(--tag-green)', fontSize: 12, fontWeight: 500
-        }}>+12 vs last week</div>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 6,
-        alignItems: 'end', height: 72, marginBottom: 16 }}>
-        {[45,68,52,90,74,82,60].map((v, i) => (
-          <div key={i} style={{
-            height: `${v}%`,
-            background: i === 6 ? 'var(--orange)' : 'var(--charcoal)',
-            borderRadius: 3, opacity: i === 6 ? 1 : 0.85
-          }} />
-        ))}
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11,
-        color: 'var(--fg-muted)', marginBottom: 20 }}>
-        {['M','T','W','T','F','S','S'].map((d, i) => <span key={i}>{d}</span>)}
-      </div>
-      <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: 16,
-        display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {[
-          { course: 'CS331', hours: '9.2h', pct: 88, color: 'blue' },
-          { course: 'PH220', hours: '6.1h', pct: 72, color: 'green' },
-          { course: 'EN210', hours: '4.4h', pct: 54, color: 'rose' },
-        ].map(c => (
-          <div key={c.course} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 13 }}>
-            <span style={{ width: 52, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-muted)' }}>{c.course}</span>
-            <div style={{ flex: 1, height: 6, background: 'var(--light-gray)', borderRadius: 3, overflow: 'hidden' }}>
-              <div style={{ width: `${c.pct}%`, height: '100%', background: `var(--tag-${c.color})`, borderRadius: 3 }} />
-            </div>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-deep)' }}>{c.hours}</span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

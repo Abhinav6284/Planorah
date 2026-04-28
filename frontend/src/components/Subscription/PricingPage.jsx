@@ -218,9 +218,8 @@ export default function PricingPage() {
     const [currentSubscription, setCurrentSubscription] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => { fetchData(); }, []);
 
     const normalizePlans = (plansData) => {
         if (Array.isArray(plansData) && plansData.length > 0) {
