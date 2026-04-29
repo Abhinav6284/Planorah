@@ -97,139 +97,254 @@ const FALLBACK_PLANS = [
         has_early_access: true,
         is_active: true,
     },
+    {
+        id: 'starter_yearly',
+        name: 'starter_yearly',
+        display_name: 'Starter',
+        price_inr: 1089,
+        validity_days: 365,
+        roadmap_limit: 5,
+        resume_full: true,
+        job_finder_unlimited: true,
+        quicky_ai_daily_limit: -1,
+        has_project_management: true,
+        ats_scan_limit: 0,
+        ats_rate_limit_per_day: 0,
+        has_resources_hub: false,
+        has_portfolio_live: true,
+        portfolio_addon_price_inr: 79,
+        sessions_per_month: 0,
+        session_duration_minutes: 0,
+        has_priority_booking: false,
+        has_async_support: false,
+        has_early_access: false,
+        is_active: true,
+    },
+    {
+        id: 'pro_yearly',
+        name: 'pro_yearly',
+        display_name: 'Pro',
+        price_inr: 2400,
+        validity_days: 365,
+        roadmap_limit: 15,
+        resume_full: true,
+        job_finder_unlimited: true,
+        quicky_ai_daily_limit: -1,
+        has_project_management: true,
+        ats_scan_limit: -1,
+        ats_rate_limit_per_day: 0,
+        has_resources_hub: true,
+        has_portfolio_live: true,
+        portfolio_addon_price_inr: 0,
+        sessions_per_month: 5,
+        session_duration_minutes: 30,
+        has_priority_booking: false,
+        has_async_support: false,
+        has_early_access: false,
+        is_active: true,
+    },
+    {
+        id: 'elite_yearly',
+        name: 'elite_yearly',
+        display_name: 'Elite',
+        price_inr: 5148,
+        validity_days: 365,
+        roadmap_limit: -1,
+        resume_full: true,
+        job_finder_unlimited: true,
+        quicky_ai_daily_limit: -1,
+        has_project_management: true,
+        ats_scan_limit: -1,
+        ats_rate_limit_per_day: 0,
+        has_resources_hub: true,
+        has_portfolio_live: true,
+        portfolio_addon_price_inr: 0,
+        sessions_per_month: 10,
+        session_duration_minutes: 45,
+        has_priority_booking: true,
+        has_async_support: true,
+        has_early_access: true,
+        is_active: true,
+    },
 ];
 
+const PLAN_TIER = { free: 0, starter: 1, pro: 2, elite: 3 };
+
+const getPlanTier = (p) => {
+    if (!p) return -1;
+    const byName = PLAN_TIER[String(p.name || p.display_name || '').toLowerCase()];
+    if (byName != null) return byName;
+    return Number(p.price_inr ?? -1);
+};
+
 const PlanCard = ({ plan, currentPlan, onSelect, isPopular }) => {
-    const isCurrentPlan = currentPlan?.plan === plan.id;
+    const isCurrentPlan = currentPlan?.plan === plan.id || currentPlan?.plan_details?.name === plan.name;
+    const thisTier = getPlanTier(plan);
+    const currentTier = getPlanTier(currentPlan?.plan_details);
+    const hasCurrentPlan = currentTier !== -1;
+    const isUpgrade = hasCurrentPlan && !isCurrentPlan && thisTier > currentTier;
+    const isDowngrade = hasCurrentPlan && !isCurrentPlan && thisTier < currentTier;
+    const isYearly = plan.name.endsWith('_yearly');
+
+    const buttonLabel = isCurrentPlan
+        ? 'Current Plan'
+        : isUpgrade
+            ? 'Upgrade Plan'
+            : isDowngrade
+                ? 'Downgrade Plan'
+                : 'Select Plan';
+
+    const monthlyEquivalent = isYearly ? Math.round(plan.price_inr / 12) : null;
 
     const getFeaturesList = (plan) => {
         const features = [];
-
-        // Roadmaps
         if (plan.roadmap_limit === -1) {
             features.push('Unlimited Career Roadmaps');
         } else {
-            features.push(`${plan.roadmap_limit} Career Roadmaps/month`);
+            features.push(`${plan.roadmap_limit} Career Roadmaps`);
         }
-
-        // Resume generator
-        features.push(plan.resume_full ? 'Full Resume Generator' : 'Basic Resume Generator');
-
-        // Job finder
-        features.push(plan.job_finder_unlimited ? 'Job Finder (unlimited)' : 'Job Finder (limited listings)');
-
-        // Quicky AI
-        features.push(plan.quicky_ai_daily_limit === -1 ? 'Quicky AI (unlimited)' : `Quicky AI (${plan.quicky_ai_daily_limit} queries/day)`);
-
-        // Task/Project management
+        features.push(plan.resume_full ? 'Full Resume Builder' : 'Basic Resume Builder');
+        features.push(plan.job_finder_unlimited ? 'Job Finder (unlimited)' : 'Job Finder (limited)');
+        features.push(plan.quicky_ai_daily_limit === -1 ? 'Unlimited AI Queries' : `${plan.quicky_ai_daily_limit} AI Queries/day`);
         features.push(plan.has_project_management ? 'Task & Project Management' : 'Task Management (basic)');
-
-        // ATS
-        if (plan.ats_scan_limit === -1) {
-            features.push('ATS Scanner (unlimited)');
-        } else if (plan.ats_scan_limit > 0) {
-            features.push(`${plan.ats_scan_limit} ATS scans`);
-        }
-
-        // Resources hub
-        if (plan.has_resources_hub) {
-            features.push('Resources Hub (50+ tools)');
-        }
-
-        // Portfolio live
+        if (plan.ats_scan_limit === -1) features.push('ATS Scanner (unlimited)');
+        else if (plan.ats_scan_limit > 0) features.push(`${plan.ats_scan_limit} ATS scans`);
+        if (plan.has_resources_hub) features.push('Resources Hub (50+ tools)');
         if (plan.has_portfolio_live && Number(plan.portfolio_addon_price_inr) > 0) {
-            features.push(`Portfolio Live (addon at ₹${plan.portfolio_addon_price_inr})`);
+            features.push(`Portfolio Live (addon ₹${plan.portfolio_addon_price_inr})`);
         } else if (plan.has_portfolio_live) {
             features.push('Portfolio Live (included)');
         }
-
-        // Sessions
         if ((plan.sessions_per_month ?? 0) > 0) {
-            const label = plan.sessions_per_month === 1 ? 'Session' : 'Sessions';
-            features.push(`${plan.sessions_per_month} x 1:1 ${label} per month (${plan.session_duration_minutes} min)`);
+            features.push(`${plan.sessions_per_month} × 1:1 Sessions/mo (${plan.session_duration_minutes} min)`);
         }
-
-        // Elite extras
-        if (plan.has_priority_booking) features.push('Priority booking');
-        if (plan.has_async_support) features.push('Async support (WhatsApp/Discord)');
-        if (plan.has_early_access) features.push('Early access to new features');
-
+        if (plan.has_priority_booking) features.push('Priority Booking');
+        if (plan.has_async_support) features.push('Async Support (WhatsApp/Discord)');
+        if (plan.has_early_access) features.push('Early Access to New Features');
         return features;
+    };
+
+    const cardStyle = {
+        position: 'relative',
+        background: isPopular ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.03)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        border: isPopular ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(255,255,255,0.08)',
+        borderRadius: '18px',
+        padding: '24px 20px',
+        boxShadow: isPopular
+            ? '0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)'
+            : '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)',
     };
 
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`relative bg-white dark:bg-[#1a1a1a] border ${isPopular ? 'border-gray-900 dark:border-white' : 'border-gray-200 dark:border-charcoalMuted'} rounded-2xl p-6 ${isPopular ? 'ring-2 ring-gray-900 dark:ring-white' : ''}`}
+            whileHover={{ y: -3, transition: { duration: 0.2 } }}
+            style={cardStyle}
         >
             {isPopular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-semibold rounded-full">
-                    Most Popular
+                <div style={{
+                    position: 'absolute', top: '-11px', left: '50%', transform: 'translateX(-50%)',
+                    background: 'white', color: '#0a0a0a', fontSize: '11px', fontWeight: 700,
+                    padding: '3px 14px', borderRadius: '999px', letterSpacing: '0.05em', whiteSpace: 'nowrap',
+                }}>
+                    MOST POPULAR
                 </div>
             )}
-
             {isCurrentPlan && (
-                <div className="absolute -top-3 right-4 px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-full">
+                <div style={{
+                    position: 'absolute', top: '-11px', right: '16px',
+                    background: '#22c55e', color: '#0a0a0a', fontSize: '11px', fontWeight: 700,
+                    padding: '3px 12px', borderRadius: '999px', whiteSpace: 'nowrap',
+                }}>
                     Current Plan
                 </div>
             )}
 
-            <div className="text-center mb-6">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
-                    {plan.display_name}
-                </h3>
-                <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-3xl font-bold text-gray-900 dark:text-white">₹{plan.price_inr}</span>
-                    <span className="text-gray-500 text-sm">/ {plan.validity_days} days</span>
-                </div>
+            {/* Plan name */}
+            <div style={{ fontSize: '13px', fontWeight: 600, color: '#a1a1aa', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '12px' }}>
+                {plan.display_name}
             </div>
 
-            <div className="space-y-3 mb-6">
+            {/* Price */}
+            {isYearly ? (
+                <>
+                    <div style={{ fontSize: '38px', fontWeight: 800, color: 'white', lineHeight: 1, letterSpacing: '-0.02em' }}>
+                        ₹{monthlyEquivalent}<span style={{ fontSize: '15px', fontWeight: 400, color: '#52525b' }}>/mo</span>
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#3f3f46', marginTop: '4px', marginBottom: '20px' }}>
+                        billed annually · ₹{plan.price_inr.toLocaleString('en-IN')}/year
+                    </div>
+                </>
+            ) : (
+                <>
+                    <div style={{ fontSize: '38px', fontWeight: 800, color: 'white', lineHeight: 1, letterSpacing: '-0.02em' }}>
+                        {plan.price_inr === 0 ? '₹0' : `₹${plan.price_inr}`}
+                        <span style={{ fontSize: '15px', fontWeight: 400, color: '#52525b' }}>
+                            {plan.price_inr === 0 ? '' : '/mo'}
+                        </span>
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#3f3f46', marginTop: '4px', marginBottom: '20px' }}>
+                        {plan.price_inr === 0 ? 'forever' : 'per month'}
+                    </div>
+                </>
+            )}
+
+            {/* CTA Button */}
+            <button
+                onClick={() => onSelect(plan)}
+                disabled={isCurrentPlan}
+                style={{
+                    width: '100%',
+                    padding: '11px',
+                    borderRadius: '10px',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    cursor: isCurrentPlan ? 'default' : 'pointer',
+                    border: 'none',
+                    marginBottom: '20px',
+                    transition: 'opacity 0.2s',
+                    ...(isCurrentPlan
+                        ? { background: 'rgba(255,255,255,0.04)', color: '#52525b', border: '1px solid rgba(255,255,255,0.08)' }
+                        : isPopular
+                            ? { background: 'white', color: '#0a0a0a' }
+                            : { background: 'rgba(255,255,255,0.08)', color: '#d4d4d8', border: '1px solid rgba(255,255,255,0.1)' }
+                    ),
+                }}
+            >
+                {buttonLabel}
+            </button>
+
+            <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.06)', marginBottom: '16px' }} />
+
+            {/* Features */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '9px' }}>
                 {getFeaturesList(plan).map((feature, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#a1a1aa', lineHeight: 1.4 }}>
+                        <span style={{ color: '#22c55e', flexShrink: 0 }}>✓</span>
                         {feature}
                     </div>
                 ))}
             </div>
-
-            <button
-                onClick={() => onSelect(plan)}
-                disabled={isCurrentPlan}
-                className={`w-full py-3 rounded-xl font-semibold transition-all ${isCurrentPlan
-                        ? 'bg-gray-100 dark:bg-charcoal text-gray-400 cursor-not-allowed'
-                        : isPopular
-                            ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:opacity-90'
-                            : 'border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoalDark'
-                    }`}
-            >
-                {isCurrentPlan ? 'Current Plan' : 'Select Plan'}
-            </button>
         </motion.div>
     );
 };
 
 export default function PricingPage() {
     const navigate = useNavigate();
-    const [plans, setPlans] = useState([]);
+    const [allPlans, setAllPlans] = useState([]);
     const [currentSubscription, setCurrentSubscription] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [billingPeriod, setBillingPeriod] = useState('monthly');
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { fetchData(); }, []);
 
     const normalizePlans = (plansData) => {
-        if (Array.isArray(plansData) && plansData.length > 0) {
-            return plansData;
-        }
-
-        if (Array.isArray(plansData?.results) && plansData.results.length > 0) {
-            return plansData.results;
-        }
-
+        if (Array.isArray(plansData) && plansData.length > 0) return plansData;
+        if (Array.isArray(plansData?.results) && plansData.results.length > 0) return plansData.results;
         return FALLBACK_PLANS;
     };
 
@@ -239,11 +354,11 @@ export default function PricingPage() {
                 planService.getAll(),
                 subscriptionService.getCurrent().catch(() => null)
             ]);
-            setPlans(normalizePlans(plansData));
+            setAllPlans(normalizePlans(plansData));
             setCurrentSubscription(subscriptionData);
         } catch (error) {
             console.error('Failed to fetch plans:', error);
-            setPlans(FALLBACK_PLANS);
+            setAllPlans(FALLBACK_PLANS);
         } finally {
             setLoading(false);
         }
@@ -254,89 +369,130 @@ export default function PricingPage() {
             navigate('/register');
             return;
         }
-
         navigate('/billing/checkout', { state: { plan } });
     };
 
+    const displayedPlans = allPlans.filter((p) =>
+        billingPeriod === 'yearly'
+            ? p.name === 'free' || p.name.endsWith('_yearly')
+            : !p.name.endsWith('_yearly')
+    );
+
+    const isPopularPlan = (plan) =>
+        plan.name === 'pro' || plan.name === 'pro_yearly';
+
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center">
-                <div className="text-gray-500 dark:text-gray-400">Loading plans...</div>
+            <div style={{ minHeight: '100vh', background: '#050505', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ color: '#52525b' }}>Loading plans...</div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-black transition-colors duration-300 font-sans pb-20">
-            <div className="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-12">
+        <div style={{ minHeight: '100vh', background: '#050505', fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", sans-serif', paddingBottom: '80px' }}>
+            <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px 20px' }}>
+
                 {/* Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-center mb-12"
-                >
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3">
-                        Choose Your Plan
+                <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: 'center', marginBottom: '36px' }}>
+                    <h1 style={{ fontSize: '36px', fontWeight: 800, color: 'white', letterSpacing: '-0.02em', marginBottom: '10px' }}>
+                        Plans &amp; Pricing
                     </h1>
-                    <p className="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
-                        Get access to roadmaps, projects, resume builder, ATS scanner, and a live portfolio.
-                        All plans include subscription-based portfolio hosting.
+                    <p style={{ fontSize: '15px', color: '#71717a', maxWidth: '480px', margin: '0 auto' }}>
+                        Choose the best plan for your professional needs.
                     </p>
                 </motion.div>
 
-                {/* Current Subscription Banner */}
+                {/* Current plan banner */}
                 {currentSubscription && (
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mb-8 p-4 bg-white dark:bg-[#1a1a1a] border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] rounded-2xl"
+                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                        style={{
+                            background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+                            borderRadius: '14px', padding: '16px 20px', display: 'flex', alignItems: 'center',
+                            justifyContent: 'space-between', marginBottom: '28px', backdropFilter: 'blur(12px)',
+                        }}
                     >
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                            <div>
-                                <h3 className="font-semibold text-gray-900 dark:text-white">
-                                    Current Plan: {currentSubscription.plan_details?.display_name}
-                                </h3>
-                                <p className="text-sm text-gray-500">
-                                    {currentSubscription.days_remaining} days remaining •
-                                    Status: <span className={`font-medium ${currentSubscription.status === 'active' ? 'text-green-500' : 'text-yellow-500'}`}>
-                                        {currentSubscription.status}
-                                    </span>
-                                </p>
+                        <div>
+                            <div style={{ fontSize: '13px', color: '#71717a' }}>You're currently on</div>
+                            <div style={{ fontSize: '15px', fontWeight: 600, color: 'white' }}>
+                                {currentSubscription.plan_details?.display_name} Plan
                             </div>
-                            <button
-                                onClick={() => navigate('/subscription')}
-                                className="px-4 py-2 text-sm border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoalDark transition-colors"
-                            >
-                                View Details
-                            </button>
                         </div>
+                        <button
+                            onClick={() => navigate('/subscription')}
+                            style={{
+                                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                                color: '#d4d4d8', padding: '7px 16px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer',
+                            }}
+                        >
+                            View Details
+                        </button>
                     </motion.div>
                 )}
 
-                {/* Plans Grid */}
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {plans.map((plan, index) => (
+                {/* Billing toggle */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '36px' }}>
+                    <div style={{
+                        display: 'flex', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '999px', padding: '4px', gap: '2px',
+                    }}>
+                        {['monthly', 'yearly'].map((period) => (
+                            <button
+                                key={period}
+                                onClick={() => setBillingPeriod(period)}
+                                style={{
+                                    padding: '7px 20px', borderRadius: '999px', fontSize: '14px', border: 'none', cursor: 'pointer',
+                                    fontWeight: billingPeriod === period ? 600 : 500,
+                                    background: billingPeriod === period ? 'white' : 'transparent',
+                                    color: billingPeriod === period ? '#0a0a0a' : '#71717a',
+                                    transition: 'all 0.2s',
+                                    textTransform: 'capitalize',
+                                }}
+                            >
+                                {period}
+                            </button>
+                        ))}
+                    </div>
+                    {billingPeriod === 'yearly' && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+                            style={{
+                                background: 'rgba(34,197,94,0.12)', color: '#22c55e',
+                                border: '1px solid rgba(34,197,94,0.2)', fontSize: '12px',
+                                fontWeight: 600, padding: '4px 10px', borderRadius: '999px',
+                            }}
+                        >
+                            1 month free
+                        </motion.div>
+                    )}
+                </div>
+
+                {/* Plan cards */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '48px' }}>
+                    {displayedPlans.map((plan) => (
                         <PlanCard
-                            key={plan.id}
+                            key={plan.id || plan.name}
                             plan={plan}
                             currentPlan={currentSubscription}
                             onSelect={handleSelectPlan}
-                            isPopular={plan.name === 'pro'}
+                            isPopular={isPopularPlan(plan)}
                         />
                     ))}
                 </div>
 
-                {/* Features Comparison */}
+                {/* All plans include */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="mt-12 bg-white dark:bg-[#1a1a1a] border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] rounded-2xl p-6"
+                    initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                    style={{
+                        background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
+                        borderRadius: '18px', padding: '32px', backdropFilter: 'blur(12px)', marginBottom: '24px',
+                    }}
                 >
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+                    <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'white', textAlign: 'center', marginBottom: '24px' }}>
                         All Plans Include
                     </h2>
-                    <div className="grid md:grid-cols-3 gap-6">
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
                         {[
                             { icon: '🎯', title: 'Goal-Based Roadmaps', desc: 'Structured learning paths tailored to your career goals' },
                             { icon: '📅', title: 'Calendar Scheduling', desc: 'Schedule tasks and track your daily progress' },
@@ -345,29 +501,26 @@ export default function PricingPage() {
                             { icon: '🔍', title: 'ATS Scanner', desc: 'Check your resume compatibility' },
                             { icon: '🌐', title: 'Live Portfolio', desc: 'Hosted portfolio while subscribed' },
                         ].map((feature, i) => (
-                            <div key={i} className="flex items-start gap-3">
-                                <span className="text-2xl">{feature.icon}</span>
+                            <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                                <span style={{ fontSize: '20px' }}>{feature.icon}</span>
                                 <div>
-                                    <h4 className="font-semibold text-gray-900 dark:text-white text-sm">{feature.title}</h4>
-                                    <p className="text-xs text-gray-500">{feature.desc}</p>
+                                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'white', marginBottom: '2px' }}>{feature.title}</div>
+                                    <div style={{ fontSize: '12px', color: '#52525b' }}>{feature.desc}</div>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </motion.div>
 
-                {/* FAQ */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="mt-8 text-center"
+                {/* Footer note */}
+                <motion.p
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
+                    style={{ textAlign: 'center', fontSize: '12px', color: '#3f3f46' }}
                 >
-                    <p className="text-sm text-gray-500">
-                        Portfolio stays live only while your subscription is active.
-                        After expiry, it enters read-only mode showing only your name and project titles.
-                    </p>
-                </motion.div>
+                    Portfolio stays live only while your subscription is active.
+                    After expiry, it enters read-only mode showing only your name and project titles.
+                </motion.p>
+
             </div>
         </div>
     );
