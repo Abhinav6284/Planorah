@@ -372,6 +372,8 @@ export default function PricingPage() {
     };
 
     const handleSelectPlan = (plan) => {
+        // Fallback plans use string IDs (e.g. 'pro_yearly'). A non-numeric ID means
+        // the API failed and we're showing skeleton data — redirect unauthenticated users to register.
         if (!plan?.id || typeof plan.id !== 'number') {
             navigate('/register');
             return;
