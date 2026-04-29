@@ -338,9 +338,16 @@ export default function PricingPage() {
     const [currentSubscription, setCurrentSubscription] = useState(null);
     const [loading, setLoading] = useState(true);
     const [billingPeriod, setBillingPeriod] = useState('monthly');
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { fetchData(); }, []);
+
+    useEffect(() => {
+        const handleResize = () => setWindowWidth(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const normalizePlans = (plansData) => {
         if (Array.isArray(plansData) && plansData.length > 0) return plansData;
@@ -469,7 +476,7 @@ export default function PricingPage() {
                 </div>
 
                 {/* Plan cards */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '48px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: windowWidth >= 1024 ? 'repeat(4, 1fr)' : windowWidth >= 640 ? 'repeat(2, 1fr)' : '1fr', gap: '16px', marginBottom: '48px' }}>
                     {displayedPlans.map((plan) => (
                         <PlanCard
                             key={plan.id || plan.name}
@@ -492,7 +499,7 @@ export default function PricingPage() {
                     <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'white', textAlign: 'center', marginBottom: '24px' }}>
                         All Plans Include
                     </h2>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: windowWidth >= 768 ? 'repeat(3, 1fr)' : '1fr', gap: '20px' }}>
                         {[
                             { icon: '🎯', title: 'Goal-Based Roadmaps', desc: 'Structured learning paths tailored to your career goals' },
                             { icon: '📅', title: 'Calendar Scheduling', desc: 'Schedule tasks and track your daily progress' },
