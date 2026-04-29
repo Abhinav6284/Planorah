@@ -338,7 +338,7 @@ export default function PricingPage() {
     const [currentSubscription, setCurrentSubscription] = useState(null);
     const [loading, setLoading] = useState(true);
     const [billingPeriod, setBillingPeriod] = useState('monthly');
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const [windowWidth, setWindowWidth] = useState(() => typeof window !== 'undefined' ? window.innerWidth : 1024);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { fetchData(); }, []);
