@@ -73,12 +73,15 @@ YEARLY_PLANS = [
 def insert_yearly_plans(apps, schema_editor):
     Plan = apps.get_model('plans', 'Plan')
     for data in YEARLY_PLANS:
-        Plan.objects.get_or_create(name=data['name'], defaults=data)
+        Plan.objects.get_or_create(
+            name=data['name'],
+            defaults={k: v for k, v in data.items() if k != 'name'},
+        )
 
 
 def remove_yearly_plans(apps, schema_editor):
     Plan = apps.get_model('plans', 'Plan')
-    Plan.objects.filter(name__in=['starter_yearly', 'pro_yearly', 'elite_yearly']).delete()
+    Plan.objects.filter(name__in=[p['name'] for p in YEARLY_PLANS]).delete()
 
 
 class Migration(migrations.Migration):
