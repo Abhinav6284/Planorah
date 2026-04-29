@@ -168,7 +168,7 @@ const FALLBACK_PLANS = [
     },
 ];
 
-const PLAN_TIER = { free: 0, starter: 1, pro: 2, elite: 3 };
+const PLAN_TIER = { free: 0, starter: 1, starter_yearly: 1, pro: 2, pro_yearly: 2, elite: 3, elite_yearly: 3 };
 
 const getPlanTier = (p) => {
     if (!p) return -1;
