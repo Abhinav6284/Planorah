@@ -166,7 +166,7 @@ class Plan(models.Model):
 
     @classmethod
     def create_default_plans(cls):
-        """Create the 4 pricing plans."""
+        """Create the 7 default subscription plans (4 monthly + 3 yearly)."""
         allowed_names = [name for name, _ in cls.PLAN_CHOICES]
         plans_data = [
             {
