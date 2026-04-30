@@ -9,27 +9,37 @@ export default function Input({
   return (
     <div className={['flex flex-col gap-1.5', className].join(' ')}>
       {label && (
-        <label className="text-xs font-medium text-[#94A3B8] tracking-wide uppercase">
+        <label
+          className="text-xs font-medium tracking-wide uppercase"
+          style={{ color: 'var(--text-secondary)' }}
+        >
           {label}
         </label>
       )}
       <div className="relative">
         {icon && (
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#475569] pointer-events-none">
+          <span
+            className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+            style={{ color: 'var(--text-secondary)' }}
+          >
             {icon}
           </span>
         )}
         <input
           className={[
-            'w-full bg-obs-elevated border border-[rgba(255,255,255,0.08)] rounded-xl',
-            'text-[#F1F5F9] placeholder-[#475569] text-sm',
-            'px-3.5 py-2.5 transition-all duration-150',
-            'focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/20',
-            'hover:border-[rgba(255,255,255,0.14)]',
-            error ? 'border-red-500/50 focus:border-red-500/70 focus:ring-red-500/10' : '',
+            'w-full rounded-xl text-sm px-3.5 py-2.5 transition-colors duration-150 outline-none border',
+            'placeholder-mid-gray',
+            error
+              ? 'border-red-500/50 focus:border-red-500/70 focus:ring-1 focus:ring-red-500/20'
+              : 'focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500/50',
             icon ? 'pl-9' : '',
             inputClassName,
           ].join(' ')}
+          style={{
+            background: 'var(--bg-elevated)',
+            borderColor: error ? undefined : 'var(--border-bright)',
+            color: 'var(--text-primary)',
+          }}
           {...props}
         />
       </div>
