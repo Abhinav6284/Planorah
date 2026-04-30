@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 
 const ThemeContext = createContext(null)
 
@@ -12,9 +12,9 @@ export function ThemeProvider({ children }) {
     localStorage.setItem('admin_theme', theme)
   }, [theme])
 
-  function toggleTheme() {
+  const toggleTheme = useCallback(() => {
     setTheme(t => (t === 'light' ? 'dark' : 'light'))
-  }
+  }, [])
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
@@ -24,5 +24,9 @@ export function ThemeProvider({ children }) {
 }
 
 export function useTheme() {
-  return useContext(ThemeContext)
+  const ctx = useContext(ThemeContext)
+  if (ctx === null) {
+    throw new Error('useTheme must be used within a ThemeProvider')
+  }
+  return ctx
 }
