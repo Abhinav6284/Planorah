@@ -24,12 +24,11 @@ export default function Toast({ toast, onClose }) {
       transition={{ type: 'spring', stiffness: 380, damping: 32 }}
       className="relative overflow-hidden flex items-center gap-3 px-4 py-3 rounded-xl min-w-[280px] max-w-[360px]"
       style={{
-        background:  'var(--bg-elevated)',
-        border:      '1px solid var(--border-bright)',
-        boxShadow:   '0 8px 32px rgba(0,0,0,0.4)',
+        background: 'var(--bg-toast)',
+        border:     '1px solid var(--border-bright)',
+        boxShadow:  '0 8px 32px rgba(0,0,0,0.4)',
       }}
     >
-      {/* progress bar */}
       <motion.div
         className={`absolute bottom-0 left-0 h-[2px] ${BARS[toast.type] ?? BARS.info}`}
         initial={{ width: '100%' }}
@@ -38,11 +37,13 @@ export default function Toast({ toast, onClose }) {
       />
 
       <span className="flex-shrink-0">{ICONS[toast.type] ?? ICONS.info}</span>
-      <p className="text-sm flex-1" style={{ color: 'var(--text-primary)' }}>{toast.message}</p>
+      <p className="text-sm flex-1" style={{ color: 'var(--text-on-toast)' }}>
+        {toast.message}
+      </p>
       <button
         onClick={onClose}
         className="flex-shrink-0 p-0.5 rounded opacity-50 hover:opacity-100 transition-opacity"
-        style={{ color: 'var(--text-secondary)' }}
+        style={{ color: 'var(--text-on-toast)' }}
       >
         <X size={14} />
       </button>
