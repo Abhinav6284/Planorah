@@ -214,10 +214,8 @@ function DropItem({ icon, label, danger, onClick }) {
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-inter transition-colors cursor-pointer ${
-        danger ? 'text-red-600 hover:bg-red-50' : 'hover:bg-[var(--bg-elevated)]'
-      }`}
-      style={danger ? {} : { color: 'var(--text-primary)' }}
+      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-inter transition-colors cursor-pointer hover:bg-[var(--bg-elevated)]"
+      style={{ color: danger ? '#ef4444' : 'var(--text-primary)' }}
     >
       {icon}
       {label}
