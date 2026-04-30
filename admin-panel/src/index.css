@@ -12,19 +12,53 @@
 }
 
 :root {
-  /* Cal.com monochromatic palette */
+  /* ── Surface ── */
+  --bg-base:        #ffffff;
+  --bg-elevated:    #f9fafb;
+  --bg-card:        #ffffff;
+  --bg-toast:       #1e1e1e;   /* stays dark in both modes */
+
+  /* ── Text ── */
+  --text-primary:   #242424;
+  --text-secondary: #898989;
+  --text-on-toast:  #f1f5f9;
+
+  /* ── Border ── */
+  --border:         rgba(34,42,53,0.08);
+  --border-bright:  rgba(34,42,53,0.14);
+
+  /* Cal.com legacy (used by Tailwind config names) */
   --charcoal:      #242424;
   --midnight:      #111111;
   --mid-gray:      #898989;
   --white:         #ffffff;
   --border-ring:   rgba(34, 42, 53, 0.08);
-  --border-bright: rgba(34, 42, 53, 0.14);
 
   /* Semantic */
   --success: #10b981;
   --warning: #f59e0b;
   --error:   #ef4444;
   --info:    #3b82f6;
+}
+
+.dark {
+  --bg-base:        #111111;
+  --bg-elevated:    #1a1a1a;
+  --bg-card:        #1e1e1e;
+  --bg-toast:       #2a2a2a;
+
+  --text-primary:   #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-on-toast:  #f1f5f9;
+
+  --border:         rgba(255,255,255,0.06);
+  --border-bright:  rgba(255,255,255,0.12);
+}
+
+*,
+*::before,
+*::after {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 *,
