@@ -26,6 +26,7 @@
   /* ── Border ── */
   --border:         rgba(34,42,53,0.08);
   --border-bright:  rgba(34,42,53,0.14);
+  --scrollbar-thumb: rgba(34,42,53,0.15);
 
   /* Cal.com legacy (used by Tailwind config names) */
   --charcoal:      #242424;
@@ -53,24 +54,20 @@
 
   --border:         rgba(255,255,255,0.06);
   --border-bright:  rgba(255,255,255,0.12);
-}
-
-*,
-*::before,
-*::after {
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  --scrollbar-thumb: rgba(255,255,255,0.15);
 }
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 html,
 body {
-  background-color: #ffffff;
-  color: #242424;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -79,10 +76,10 @@ body {
 /* Scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(34, 42, 53, 0.15) transparent;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 *::-webkit-scrollbar       { width: 4px; height: 4px; }
-*::-webkit-scrollbar-thumb { background: rgba(34, 42, 53, 0.15); border-radius: 4px; }
+*::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
 
 /* Cal.com card — white + multi-layered shadow ring */
 .card {
