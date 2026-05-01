@@ -33,19 +33,26 @@ def staff_required(fn):
 
 # ─── Auth helper ─────────────────────────────────────────────────────────────
 
-@api_view(['GET'])
+@api_view(['GET', 'PATCH'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def me(request):
-    """Return current admin user info."""
+    """Return or update current admin user info."""
     if not request.user.is_staff:
         return Response({'detail': 'Staff access required.'}, status=status.HTTP_403_FORBIDDEN)
     user = request.user
+
+    if request.method == 'PATCH':
+        user.first_name = request.data.get('first_name', user.first_name)
+        user.last_name  = request.data.get('last_name',  user.last_name)
+        user.email      = request.data.get('email',      user.email)
+        user.save(update_fields=['first_name', 'last_name', 'email'])
+
     return Response({
-        'id': user.id,
-        'name': f'{user.first_name} {user.last_name}'.strip() or user.username,
-        'email': user.email,
-        'role': 'superadmin' if user.is_superuser else 'admin',
+        'id':       user.id,
+        'name':     f'{user.first_name} {user.last_name}'.strip() or user.username,
+        'email':    user.email,
+        'role':     'superadmin' if user.is_superuser else 'admin',
         'username': user.username,
     })
 
