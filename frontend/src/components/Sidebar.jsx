@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
   Settings,
-  LogOut,
   ChevronDown,
   X,
   Beaker,
@@ -192,12 +191,6 @@ const SidebarContent = ({ onNavClick = () => { }, user = null }) => {
 
   const toggleSection = (name) =>
     setExpandedSections((prev) => ({ ...prev, [name]: !prev[name] }));
-
-  const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    window.location.href = '/login';
-  };
 
   return (
     <div className="flex flex-col h-full" style={{ background: 'var(--el-sidebar-bg)', color: 'var(--el-sidebar-text)' }}>
