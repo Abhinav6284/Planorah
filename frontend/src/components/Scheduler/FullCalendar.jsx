@@ -138,7 +138,18 @@ const FullCalendar = ({ onEventClick }) => {
     const maxTime = useMemo(() => new Date(1970, 1, 1, 23, 0, 0), []);
 
     return (
-        <div className="scheduler-full-calendar h-full min-h-[680px] rounded-2xl border border-gray-200 bg-white p-3 dark:border-charcoalMuted dark:bg-[#111318] md:p-4">
+        <div
+            className="scheduler-full-calendar"
+            style={{
+                height: '100%',
+                minHeight: 680,
+                borderRadius: 16,
+                border: '1px solid var(--el-border)',
+                background: 'var(--el-bg-secondary)',
+                padding: 12,
+                position: 'relative',
+            }}
+        >
             <Calendar
                 localizer={localizer}
                 events={events}
@@ -161,7 +172,20 @@ const FullCalendar = ({ onEventClick }) => {
             />
 
             {loading && (
-                <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/70 text-sm font-medium text-gray-600 dark:bg-[#111318]/70 dark:text-gray-300">
+                <div style={{
+                    pointerEvents: 'none',
+                    position: 'absolute',
+                    inset: 0,
+                    zIndex: 10,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 16,
+                    background: 'color-mix(in srgb, var(--el-bg-secondary) 85%, transparent)',
+                    fontSize: 13,
+                    fontWeight: 500,
+                    color: 'var(--el-text-muted)',
+                }}>
                     Loading calendar...
                 </div>
             )}

@@ -77,7 +77,7 @@ const TodayMissionCard = ({ task, loading, onStart, onChangeTask }) => {
                     whileTap={{ scale: 0.98 }}
                     onClick={onStart}
                     style={{ 
-                        padding: '12px 32px', borderRadius: 12, background: 'var(--el-text)', color: '#fff', 
+                        padding: '12px 32px', borderRadius: 12, background: 'var(--el-text)', color: 'var(--el-bg)',
                         fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.1s'
                     }}
                 >

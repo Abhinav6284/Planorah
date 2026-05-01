@@ -205,7 +205,7 @@ const FocusMode = ({ open, task, onClose, onComplete, embedded = false }) => {
                                 padding: '8px 16px', borderRadius: 8, fontSize: 12, fontWeight: 700,
                                 cursor: 'pointer', transition: 'all 0.1s',
                                 background: duration === option ? 'var(--el-text)' : 'var(--el-bg)',
-                                color: duration === option ? '#fff' : 'var(--el-text-secondary)',
+                                color: duration === option ? 'var(--el-bg)' : 'var(--el-text-secondary)',
                                 border: duration === option ? 'none' : '1px solid var(--el-border)'
                             }}
                         >

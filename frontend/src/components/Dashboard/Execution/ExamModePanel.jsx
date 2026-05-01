@@ -39,7 +39,7 @@ const ExamModePanel = ({ plan, loading, onGenerate }) => {
                     disabled={loading || !syllabus.trim()}
                     style={{
                         width: 'fit-content', padding: '10px 24px', borderRadius: 10, 
-                        background: 'var(--el-text)', color: '#fff', fontSize: 13, fontWeight: 700, 
+                        background: 'var(--el-text)', color: 'var(--el-bg)', fontSize: 13, fontWeight: 700,
                         border: 'none', cursor: 'pointer', opacity: loading || !syllabus.trim() ? 0.5 : 1,
                         transition: 'all 0.1s'
                     }}

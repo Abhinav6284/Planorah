@@ -95,7 +95,7 @@ const ExecutionFeed = React.memo(({ tasks, focusOpen, todayTask, streak, recentA
                         <div style={{ 
                             width: 32, height: 32, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
                             background: item.type === 'active' ? 'var(--el-text)' : 'var(--el-bg-secondary)',
-                            color: item.type === 'active' ? '#fff' : 'var(--el-text-secondary)'
+                            color: item.type === 'active' ? 'var(--el-bg)' : 'var(--el-text-secondary)'
                         }}>
                             <item.icon style={{ width: 16, height: 16 }} />
                         </div>

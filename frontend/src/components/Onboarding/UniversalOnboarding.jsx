@@ -830,7 +830,7 @@ export default function UniversalOnboarding() {
                             padding: '14px 40px',
                             borderRadius: 99,
                             background: 'var(--el-text)',
-                            color: '#000',
+                            color: 'var(--el-bg)',
                             fontSize: 14,
                             fontWeight: 600,
                             border: 'none',

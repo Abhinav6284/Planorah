@@ -32,28 +32,28 @@ const navSections = [
   {
     section: 'Configure',
     items: [
-      { path: '/lab',              label: 'Virtual Lab',      icon: Beaker },
-      { path: '/roadmap/list',     label: 'Learning Path',    icon: MapPin },
-      { path: '/roadmap/projects', label: 'My Projects',      icon: FolderOpen },
-      { path: '/planora',          label: 'Study Platform',   icon: BookOpen },
+      { path: '/lab', label: 'Virtual Lab', icon: Beaker },
+      { path: '/roadmap/list', label: 'Learning Path', icon: MapPin },
+      { path: '/roadmap/projects', label: 'My Projects', icon: FolderOpen },
+      { path: '/planora', label: 'Study Platform', icon: BookOpen },
     ],
   },
   {
     section: 'Monitor',
     items: [
-      { path: '/tasks',     label: 'Tasks',     icon: CheckSquare },
-      { path: '/scheduler', label: 'Calendar',  icon: Calendar },
+      { path: '/tasks', label: 'Tasks', icon: CheckSquare },
+      { path: '/scheduler', label: 'Calendar', icon: Calendar },
     ],
   },
   {
     section: 'Career',
     items: [
-      { path: '/resume',          label: 'Resume Builder',   icon: FileText },
+      { path: '/resume', label: 'Resume Builder', icon: FileText },
       { path: '/resume/compiled', label: 'Compiled Resumes', icon: Files },
-      { path: '/ats',             label: 'Find Your Fit',    icon: Search },
-      { path: '/jobs',            label: 'Job Finder',       icon: Briefcase },
-      { path: '/interview',       label: 'Mock Interview',   icon: MessageSquare },
-      { path: '/portfolio/edit',  label: 'Portfolio',        icon: Globe },
+      { path: '/ats', label: 'Find Your Fit', icon: Search },
+      { path: '/jobs', label: 'Job Finder', icon: Briefcase },
+      { path: '/interview', label: 'Mock Interview', icon: MessageSquare },
+      { path: '/portfolio/edit', label: 'Portfolio', icon: Globe },
     ],
   },
 
@@ -69,8 +69,118 @@ const getActiveNavPath = (pathname) => {
   return matched.sort((a, b) => b.length - a.length)[0];
 };
 
+// ─── SettingsLink ────────────────────────────────────────────────────────────
+const SettingsLink = ({ onNavClick }) => {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <Link
+      to="/settings"
+      onClick={onNavClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: '7px 10px',
+        borderRadius: 7,
+        fontSize: 13.5,
+        fontWeight: 400,
+        fontFamily: "'Inter', sans-serif",
+        textDecoration: 'none',
+        transition: 'color 0.15s',
+        background: hovered ? 'var(--el-sidebar-hover-bg)' : 'transparent',
+        color: hovered ? 'var(--el-sidebar-active)' : 'var(--el-sidebar-text)',
+      }}
+    >
+      <Settings style={{ width: 15, height: 15, opacity: 0.65 }} />
+      Settings
+    </Link>
+  );
+};
+
+// ─── HomeLink ────────────────────────────────────────────────────────────────
+const HomeLink = ({ activeNavPath, onNavClick }) => {
+  const [hovered, setHovered] = useState(false);
+  const active = activeNavPath === '/dashboard';
+  return (
+    <div style={{ padding: '0 12px 4px' }}>
+      <Link
+        to="/dashboard"
+        onClick={onNavClick}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          padding: '10px 12px',
+          borderRadius: 10,
+          fontSize: 14,
+          fontWeight: active ? 600 : 400,
+          fontFamily: "'Inter', sans-serif",
+          textDecoration: 'none',
+          transition: 'color 0.15s',
+          background: !active && hovered ? 'var(--el-sidebar-hover-bg)' : 'transparent',
+          color: active || hovered ? 'var(--el-sidebar-active)' : 'var(--el-sidebar-text)',
+        }}
+      >
+        <LayoutDashboard style={{ width: 16, height: 16, opacity: active ? 1 : 0.6 }} />
+        Home
+      </Link>
+    </div>
+  );
+};
+
+// ─── NavItemLink ─────────────────────────────────────────────────────────────
+const NavItemLink = ({ item, active, onNavClick }) => {
+  const [hovered, setHovered] = useState(false);
+  const Icon = item.icon;
+  return (
+    <Link
+      to={item.path}
+      onClick={onNavClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        padding: '8px 12px',
+        borderRadius: 10,
+        fontSize: 13.5,
+        fontWeight: active ? 600 : 400,
+        fontFamily: "'Inter', sans-serif",
+        textDecoration: 'none',
+        transition: 'color 0.15s',
+        background: !active && hovered ? 'var(--el-sidebar-hover-bg)' : 'transparent',
+        color: active || hovered ? 'var(--el-sidebar-active)' : 'var(--el-sidebar-text)',
+      }}
+    >
+      <Icon style={{ width: 15, height: 15, opacity: active ? 1 : 0.5, flexShrink: 0 }} />
+      <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {item.label}
+      </span>
+      {item.badge && (
+        <span style={{
+          marginLeft: 'auto',
+          fontSize: 10,
+          fontWeight: 700,
+          padding: '1px 8px',
+          borderRadius: 9999,
+          background: 'var(--el-sidebar-item-active-bg)',
+          color: 'var(--el-sidebar-active)',
+          letterSpacing: '0.02em'
+        }}>
+          {item.badge}
+        </span>
+      )}
+    </Link>
+  );
+};
+
 // ─── SidebarContent ──────────────────────────────────────────────────────────
-const SidebarContent = ({ onNavClick = () => {}, user = null }) => {
+const SidebarContent = ({ onNavClick = () => { }, user = null }) => {
   const location = useLocation();
   const activeNavPath = getActiveNavPath(location.pathname);
   const [expandedSections, setExpandedSections] = useState(() =>
@@ -111,7 +221,7 @@ const SidebarContent = ({ onNavClick = () => {}, user = null }) => {
               width: 24,
               height: 24,
               objectFit: 'contain',
-              filter: 'invert(1)',
+              filter: 'var(--el-sidebar-logo-filter)',
               flexShrink: 0,
             }}
           />
@@ -127,73 +237,8 @@ const SidebarContent = ({ onNavClick = () => {}, user = null }) => {
         </Link>
       </div>
 
-      {/* ── Workspace Selector ── */}
-      <div style={{ padding: '0 12px 16px' }}>
-        <button
-          type="button"
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '8px 12px',
-            borderRadius: 10,
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.06)',
-            color: 'var(--el-sidebar-active)',
-            fontSize: 13,
-            fontWeight: 500,
-            fontFamily: "'Inter', sans-serif",
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
-            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
-            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
-          }}
-        >
-          <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{
-              width: 18, height: 18, borderRadius: 4,
-              background: '#fff',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 10, fontWeight: 800, color: '#000',
-            }}>P</div>
-            My Workspace
-          </span>
-          <ChevronDown style={{ width: 14, height: 14, opacity: 0.4 }} />
-        </button>
-      </div>
-
       {/* ── Home Link ── */}
-      <div style={{ padding: '0 12px 4px' }}>
-        <Link
-          to="/dashboard"
-          onClick={onNavClick}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            padding: '10px 12px',
-            borderRadius: 10,
-            fontSize: 14,
-            fontWeight: activeNavPath === '/dashboard' ? 500 : 400,
-            fontFamily: "'Inter', sans-serif",
-            textDecoration: 'none',
-            transition: 'all 0.2s',
-            background: activeNavPath === '/dashboard' ? 'rgba(255,255,255,0.08)' : 'transparent',
-            color: activeNavPath === '/dashboard' ? 'var(--el-sidebar-active)' : 'var(--el-sidebar-text)',
-            boxShadow: activeNavPath === '/dashboard' ? 'inset 0 1px 1px rgba(255,255,255,0.05)' : 'none'
-          }}
-        >
-          <LayoutDashboard style={{ width: 16, height: 16, opacity: activeNavPath === '/dashboard' ? 1 : 0.6 }} />
-          Home
-        </Link>
-      </div>
+      <HomeLink activeNavPath={activeNavPath} onNavClick={onNavClick} />
 
       {/* ── Sections ── */}
       <nav style={{ flex: 1, overflowY: 'auto', padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -251,61 +296,14 @@ const SidebarContent = ({ onNavClick = () => {}, user = null }) => {
                     style={{ overflow: 'hidden' }}
                   >
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                      {section.items.map((item) => {
-                        const active = activeNavPath === item.path;
-                        const Icon = item.icon;
-                        return (
-                          <Link
-                            key={item.path}
-                            to={item.path}
-                            onClick={onNavClick}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 12,
-                              padding: '8px 12px',
-                              borderRadius: 10,
-                              fontSize: 13.5,
-                              fontWeight: active ? 500 : 400,
-                              fontFamily: "'Inter', sans-serif",
-                              textDecoration: 'none',
-                              transition: 'all 0.2s',
-                              background: active ? 'rgba(255,255,255,0.08)' : 'transparent',
-                              color: active ? 'var(--el-sidebar-active)' : 'var(--el-sidebar-text)',
-                              boxShadow: active ? 'inset 0 1px 1px rgba(255,255,255,0.05)' : 'none'
-                            }}
-                            onMouseEnter={(e) => {
-                              if (!active) {
-                                e.currentTarget.style.background = 'var(--el-sidebar-hover-bg)';
-                                e.currentTarget.style.color = 'var(--el-sidebar-active)';
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              if (!active) {
-                                e.currentTarget.style.background = 'transparent';
-                                e.currentTarget.style.color = 'var(--el-sidebar-text)';
-                              }
-                            }}
-                          >
-                            <Icon style={{ width: 15, height: 15, opacity: active ? 1 : 0.5, flexShrink: 0 }} />
-                            <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</span>
-                            {item.badge && (
-                              <span style={{
-                                marginLeft: 'auto',
-                                fontSize: 10,
-                                fontWeight: 700,
-                                padding: '1px 8px',
-                                borderRadius: 9999,
-                                background: 'rgba(255,255,255,0.1)',
-                                color: 'var(--el-sidebar-active)',
-                                letterSpacing: '0.02em'
-                              }}>
-                                {item.badge}
-                              </span>
-                            )}
-                          </Link>
-                        );
-                      })}
+                      {section.items.map((item) => (
+                        <NavItemLink
+                          key={item.path}
+                          item={item}
+                          active={activeNavPath === item.path}
+                          onNavClick={onNavClick}
+                        />
+                      ))}
                     </div>
                   </motion.div>
                 )}
@@ -318,78 +316,19 @@ const SidebarContent = ({ onNavClick = () => {}, user = null }) => {
       {/* ── Bottom ── */}
       <div style={{
         padding: '12px',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
+        borderTop: '1px solid var(--el-sidebar-border)',
         display: 'flex',
         flexDirection: 'column',
         gap: 1,
       }}>
-        <Link
-          to="/settings"
-          onClick={onNavClick}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            padding: '7px 10px',
-            borderRadius: 7,
-            fontSize: 13.5,
-            fontWeight: 400,
-            fontFamily: "'Inter', sans-serif",
-            textDecoration: 'none',
-            color: 'var(--el-sidebar-text)',
-            transition: 'all 0.15s',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'var(--el-sidebar-hover-bg)';
-            e.currentTarget.style.color = 'var(--el-sidebar-active)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'transparent';
-            e.currentTarget.style.color = 'var(--el-sidebar-text)';
-          }}
-        >
-          <Settings style={{ width: 15, height: 15, opacity: 0.65 }} />
-          Settings
-        </Link>
-
-        <button
-          onClick={handleLogout}
-          type="button"
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            padding: '7px 10px',
-            borderRadius: 7,
-            fontSize: 13.5,
-            fontWeight: 400,
-            fontFamily: "'Inter', sans-serif",
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'rgba(239,68,68,0.7)',
-            transition: 'all 0.15s',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(239,68,68,0.08)';
-            e.currentTarget.style.color = 'rgba(239,68,68,0.9)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'transparent';
-            e.currentTarget.style.color = 'rgba(239,68,68,0.7)';
-          }}
-        >
-          <LogOut style={{ width: 15, height: 15 }} />
-          Logout
-        </button>
+        <SettingsLink onNavClick={onNavClick} />
       </div>
     </div>
   );
 };
 
 // ─── Sidebar ─────────────────────────────────────────────────────────────────
-const Sidebar = ({ mobileOpen = false, onMobileClose = () => {}, user = null }) => (
+const Sidebar = ({ mobileOpen = false, onMobileClose = () => { }, user = null }) => (
   <>
     {/* Desktop — fixed dark sidebar */}
     <aside
@@ -398,7 +337,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose = () => {}, user = null }) 
         width: 240,
         flexShrink: 0,
         background: 'var(--el-sidebar-bg)',
-        borderRight: '1px solid rgba(255,255,255,0.06)',
+        borderRight: '1px solid var(--el-sidebar-border)',
       }}
     >
       <SidebarContent user={user} />
@@ -437,7 +376,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose = () => {}, user = null }) 
                   width: 32, height: 32,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   borderRadius: 8,
-                  background: 'rgba(255,255,255,0.08)',
+                  background: 'var(--el-sidebar-item-active-bg)',
                   border: 'none',
                   cursor: 'pointer',
                   color: 'var(--el-sidebar-text)',

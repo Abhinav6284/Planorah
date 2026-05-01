@@ -208,9 +208,10 @@ export default function AITalkPanel({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 16, scale: 0.96 }}
                 transition={{ type: "spring", stiffness: 320, damping: 30 }}
-                className="fixed bottom-4 left-3 right-3 z-[9999] ml-auto w-[calc(100vw-24px)] max-w-[430px] overflow-hidden rounded-3xl border-2 border-borderMuted bg-white/95 shadow-[0_14px_36px_rgba(47,39,32,0.22)] backdrop-blur-md dark:border-white/10 dark:bg-charcoal"
+                className="fixed bottom-4 left-3 right-3 z-[9999] ml-auto w-[calc(100vw-24px)] max-w-[430px] overflow-hidden rounded-3xl shadow-[0_14px_36px_rgba(0,0,0,0.18)] backdrop-blur-md"
+                style={{ background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border)' }}
             >
-                <div className="flex items-center justify-between gap-2 border-b border-borderMuted px-3 py-3 dark:border-white/10">
+                <div className="flex items-center justify-between gap-2 px-3 py-3" style={{ borderBottom: '1px solid var(--el-border)' }}>
                     <div className="flex min-w-0 items-center gap-2">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-terracotta/30 bg-terracotta/10 text-2xl">
                             🦉
@@ -241,7 +242,7 @@ export default function AITalkPanel({
                     </div>
                 </div>
 
-                <div ref={listRef} className="max-h-[46vh] min-h-[220px] space-y-3 overflow-y-auto bg-beigePrimary/55 px-3 py-3 dark:bg-charcoalDark/50">
+                <div ref={listRef} className="max-h-[46vh] min-h-[220px] space-y-3 overflow-y-auto px-3 py-3" style={{ background: 'var(--el-bg)' }}>
                     {messages.length === 0 && (
                         <div className="rounded-2xl border border-borderMuted bg-white/80 px-3 py-2 text-sm text-textSecondary dark:border-white/10 dark:bg-charcoal/70 dark:text-gray-400">
                             Start chatting with Quicky. Ask anything and continue the conversation naturally.
@@ -301,7 +302,7 @@ export default function AITalkPanel({
                 )}
 
                 <div className="p-3">
-                    <div className="rounded-2xl border-2 border-terracotta/20 bg-white p-2 shadow-sm dark:border-terracotta/30 dark:bg-charcoalDark">
+                    <div className="rounded-2xl border-2 border-terracotta/20 p-2 shadow-sm dark:border-terracotta/30" style={{ background: 'var(--el-bg)' }}>
                         <textarea
                             ref={textareaRef}
                             value={input}
@@ -310,7 +311,8 @@ export default function AITalkPanel({
                             disabled={loading}
                             rows={2}
                             placeholder="Message Quicky..."
-                            className="w-full resize-none border-none bg-transparent px-2 py-1 text-base text-textPrimary outline-none placeholder:text-textSecondary/70 dark:text-white dark:placeholder:text-gray-500"
+                            className="w-full resize-none border-none bg-transparent px-2 py-1 text-base outline-none"
+                        style={{ color: 'var(--el-text)' }}
                         />
 
                         <div className="mt-1 flex items-center justify-between px-1">

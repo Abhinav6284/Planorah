@@ -72,7 +72,7 @@ function RequestModal({ onClose }) {
                                                 padding: '6px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
                                                 border: '1px solid var(--el-border)', cursor: 'pointer', transition: 'all 0.1s',
                                                 background: active ? 'var(--el-text)' : 'var(--el-bg-secondary)',
-                                                color: active ? '#fff' : 'var(--el-text-secondary)',
+                                                color: active ? 'var(--el-bg)' : 'var(--el-text-secondary)',
                                                 borderColor: active ? 'var(--el-text)' : 'var(--el-border)'
                                             }}
                                         >
@@ -109,7 +109,7 @@ function RequestModal({ onClose }) {
                             <button
                                 onClick={handleSubmit}
                                 disabled={isSubmitting}
-                                style={{ flex: 1, padding: '12px', borderRadius: 12, fontSize: 13, fontWeight: 700, background: 'var(--el-text)', color: '#fff', border: 'none', cursor: 'pointer', opacity: isSubmitting ? 0.6 : 1 }}
+                                style={{ flex: 1, padding: '12px', borderRadius: 12, fontSize: 13, fontWeight: 700, background: 'var(--el-text)', color: 'var(--el-bg)', border: 'none', cursor: 'pointer', opacity: isSubmitting ? 0.6 : 1 }}
                             >
                                 {isSubmitting ? 'Sending…' : 'Send Request'}
                             </button>
@@ -178,7 +178,7 @@ export default function SessionsSection() {
                     disabled={!canRequest}
                     style={{
                         padding: '8px 16px', borderRadius: 10, fontSize: 12, fontWeight: 700,
-                        background: 'var(--el-text)', color: '#fff', border: 'none', 
+                        background: 'var(--el-text)', color: 'var(--el-bg)', border: 'none',
                         cursor: 'pointer', opacity: !canRequest ? 0.4 : 1
                     }}
                 >

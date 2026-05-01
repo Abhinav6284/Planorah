@@ -16,7 +16,7 @@ const ModeSwitch = ({ mode, onChange }) => {
                             padding: '6px 14px', borderRadius: 10, fontSize: 13, fontWeight: 700,
                             textTransform: 'capitalize', border: 'none', cursor: 'pointer',
                             background: active ? 'var(--el-text)' : 'transparent',
-                            color: active ? '#fff' : 'var(--el-text-secondary)',
+                            color: active ? 'var(--el-bg)' : 'var(--el-text-secondary)',
                             transition: 'all 0.2s'
                         }}
                     >

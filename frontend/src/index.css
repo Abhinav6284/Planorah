@@ -87,11 +87,19 @@
   --el-text-muted: #8c8c8c;
   --el-border: #e5e5e5;
   --el-border-subtle: rgba(0, 0, 0, 0.04);
-  --el-sidebar-bg: #000000;
-  --el-sidebar-text: rgba(255, 255, 255, 0.5);
-  --el-sidebar-active: #ffffff;
-  --el-sidebar-hover-bg: rgba(255, 255, 255, 0.06);
-  --el-sidebar-section: rgba(255, 255, 255, 0.3);
+  --el-sidebar-bg: #f0f0f0;
+  --el-sidebar-text: rgba(0, 0, 0, 0.5);
+  --el-sidebar-active: #0d0d0d;
+  --el-sidebar-hover-bg: rgba(0, 0, 0, 0.04);
+  --el-sidebar-section: rgba(0, 0, 0, 0.35);
+  --el-sidebar-border: rgba(0, 0, 0, 0.08);
+  --el-sidebar-item-active-bg: rgba(0, 0, 0, 0.06);
+  --el-sidebar-item-active-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.04);
+  --el-sidebar-btn-bg: rgba(0, 0, 0, 0.04);
+  --el-sidebar-btn-border: rgba(0, 0, 0, 0.08);
+  --el-sidebar-ws-icon-bg: #1a1a1a;
+  --el-sidebar-ws-icon-color: #ffffff;
+  --el-sidebar-logo-filter: none;
   /* Premium Layered Shadows (ElevenLabs/Cal.com style) */
   --el-shadow-card: 
     0 0 0 1px rgba(0, 0, 0, 0.04),
@@ -120,6 +128,14 @@
   --el-sidebar-active: #ffffff;
   --el-sidebar-hover-bg: rgba(255, 255, 255, 0.06);
   --el-sidebar-section: rgba(255, 255, 255, 0.25);
+  --el-sidebar-border: rgba(255, 255, 255, 0.06);
+  --el-sidebar-item-active-bg: rgba(255, 255, 255, 0.08);
+  --el-sidebar-item-active-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  --el-sidebar-btn-bg: rgba(255, 255, 255, 0.03);
+  --el-sidebar-btn-border: rgba(255, 255, 255, 0.06);
+  --el-sidebar-ws-icon-bg: #ffffff;
+  --el-sidebar-ws-icon-color: #000000;
+  --el-sidebar-logo-filter: invert(1);
   /* Dark Mode Premium Shadows */
   --el-shadow-card: 
     0 0 0 1px rgba(255, 255, 255, 0.08),

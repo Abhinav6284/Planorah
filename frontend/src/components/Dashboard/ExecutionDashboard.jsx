@@ -494,7 +494,7 @@ const ExecutionDashboard = () => {
                             <button
                                 data-tour="ai-coach-btn"
                                 onClick={openVoicePanel}
-                                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 16px', borderRadius: 9999, background: 'var(--el-text)', color: '#fff', fontWeight: 500, fontSize: 13, border: 'none', cursor: 'pointer', transition: 'opacity 0.15s', fontFamily: "'Inter', sans-serif" }}
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 16px', borderRadius: 9999, background: 'var(--el-text)', color: 'var(--el-bg)', fontWeight: 500, fontSize: 13, border: 'none', cursor: 'pointer', transition: 'opacity 0.15s', fontFamily: "'Inter', sans-serif" }}
                             >
                                 <Sparkles style={{ width: 14, height: 14 }} />
                                 <span className="hidden sm:inline">AI Coach</span>
@@ -525,7 +525,7 @@ const ExecutionDashboard = () => {
                                                 gap: 2, borderRadius: 10, fontWeight: 600, transition: 'all 0.15s',
                                                 border: `1px solid ${day.isSelected ? 'var(--el-text)' : 'var(--el-border)'}`,
                                                 background: day.isSelected ? 'var(--el-text)' : day.hasTasks ? 'var(--el-bg)' : 'var(--el-bg)',
-                                                color: day.isSelected ? '#fff' : 'var(--el-text)',
+                                                color: day.isSelected ? 'var(--el-bg)' : 'var(--el-text)',
                                                 cursor: 'pointer', fontFamily: "'Inter', sans-serif",
                                             }}
                                         >
@@ -687,7 +687,7 @@ const ExecutionDashboard = () => {
                             </p>
                             <button
                                 onClick={openVoicePanel}
-                                style={{ marginTop: 16, width: '100%', padding: '10px 16px', borderRadius: 9999, background: 'var(--el-text)', color: '#fff', fontSize: 13, fontWeight: 500, border: 'none', cursor: 'pointer', transition: 'opacity 0.15s', fontFamily: "'Inter', sans-serif" }}
+                                style={{ marginTop: 16, width: '100%', padding: '10px 16px', borderRadius: 9999, background: 'var(--el-text)', color: 'var(--el-bg)', fontSize: 13, fontWeight: 500, border: 'none', cursor: 'pointer', transition: 'opacity 0.15s', fontFamily: "'Inter', sans-serif" }}
                             >
                                 Get Strategy
                             </button>

@@ -35,7 +35,8 @@ const SubjectCard = ({ subject, onDelete }) => {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.96 }}
-      className="group bg-white dark:bg-charcoal border border-borderMuted dark:border-white/8 rounded-2xl p-5 shadow-sm hover:shadow-md dark:shadow-none transition-all duration-200 flex flex-col gap-4"
+      className="group rounded-2xl p-5 shadow-sm hover:shadow-md dark:shadow-none transition-all duration-200 flex flex-col gap-4"
+      style={{ background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border)' }}
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
@@ -219,7 +220,7 @@ export default function PlanoraDashboard() {
   };
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-beigePrimary via-beigeSecondary to-beigeMuted dark:from-charcoalDark dark:via-charcoal dark:to-charcoalMuted transition-colors">
+    <div style={{ minHeight: '100%', background: 'var(--el-bg)' }}>
       <div className="max-w-5xl mx-auto px-5 py-8">
 
         {/* Header */}
@@ -250,7 +251,8 @@ export default function PlanoraDashboard() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center justify-center py-20 text-center bg-white dark:bg-charcoal border border-borderMuted dark:border-white/8 rounded-2xl shadow-sm p-8 max-w-sm mx-auto"
+            className="flex flex-col items-center justify-center py-20 text-center rounded-2xl shadow-sm p-8 max-w-sm mx-auto"
+            style={{ background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border)' }}
           >
             <span className="text-4xl mb-4">⚠️</span>
             <h2 className="text-base font-semibold text-textPrimary dark:text-white mb-2">Something went wrong</h2>
@@ -269,7 +271,8 @@ export default function PlanoraDashboard() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center justify-center py-20 text-center bg-white dark:bg-charcoal border border-borderMuted dark:border-white/8 rounded-2xl shadow-sm p-10 max-w-sm mx-auto"
+            className="flex flex-col items-center justify-center py-20 text-center rounded-2xl shadow-sm p-10 max-w-sm mx-auto"
+            style={{ background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border)' }}
           >
             <div className="w-16 h-16 bg-beigeSecondary dark:bg-white/5 rounded-2xl flex items-center justify-center mb-5 border border-borderMuted dark:border-white/8">
               <span className="text-2xl">📚</span>

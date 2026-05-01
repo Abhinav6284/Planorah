@@ -45,7 +45,7 @@ const TodayFocusCard = ({ task, onStart, onSkip, onChangeTask }) => {
                 <button
                     onClick={onStart}
                     style={{ 
-                        padding: '10px 24px', borderRadius: 10, background: 'var(--el-text)', color: '#fff', 
+                        padding: '10px 24px', borderRadius: 10, background: 'var(--el-text)', color: 'var(--el-bg)',
                         fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.1s'
                     }}
                 >
