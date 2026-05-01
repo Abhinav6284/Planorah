@@ -87,7 +87,7 @@ export default function Logs() {
             value={filter}
             onChange={e => setFilter(e.target.value)}
             placeholder="Filter by action, admin, or user…"
-            className="w-full pl-9 pr-4 py-2.5 rounded-lg text-sm font-inter outline-none border placeholder-mid-gray"
+            className="w-full pl-9 pr-4 py-2.5 rounded-lg text-sm font-inter outline-none border placeholder:text-[var(--text-secondary)]"
             style={{
               background: 'var(--bg-elevated)',
               borderColor: 'var(--border-bright)',
@@ -174,7 +174,7 @@ export default function Logs() {
               </span>
               <span>
                 <span className={`text-xs font-inter font-medium px-2 py-0.5 rounded-full ${
-                  ACTION_COLORS[log.action] ?? 'bg-gray-100 text-gray-700'
+                  ACTION_COLORS[log.action] ?? 'bg-[var(--bg-elevated)] text-[var(--text-primary)]'
                 }`}>
                   {log.action_display}
                 </span>

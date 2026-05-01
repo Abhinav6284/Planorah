@@ -28,7 +28,7 @@ export default function Input({
         <input
           className={[
             'w-full rounded-xl text-sm px-3.5 py-2.5 transition-colors duration-150 outline-none border',
-            'placeholder-mid-gray',
+            'placeholder:text-[var(--text-secondary)]',
             error
               ? 'border-red-500/50 focus:border-red-500/70 focus:ring-1 focus:ring-red-500/20'
               : 'focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500/50',
