@@ -67,7 +67,7 @@ function InputField({ label, value, onChange, type = 'text' }) {
 }
 
 export default function Settings() {
-  const { user }     = useAuth()
+  const { user, updateUser } = useAuth()
   const { addToast } = useToast()
   const [loading,       setLoading]       = useState(true)
   const [flags,         setFlags]         = useState([])
@@ -101,9 +101,18 @@ export default function Settings() {
 
   async function saveProfile() {
     setSavingProfile(true)
-    await new Promise(r => setTimeout(r, 600))
-    setSavingProfile(false)
-    addToast('Profile saved successfully.', 'success')
+    try {
+      const parts      = name.trim().split(' ')
+      const first_name = parts[0] || ''
+      const last_name  = parts.slice(1).join(' ') || ''
+      const updated    = await adminApi.updateMe({ first_name, last_name, email })
+      updateUser({ name: updated.name, email: updated.email })
+      addToast('Profile saved successfully.', 'success')
+    } catch (e) {
+      addToast(e.message, 'error')
+    } finally {
+      setSavingProfile(false)
+    }
   }
 
   const NOTIF_DESCRIPTIONS = {
