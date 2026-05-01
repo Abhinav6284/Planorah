@@ -27,7 +27,7 @@ function SkRow() {
     <tr>
       {[180, 200, 80, 80, 100, 60].map((w, i) => (
         <td key={i} className="px-6 py-4">
-          <div className="h-4 bg-gray-100 rounded animate-pulse" style={{ width: w }} />
+          <div className="h-4 bg-[var(--bg-elevated)] rounded animate-pulse" style={{ width: w }} />
         </td>
       ))}
     </tr>
@@ -40,7 +40,7 @@ function ActionItem({ icon, label, onClick, danger }) {
     <button
       onClick={onClick}
       className={`flex items-center gap-2.5 w-full px-4 py-2.5 font-inter text-sm transition-colors cursor-pointer ${
-        danger ? 'text-red-600 hover:bg-red-50' : 'text-charcoal hover:bg-gray-50'
+        danger ? 'text-red-600 hover:bg-[var(--bg-elevated)]' : 'text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
       }`}
     >
       {icon}
@@ -58,7 +58,7 @@ function PagBtn({ children, active, disabled, onClick }) {
       className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-inter font-medium transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
         active
           ? 'bg-charcoal text-white'
-          : 'bg-white text-mid-gray border border-border-gray hover:border-charcoal hover:text-charcoal'
+          : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-charcoal hover:text-[var(--text-primary)]'
       }`}
     >
       {children}
@@ -74,7 +74,7 @@ function FilterChip({ label, active, onClick }) {
       className={`px-3 py-1.5 rounded-lg text-xs font-inter font-medium transition-all cursor-pointer ${
         active
           ? 'bg-charcoal text-white'
-          : 'bg-white text-mid-gray border border-border-gray hover:border-charcoal hover:text-charcoal'
+          : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-charcoal hover:text-[var(--text-primary)]'
       }`}
     >
       {label || 'All'}
@@ -158,14 +158,14 @@ export default function Users() {
         className="mb-8 flex items-end justify-between"
       >
         <div>
-          <h1 className="font-cal-sans font-semibold text-4xl text-charcoal tracking-tight">Users</h1>
-          <p className="text-sm font-inter text-mid-gray mt-2">
+          <h1 className="font-cal-sans font-semibold text-4xl text-[var(--text-primary)] tracking-tight">Users</h1>
+          <p className="text-sm font-inter text-[var(--text-secondary)] mt-2">
             {total} user{total !== 1 ? 's' : ''} total
           </p>
         </div>
         <button
           onClick={() => fetchUsers()}
-          className="p-2.5 rounded-lg border border-border-gray text-mid-gray hover:text-charcoal hover:border-charcoal transition-colors"
+          className="p-2.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-charcoal transition-colors"
           title="Refresh"
         >
           <RefreshCw size={15} />
@@ -177,22 +177,22 @@ export default function Users() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.08 }}
-        className="bg-white rounded-lg p-4 shadow-level-2-card mb-4 flex flex-wrap items-center gap-3"
+        className="bg-[var(--bg-card)] rounded-lg p-4 shadow-level-2-card mb-4 flex flex-wrap items-center gap-3"
       >
         {/* Search */}
         <div className="relative flex-1 min-w-[200px]">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-mid-gray" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search by name or email…"
-            className="w-full pl-9 pr-3 py-2 rounded-lg text-sm font-inter outline-none border border-border-gray text-charcoal placeholder-mid-gray focus:border-charcoal transition-colors bg-white"
+            className="w-full pl-9 pr-3 py-2 rounded-lg text-sm font-inter outline-none border border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:border-charcoal transition-colors bg-[var(--bg-card)]"
           />
         </div>
 
         {/* Plan filter */}
         <div className="flex items-center gap-1.5 flex-wrap">
-          <Filter size={12} className="text-mid-gray" />
+          <Filter size={12} className="text-[var(--text-secondary)]" />
           {PLANS.map(p => (
             <FilterChip key={p || 'all-plan'} label={p || 'All'} active={planFilter === p} onClick={() => { setPlanFilter(p); setPage(1) }} />
           ))}
@@ -211,14 +211,14 @@ export default function Users() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.14 }}
-        className="bg-white rounded-lg shadow-level-2-card overflow-hidden"
+        className="bg-[var(--bg-card)] rounded-lg shadow-level-2-card overflow-hidden"
       >
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-border-gray">
+              <tr className="border-b border-[var(--border)]">
                 {['User', 'Email', 'Status', 'Plan', 'Last Login', 'Actions'].map(h => (
-                  <th key={h} className="px-6 py-3.5 text-left text-xs font-inter font-semibold uppercase tracking-wide text-mid-gray">
+                  <th key={h} className="px-6 py-3.5 text-left text-xs font-inter font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
                     {h}
                   </th>
                 ))}
@@ -233,33 +233,33 @@ export default function Users() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.025 }}
-                      className="row-hover border-b border-border-gray last:border-b-0 group"
+                      className="row-hover border-b border-[var(--border)] last:border-b-0 group"
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <Avatar name={user.name} />
                           <div>
-                            <p className="text-sm font-inter font-medium text-charcoal">{user.name}</p>
-                            <p className="text-xs text-mid-gray font-inter">#{user.id}</p>
+                            <p className="text-sm font-inter font-medium text-[var(--text-primary)]">{user.name}</p>
+                            <p className="text-xs text-[var(--text-secondary)] font-inter">#{user.id}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm font-inter text-mid-gray">{user.email}</td>
+                      <td className="px-6 py-4 text-sm font-inter text-[var(--text-secondary)]">{user.email}</td>
                       <td className="px-6 py-4"><Badge type="status" value={user.status} /></td>
                       <td className="px-6 py-4"><Badge type="plan" value={user.plan} /></td>
-                      <td className="px-6 py-4 text-sm font-inter text-mid-gray">{user.last_login}</td>
+                      <td className="px-6 py-4 text-sm font-inter text-[var(--text-secondary)]">{user.last_login}</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-1 relative">
                           <button
                             onClick={() => setSelected(user)}
-                            className="p-1.5 rounded-lg text-mid-gray hover:text-charcoal hover:bg-gray-50 transition-colors"
+                            className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
                             title="View"
                           >
                             <Eye size={14} />
                           </button>
                           <button
                             onClick={() => setMenuId(menuId === user.id ? null : user.id)}
-                            className="p-1.5 rounded-lg text-mid-gray hover:text-charcoal hover:bg-gray-50 transition-colors"
+                            className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
                           >
                             <MoreHorizontal size={14} />
                           </button>
@@ -273,7 +273,7 @@ export default function Users() {
                                   animate={{ opacity: 1, scale: 1,    y: 0  }}
                                   exit={{   opacity: 0, scale: 0.94, y: -4 }}
                                   transition={{ duration: 0.14 }}
-                                  className="absolute right-0 top-full mt-1 rounded-lg overflow-hidden shadow-level-2-card z-30 w-40 bg-white"
+                                  className="absolute right-0 top-full mt-1 rounded-lg overflow-hidden shadow-level-2-card z-30 w-40 bg-[var(--bg-card)]"
                                 >
                                   {user.status === 'active'
                                     ? <ActionItem icon={<UserX size={13} />}  label="Suspend" onClick={() => suspendUser(user.id)} />
@@ -295,8 +295,8 @@ export default function Users() {
 
         {/* Pagination */}
         {!loading && (
-          <div className="px-6 py-4 flex items-center justify-between border-t border-border-gray">
-            <p className="text-xs font-inter text-mid-gray">
+          <div className="px-6 py-4 flex items-center justify-between border-t border-[var(--border)]">
+            <p className="text-xs font-inter text-[var(--text-secondary)]">
               {((page - 1) * PAGE_SIZE) + 1}–{Math.min(page * PAGE_SIZE, total)} of {total}
             </p>
             <div className="flex items-center gap-1">
@@ -319,13 +319,13 @@ export default function Users() {
       <Modal open={!!selected} onClose={() => setSelected(null)} title="User Details">
         {selected && (
           <div className="flex flex-col gap-5">
-            <div className="flex items-center gap-4 pb-4 border-b border-border-gray">
+            <div className="flex items-center gap-4 pb-4 border-b border-[var(--border)]">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold bg-charcoal text-white">
                 {selected.name[0]?.toUpperCase()}
               </div>
               <div>
-                <p className="font-inter font-semibold text-charcoal">{selected.name}</p>
-                <p className="text-sm font-inter text-mid-gray">{selected.email}</p>
+                <p className="font-inter font-semibold text-[var(--text-primary)]">{selected.name}</p>
+                <p className="text-sm font-inter text-[var(--text-secondary)]">{selected.email}</p>
               </div>
               <div className="ml-auto flex gap-2">
                 <Badge type="status" value={selected.status} />
@@ -342,9 +342,9 @@ export default function Users() {
                 ['XP',         (selected.xp ?? 0).toLocaleString()],
                 ['Country',    selected.country || '—'],
               ].map(([k, v]) => (
-                <div key={k} className="p-3 rounded-lg bg-gray-50 border border-border-gray">
-                  <p className="text-xs font-inter text-mid-gray mb-1">{k}</p>
-                  <p className="text-sm font-inter font-medium text-charcoal capitalize">{v}</p>
+                <div key={k} className="p-3 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border)]">
+                  <p className="text-xs font-inter text-[var(--text-secondary)] mb-1">{k}</p>
+                  <p className="text-sm font-inter font-medium text-[var(--text-primary)] capitalize">{v}</p>
                 </div>
               ))}
             </div>

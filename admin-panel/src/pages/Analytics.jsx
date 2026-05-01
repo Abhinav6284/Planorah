@@ -9,18 +9,18 @@ import { TrendingUp, Users, Activity, Target, ArrowUpRight } from 'lucide-react'
 
 const RANGES       = ['3M', '6M', '12M']
 const RANGE_MONTHS = { '3M': 3, '6M': 6, '12M': 12 }
-const AXIS_STYLE   = { fill: '#898989', fontSize: 11, fontFamily: 'Inter' }
+const AXIS_STYLE   = { fill: 'var(--text-secondary)', fontSize: 11, fontFamily: 'Inter' }
 
 // ─── Tooltip ──────────────────────────────────────────────────────────────────
 function ChartTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="rounded-lg px-3 py-2.5 shadow-level-2-card bg-white text-xs font-inter">
-      <p className="font-semibold text-charcoal mb-1">{label}</p>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} className="rounded-lg px-3 py-2.5 shadow-level-2-card text-xs font-inter">
+      <p className="font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{label}</p>
       {payload.map(p => (
-        <p key={p.dataKey} className="text-mid-gray">
+        <p key={p.dataKey} style={{ color: 'var(--text-secondary)' }}>
           {p.name}:{' '}
-          <span className="font-semibold text-charcoal">
+          <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>
             {p.name === 'Revenue' ? '₹' : ''}{Number(p.value).toLocaleString()}
           </span>
         </p>
@@ -36,19 +36,19 @@ function MetricCard({ icon: Icon, label, value, delta, delay: d = 0 }) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: d, duration: 0.3 }}
-      className="bg-white rounded-lg p-6 shadow-level-2-card"
+      className="bg-[var(--bg-card)] rounded-lg p-6 shadow-level-2-card"
     >
       <div className="flex items-start justify-between mb-4">
         <div className="w-10 h-10 rounded-lg bg-charcoal text-white flex items-center justify-center">
           <Icon size={18} strokeWidth={1.8} />
         </div>
-        <span className="flex items-center gap-1 text-xs font-inter font-medium text-charcoal bg-gray-50 px-2 py-1 rounded-lg border border-border-gray">
+        <span className="flex items-center gap-1 text-xs font-inter font-medium text-[var(--text-primary)] bg-[var(--bg-elevated)] px-2 py-1 rounded-lg border border-[var(--border)]">
           <ArrowUpRight size={12} />
           {delta}
         </span>
       </div>
-      <p className="font-cal-sans font-semibold text-2xl text-charcoal mb-1 tracking-tight">{value}</p>
-      <p className="text-xs font-inter text-mid-gray">{label}</p>
+      <p className="font-cal-sans font-semibold text-2xl text-[var(--text-primary)] mb-1 tracking-tight">{value}</p>
+      <p className="text-xs font-inter text-[var(--text-secondary)]">{label}</p>
     </motion.div>
   )
 }
@@ -60,11 +60,11 @@ function ChartCard({ title, subtitle, children, delay: d = 0 }) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: d, duration: 0.35 }}
-      className="bg-white rounded-lg p-8 shadow-level-2-card"
+      className="bg-[var(--bg-card)] rounded-lg p-8 shadow-level-2-card"
     >
       <div className="mb-6">
-        <h2 className="font-cal-sans font-semibold text-xl text-charcoal">{title}</h2>
-        {subtitle && <p className="text-sm font-inter text-mid-gray mt-1">{subtitle}</p>}
+        <h2 className="font-cal-sans font-semibold text-xl text-[var(--text-primary)]">{title}</h2>
+        {subtitle && <p className="text-sm font-inter text-[var(--text-secondary)] mt-1">{subtitle}</p>}
       </div>
       {children}
     </motion.div>
@@ -73,7 +73,7 @@ function ChartCard({ title, subtitle, children, delay: d = 0 }) {
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 function Sk({ h = 'h-48' }) {
-  return <div className={`${h} bg-gray-100 rounded-lg animate-pulse`} />
+  return <div className={`${h} bg-[var(--bg-elevated)] rounded-lg animate-pulse`} />
 }
 
 export default function Analytics() {
@@ -129,12 +129,12 @@ export default function Analytics() {
         className="mb-8 flex items-end justify-between"
       >
         <div>
-          <h1 className="font-cal-sans font-semibold text-4xl text-charcoal tracking-tight">Analytics</h1>
-          <p className="text-sm font-inter text-mid-gray mt-2">Platform growth and revenue metrics</p>
+          <h1 className="font-cal-sans font-semibold text-4xl text-[var(--text-primary)] tracking-tight">Analytics</h1>
+          <p className="text-sm font-inter text-[var(--text-secondary)] mt-2">Platform growth and revenue metrics</p>
         </div>
 
         {/* Range picker */}
-        <div className="flex items-center gap-1 p-1 rounded-lg bg-gray-50 border border-border-gray">
+        <div className="flex items-center gap-1 p-1 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border)]">
           {RANGES.map(r => (
             <button
               key={r}
@@ -142,7 +142,7 @@ export default function Analytics() {
               className={`px-3 py-1.5 rounded-md text-xs font-inter font-medium transition-all cursor-pointer ${
                 range === r
                   ? 'bg-charcoal text-white shadow-sm'
-                  : 'text-mid-gray hover:text-charcoal'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               {r}
@@ -166,7 +166,7 @@ export default function Analytics() {
             <ResponsiveContainer width="100%" height={220}>
               <AreaChart data={revSlice} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
                 {gradDefs('gRev', '#242424')}
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(34,42,53,0.05)" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_STYLE} />
                 <YAxis axisLine={false} tickLine={false} tick={AXIS_STYLE} tickFormatter={v => `₹${(v / 1000).toFixed(0)}k`} />
                 <Tooltip content={<ChartTooltip />} />
@@ -183,7 +183,7 @@ export default function Analytics() {
             <ResponsiveContainer width="100%" height={220}>
               <AreaChart data={revSlice} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
                 {gradDefs('gSubs', '#242424')}
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(34,42,53,0.05)" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_STYLE} />
                 <YAxis axisLine={false} tickLine={false} tick={AXIS_STYLE} />
                 <Tooltip content={<ChartTooltip />} />
@@ -202,7 +202,7 @@ export default function Analytics() {
           {loading ? <Sk h="h-40" /> : (
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={signupData} margin={{ top: 4, right: 4, bottom: 0, left: -10 }} barSize={12}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(34,42,53,0.05)" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_STYLE} />
                 <YAxis axisLine={false} tickLine={false} tick={AXIS_STYLE} />
                 <Tooltip content={<ChartTooltip />} />
@@ -216,7 +216,7 @@ export default function Analytics() {
           {loading ? <Sk h="h-40" /> : (
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={signupData} margin={{ top: 4, right: 4, bottom: 0, left: -10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(34,42,53,0.05)" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_STYLE} />
                 <YAxis axisLine={false} tickLine={false} tick={AXIS_STYLE} />
                 <Tooltip content={<ChartTooltip />} />
@@ -235,19 +235,19 @@ export default function Analytics() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.40, duration: 0.35 }}
-          className="bg-white rounded-lg p-8 shadow-level-2-card"
+          className="bg-[var(--bg-card)] rounded-lg p-8 shadow-level-2-card"
         >
-          <h2 className="font-cal-sans font-semibold text-xl text-charcoal mb-6">
+          <h2 className="font-cal-sans font-semibold text-xl text-[var(--text-primary)] mb-6">
             Active Subscriptions by Plan
           </h2>
           <div className="flex flex-wrap gap-4">
             {data.plan_breakdown.map(pb => (
               <div
                 key={pb.plan__name}
-                className="flex-1 min-w-[120px] p-5 rounded-lg bg-gray-50 border border-border-gray text-center"
+                className="flex-1 min-w-[120px] p-5 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border)] text-center"
               >
-                <p className="font-cal-sans font-semibold text-2xl text-charcoal tracking-tight">{pb.count}</p>
-                <p className="text-xs font-inter text-mid-gray mt-1.5">
+                <p className="font-cal-sans font-semibold text-2xl text-[var(--text-primary)] tracking-tight">{pb.count}</p>
+                <p className="text-xs font-inter text-[var(--text-secondary)] mt-1.5">
                   {pb.plan__display_name || pb.plan__name}
                 </p>
               </div>
