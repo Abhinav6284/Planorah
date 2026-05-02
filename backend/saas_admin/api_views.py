@@ -114,8 +114,8 @@ def users_list(request):
     search = request.GET.get('q', '').strip()
     status_filter = request.GET.get('status', '')
     plan_filter = request.GET.get('plan', '')
-    page = int(request.GET.get('page', 1))
-    page_size = int(request.GET.get('page_size', 20))
+    page = max(1, int(request.GET.get('page', 1)))
+    page_size = max(1, int(request.GET.get('page_size', 20)))
 
     qs = services.get_users_queryset(search, status_filter, plan_filter)
     total = qs.count()
@@ -260,8 +260,8 @@ def subscriptions_list(request):
     status_filter = request.GET.get('status', '')
     plan_filter = request.GET.get('plan', '')
     search = request.GET.get('q', '').strip()
-    page = int(request.GET.get('page', 1))
-    page_size = int(request.GET.get('page_size', 20))
+    page = max(1, int(request.GET.get('page', 1)))
+    page_size = max(1, int(request.GET.get('page_size', 20)))
 
     qs = services.get_subscriptions_queryset(status_filter, plan_filter, search)
     total = qs.count()
