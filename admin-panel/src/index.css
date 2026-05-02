@@ -75,6 +75,7 @@ body {
 
 /* Scrollbar */
 * {
+  /* @supports for scrollbar-width/color (Firefox) */
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) transparent;
 }
