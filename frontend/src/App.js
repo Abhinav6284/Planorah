@@ -1,6 +1,7 @@
 import React, { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { ThemeProvider } from "./context/ThemeContext";
 import { SubscriptionProvider } from "./context/SubscriptionContext";
 import { ToastProvider, useToast } from "./components/common/Toast";
@@ -154,6 +155,7 @@ function AppInner() {
             </Routes>
           </Suspense>
           <VercelAnalytics />
+          <SpeedInsights />
         </ErrorBoundary>
       </Router>
     );
@@ -252,6 +254,7 @@ function AppInner() {
           </Routes>
         </Suspense>
         <VercelAnalytics />
+        <SpeedInsights />
       </ErrorBoundary>
     </Router>
   );
