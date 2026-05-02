@@ -2,8 +2,8 @@ import { motion } from 'framer-motion'
 
 const variants = {
   primary:   'bg-charcoal text-white hover:opacity-75 shadow-level-4-highlight',
-  secondary: 'bg-white text-charcoal border border-border-gray hover:border-charcoal shadow-level-2-card',
-  ghost:     'text-mid-gray hover:text-charcoal hover:bg-gray-50',
+  secondary: 'bg-[var(--bg-card)] text-[var(--text-primary)] border border-[var(--border)] hover:border-charcoal shadow-level-2-card',
+  ghost:     'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]',
   danger:    'bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 hover:border-red-300',
   success:   'bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100',
 }

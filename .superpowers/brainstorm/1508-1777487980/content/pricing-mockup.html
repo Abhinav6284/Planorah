@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pricing Page Mockup</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #050505; color: white; font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; min-height: 100vh; padding: 40px 20px; }
+
+  .page { max-width: 1100px; margin: 0 auto; }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 36px; }
+  .header h1 { font-size: 36px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 10px; }
+  .header p { font-size: 15px; color: #71717a; max-width: 480px; margin: 0 auto; }
+
+  /* Current plan banner */
+  .current-banner {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    backdrop-filter: blur(12px);
+  }
+  .current-banner .label { font-size: 13px; color: #71717a; }
+  .current-banner .plan-name { font-size: 15px; font-weight: 600; color: white; }
+  .view-btn {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #d4d4d8;
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  /* Toggle */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+  .toggle-pill {
+    display: flex;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 999px;
+    padding: 4px;
+    gap: 2px;
+  }
+  .toggle-opt {
+    padding: 7px 20px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #71717a;
+    transition: all 0.2s;
+  }
+  .toggle-opt.active {
+    background: white;
+    color: #0a0a0a;
+    font-weight: 600;
+  }
+  .save-badge {
+    background: rgba(34, 197, 94, 0.12);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+
+  /* Cards grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .plan-card {
+    position: relative;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 24px 20px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .plan-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .plan-card.popular {
+    border-color: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.05);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1), 0 0 0 1px rgba(255,255,255,0.06);
+  }
+
+  .popular-badge {
+    position: absolute;
+    top: -11px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    color: #0a0a0a;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 14px;
+    border-radius: 999px;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  .current-badge {
+    position: absolute;
+    top: -11px;
+    right: 16px;
+    background: #22c55e;
+    color: #0a0a0a;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .plan-name { font-size: 13px; font-weight: 600; color: #a1a1aa; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 12px; }
+  .plan-price { font-size: 38px; font-weight: 800; color: white; line-height: 1; letter-spacing: -0.02em; }
+  .plan-price span { font-size: 15px; font-weight: 400; color: #52525b; }
+  .plan-billing { font-size: 12px; color: #3f3f46; margin-top: 4px; margin-bottom: 20px; }
+  .plan-desc { font-size: 13px; color: #52525b; margin-bottom: 18px; min-height: 32px; }
+
+  .select-btn {
+    width: 100%;
+    padding: 11px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    margin-bottom: 20px;
+    transition: opacity 0.2s;
+  }
+  .select-btn.primary { background: white; color: #0a0a0a; }
+  .select-btn.secondary {
+    background: rgba(255,255,255,0.06);
+    color: #d4d4d8;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .select-btn.current {
+    background: transparent;
+    color: #52525b;
+    border: 1px solid rgba(255,255,255,0.08);
+    cursor: default;
+  }
+  .select-btn:not(.current):hover { opacity: 0.85; }
+
+  .divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; }
+
+  .feature-list { display: flex; flex-direction: column; gap: 9px; }
+  .feature-item { display: flex; align-items: flex-start; gap: 8px; font-size: 12.5px; color: #a1a1aa; line-height: 1.4; }
+  .check { color: #22c55e; flex-shrink: 0; font-size: 13px; margin-top: 1px; }
+
+  /* Features section */
+  .features-section {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 18px;
+    padding: 32px;
+    backdrop-filter: blur(12px);
+    margin-bottom: 24px;
+  }
+  .features-section h2 { font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 24px; }
+  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .feat-item { display: flex; gap: 12px; align-items: flex-start; }
+  .feat-icon { font-size: 20px; }
+  .feat-title { font-size: 13px; font-weight: 600; color: white; margin-bottom: 2px; }
+  .feat-desc { font-size: 12px; color: #52525b; }
+
+  .footer-note { text-align: center; font-size: 12px; color: #3f3f46; }
+
+  /* Yearly savings label */
+  .yearly-saving {
+    font-size: 11px;
+    color: #22c55e;
+    margin-top: 2px;
+    margin-bottom: 18px;
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <h1>Plans &amp; Pricing</h1>
+    <p>Choose the best plan for your professional needs.</p>
+  </div>
+
+  <!-- Current plan banner -->
+  <div class="current-banner">
+    <div>
+      <div class="label">You're currently on</div>
+      <div class="plan-name">Free Plan</div>
+    </div>
+    <button class="view-btn">View Details</button>
+  </div>
+
+  <!-- Toggle -->
+  <div class="toggle-row">
+    <div class="toggle-pill">
+      <div class="toggle-opt">Monthly</div>
+      <div class="toggle-opt active">Yearly</div>
+    </div>
+    <div class="save-badge">1 month free</div>
+  </div>
+
+  <!-- Cards -->
+  <div class="cards-grid">
+
+    <!-- Free -->
+    <div class="plan-card">
+      <div class="current-badge">Current Plan</div>
+      <div class="plan-name">Free</div>
+      <div class="plan-price">₹0<span></span></div>
+      <div class="plan-billing">forever</div>
+      <div class="plan-desc">Get started for free</div>
+      <button class="select-btn current">Current Plan</button>
+      <hr class="divider">
+      <div class="feature-list">
+        <div class="feature-item"><span class="check">✓</span>1 Career Roadmap</div>
+        <div class="feature-item"><span class="check">✓</span>Basic Resume Builder</div>
+        <div class="feature-item"><span class="check">✓</span>5 AI Queries/day</div>
+      </div>
+    </div>
+
+    <!-- Starter -->
+    <div class="plan-card">
+      <div class="plan-name">Starter</div>
+      <div class="plan-price">₹91<span>/mo</span></div>
+      <div class="plan-billing">billed annually · save 1 month</div>
+      <div class="plan-desc">Perfect for beginners</div>
+      <button class="select-btn secondary">Select Plan</button>
+      <hr class="divider">
+      <div class="feature-list">
+        <div class="feature-item"><span class="check">✓</span>5 Career Roadmaps</div>
+        <div class="feature-item"><span class="check">✓</span>Full Resume Builder</div>
+        <div class="feature-item"><span class="check">✓</span>Unlimited AI Queries</div>
+        <div class="feature-item"><span class="check">✓</span>Live Portfolio</div>
+      </div>
+    </div>
+
+    <!-- Pro (popular) -->
+    <div class="plan-card popular">
+      <div class="popular-badge">MOST POPULAR</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">₹200<span>/mo</span></div>
+      <div class="plan-billing">billed annually · ₹2,400/year</div>
+      <div class="plan-desc">Best for professionals</div>
+      <button class="select-btn primary">Upgrade Plan</button>
+      <hr class="divider">
+      <div class="feature-list">
+        <div class="feature-item"><span class="check">✓</span>15 Career Roadmaps</div>
+        <div class="feature-item"><span class="check">✓</span>Full Resume Builder</div>
+        <div class="feature-item"><span class="check">✓</span>Unlimited AI Queries</div>
+        <div class="feature-item"><span class="check">✓</span>ATS Scanner (unlimited)</div>
+        <div class="feature-item"><span class="check">✓</span>Resources Hub (50+ tools)</div>
+        <div class="feature-item"><span class="check">✓</span>5 × 1:1 Sessions/mo (30 min)</div>
+      </div>
+    </div>
+
+    <!-- Elite -->
+    <div class="plan-card">
+      <div class="plan-name">Elite</div>
+      <div class="plan-price">₹429<span>/mo</span></div>
+      <div class="plan-billing">billed annually · ₹5,148/year</div>
+      <div class="plan-desc">For serious career growth</div>
+      <button class="select-btn secondary">Upgrade Plan</button>
+      <hr class="divider">
+      <div class="feature-list">
+        <div class="feature-item"><span class="check">✓</span>Unlimited Roadmaps</div>
+        <div class="feature-item"><span class="check">✓</span>Full Resume Builder</div>
+        <div class="feature-item"><span class="check">✓</span>Unlimited AI Queries</div>
+        <div class="feature-item"><span class="check">✓</span>ATS Scanner (unlimited)</div>
+        <div class="feature-item"><span class="check">✓</span>10 × 1:1 Sessions/mo (45 min)</div>
+        <div class="feature-item"><span class="check">✓</span>Priority Booking</div>
+        <div class="feature-item"><span class="check">✓</span>Async Support (WhatsApp/Discord)</div>
+        <div class="feature-item"><span class="check">✓</span>Early Access to New Features</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- All plans include -->
+  <div class="features-section">
+    <h2>All Plans Include</h2>
+    <div class="features-grid">
+      <div class="feat-item"><span class="feat-icon">🎯</span><div><div class="feat-title">Goal-Based Roadmaps</div><div class="feat-desc">Structured paths tailored to your career goals</div></div></div>
+      <div class="feat-item"><span class="feat-icon">📅</span><div><div class="feat-title">Calendar Scheduling</div><div class="feat-desc">Schedule tasks and track daily progress</div></div></div>
+      <div class="feat-item"><span class="feat-icon">🚀</span><div><div class="feat-title">Project Building</div><div class="feat-desc">Build real projects to showcase your skills</div></div></div>
+      <div class="feat-item"><span class="feat-icon">📝</span><div><div class="feat-title">Resume Builder</div><div class="feat-desc">Create ATS-optimized resumes</div></div></div>
+      <div class="feat-item"><span class="feat-icon">🔍</span><div><div class="feat-title">ATS Scanner</div><div class="feat-desc">Check your resume compatibility</div></div></div>
+      <div class="feat-item"><span class="feat-icon">🌐</span><div><div class="feat-title">Live Portfolio</div><div class="feat-desc">Hosted portfolio while subscribed</div></div></div>
+    </div>
+  </div>
+
+  <p class="footer-note">Portfolio stays live only while your subscription is active. After expiry it enters read-only mode.</p>
+
+</div>
+</body>
+</html>

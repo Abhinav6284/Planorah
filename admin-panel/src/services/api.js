@@ -156,4 +156,11 @@ export const adminApi = {
   // Logs
   getLogs: (limit = 20) =>
     apiFetch(`/api/admin/logs/?limit=${limit}`),
+
+  // Profile
+  updateMe: (data) =>
+    apiFetch('/api/admin/me/', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
 }

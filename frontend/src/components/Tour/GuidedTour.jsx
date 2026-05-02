@@ -212,15 +212,15 @@ export default function GuidedTour() {
                         {!isCenter && <ArrowIndicator position={currentStep?.position} />}
 
                         <div style={{
-                            background: 'linear-gradient(165deg, #1f1f1f 0%, #141414 50%, #0f0f0f 100%)',
+                            background: 'var(--el-bg-secondary)',
                             border: '1px solid rgba(217,108,74,0.35)',
                             borderRadius: 22,
                             overflow: 'hidden',
-                            boxShadow: '0 48px 96px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.08)',
+                            boxShadow: 'var(--el-shadow-card)',
                             backdropFilter: 'blur(4px)',
                         }}>
                             {/* Progress Bar */}
-                            <div style={{ height: 2.5, background: 'rgba(255,255,255,0.07)' }}>
+                            <div style={{ height: 2.5, background: 'var(--el-border)' }}>
                                 <motion.div
                                     initial={{ width: `${((step) / totalSteps) * 100}%` }}
                                     animate={{ width: `${progressPct}%` }}
@@ -241,7 +241,7 @@ export default function GuidedTour() {
                                     <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(217,108,74,0.85)' }}>
                                         {step + 1} / {totalSteps}
                                     </span>
-                                    <button onClick={skip} style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.28)', background: 'none', border: 'none', cursor: 'pointer', padding: '3px 8px', borderRadius: 6, transition: 'color 0.1s' }} onMouseEnter={e => e.target.style.color = 'rgba(255,255,255,0.55)'} onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.28)'}>
+                                    <button onClick={skip} style={{ fontSize: 11, fontWeight: 500, color: 'var(--el-text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: '3px 8px', borderRadius: 6, transition: 'color 0.1s' }} onMouseEnter={e => e.target.style.color = 'var(--el-text-secondary)'} onMouseLeave={e => e.target.style.color = 'var(--el-text-muted)'}>
                                         Skip tour ✕
                                     </button>
                                 </div>
@@ -252,14 +252,14 @@ export default function GuidedTour() {
                                         {currentStep?.icon}
                                     </motion.div>
                                     <motion.div key={`title-${step}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.02, duration: 0.14, ease: 'easeOut' }} style={{ paddingTop: 3 }}>
-                                        <h3 style={{ margin: 0, fontSize: 15.5, fontWeight: 700, color: '#ffffff', lineHeight: 1.35, letterSpacing: '-0.015em' }}>
+                                        <h3 style={{ margin: 0, fontSize: 15.5, fontWeight: 700, color: 'var(--el-text)', lineHeight: 1.35, letterSpacing: '-0.015em' }}>
                                             {currentStep?.title}
                                         </h3>
                                     </motion.div>
                                 </div>
 
                                 {/* Description */}
-                                <motion.p key={`desc-${step}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.06, duration: 0.14, ease: 'easeOut' }} style={{ margin: '0 0 20px', fontSize: 13, lineHeight: 1.75, color: 'rgba(255,255,255,0.55)' }}>
+                                <motion.p key={`desc-${step}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.06, duration: 0.14, ease: 'easeOut' }} style={{ margin: '0 0 20px', fontSize: 13, lineHeight: 1.75, color: 'var(--el-text-secondary)' }}>
                                     {currentStep?.description}
                                 </motion.p>
 
@@ -268,7 +268,7 @@ export default function GuidedTour() {
                                     {TOUR_STEPS.map((_, i) => (
                                         <motion.div
                                             key={i}
-                                            animate={{ width: i === step ? 24 : 6, background: i === step ? '#D96C4A' : i < step ? 'rgba(217,108,74,0.5)' : 'rgba(255,255,255,0.15)', boxShadow: i === step ? '0 0 12px rgba(217,108,74,0.6)' : 'none' }}
+                                            animate={{ width: i === step ? 24 : 6, background: i === step ? '#D96C4A' : i < step ? 'rgba(217,108,74,0.5)' : 'var(--el-border)', boxShadow: i === step ? '0 0 12px rgba(217,108,74,0.6)' : 'none' }}
                                             transition={{ duration: 0.16, ease: 'easeOut' }}
                                             style={{ height: 6, borderRadius: 3, willChange: 'width, background, box-shadow' }}
                                         />
@@ -278,7 +278,7 @@ export default function GuidedTour() {
                                 {/* Buttons */}
                                 <div style={{ display: 'flex', gap: 8 }}>
                                     {!isFirst && (
-                                        <button onClick={back} style={{ padding: '9px 16px', borderRadius: 11, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)', transition: 'all 0.12s' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = 'rgba(255,255,255,0.8)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; }}>
+                                        <button onClick={back} style={{ padding: '9px 16px', borderRadius: 11, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', border: '1px solid var(--el-border)', background: 'var(--el-bg)', color: 'var(--el-text-secondary)', transition: 'all 0.12s' }} onMouseEnter={e => { e.currentTarget.style.background = 'var(--el-bg-secondary)'; e.currentTarget.style.color = 'var(--el-text)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'var(--el-bg)'; e.currentTarget.style.color = 'var(--el-text-secondary)'; }}>
                                             ← Back
                                         </button>
                                     )}
@@ -307,7 +307,7 @@ export default function GuidedTour() {
                                 </div>
 
                                 {/* Hint */}
-                                <p style={{ margin: '12px 0 0', textAlign: 'center', fontSize: 10.5, color: 'rgba(255,255,255,0.2)' }}>
+                                <p style={{ margin: '12px 0 0', textAlign: 'center', fontSize: 10.5, color: 'var(--el-text-muted)', opacity: 0.6 }}>
                                     ← → arrow keys to navigate · Esc to exit
                                 </p>
                             </div>

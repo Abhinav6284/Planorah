@@ -159,7 +159,7 @@ const TaskDetailModal = ({ task, isOpen, onClose, onStartFocus }) => {
                                                     >
                                                         <div style={{ 
                                                             width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                            background: 'var(--el-text)', color: '#fff', fontSize: 11, fontWeight: 700, flexShrink: 0, marginTop: 2
+                                                            background: 'var(--el-text)', color: 'var(--el-bg)', fontSize: 11, fontWeight: 700, flexShrink: 0, marginTop: 2
                                                         }}>
                                                             {step.step}
                                                         </div>
@@ -227,7 +227,7 @@ const TaskDetailModal = ({ task, isOpen, onClose, onStartFocus }) => {
                                 onClick={handleStartFocusFromModal}
                                 style={{ 
                                     display: 'flex', alignItems: 'center', gap: 8, padding: '10px 24px', 
-                                    borderRadius: 10, background: 'var(--el-text)', color: '#fff', 
+                                    borderRadius: 10, background: 'var(--el-text)', color: 'var(--el-bg)',
                                     fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer'
                                 }}
                             >

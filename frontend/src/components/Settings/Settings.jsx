@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { 
+import {
   User,
   CreditCard,
   Tag,
@@ -11,7 +11,8 @@ import {
   LogOut,
   History,
   Lock,
-  ChevronLeft
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 import { useTheme } from '../../context/ThemeContext';
@@ -27,71 +28,71 @@ const MAX_AVATAR_UPLOAD_BYTES = 900 * 1024;
 const AVATAR_MAX_DIMENSION = 1024;
 
 const readFileAsDataUrl = (file) => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error('Failed to read selected image.'));
-    reader.readAsDataURL(file);
+  const reader = new FileReader();
+  reader.onload = () => resolve(reader.result);
+  reader.onerror = () => reject(new Error('Failed to read selected image.'));
+  reader.readAsDataURL(file);
 });
 
 const loadImage = (src) => new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error('Failed to process selected image.'));
-    image.src = src;
+  const image = new Image();
+  image.onload = () => resolve(image);
+  image.onerror = () => reject(new Error('Failed to process selected image.'));
+  image.src = src;
 });
 
 const canvasToBlob = (canvas, type, quality) => new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-        if (!blob) {
-            reject(new Error('Failed to compress selected image.'));
-            return;
-        }
-        resolve(blob);
-    }, type, quality);
+  canvas.toBlob((blob) => {
+    if (!blob) {
+      reject(new Error('Failed to compress selected image.'));
+      return;
+    }
+    resolve(blob);
+  }, type, quality);
 });
 
 const optimizeAvatarFile = async (file) => {
-    if (!file?.type?.startsWith('image/')) {
-        throw new Error('Please select a valid image file.');
-    }
-    if (file.size <= MAX_AVATAR_UPLOAD_BYTES) return file;
-    const dataUrl = await readFileAsDataUrl(file);
-    const image = await loadImage(dataUrl);
+  if (!file?.type?.startsWith('image/')) {
+    throw new Error('Please select a valid image file.');
+  }
+  if (file.size <= MAX_AVATAR_UPLOAD_BYTES) return file;
+  const dataUrl = await readFileAsDataUrl(file);
+  const image = await loadImage(dataUrl);
 
-    const longestEdge = Math.max(image.width, image.height);
-    const scale = longestEdge > AVATAR_MAX_DIMENSION ? AVATAR_MAX_DIMENSION / longestEdge : 1;
-    const width = Math.max(1, Math.round(image.width * scale));
-    const height = Math.max(1, Math.round(image.height * scale));
+  const longestEdge = Math.max(image.width, image.height);
+  const scale = longestEdge > AVATAR_MAX_DIMENSION ? AVATAR_MAX_DIMENSION / longestEdge : 1;
+  const width = Math.max(1, Math.round(image.width * scale));
+  const height = Math.max(1, Math.round(image.height * scale));
 
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
 
-    const context = canvas.getContext('2d');
-    if (!context) throw new Error('Could not initialize image processing.');
-    context.drawImage(image, 0, 0, width, height);
+  const context = canvas.getContext('2d');
+  if (!context) throw new Error('Could not initialize image processing.');
+  context.drawImage(image, 0, 0, width, height);
 
-    let mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
-    let quality = 0.9;
-    let blob = await canvasToBlob(canvas, mimeType, quality);
+  let mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+  let quality = 0.9;
+  let blob = await canvasToBlob(canvas, mimeType, quality);
 
-    if (blob.size > MAX_AVATAR_UPLOAD_BYTES && mimeType === 'image/png') {
-        mimeType = 'image/jpeg';
-        quality = 0.85;
-        blob = await canvasToBlob(canvas, mimeType, quality);
-    }
+  if (blob.size > MAX_AVATAR_UPLOAD_BYTES && mimeType === 'image/png') {
+    mimeType = 'image/jpeg';
+    quality = 0.85;
+    blob = await canvasToBlob(canvas, mimeType, quality);
+  }
 
-    while (blob.size > MAX_AVATAR_UPLOAD_BYTES && quality > 0.3) {
-        quality -= 0.1;
-        blob = await canvasToBlob(canvas, mimeType, quality);
-    }
+  while (blob.size > MAX_AVATAR_UPLOAD_BYTES && quality > 0.3) {
+    quality -= 0.1;
+    blob = await canvasToBlob(canvas, mimeType, quality);
+  }
 
-    if (blob.size > MAX_AVATAR_UPLOAD_BYTES) {
-        throw new Error('Image is too large. Please choose a smaller image (under 900 KB).');
-    }
+  if (blob.size > MAX_AVATAR_UPLOAD_BYTES) {
+    throw new Error('Image is too large. Please choose a smaller image (under 900 KB).');
+  }
 
-    const outputName = file.name.replace(/\.[^.]+$/, mimeType === 'image/png' ? '.png' : '.jpg');
-    return new File([blob], outputName, { type: mimeType, lastModified: Date.now() });
+  const outputName = file.name.replace(/\.[^.]+$/, mimeType === 'image/png' ? '.png' : '.jpg');
+  return new File([blob], outputName, { type: mimeType, lastModified: Date.now() });
 };
 
 function SettingsSectionTitle({ title, subtitle }) {
@@ -139,7 +140,7 @@ function ProfileSection({ user, stats, onEdit }) {
           <p style={{ fontSize: 13, color: 'var(--el-text-muted)', marginBottom: 8 }}>@{user.username} · {user.role}</p>
           <p style={{ fontSize: 13, color: 'var(--el-text)', maxWidth: 600, lineHeight: 1.5 }}>{user.bio}</p>
         </div>
-        <button 
+        <button
           onClick={onEdit}
           style={{
             padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600,
@@ -186,7 +187,7 @@ function AccountSection({ user, isOAuth, onDelete }) {
             </div>
             <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, background: 'var(--el-bg-secondary)', color: 'var(--el-text-muted)', fontWeight: 700 }}>PRIMARY</span>
           </div>
-          
+
           <div style={{ borderTop: '1px solid var(--el-border)', paddingTop: 20 }}>
             <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--el-text)', marginBottom: 4 }}>Authentication</div>
             <div style={{ fontSize: 13, color: 'var(--el-text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -205,7 +206,7 @@ function AccountSection({ user, isOAuth, onDelete }) {
         <p style={{ fontSize: 13, color: 'var(--el-text-muted)', marginBottom: 16 }}>
           Permanently delete your account. This action cannot be undone.
         </p>
-        <button 
+        <button
           onClick={onDelete}
           style={{
             padding: '8px 16px', borderRadius: 8, fontSize: 12, fontWeight: 700,
@@ -232,7 +233,7 @@ function PreferencesSection() {
             <div style={{ fontSize: 13, color: 'var(--el-text-muted)' }}>Toggle between light and dark mode</div>
           </div>
           <div style={{ display: 'flex', background: 'var(--el-bg-secondary)', padding: 3, borderRadius: 10, gap: 2, border: '1px solid var(--el-border)' }}>
-            <button 
+            <button
               onClick={() => theme === 'dark' && toggleTheme()}
               style={{
                 padding: '6px 14px', fontSize: 12, fontWeight: 600, borderRadius: 8, border: 'none', cursor: 'pointer',
@@ -244,7 +245,7 @@ function PreferencesSection() {
             >
               Light
             </button>
-            <button 
+            <button
               onClick={() => theme === 'light' && toggleTheme()}
               style={{
                 padding: '6px 14px', fontSize: 12, fontWeight: 600, borderRadius: 8, border: 'none', cursor: 'pointer',
@@ -271,7 +272,7 @@ function SubscriptionSection({ subscription, usage, onUpgrade, onHistory }) {
       <p style={{ fontSize: 14, color: 'var(--el-text-muted)', marginBottom: 24, maxWidth: 400, margin: '0 auto 24px' }}>
         Unlock premium features like AI-powered roadmaps, ATS scanner, and unlimited job searches.
       </p>
-      <button 
+      <button
         onClick={onUpgrade}
         style={{
           padding: '10px 24px', borderRadius: 10, fontSize: 14, fontWeight: 700,
@@ -290,7 +291,7 @@ function SubscriptionSection({ subscription, usage, onUpgrade, onHistory }) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
               <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--el-text)' }}>{subscription.plan_details?.display_name}</h3>
-              <span style={{ 
+              <span style={{
                 fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 6,
                 background: subscription.status === 'active' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(234, 179, 8, 0.1)',
                 color: subscription.status === 'active' ? '#22c55e' : '#eab308'
@@ -314,15 +315,15 @@ function SubscriptionSection({ subscription, usage, onUpgrade, onHistory }) {
             <span>Expires {new Date(subscription.end_date).toLocaleDateString()}</span>
           </div>
           <div style={{ height: 6, width: '100%', background: 'var(--el-bg-secondary)', borderRadius: 10, overflow: 'hidden', border: '1px solid var(--el-border)' }}>
-            <div style={{ 
-              height: '100%', background: 'var(--el-text)', 
-              width: `${Math.max(5, 100 - (subscription.days_remaining / subscription.plan_details?.validity_days) * 100)}%` 
+            <div style={{
+              height: '100%', background: 'var(--el-text)',
+              width: `${Math.max(5, 100 - (subscription.days_remaining / subscription.plan_details?.validity_days) * 100)}%`
             }} />
           </div>
         </div>
 
         <div style={{ display: 'flex', gap: 12 }}>
-          <button 
+          <button
             onClick={onUpgrade}
             style={{
               flex: 1, padding: '10px', borderRadius: 8, fontSize: 13, fontWeight: 700,
@@ -331,7 +332,7 @@ function SubscriptionSection({ subscription, usage, onUpgrade, onHistory }) {
           >
             Change Plan
           </button>
-          <button 
+          <button
             onClick={onHistory}
             style={{
               flex: 1, padding: '10px', borderRadius: 8, fontSize: 13, fontWeight: 600,
@@ -373,66 +374,307 @@ function SubscriptionSection({ subscription, usage, onUpgrade, onHistory }) {
 }
 
 function PricingSection({ plans, currentSubscription, onSelect }) {
+  const [currency, setCurrency] = useState('INR');
+  const [billingCycle, setBillingCycle] = useState('monthly');
+  const cardsRef = useRef(null);
+
+  const normalizePlanKey = (plan) => (plan.name || plan.display_name || '').toString().trim().toLowerCase();
+  const cycleFromDays = (days) => (Number(days) >= 300 ? 'yearly' : 'monthly');
+
+  const groupedPlans = useMemo(() => {
+    const groups = new Map();
+
+    plans.forEach((plan) => {
+      const key = normalizePlanKey(plan);
+      if (!key) return;
+
+      if (!groups.has(key)) {
+        groups.set(key, { monthly: null, yearly: null });
+      }
+
+      const cycle = cycleFromDays(plan.validity_days);
+      const existing = groups.get(key)[cycle];
+
+      // Keep the closest duration to canonical billing cycle windows.
+      const targetDays = cycle === 'monthly' ? 30 : 365;
+      const existingDelta = existing ? Math.abs(Number(existing.validity_days) - targetDays) : Number.POSITIVE_INFINITY;
+      const incomingDelta = Math.abs(Number(plan.validity_days) - targetDays);
+      if (!existing || incomingDelta < existingDelta) {
+        groups.get(key)[cycle] = plan;
+      }
+    });
+
+    return groups;
+  }, [plans]);
+
+  const orderedPlanKeys = useMemo(() => {
+    const preferred = ['free', 'starter', 'creator', 'pro', 'scale', 'business', 'elite'];
+    const existingKeys = Array.from(groupedPlans.keys());
+    const known = preferred.filter((key) => existingKeys.includes(key));
+    const unknown = existingKeys.filter((key) => !preferred.includes(key)).sort();
+    return [...known, ...unknown];
+  }, [groupedPlans]);
+
+  const visiblePlans = useMemo(() => {
+    return orderedPlanKeys
+      .map((key) => {
+        const variants = groupedPlans.get(key);
+        const selected = variants?.[billingCycle] || null;
+        if (!selected) return null;
+        return {
+          key,
+          selected,
+          monthly: variants?.monthly || null,
+          yearly: variants?.yearly || null
+        };
+      })
+      .filter(Boolean);
+  }, [billingCycle, groupedPlans, orderedPlanKeys]);
+
+  const formatPrice = (priceInr) => {
+    const numericPrice = Number(priceInr || 0);
+    if (currency === 'USD') {
+      return `$${(numericPrice / 83).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+    return `₹${numericPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
+  const getPlanSubtitle = (planKey) => {
+    if (planKey === 'free') return 'Get started free';
+    if (planKey === 'starter') return 'Perfect for beginners';
+    if (planKey === 'creator') return 'For active creators';
+    if (planKey === 'pro') return 'Best for professionals';
+    if (planKey === 'scale') return 'Built for growing teams';
+    if (planKey === 'business') return 'Enterprise-grade controls';
+    if (planKey === 'elite') return 'For power users';
+    return 'Flexible plan for your goals';
+  };
+
+  const scrollCards = (direction) => {
+    if (!cardsRef.current) return;
+    cardsRef.current.scrollBy({ left: direction * 320, behavior: 'smooth' });
+  };
+
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
-      {plans.map(plan => {
-        const isCurrent = currentSubscription?.plan_details?.id === plan.id;
-        const isPopular = plan.name === 'pro';
-
-        return (
-          <SettingsCard key={plan.id} style={{ 
-            display: 'flex', flexDirection: 'column',
-            border: isPopular ? '1px solid var(--el-text)' : '1px solid var(--el-border)',
-            position: 'relative'
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            border: '1px solid var(--el-border)',
+            borderRadius: 10,
+            padding: '8px 10px',
+            color: 'var(--el-text)',
+            fontSize: 14,
+            fontWeight: 600,
+            background: 'var(--el-bg)'
           }}>
-            {isPopular && (
-              <div style={{ 
-                position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)',
-                background: 'var(--el-text)', color: 'var(--el-bg)', fontSize: 9, fontWeight: 800, 
-                padding: '2px 10px', borderRadius: 99, textTransform: 'uppercase', letterSpacing: '0.05em'
-              }}>
-                Recommended
-              </div>
-            )}
-            <div style={{ marginBottom: 20 }}>
-              <h4 style={{ fontSize: 15, fontWeight: 700, color: 'var(--el-text)', marginBottom: 4 }}>{plan.display_name}</h4>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
-                <span style={{ fontSize: 24, fontWeight: 800, color: 'var(--el-text)' }}>₹{plan.price_inr}</span>
-                <span style={{ fontSize: 12, color: 'var(--el-text-muted)' }}>/ {plan.validity_days}d</span>
-              </div>
-            </div>
-            
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
-              {[
-                plan.roadmap_limit === -1 ? 'Unlimited Roadmaps' : `${plan.roadmap_limit} Roadmaps`,
-                plan.resume_full ? 'Full Resume Builder' : 'Basic Resume Builder',
-                plan.ats_scan_limit === -1 ? 'Unlimited ATS Scans' : plan.ats_scan_limit > 0 ? `${plan.ats_scan_limit} ATS Scans` : null,
-                plan.quicky_ai_daily_limit === -1 ? 'Unlimited AI Queries' : `${plan.quicky_ai_daily_limit} AI Queries/d`,
-                plan.has_portfolio_live ? 'Live Portfolio' : null
-              ].filter(Boolean).map((f, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--el-text-secondary)' }}>
-                  <Check style={{ width: 14, height: 14, color: '#22c55e' }} /> {f}
-                </div>
-              ))}
-            </div>
-
-            <button 
-              disabled={isCurrent}
-              onClick={() => onSelect(plan)}
+            <span>{currency === 'INR' ? '🇮🇳' : '🇺🇸'}</span>
+            <span>{currency}</span>
+            <button
+              type="button"
+              onClick={() => setCurrency((prev) => (prev === 'INR' ? 'USD' : 'INR'))}
               style={{
-                width: '100%', padding: '10px', borderRadius: 8, fontSize: 13, fontWeight: 700,
-                background: isCurrent ? 'var(--el-bg-secondary)' : isPopular ? 'var(--el-text)' : 'var(--el-bg)',
-                color: isCurrent ? 'var(--el-text-muted)' : isPopular ? 'var(--el-bg)' : 'var(--el-text)',
-                border: isCurrent ? 'none' : '1px solid var(--el-border)',
-                cursor: isCurrent ? 'default' : 'pointer',
-                transition: 'all 0.15s'
+                border: 'none',
+                background: 'transparent',
+                color: 'var(--el-text-muted)',
+                cursor: 'pointer',
+                fontSize: 12,
+                padding: 0
               }}
             >
-              {isCurrent ? 'Current Plan' : 'Select Plan'}
+              ▾
             </button>
-          </SettingsCard>
-        );
-      })}
+          </div>
+
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            borderRadius: 12,
+            padding: 4,
+            background: 'var(--el-bg-secondary)',
+            border: '1px solid var(--el-border)'
+          }}>
+            {[
+              { id: 'monthly', label: 'Monthly' },
+              { id: 'yearly', label: 'Yearly (save 2 months)' }
+            ].map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                onClick={() => setBillingCycle(option.id)}
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: 10,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: 'none',
+                  background: billingCycle === option.id ? 'var(--el-bg)' : 'transparent',
+                  color: billingCycle === option.id ? 'var(--el-text)' : 'var(--el-text-muted)',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button
+            type="button"
+            style={{
+              padding: '8px 14px',
+              borderRadius: 10,
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: 'pointer',
+              border: '1px solid var(--el-border)',
+              background: 'var(--el-bg)',
+              color: 'var(--el-text)'
+            }}
+          >
+            Talk to Sales
+          </button>
+          {[ -1, 1 ].map((dir) => (
+            <button
+              key={dir}
+              type="button"
+              onClick={() => scrollCards(dir)}
+              style={{
+                width: 34,
+                height: 34,
+                borderRadius: '50%',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                border: '1px solid var(--el-border)',
+                background: 'var(--el-bg)',
+                color: 'var(--el-text-muted)'
+              }}
+            >
+              {dir < 0 ? <ChevronLeft style={{ width: 14, height: 14 }} /> : <ChevronRight style={{ width: 14, height: 14 }} />}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div
+        ref={cardsRef}
+        style={{
+          display: 'flex',
+          gap: 18,
+          width: '100%',
+          overflowX: 'auto',
+          paddingBottom: 8,
+          scrollbarWidth: 'thin'
+        }}
+      >
+        {visiblePlans.map(({ key, selected, monthly, yearly }) => {
+          const isCurrent = currentSubscription?.plan_details?.id === selected.id;
+
+          const monthlyPrice = Number(monthly?.price_inr || 0);
+          const yearlyPrice = Number(yearly?.price_inr || 0);
+          const annualizedMonthly = monthlyPrice * 12;
+          const showSavings = billingCycle === 'yearly' && monthlyPrice > 0 && yearlyPrice > 0 && annualizedMonthly > yearlyPrice;
+          const savingsPercent = showSavings ? Math.round(((annualizedMonthly - yearlyPrice) / annualizedMonthly) * 100) : 0;
+
+          return (
+            <SettingsCard key={selected.id} style={{
+              display: 'flex', flexDirection: 'column',
+              minWidth: 272,
+              maxWidth: 272,
+              padding: 22,
+              border: isCurrent ? '1px solid rgba(34, 197, 94, 0.5)' : '1px solid var(--el-border)',
+              background: 'var(--el-bg)',
+              position: 'relative',
+              transition: 'none'
+            }}>
+              <div style={{ marginBottom: 20 }}>
+                {isCurrent && (
+                  <div style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    padding: '3px 10px',
+                    borderRadius: 999,
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: '0.05em',
+                    textTransform: 'uppercase',
+                    color: '#22c55e',
+                    border: '1px solid rgba(34, 197, 94, 0.4)',
+                    marginBottom: 10
+                  }}>
+                    Current Plan
+                  </div>
+                )}
+                <h4 style={{ fontSize: 18, fontWeight: 700, color: 'var(--el-text)', marginBottom: 12 }}>{selected.display_name}</h4>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 8 }}>
+                  <span style={{ fontSize: 28, fontWeight: 800, color: 'var(--el-text)' }}>{formatPrice(selected.price_inr)}</span>
+                  <span style={{ fontSize: 13, color: 'var(--el-text-muted)' }}>{billingCycle === 'yearly' ? '/yr' : '/mo'}</span>
+                </div>
+                {showSavings && (
+                  <div style={{ fontSize: 11, color: '#22c55e', fontWeight: 700, marginBottom: 8 }}>
+                    Save {savingsPercent}% vs monthly
+                  </div>
+                )}
+                <p style={{ fontSize: 12, color: 'var(--el-text-secondary)' }}>
+                  {getPlanSubtitle(key)}
+                </p>
+              </div>
+
+              <button
+                disabled={isCurrent}
+                onClick={() => onSelect(selected)}
+                style={{
+                  width: '100%', padding: '12px 16px', borderRadius: 8, fontSize: 14, fontWeight: 700,
+                  background: isCurrent ? 'var(--el-bg-secondary)' : '#d9d9d9',
+                  color: isCurrent ? 'var(--el-text-muted)' : '#000',
+                  border: isCurrent ? 'none' : '1px solid var(--el-border)',
+                  cursor: isCurrent ? 'default' : 'pointer',
+                  transition: 'none',
+                  marginBottom: 20
+                }}
+              >
+                {isCurrent ? 'Current plan' : 'Upgrade'}
+              </button>
+
+              <div style={{
+                marginLeft: -22,
+                marginRight: -22,
+                marginBottom: -22,
+                padding: '16px 22px 18px',
+                background: 'rgba(255,255,255,0.04)',
+                borderTop: '1px solid rgba(255,255,255,0.05)',
+                borderBottomLeftRadius: 16,
+                borderBottomRightRadius: 16,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 11,
+                flex: 1
+              }}>
+                {[
+                  selected.roadmap_limit === -1 ? 'Unlimited Roadmaps' : `${selected.roadmap_limit} Roadmaps`,
+                  selected.resume_full ? 'Full Resume Builder' : 'Basic Resume Builder',
+                  selected.ats_scan_limit === -1 ? 'Unlimited ATS Scans' : selected.ats_scan_limit > 0 ? `${selected.ats_scan_limit} ATS Scans` : null,
+                  selected.quicky_ai_daily_limit === -1 ? 'Unlimited AI Queries' : `${selected.quicky_ai_daily_limit} AI Queries/d`,
+                  selected.has_portfolio_live ? 'Live Portfolio' : null
+                ].filter(Boolean).map((f, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 13, color: 'var(--el-text-secondary)' }}>
+                    <Check style={{ width: 16, height: 16, color: '#22c55e', flexShrink: 0, marginTop: 2 }} />
+                    <span>{f}</span>
+                  </div>
+                ))}
+              </div>
+            </SettingsCard>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -444,7 +686,7 @@ function BillingHistorySection({ payments, invoices }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <div style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
         {['payments', 'invoices'].map(tab => (
-          <button 
+          <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             style={{
@@ -481,15 +723,15 @@ function BillingHistorySection({ payments, invoices }) {
                   </div>
                   <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: 16 }}>
                     <div>
-                        <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--el-text)' }}>₹{item.amount || item.total}</div>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: (item.status === 'completed' || activeTab === 'invoices') ? '#22c55e' : '#eab308' }}>
-                            {(item.status || 'PAID').toUpperCase()}
-                        </div>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--el-text)' }}>₹{item.amount || item.total}</div>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: (item.status === 'completed' || activeTab === 'invoices') ? '#22c55e' : '#eab308' }}>
+                        {(item.status || 'PAID').toUpperCase()}
+                      </div>
                     </div>
                     {item.pdf_url && (
-                        <a href={item.pdf_url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--el-text)', opacity: 0.7 }}>
-                            <Receipt style={{ width: 18, height: 18 }} />
-                        </a>
+                      <a href={item.pdf_url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--el-text)', opacity: 0.7 }}>
+                        <Receipt style={{ width: 18, height: 18 }} />
+                      </a>
                     )}
                   </div>
                 </SettingsCard>
@@ -505,416 +747,423 @@ function BillingHistorySection({ payments, invoices }) {
 // --- Main Component ---
 
 export default function Settings() {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const [activeTab, setActiveTab] = useState('profile');
-    
-    // User & Stats state
-    const [user, setUser] = useState({ name: "", username: "", role: "", bio: "", email: "", avatar: null });
-    const [stats, setStats] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [isOAuth, setIsOAuth] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState('profile');
 
-    // Subscription & Billing state
-    const [subscription, setSubscription] = useState(null);
-    const [usage, setUsage] = useState(null);
-    const [plans, setPlans] = useState([]);
-    const [payments, setPayments] = useState([]);
-    const [invoices, setInvoices] = useState([]);
+  // User & Stats state
+  const [user, setUser] = useState({ name: "", username: "", role: "", bio: "", email: "", avatar: null });
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isOAuth, setIsOAuth] = useState(false);
 
-    // Edit Modal state
-    const [showEditModal, setShowEditModal] = useState(false);
-    const [editForm, setEditForm] = useState({});
-    const [editPreview, setEditPreview] = useState(null);
-    const [saving, setSaving] = useState(false);
-    const [message, setMessage] = useState(null);
+  // Subscription & Billing state
+  const [subscription, setSubscription] = useState(null);
+  const [usage, setUsage] = useState(null);
+  const [plans, setPlans] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [invoices, setInvoices] = useState([]);
 
-    // Delete Modal state
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [deleteConfirm, setDeleteConfirm] = useState('');
-    const [deleting, setDeleting] = useState(false);
-    const [deleteError, setDeleteError] = useState('');
+  // Edit Modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({});
+  const [editPreview, setEditPreview] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState(null);
 
-    useEffect(() => {
-      const hash = location.hash.replace('#', '');
-      if (['profile', 'subscription', 'plans', 'billing'].includes(hash)) {
-        setActiveTab(hash);
-      }
-    }, [location.hash]);
+  // Delete Modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
-    const fetchData = useCallback(async () => {
-      try {
-        setLoading(true);
-        const [profileRes, statsRes, authRes, subRes, plansRes, billingRes, invoicesRes] = await Promise.all([
-          userService.getProfile(),
-          userService.getStatistics(),
-          userService.checkAuthType(),
-          subscriptionService.getCurrent().catch(() => null),
-          planService.getAll().catch(() => ({ results: [] })),
-          billingService.getHistory().catch(() => []),
-          billingService.getInvoices().catch(() => [])
-        ]);
-
-        const profile = profileRes.profile || {};
-        setUser({
-          name: `${profileRes.first_name || ''} ${profileRes.last_name || ''}`.trim() || profileRes.username,
-          username: profileRes.username,
-          role: profile.target_role || "Student",
-          bio: profile.bio || "Passionate about learning and building the future. 🚀",
-          email: profileRes.email,
-          avatar: profileRes.avatar || profile.avatar,
-        });
-
-        setStats(statsRes);
-        setIsOAuth(authRes.is_oauth);
-        setSubscription(subRes);
-        if (subRes) {
-          const usageRes = await subscriptionService.getUsage();
-          setUsage(usageRes);
-        }
-        setPlans(plansRes.results || plansRes);
-        setPayments(billingRes);
-        setInvoices(invoicesRes);
-
-      } catch (err) {
-        console.error("Settings: Failed to load data", err);
-      } finally {
-        setLoading(false);
-      }
-    }, []);
-
-    useEffect(() => {
-      fetchData();
-    }, [fetchData]);
-
-    const handleEditProfile = () => {
-      setEditForm({ ...user });
-      setEditPreview(user.avatar ? resolveAvatarUrl(user.avatar) : null);
-      setShowEditModal(true);
-    };
-
-    const handleSaveProfile = async () => {
-      setSaving(true);
-      setMessage(null);
-      try {
-        const formData = new FormData();
-        formData.append('name', editForm.name);
-        formData.append('target_role', editForm.role);
-        formData.append('bio', editForm.bio);
-        if (editForm.avatarFile) {
-          formData.append('avatar', editForm.avatarFile);
-        }
-
-        await userService.updateProfile(formData);
-        setUser({ ...user, ...editForm });
-        setMessage({ type: 'success', text: 'Profile updated!' });
-        setTimeout(() => {
-          setShowEditModal(false);
-          setMessage(null);
-          fetchData(); // Refresh
-        }, 1000);
-      } catch (err) {
-        setMessage({ type: 'error', text: err.response?.data?.details || 'Failed to update profile.' });
-      } finally {
-        setSaving(false);
-      }
-    };
-
-    const handleDeleteAccount = async () => {
-      if (!deleteConfirm) return;
-      setDeleting(true);
-      try {
-        await userService.deleteAccount(deleteConfirm, isOAuth);
-        localStorage.clear();
-        window.location.href = '/login';
-      } catch (err) {
-        setDeleteError(err.response?.data?.details || 'Verification failed. Please check your credentials.');
-      } finally {
-        setDeleting(false);
-      }
-    };
-
-    const sideNavItems = [
-      { id: 'profile', label: 'General', icon: User },
-      { id: 'subscription', label: 'Subscription', icon: CreditCard },
-      { id: 'plans', label: 'Plans & Pricing', icon: Tag },
-      { id: 'billing', label: 'Billing History', icon: History },
-    ];
-
-    if (loading) {
-      return (
-        <div style={{ height: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--el-text-muted)' }}>
-          Loading settings...
-        </div>
-      );
+  useEffect(() => {
+    const hash = location.hash.replace('#', '');
+    if (['profile', 'subscription', 'plans', 'billing'].includes(hash)) {
+      setActiveTab(hash);
     }
+  }, [location.hash]);
 
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const [profileRes, statsRes, authRes, subRes, plansRes, billingRes, invoicesRes] = await Promise.all([
+        userService.getProfile(),
+        userService.getStatistics(),
+        userService.checkAuthType(),
+        subscriptionService.getCurrent().catch(() => null),
+        planService.getAll().catch(() => ({ results: [] })),
+        billingService.getHistory().catch(() => []),
+        billingService.getInvoices().catch(() => [])
+      ]);
+
+      const profile = profileRes.profile || {};
+      setUser({
+        name: `${profileRes.first_name || ''} ${profileRes.last_name || ''}`.trim() || profileRes.username,
+        username: profileRes.username,
+        role: profile.target_role || "Student",
+        bio: profile.bio || "Passionate about learning and building the future. 🚀",
+        email: profileRes.email,
+        avatar: profileRes.avatar || profile.avatar,
+      });
+
+      setStats(statsRes);
+      setIsOAuth(authRes.is_oauth);
+      setSubscription(subRes);
+      if (subRes) {
+        const usageRes = await subscriptionService.getUsage();
+        setUsage(usageRes);
+      }
+      setPlans(plansRes.results || plansRes);
+      setPayments(billingRes);
+      setInvoices(invoicesRes);
+
+    } catch (err) {
+      console.error("Settings: Failed to load data", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleEditProfile = () => {
+    setEditForm({ ...user });
+    setEditPreview(user.avatar ? resolveAvatarUrl(user.avatar) : null);
+    setShowEditModal(true);
+  };
+
+  const handleSaveProfile = async () => {
+    setSaving(true);
+    setMessage(null);
+    try {
+      const formData = new FormData();
+      formData.append('name', editForm.name);
+      formData.append('target_role', editForm.role);
+      formData.append('bio', editForm.bio);
+      if (editForm.avatarFile) {
+        formData.append('avatar', editForm.avatarFile);
+      }
+
+      await userService.updateProfile(formData);
+      setUser({ ...user, ...editForm });
+      setMessage({ type: 'success', text: 'Profile updated!' });
+      setTimeout(() => {
+        setShowEditModal(false);
+        setMessage(null);
+        fetchData(); // Refresh
+      }, 1000);
+    } catch (err) {
+      setMessage({ type: 'error', text: err.response?.data?.details || 'Failed to update profile.' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!deleteConfirm) return;
+    setDeleting(true);
+    try {
+      await userService.deleteAccount(deleteConfirm, isOAuth);
+      localStorage.clear();
+      window.location.href = '/login';
+    } catch (err) {
+      setDeleteError(err.response?.data?.details || 'Verification failed. Please check your credentials.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const sideNavItems = [
+    { id: 'profile', label: 'General', icon: User },
+    { id: 'subscription', label: 'Subscription', icon: CreditCard },
+    { id: 'plans', label: 'Plans & Pricing', icon: Tag },
+    { id: 'billing', label: 'Billing History', icon: History },
+  ];
+
+  if (loading) {
     return (
-        <div style={{ maxWidth: 1000, margin: '0 auto', padding: '40px 24px' }}>
-            <div style={{ marginBottom: 48 }}>
-              <h1 style={{ fontSize: 32, fontWeight: 800, color: 'var(--el-text)', letterSpacing: '-0.04em', marginBottom: 8 }}>Settings</h1>
-              <p style={{ fontSize: 15, color: 'var(--el-text-muted)' }}>Manage your profile, billing, and system preferences.</p>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 60 }}>
-                {/* Side Navigation */}
-                <aside style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  {sideNavItems.map(item => (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        setActiveTab(item.id);
-                        window.location.hash = item.id;
-                      }}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
-                        borderRadius: 10, fontSize: 14, fontWeight: activeTab === item.id ? 700 : 500,
-                        border: 'none', cursor: 'pointer', transition: 'all 0.1s',
-                        background: activeTab === item.id ? 'var(--el-bg-secondary)' : 'transparent',
-                        color: activeTab === item.id ? 'var(--el-text)' : 'var(--el-text-muted)',
-                        textAlign: 'left',
-                        boxShadow: activeTab === item.id ? 'var(--el-shadow-inset)' : 'none'
-                      }}
-                    >
-                      <item.icon style={{ width: 16, height: 16, opacity: activeTab === item.id ? 1 : 0.6 }} />
-                      {item.label}
-                    </button>
-                  ))}
-                  <div style={{ marginTop: 24, paddingTop: 24, borderTop: '1px solid var(--el-border)' }}>
-                    <button
-                      onClick={() => {
-                        localStorage.clear();
-                        window.location.href = '/login';
-                      }}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
-                        borderRadius: 10, fontSize: 14, fontWeight: 500, color: '#ef4444',
-                        background: 'transparent', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left'
-                      }}
-                    >
-                      <LogOut style={{ width: 16, height: 16 }} />
-                      Log Out
-                    </button>
-                  </div>
-                </aside>
-
-                {/* Main Content Area */}
-                <main>
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={activeTab}
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      transition={{ duration: 0.15 }}
-                    >
-                      {activeTab === 'profile' && (
-                        <>
-                          <SettingsSectionTitle title="General" subtitle="Your public profile, appearance, and account settings." />
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
-                            <ProfileSection user={user} stats={stats} onEdit={handleEditProfile} />
-                            
-                            <div style={{ borderTop: '1px solid var(--el-border)', paddingTop: 40 }}>
-                                <h3 style={{ fontSize: 12, fontWeight: 700, color: 'var(--el-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 16 }}>Appearance</h3>
-                                <PreferencesSection />
-                            </div>
-
-                            <div style={{ borderTop: '1px solid var(--el-border)', paddingTop: 40 }}>
-                                <h3 style={{ fontSize: 12, fontWeight: 700, color: 'var(--el-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 16 }}>Account & Security</h3>
-                                <AccountSection user={user} isOAuth={isOAuth} onDelete={() => setShowDeleteModal(true)} />
-                            </div>
-                          </div>
-                        </>
-                      )}
-                      {activeTab === 'subscription' && (
-                        <>
-                          <SettingsSectionTitle title="Subscription" subtitle="Manage your current plan and platform usage." />
-                          <SubscriptionSection 
-                            subscription={subscription} 
-                            usage={usage} 
-                            onUpgrade={() => setActiveTab('plans')}
-                            onHistory={() => setActiveTab('billing')}
-                          />
-                        </>
-                      )}
-                      {activeTab === 'plans' && (
-                        <>
-                          <SettingsSectionTitle title="Plans & Pricing" subtitle="Choose the best plan for your professional needs." />
-                          <PricingSection 
-                            plans={plans} 
-                            currentSubscription={subscription} 
-                            onSelect={(plan) => navigate('/billing/checkout', { state: { plan } })} 
-                          />
-                        </>
-                      )}
-                      {activeTab === 'billing' && (
-                        <>
-                          <SettingsSectionTitle title="Billing History" subtitle="View your past transactions and download invoices." />
-                          <BillingHistorySection payments={payments} invoices={invoices} />
-                        </>
-                      )}
-                    </motion.div>
-                  </AnimatePresence>
-                </main>
-            </div>
-
-            {/* Edit Profile Modal */}
-            <AnimatePresence>
-                {showEditModal && (
-                    <motion.div
-                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        style={{
-                            position: 'fixed', inset: 0, zIndex: 1000,
-                            background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center'
-                        }}
-                        onClick={() => setShowEditModal(false)}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
-                            onClick={e => e.stopPropagation()}
-                            style={{
-                                width: '100%', maxWidth: 500, background: 'var(--el-bg)', borderRadius: 20,
-                                overflow: 'hidden', boxShadow: '0 30px 60px rgba(0,0,0,0.2)', border: '1px solid var(--el-border)'
-                            }}
-                        >
-                            <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--el-border)', display: 'flex', alignItems: 'center', gap: 12 }}>
-                                <button onClick={() => setShowEditModal(false)} style={{ background: 'none', border: 'none', color: 'var(--el-text-muted)', cursor: 'pointer', padding: 0 }}><ChevronLeft /></button>
-                                <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--el-text)' }}>Edit Profile</h2>
-                            </div>
-                            <div style={{ padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-                                    <div style={{
-                                        width: 80, height: 80, borderRadius: '50%', background: 'var(--el-bg-secondary)',
-                                        border: '1px solid var(--el-border)', overflow: 'hidden', position: 'relative'
-                                    }}>
-                                        {editPreview ? (
-                                            <img src={editPreview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                        ) : (
-                                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>👤</div>
-                                        )}
-                                        <label style={{
-                                            position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)',
-                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            color: '#fff', fontSize: 10, fontWeight: 800, opacity: 0, cursor: 'pointer', transition: 'opacity 0.2s'
-                                        }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0}>
-                                            REPLACE
-                                            <input type="file" hidden accept="image/*" onChange={async (e) => {
-                                                const file = e.target.files[0];
-                                                if (file) {
-                                                  const optimized = await optimizeAvatarFile(file);
-                                                  setEditForm({ ...editForm, avatarFile: optimized });
-                                                  setEditPreview(URL.createObjectURL(optimized));
-                                                }
-                                            }} />
-                                        </label>
-                                    </div>
-                                    <div style={{ fontSize: 12, color: 'var(--el-text-muted)', lineHeight: 1.5 }}>
-                                        <strong>Upload new avatar</strong><br/>
-                                        PNG or JPG. Max 900KB.
-                                    </div>
-                                </div>
-
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                                    <div>
-                                        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--el-text)', marginBottom: 8 }}>Full Name</label>
-                                        <input 
-                                          style={{ 
-                                            width: '100%', padding: '12px 14px', borderRadius: 10, 
-                                            background: 'var(--el-bg)', border: '1px solid var(--el-border)',
-                                            color: 'var(--el-text)', fontSize: 14, outline: 'none',
-                                            boxShadow: 'var(--el-shadow-inset)'
-                                          }} 
-                                          value={editForm.name || ''} 
-                                          onChange={e => setEditForm({...editForm, name: e.target.value})} 
-                                        />
-                                    </div>
-                                    <div>
-                                        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--el-text)', marginBottom: 8 }}>Role / Occupation</label>
-                                        <input 
-                                          style={{ 
-                                            width: '100%', padding: '12px 14px', borderRadius: 10, 
-                                            background: 'var(--el-bg)', border: '1px solid var(--el-border)',
-                                            color: 'var(--el-text)', fontSize: 14, outline: 'none',
-                                            boxShadow: 'var(--el-shadow-inset)'
-                                          }} 
-                                          value={editForm.role || ''} 
-                                          onChange={e => setEditForm({...editForm, role: e.target.value})} 
-                                        />
-                                    </div>
-                                    <div>
-                                        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--el-text)', marginBottom: 8 }}>Bio</label>
-                                        <textarea 
-                                          style={{ 
-                                            width: '100%', padding: '12px 14px', borderRadius: 10, 
-                                            background: 'var(--el-bg)', border: '1px solid var(--el-border)',
-                                            color: 'var(--el-text)', fontSize: 14, height: 100, resize: 'none', outline: 'none',
-                                            boxShadow: 'var(--el-shadow-inset)', lineHeight: 1.5
-                                          }} 
-                                          value={editForm.bio || ''} 
-                                          onChange={e => setEditForm({...editForm, bio: e.target.value})} 
-                                        />
-                                    </div>
-                                </div>
-
-                                {message && (
-                                    <div style={{ 
-                                      padding: '12px', borderRadius: 10, fontSize: 13, fontWeight: 600,
-                                      background: message.type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                                      color: message.type === 'success' ? '#22c55e' : '#ef4444'
-                                    }}>
-                                      {message.text}
-                                    </div>
-                                )}
-                            </div>
-                            <div style={{ padding: '24px 32px', background: 'var(--el-bg-secondary)', borderTop: '1px solid var(--el-border)', display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
-                                <button onClick={() => setShowEditModal(false)} style={{ padding: '10px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600, border: 'none', background: 'transparent', color: 'var(--el-text-muted)', cursor: 'pointer' }}>Cancel</button>
-                                <button onClick={handleSaveProfile} disabled={saving} style={{ padding: '10px 24px', borderRadius: 10, fontSize: 13, fontWeight: 700, border: 'none', background: 'var(--el-text)', color: 'var(--el-bg)', cursor: 'pointer' }}>
-                                  {saving ? 'Saving...' : 'Save Changes'}
-                                </button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-
-                {/* Delete Modal */}
-                {showDeleteModal && (
-                    <motion.div
-                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                        onClick={() => setShowDeleteModal(false)}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}
-                            onClick={e => e.stopPropagation()} 
-                            style={{ width: '100%', maxWidth: 400, background: 'var(--el-bg)', borderRadius: 20, padding: 32, border: '1px solid var(--el-border)' }}
-                        >
-                            <h2 style={{ fontSize: 18, fontWeight: 700, color: '#ef4444', marginBottom: 12 }}>Delete Account</h2>
-                            <p style={{ fontSize: 14, color: 'var(--el-text-muted)', lineHeight: 1.6, marginBottom: 24 }}>
-                                This is permanent. All your roadmaps, tasks, and settings will be wiped from our servers forever.
-                            </p>
-                            
-                            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--el-text)', marginBottom: 8 }}>
-                                {isOAuth ? 'Type DELETE to confirm' : 'Enter password to confirm'}
-                            </label>
-                            <input 
-                                type={isOAuth ? 'text' : 'password'}
-                                style={{ width: '100%', padding: '12px', borderRadius: 10, border: '1px solid var(--el-border)', background: 'var(--el-bg)', color: 'var(--el-text)', marginBottom: 16, outline: 'none', boxShadow: 'var(--el-shadow-inset)' }}
-                                value={deleteConfirm} onChange={e => setDeleteConfirm(e.target.value)}
-                            />
-
-                            {deleteError && <div style={{ color: '#ef4444', fontSize: 12, marginBottom: 16, fontWeight: 600 }}>{deleteError}</div>}
-
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
-                                <button onClick={() => setShowDeleteModal(false)} style={{ padding: '10px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, border: 'none', background: 'transparent', color: 'var(--el-text-muted)', cursor: 'pointer' }}>Cancel</button>
-                                <button onClick={handleDeleteAccount} disabled={deleting} style={{ padding: '10px 24px', borderRadius: 10, fontSize: 13, fontWeight: 700, border: 'none', background: '#ef4444', color: '#fff', cursor: 'pointer' }}>
-                                  {deleting ? 'Deleting...' : 'Delete Permanently'}
-                                </button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
+      <div style={{ height: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--el-text-muted)' }}>
+        Loading settings...
+      </div>
     );
+  }
+
+  return (
+    <div style={{ width: '100%', margin: 0, padding: '16px 24px 32px', boxSizing: 'border-box' }}>
+      <div style={{ marginBottom: 28 }}>
+        <h1 style={{ fontSize: 32, fontWeight: 800, color: 'var(--el-text)', letterSpacing: '-0.04em', marginBottom: 8 }}>Settings</h1>
+        <p style={{ fontSize: 15, color: 'var(--el-text-muted)' }}>Manage your profile, billing, and system preferences.</p>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        {/* Top Navbar */}
+        <nav style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12,
+          paddingBottom: 12,
+          borderBottom: '1px solid var(--el-border)'
+        }}>
+          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', minWidth: 0 }}>
+            {sideNavItems.map(item => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  window.location.hash = item.id;
+                }}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px',
+                  borderRadius: 10, fontSize: 14, fontWeight: activeTab === item.id ? 700 : 500,
+                  border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
+                  background: activeTab === item.id ? 'var(--el-bg-secondary)' : 'transparent',
+                  color: activeTab === item.id ? 'var(--el-text)' : 'var(--el-text-muted)',
+                  boxShadow: activeTab === item.id ? 'var(--el-shadow-inset)' : 'none'
+                }}
+              >
+                <item.icon style={{ width: 16, height: 16, opacity: activeTab === item.id ? 1 : 0.65 }} />
+                {item.label}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => {
+              localStorage.clear();
+              window.location.href = '/login';
+            }}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px',
+              borderRadius: 10, fontSize: 14, fontWeight: 600, color: '#ef4444',
+              background: 'transparent', border: '1px solid rgba(239, 68, 68, 0.25)', cursor: 'pointer',
+              flexShrink: 0
+            }}
+          >
+            <LogOut style={{ width: 16, height: 16 }} />
+            Log Out
+          </button>
+        </nav>
+
+        {/* Main Content Area */}
+        <main style={{ minWidth: 0 }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.15 }}
+            >
+              {activeTab === 'profile' && (
+                <>
+                  <SettingsSectionTitle title="General" subtitle="Your public profile, appearance, and account settings." />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
+                    <ProfileSection user={user} stats={stats} onEdit={handleEditProfile} />
+
+                    <div style={{ borderTop: '1px solid var(--el-border)', paddingTop: 40 }}>
+                      <h3 style={{ fontSize: 12, fontWeight: 700, color: 'var(--el-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 16 }}>Appearance</h3>
+                      <PreferencesSection />
+                    </div>
+
+                    <div style={{ borderTop: '1px solid var(--el-border)', paddingTop: 40 }}>
+                      <h3 style={{ fontSize: 12, fontWeight: 700, color: 'var(--el-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 16 }}>Account & Security</h3>
+                      <AccountSection user={user} isOAuth={isOAuth} onDelete={() => setShowDeleteModal(true)} />
+                    </div>
+                  </div>
+                </>
+              )}
+              {activeTab === 'subscription' && (
+                <>
+                  <SettingsSectionTitle title="Subscription" subtitle="Manage your current plan and platform usage." />
+                  <SubscriptionSection
+                    subscription={subscription}
+                    usage={usage}
+                    onUpgrade={() => setActiveTab('plans')}
+                    onHistory={() => setActiveTab('billing')}
+                  />
+                </>
+              )}
+              {activeTab === 'plans' && (
+                <>
+                  <SettingsSectionTitle title="Plans & Pricing" subtitle="Choose the best plan for your professional needs." />
+                  <PricingSection
+                    plans={plans}
+                    currentSubscription={subscription}
+                    onSelect={(plan) => navigate('/billing/checkout', { state: { plan } })}
+                  />
+                </>
+              )}
+              {activeTab === 'billing' && (
+                <>
+                  <SettingsSectionTitle title="Billing History" subtitle="View your past transactions and download invoices." />
+                  <BillingHistorySection payments={payments} invoices={invoices} />
+                </>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+      </div>
+
+      {/* Edit Profile Modal */}
+      <AnimatePresence>
+        {showEditModal && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 1000,
+              background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}
+            onClick={() => setShowEditModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
+              onClick={e => e.stopPropagation()}
+              style={{
+                width: '100%', maxWidth: 500, background: 'var(--el-bg)', borderRadius: 20,
+                overflow: 'hidden', boxShadow: '0 30px 60px rgba(0,0,0,0.2)', border: '1px solid var(--el-border)'
+              }}
+            >
+              <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--el-border)', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <button onClick={() => setShowEditModal(false)} style={{ background: 'none', border: 'none', color: 'var(--el-text-muted)', cursor: 'pointer', padding: 0 }}><ChevronLeft /></button>
+                <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--el-text)' }}>Edit Profile</h2>
+              </div>
+              <div style={{ padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+                  <div style={{
+                    width: 80, height: 80, borderRadius: '50%', background: 'var(--el-bg-secondary)',
+                    border: '1px solid var(--el-border)', overflow: 'hidden', position: 'relative'
+                  }}>
+                    {editPreview ? (
+                      <img src={editPreview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>👤</div>
+                    )}
+                    <label style={{
+                      position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: '#fff', fontSize: 10, fontWeight: 800, opacity: 0, cursor: 'pointer', transition: 'opacity 0.2s'
+                    }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0}>
+                      REPLACE
+                      <input type="file" hidden accept="image/*" onChange={async (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          const optimized = await optimizeAvatarFile(file);
+                          setEditForm({ ...editForm, avatarFile: optimized });
+                          setEditPreview(URL.createObjectURL(optimized));
+                        }
+                      }} />
+                    </label>
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--el-text-muted)', lineHeight: 1.5 }}>
+                    <strong>Upload new avatar</strong><br />
+                    PNG or JPG. Max 900KB.
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--el-text)', marginBottom: 8 }}>Full Name</label>
+                    <input
+                      style={{
+                        width: '100%', padding: '12px 14px', borderRadius: 10,
+                        background: 'var(--el-bg)', border: '1px solid var(--el-border)',
+                        color: 'var(--el-text)', fontSize: 14, outline: 'none',
+                        boxShadow: 'var(--el-shadow-inset)'
+                      }}
+                      value={editForm.name || ''}
+                      onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--el-text)', marginBottom: 8 }}>Role / Occupation</label>
+                    <input
+                      style={{
+                        width: '100%', padding: '12px 14px', borderRadius: 10,
+                        background: 'var(--el-bg)', border: '1px solid var(--el-border)',
+                        color: 'var(--el-text)', fontSize: 14, outline: 'none',
+                        boxShadow: 'var(--el-shadow-inset)'
+                      }}
+                      value={editForm.role || ''}
+                      onChange={e => setEditForm({ ...editForm, role: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--el-text)', marginBottom: 8 }}>Bio</label>
+                    <textarea
+                      style={{
+                        width: '100%', padding: '12px 14px', borderRadius: 10,
+                        background: 'var(--el-bg)', border: '1px solid var(--el-border)',
+                        color: 'var(--el-text)', fontSize: 14, height: 100, resize: 'none', outline: 'none',
+                        boxShadow: 'var(--el-shadow-inset)', lineHeight: 1.5
+                      }}
+                      value={editForm.bio || ''}
+                      onChange={e => setEditForm({ ...editForm, bio: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                {message && (
+                  <div style={{
+                    padding: '12px', borderRadius: 10, fontSize: 13, fontWeight: 600,
+                    background: message.type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                    color: message.type === 'success' ? '#22c55e' : '#ef4444'
+                  }}>
+                    {message.text}
+                  </div>
+                )}
+              </div>
+              <div style={{ padding: '24px 32px', background: 'var(--el-bg-secondary)', borderTop: '1px solid var(--el-border)', display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+                <button onClick={() => setShowEditModal(false)} style={{ padding: '10px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600, border: 'none', background: 'transparent', color: 'var(--el-text-muted)', cursor: 'pointer' }}>Cancel</button>
+                <button onClick={handleSaveProfile} disabled={saving} style={{ padding: '10px 24px', borderRadius: 10, fontSize: 13, fontWeight: 700, border: 'none', background: 'var(--el-text)', color: 'var(--el-bg)', cursor: 'pointer' }}>
+                  {saving ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* Delete Modal */}
+        {showDeleteModal && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            onClick={() => setShowDeleteModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}
+              onClick={e => e.stopPropagation()}
+              style={{ width: '100%', maxWidth: 400, background: 'var(--el-bg)', borderRadius: 20, padding: 32, border: '1px solid var(--el-border)' }}
+            >
+              <h2 style={{ fontSize: 18, fontWeight: 700, color: '#ef4444', marginBottom: 12 }}>Delete Account</h2>
+              <p style={{ fontSize: 14, color: 'var(--el-text-muted)', lineHeight: 1.6, marginBottom: 24 }}>
+                This is permanent. All your roadmaps, tasks, and settings will be wiped from our servers forever.
+              </p>
+
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--el-text)', marginBottom: 8 }}>
+                {isOAuth ? 'Type DELETE to confirm' : 'Enter password to confirm'}
+              </label>
+              <input
+                type={isOAuth ? 'text' : 'password'}
+                style={{ width: '100%', padding: '12px', borderRadius: 10, border: '1px solid var(--el-border)', background: 'var(--el-bg)', color: 'var(--el-text)', marginBottom: 16, outline: 'none', boxShadow: 'var(--el-shadow-inset)' }}
+                value={deleteConfirm} onChange={e => setDeleteConfirm(e.target.value)}
+              />
+
+              {deleteError && <div style={{ color: '#ef4444', fontSize: 12, marginBottom: 16, fontWeight: 600 }}>{deleteError}</div>}
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+                <button onClick={() => setShowDeleteModal(false)} style={{ padding: '10px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, border: 'none', background: 'transparent', color: 'var(--el-text-muted)', cursor: 'pointer' }}>Cancel</button>
+                <button onClick={handleDeleteAccount} disabled={deleting} style={{ padding: '10px 24px', borderRadius: 10, fontSize: 13, fontWeight: 700, border: 'none', background: '#ef4444', color: '#fff', cursor: 'pointer' }}>
+                  {deleting ? 'Deleting...' : 'Delete Permanently'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 }

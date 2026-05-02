@@ -4,14 +4,13 @@ import { useLocation, Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import Navbar from './Navbar'
 
-// Cal.com-inspired design system constants
-const SIDEBAR_FULL = 256
+const SIDEBAR_FULL      = 256
 const SIDEBAR_COLLAPSED = 80
 
 const PAGE_VARIANTS = {
   initial: { opacity: 0, y: 8 },
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -4 },
+  exit:    { opacity: 0, y: -4 },
 }
 
 export default function Layout() {
@@ -20,7 +19,7 @@ export default function Layout() {
   const sw = collapsed ? SIDEBAR_COLLAPSED : SIDEBAR_FULL
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
       <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(v => !v)} />
       <Navbar sidebarWidth={sw} />
 

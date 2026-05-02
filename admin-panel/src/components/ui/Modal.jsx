@@ -33,19 +33,19 @@ export default function Modal({ open, onClose, title, children, width = 'max-w-x
             exit={{   opacity: 0, scale: 0.96, y: 10 }}
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
             className={[
-              'relative w-full bg-white rounded-xl overflow-hidden',
+              'relative w-full bg-[var(--bg-card)] rounded-xl overflow-hidden',
               'shadow-level-2-card',
               width,
             ].join(' ')}
           >
             {/* header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border-gray">
-              <h2 className="font-cal-sans font-semibold text-base text-charcoal tracking-tight">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+              <h2 className="font-cal-sans font-semibold text-base text-[var(--text-primary)] tracking-tight">
                 {title}
               </h2>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg text-mid-gray hover:text-charcoal hover:bg-gray-50 transition-colors"
+                className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
               >
                 <X size={16} />
               </button>

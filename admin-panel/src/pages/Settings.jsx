@@ -12,7 +12,7 @@ function ToggleSwitch({ enabled, onChange }) {
     <button
       onClick={() => onChange(!enabled)}
       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer flex-shrink-0 focus:outline-none ${
-        enabled ? 'bg-charcoal' : 'bg-gray-200'
+        enabled ? 'bg-charcoal' : 'bg-[var(--bg-elevated)]'
       }`}
     >
       <motion.span
@@ -31,7 +31,7 @@ function SectionHeader({ icon: Icon, title }) {
       <div className="w-8 h-8 rounded-lg bg-charcoal text-white flex items-center justify-center">
         <Icon size={15} />
       </div>
-      <h2 className="font-cal-sans font-semibold text-lg text-charcoal">{title}</h2>
+      <h2 className="font-cal-sans font-semibold text-lg text-[var(--text-primary)]">{title}</h2>
     </div>
   )
 }
@@ -39,10 +39,10 @@ function SectionHeader({ icon: Icon, title }) {
 // ─── Setting row ──────────────────────────────────────────────────────────────
 function SettingRow({ label, description, enabled, onChange }) {
   return (
-    <div className="flex items-center justify-between gap-4 py-3 border-b border-border-gray last:border-b-0">
+    <div className="flex items-center justify-between gap-4 py-3 border-b border-[var(--border)] last:border-b-0">
       <div className="min-w-0">
-        <p className="text-sm font-inter text-charcoal capitalize">{label}</p>
-        {description && <p className="text-xs font-inter text-mid-gray mt-0.5">{description}</p>}
+        <p className="text-sm font-inter text-[var(--text-primary)] capitalize">{label}</p>
+        {description && <p className="text-xs font-inter text-[var(--text-secondary)] mt-0.5">{description}</p>}
       </div>
       <ToggleSwitch enabled={enabled} onChange={onChange} />
     </div>
@@ -53,21 +53,21 @@ function SettingRow({ label, description, enabled, onChange }) {
 function InputField({ label, value, onChange, type = 'text' }) {
   return (
     <div>
-      <label className="text-xs font-inter font-semibold uppercase tracking-wide text-mid-gray block mb-1.5">
+      <label className="text-xs font-inter font-semibold uppercase tracking-wide text-[var(--text-secondary)] block mb-1.5">
         {label}
       </label>
       <input
         type={type}
         value={value}
         onChange={e => onChange(e.target.value)}
-        className="w-full px-4 py-2.5 rounded-lg text-sm font-inter outline-none border border-border-gray text-charcoal placeholder-mid-gray focus:border-charcoal transition-colors bg-white"
+        className="w-full px-4 py-2.5 rounded-lg text-sm font-inter outline-none border border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:border-charcoal transition-colors bg-[var(--bg-card)]"
       />
     </div>
   )
 }
 
 export default function Settings() {
-  const { user }     = useAuth()
+  const { user, updateUser } = useAuth()
   const { addToast } = useToast()
   const [loading,       setLoading]       = useState(true)
   const [flags,         setFlags]         = useState([])
@@ -101,9 +101,18 @@ export default function Settings() {
 
   async function saveProfile() {
     setSavingProfile(true)
-    await new Promise(r => setTimeout(r, 600))
-    setSavingProfile(false)
-    addToast('Profile saved successfully.', 'success')
+    try {
+      const parts      = name.trim().split(' ')
+      const first_name = parts[0] || ''
+      const last_name  = parts.slice(1).join(' ') || ''
+      const updated    = await adminApi.updateMe({ first_name, last_name, email })
+      updateUser({ name: updated.name, email: updated.email })
+      addToast('Profile saved successfully.', 'success')
+    } catch (e) {
+      addToast(e.message, 'error')
+    } finally {
+      setSavingProfile(false)
+    }
   }
 
   const NOTIF_DESCRIPTIONS = {
@@ -117,8 +126,8 @@ export default function Settings() {
     <div>
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-        <h1 className="font-cal-sans font-semibold text-4xl text-charcoal tracking-tight">Settings</h1>
-        <p className="text-sm font-inter text-mid-gray mt-2">Platform configuration and admin preferences</p>
+        <h1 className="font-cal-sans font-semibold text-4xl text-[var(--text-primary)] tracking-tight">Settings</h1>
+        <p className="text-sm font-inter text-[var(--text-secondary)] mt-2">Platform configuration and admin preferences</p>
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -129,17 +138,17 @@ export default function Settings() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.06 }}
-            className="bg-white rounded-lg p-6 shadow-level-2-card"
+            className="bg-[var(--bg-card)] rounded-lg p-6 shadow-level-2-card"
           >
             <SectionHeader icon={User} title="Admin Profile" />
             <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-3 p-4 rounded-lg bg-gray-50 border border-border-gray">
+              <div className="flex items-center gap-3 p-4 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border)]">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-charcoal text-white flex-shrink-0">
                   {user?.name?.[0] ?? 'A'}
                 </div>
                 <div>
-                  <p className="text-sm font-inter font-medium text-charcoal">{user?.name}</p>
-                  <p className="text-xs font-inter text-mid-gray capitalize">{user?.role}</p>
+                  <p className="text-sm font-inter font-medium text-[var(--text-primary)]">{user?.name}</p>
+                  <p className="text-xs font-inter text-[var(--text-secondary)] capitalize">{user?.role}</p>
                 </div>
               </div>
               <InputField label="Display Name" value={name}  onChange={setName}  />
@@ -155,7 +164,7 @@ export default function Settings() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.12 }}
-            className="bg-white rounded-lg p-6 shadow-level-2-card"
+            className="bg-[var(--bg-card)] rounded-lg p-6 shadow-level-2-card"
           >
             <SectionHeader icon={Bell} title="Notifications" />
             <div>
@@ -177,7 +186,7 @@ export default function Settings() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.18 }}
-          className="bg-white rounded-lg p-6 shadow-level-2-card h-fit"
+          className="bg-[var(--bg-card)] rounded-lg p-6 shadow-level-2-card h-fit"
         >
           <SectionHeader icon={Globe} title="Platform Info" />
           <div className="flex flex-col gap-2">
@@ -189,21 +198,21 @@ export default function Settings() {
               { label: 'API Base',    value: import.meta.env.VITE_API_URL || 'http://localhost:8000' },
               { label: 'Admin Panel', value: 'React + Vite' },
             ].map(({ label, value }) => (
-              <div key={label} className="flex items-center justify-between gap-4 py-3 border-b border-border-gray last:border-b-0">
-                <p className="text-xs font-inter text-mid-gray">{label}</p>
-                <p className="text-xs font-mono font-medium text-charcoal text-right truncate max-w-[60%]">{value}</p>
+              <div key={label} className="flex items-center justify-between gap-4 py-3 border-b border-[var(--border)] last:border-b-0">
+                <p className="text-xs font-inter text-[var(--text-secondary)]">{label}</p>
+                <p className="text-xs font-mono font-medium text-[var(--text-primary)] text-right truncate max-w-[60%]">{value}</p>
               </div>
             ))}
           </div>
 
-          <div className="mt-4 p-4 rounded-lg bg-gray-50 border border-border-gray">
+          <div className="mt-4 p-4 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border)]">
             <div className="flex items-center gap-2 mb-2">
-              <Shield size={13} className="text-mid-gray" />
-              <p className="text-xs font-inter font-semibold text-charcoal">Security</p>
+              <Shield size={13} className="text-[var(--text-secondary)]" />
+              <p className="text-xs font-inter font-semibold text-[var(--text-primary)]">Security</p>
             </div>
-            <p className="text-xs font-inter text-mid-gray leading-relaxed">
+            <p className="text-xs font-inter text-[var(--text-secondary)] leading-relaxed">
               All admin API endpoints require JWT Bearer token and{' '}
-              <code className="text-[11px] bg-gray-100 px-1 py-0.5 rounded text-charcoal font-mono">is_staff=True</code>.
+              <code className="text-[11px] bg-[var(--bg-elevated)] px-1 py-0.5 rounded text-[var(--text-primary)] font-mono">is_staff=True</code>.
             </p>
           </div>
         </motion.div>
@@ -213,21 +222,21 @@ export default function Settings() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.24 }}
-          className="bg-white rounded-lg p-6 shadow-level-2-card h-fit"
+          className="bg-[var(--bg-card)] rounded-lg p-6 shadow-level-2-card h-fit"
         >
           <SectionHeader icon={Zap} title="Feature Flags" />
 
           {loading ? (
             <div className="flex flex-col gap-2">
               {[0, 1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="h-16 bg-gray-100 rounded-lg animate-pulse" />
+                <div key={i} className="h-16 bg-[var(--bg-elevated)] rounded-lg animate-pulse" />
               ))}
             </div>
           ) : flags.length === 0 ? (
             <div className="py-8 text-center">
-              <Zap size={24} className="text-mid-gray mx-auto mb-3" strokeWidth={1.5} />
-              <p className="text-sm font-inter text-mid-gray">No feature flags yet.</p>
-              <p className="text-xs font-inter text-mid-gray mt-1 opacity-60">
+              <Zap size={24} className="text-[var(--text-secondary)] mx-auto mb-3" strokeWidth={1.5} />
+              <p className="text-sm font-inter text-[var(--text-secondary)]">No feature flags yet.</p>
+              <p className="text-xs font-inter text-[var(--text-secondary)] mt-1 opacity-60">
                 Create them at <code className="font-mono">/saas-admin/flags/</code>
               </p>
             </div>
@@ -240,15 +249,15 @@ export default function Settings() {
                   transition={{ duration: 0.12 }}
                   className={`flex items-start justify-between gap-3 p-4 rounded-lg cursor-pointer transition-all border ${
                     flag.enabled
-                      ? 'bg-gray-50 border-border-gray'
-                      : 'bg-white border-border-gray hover:bg-gray-50'
+                      ? 'bg-[var(--bg-elevated)] border-[var(--border)]'
+                      : 'bg-[var(--bg-card)] border-[var(--border)] hover:bg-[var(--bg-elevated)]'
                   }`}
                   onClick={() => toggleFlag(flag.id)}
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-inter font-medium text-charcoal truncate">{flag.label}</p>
-                    <p className="text-xs font-inter text-mid-gray mt-0.5 truncate">{flag.description}</p>
-                    <code className="text-[10px] font-mono text-mid-gray opacity-60 mt-0.5 block truncate">
+                    <p className="text-sm font-inter font-medium text-[var(--text-primary)] truncate">{flag.label}</p>
+                    <p className="text-xs font-inter text-[var(--text-secondary)] mt-0.5 truncate">{flag.description}</p>
+                    <code className="text-[10px] font-mono text-[var(--text-secondary)] opacity-60 mt-0.5 block truncate">
                       {flag.key}
                     </code>
                   </div>

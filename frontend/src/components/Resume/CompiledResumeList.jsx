@@ -26,14 +26,14 @@ export default function CompiledResumeList() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 dark:bg-charcoalDark flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--el-bg)' }}>
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-500 border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-charcoalDark transition-colors duration-300">
+        <div className="min-h-screen transition-colors duration-300" style={{ background: 'var(--el-bg)' }}>
             <div className="max-w-6xl mx-auto p-4 sm:p-8">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -45,7 +45,7 @@ export default function CompiledResumeList() {
                 </div>
 
                 {resumes.length === 0 ? (
-                    <div className="text-center py-16 bg-white dark:bg-[#1a1a1a] rounded-2xl border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] transition-all duration-300">
+                    <div className="text-center py-16 rounded-2xl transition-all duration-300" style={{ background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border)', boxShadow: 'var(--el-shadow-card)' }}>
                         <FaFileAlt className="mx-auto text-5xl text-gray-400 mb-4" />
                         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                             No Resumes Yet
@@ -69,7 +69,8 @@ export default function CompiledResumeList() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.1 }}
                                 onClick={() => navigate(`/resume/compiled/${resume.version_id}`)}
-                                className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border-0 shadow-[0_8px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_12px_20px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_12px_28px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.1)] hover:-translate-y-1 transition-all duration-150 cursor-pointer"
+                                className="p-6 rounded-2xl hover:-translate-y-1 transition-all duration-150 cursor-pointer"
+                                style={{ background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border)', boxShadow: 'var(--el-shadow-card)' }}
                             >
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="flex items-center gap-3">
@@ -114,7 +115,7 @@ export default function CompiledResumeList() {
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-2 pt-4 border-t border-gray-100 dark:border-white/5">
+                                <div className="flex items-center gap-2 pt-4" style={{ borderTop: '1px solid var(--el-border-subtle)' }}>
                                     {resume.was_eligible ? (
                                         <>
                                             <FaCheckCircle className="text-green-500" />

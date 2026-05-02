@@ -14,12 +14,12 @@ function StatCard({ label, value, trend, delay: d = 0 }) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: d, duration: 0.3 }}
-      className="bg-white rounded-lg p-6 shadow-level-2-card"
+      className="bg-[var(--bg-card)] rounded-lg p-6 shadow-level-2-card"
     >
-      <p className="text-xs font-inter text-mid-gray mb-2">{label}</p>
-      <p className="font-cal-sans font-semibold text-2xl text-charcoal tracking-tight">{value}</p>
+      <p className="text-xs font-inter text-[var(--text-secondary)] mb-2">{label}</p>
+      <p className="font-cal-sans font-semibold text-2xl text-[var(--text-primary)] tracking-tight">{value}</p>
       {trend && (
-        <div className="flex items-center gap-1 mt-2 text-xs font-inter text-mid-gray">
+        <div className="flex items-center gap-1 mt-2 text-xs font-inter text-[var(--text-secondary)]">
           <ArrowUpRight size={12} />
           {trend}
         </div>
@@ -39,7 +39,7 @@ function FilterChips({ options, active, onChange }) {
           className={`px-3 py-1.5 rounded-lg text-xs font-inter font-medium transition-all cursor-pointer capitalize ${
             active === o
               ? 'bg-charcoal text-white'
-              : 'bg-white text-mid-gray border border-border-gray hover:border-charcoal hover:text-charcoal'
+              : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-charcoal hover:text-[var(--text-primary)]'
           }`}
         >
           {o || 'All'}
@@ -55,7 +55,7 @@ function SkRow() {
     <tr>
       {[160, 80, 80, 80, 80, 100, 60].map((w, i) => (
         <td key={i} className="px-6 py-4">
-          <div className="h-4 bg-gray-100 rounded animate-pulse" style={{ width: w }} />
+          <div className="h-4 bg-[var(--bg-elevated)] rounded animate-pulse" style={{ width: w }} />
         </td>
       ))}
     </tr>
@@ -120,12 +120,12 @@ export default function Subscriptions() {
         className="mb-8 flex items-end justify-between"
       >
         <div>
-          <h1 className="font-cal-sans font-semibold text-4xl text-charcoal tracking-tight">Subscriptions</h1>
-          <p className="text-sm font-inter text-mid-gray mt-2">{total} total subscriptions</p>
+          <h1 className="font-cal-sans font-semibold text-4xl text-[var(--text-primary)] tracking-tight">Subscriptions</h1>
+          <p className="text-sm font-inter text-[var(--text-secondary)] mt-2">{total} total subscriptions</p>
         </div>
         <button
           onClick={fetchSubs}
-          className="p-2.5 rounded-lg border border-border-gray text-mid-gray hover:text-charcoal hover:border-charcoal transition-colors"
+          className="p-2.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-charcoal transition-colors"
           title="Refresh"
         >
           <RefreshCw size={15} />
@@ -145,15 +145,15 @@ export default function Subscriptions() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-white rounded-lg p-4 shadow-level-2-card mb-4 flex flex-wrap items-center gap-3"
+        className="bg-[var(--bg-card)] rounded-lg p-4 shadow-level-2-card mb-4 flex flex-wrap items-center gap-3"
       >
         <div className="relative flex-1 min-w-[180px]">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-mid-gray" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search by user email…"
-            className="w-full pl-9 pr-3 py-2 rounded-lg text-sm font-inter outline-none border border-border-gray text-charcoal placeholder-mid-gray focus:border-charcoal transition-colors bg-white"
+            className="w-full pl-9 pr-3 py-2 rounded-lg text-sm font-inter outline-none border border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:border-charcoal transition-colors bg-[var(--bg-card)]"
           />
         </div>
         <FilterChips options={STATUSES} active={statusFilter} onChange={setStatusFilter} />
@@ -165,14 +165,14 @@ export default function Subscriptions() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25 }}
-        className="bg-white rounded-lg shadow-level-2-card overflow-hidden"
+        className="bg-[var(--bg-card)] rounded-lg shadow-level-2-card overflow-hidden"
       >
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-border-gray">
+              <tr className="border-b border-[var(--border)]">
                 {['User', 'Plan', 'Status', 'Billing', 'Amount/mo', 'End Date', 'Actions'].map(h => (
-                  <th key={h} className="px-6 py-3.5 text-left text-xs font-inter font-semibold uppercase tracking-wide text-mid-gray">
+                  <th key={h} className="px-6 py-3.5 text-left text-xs font-inter font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
                     {h}
                   </th>
                 ))}
@@ -187,29 +187,29 @@ export default function Subscriptions() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.025 }}
-                      className="row-hover border-b border-border-gray last:border-b-0"
+                      className="row-hover border-b border-[var(--border)] last:border-b-0"
                     >
                       <td className="px-6 py-4">
-                        <p className="text-sm font-inter font-medium text-charcoal">{sub.user_name}</p>
-                        <p className="text-xs font-inter text-mid-gray">{sub.user_email}</p>
+                        <p className="text-sm font-inter font-medium text-[var(--text-primary)]">{sub.user_name}</p>
+                        <p className="text-xs font-inter text-[var(--text-secondary)]">{sub.user_email}</p>
                       </td>
                       <td className="px-6 py-4"><Badge type="plan"   value={sub.plan}   /></td>
                       <td className="px-6 py-4"><Badge type="status" value={sub.status} /></td>
                       <td className="px-6 py-4">
-                        <span className="text-xs font-inter px-2.5 py-1 rounded-lg capitalize bg-gray-50 text-mid-gray border border-border-gray">
+                        <span className="text-xs font-inter px-2.5 py-1 rounded-lg capitalize bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border)]">
                           {sub.billing_cycle}
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-sm font-inter font-semibold text-charcoal">
+                        <span className="text-sm font-inter font-semibold text-[var(--text-primary)]">
                           ₹{Math.round(sub.amount)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm font-inter text-mid-gray">{sub.end_date}</td>
+                      <td className="px-6 py-4 text-sm font-inter text-[var(--text-secondary)]">{sub.end_date}</td>
                       <td className="px-6 py-4">
                         <button
                           onClick={() => setSelected(sub)}
-                          className="text-xs font-inter px-3 py-1.5 rounded-lg border border-border-gray text-mid-gray hover:border-charcoal hover:text-charcoal transition-colors bg-white"
+                          className="text-xs font-inter px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:border-charcoal hover:text-[var(--text-primary)] transition-colors bg-[var(--bg-card)]"
                         >
                           Details
                         </button>
@@ -226,13 +226,13 @@ export default function Subscriptions() {
       <Modal open={!!selected} onClose={() => setSelected(null)} title="Subscription Details" width="max-w-lg">
         {selected && (
           <div className="flex flex-col gap-5">
-            <div className="flex items-center gap-4 pb-4 border-b border-border-gray">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-50 border border-border-gray">
-                <CreditCard size={18} className="text-mid-gray" />
+            <div className="flex items-center gap-4 pb-4 border-b border-[var(--border)]">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--bg-elevated)] border border-[var(--border)]">
+                <CreditCard size={18} className="text-[var(--text-secondary)]" />
               </div>
               <div>
-                <p className="font-inter font-semibold text-charcoal">{selected.user_name}</p>
-                <p className="text-sm font-inter text-mid-gray">{selected.user_email}</p>
+                <p className="font-inter font-semibold text-[var(--text-primary)]">{selected.user_name}</p>
+                <p className="text-sm font-inter text-[var(--text-secondary)]">{selected.user_email}</p>
               </div>
               <div className="ml-auto flex gap-2">
                 <Badge type="plan"   value={selected.plan}   />
@@ -249,26 +249,26 @@ export default function Subscriptions() {
                 ['End Date', selected.end_date],
                 ['MRR',      `₹${Math.round(selected.mrr)}`],
               ].map(([k, v]) => (
-                <div key={k} className="p-3 rounded-lg bg-gray-50 border border-border-gray">
-                  <p className="text-xs font-inter text-mid-gray mb-1">{k}</p>
-                  <p className="text-sm font-inter font-medium text-charcoal capitalize">{v}</p>
+                <div key={k} className="p-3 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border)]">
+                  <p className="text-xs font-inter text-[var(--text-secondary)] mb-1">{k}</p>
+                  <p className="text-sm font-inter font-medium text-[var(--text-primary)] capitalize">{v}</p>
                 </div>
               ))}
             </div>
 
             {selected.payment_history?.length > 0 && (
               <div>
-                <p className="text-xs font-inter font-semibold uppercase tracking-wide text-mid-gray mb-2">
+                <p className="text-xs font-inter font-semibold uppercase tracking-wide text-[var(--text-secondary)] mb-2">
                   Payment History
                 </p>
                 <div className="flex flex-col gap-1.5">
                   {selected.payment_history.map(p => (
-                    <div key={p.id} className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-gray-50 border border-border-gray">
+                    <div key={p.id} className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border)]">
                       <div className="flex items-center gap-2">
-                        <Calendar size={12} className="text-mid-gray" />
-                        <span className="text-xs font-inter text-mid-gray">{p.date}</span>
+                        <Calendar size={12} className="text-[var(--text-secondary)]" />
+                        <span className="text-xs font-inter text-[var(--text-secondary)]">{p.date}</span>
                       </div>
-                      <span className="text-xs font-inter font-semibold text-charcoal">₹{p.amount}</span>
+                      <span className="text-xs font-inter font-semibold text-[var(--text-primary)]">₹{p.amount}</span>
                       <Badge type="status" value={p.status} />
                     </div>
                   ))}
