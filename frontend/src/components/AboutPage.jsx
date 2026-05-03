@@ -103,7 +103,7 @@ export default function AboutPage() {
       {/* Hero / Leadership Spotlight */}
       <section style={{ padding: '96px 0 48px' }}>
         <div className="container">
-          <div className="reveal-fade" style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 64, alignItems: 'center' }}>
+          <div className="reveal-fade grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 lg:gap-[64px] items-center">
             <div>
               <div className="eyebrow" style={{ marginBottom: 16 }}>Leadership Spotlight</div>
               
@@ -131,14 +131,14 @@ export default function AboutPage() {
                 {activeProfile.intro}
               </p>
 
-              <div style={{ display: 'flex', gap: 16, marginBottom: 48 }}>
+              <div style={{ display: 'flex', gap: 16, marginBottom: 48, flexWrap: 'wrap' }}>
                 <button className="btn" onClick={() => navigate('/register')}>Start Free</button>
                 <a href={`mailto:${activeProfile.email}`} className="btn btn-plain" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
                   <Mail size={16} /> Contact {activeProfile.tabLabel}
                 </a>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4" style={{ marginBottom: 32 }}>
                 {founderStats.map((item) => (
                   <div key={item.label} className="card" style={{ padding: 20 }}>
                     <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--fg-deep)', marginBottom: 4 }}>{item.value}</div>
@@ -203,7 +203,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24 }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {principles.map((item, i) => (
               <div key={i} className="card reveal-scale" style={{ padding: 32 }}>
                 <h3 style={{ fontSize: 20, marginBottom: 12 }}>{item.title}</h3>
@@ -223,7 +223,7 @@ export default function AboutPage() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             {journey.map((item, i) => (
-              <div key={i} className="card reveal-scale" style={{ padding: 32, display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+              <div key={i} className="card reveal-scale" style={{ padding: 32, display: 'flex', flexWrap: 'wrap', smFlexWrap: 'nowrap', gap: 24, alignItems: 'flex-start' }}>
                 <div style={{ background: 'var(--surface)', padding: '6px 12px', borderRadius: 6, fontSize: 13, fontWeight: 600, color: 'var(--fg-deep)', flexShrink: 0 }}>
                   {item.period}
                 </div>

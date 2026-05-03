@@ -195,7 +195,7 @@ export default function PricingPublicPage() {
             </div>
           </div>
 
-          <div className="reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, maxWidth: 1020, margin: '0 auto 40px' }}>
+          <div className="reveal grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" style={{ gap: 12, maxWidth: 1020, margin: '0 auto 40px' }}>
             {plans.map((p) => {
               const isPro = p.id === 'pro';
               return (
@@ -256,19 +256,18 @@ export default function PricingPublicPage() {
           </div>
 
           <div className="reveal" style={{ maxWidth: 1020, margin: '0 auto' }}>
-            <div style={{
+            <div className="flex flex-col md:flex-row items-start md:items-center" style={{
               background: 'var(--surface)', border: '1px solid var(--border-subtle)', borderRadius: 14,
-              padding: '18px 24px', display: 'flex', alignItems: 'center', gap: 0,
+              padding: '18px 24px', gap: 16,
             }}>
-              <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--fg-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginRight: 32, flexShrink: 0 }}>
+              <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--fg-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginRight: 0, flexShrink: 0 }}>
                 Session add-ons
               </div>
-              <div style={{ display: 'flex', gap: 0, flex: 1 }}>
+              <div className="flex flex-col md:flex-row gap-4 md:gap-0" style={{ flex: 1, width: '100%' }}>
                 {addons.map((a, i) => (
-                  <div key={i} style={{
+                  <div key={i} className="border-t md:border-t-0 md:border-l border-[var(--border-subtle)] w-full md:w-auto py-2 md:py-0" style={{
                     flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     padding: '0 20px',
-                    borderLeft: '1px solid var(--border-subtle)',
                   }}>
                     <span style={{ fontSize: 13, color: 'var(--fg-muted)' }}>{a.label}</span>
                     <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--fg-deep)', fontFamily: 'var(--font-mono)' }}>

@@ -218,7 +218,7 @@ export const TopNav = ({ inApp = false }) => {
           <Link to="/dashboard" style={{ textDecoration: 'none' }}>
             <Logo />
           </Link>
-          <div className="nav-links" style={{ marginLeft: 24 }}>
+          <div className="nav-links hidden md:flex" style={{ marginLeft: 24 }}>
             {APP_NAV.map(r => {
               const I = r.icon;
               return (
@@ -232,7 +232,7 @@ export const TopNav = ({ inApp = false }) => {
               );
             })}
           </div>
-          <div className="nav-links">
+          <div className="nav-links hidden md:flex">
             <button
               onClick={toggleTheme}
               className="nav-link"
@@ -258,10 +258,9 @@ export const TopNav = ({ inApp = false }) => {
           </div>
         </div>
         <button
-          className="nav-mobile-toggle"
+          className="nav-mobile-toggle flex md:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
           style={{
-            display: 'none',
             background: 'none', border: 'none', cursor: 'pointer',
             color: 'var(--fg-deep)', padding: 8, position: 'absolute', right: 16, top: 12
           }}
@@ -316,7 +315,7 @@ export const TopNav = ({ inApp = false }) => {
         </Link>
 
         {/* Desktop Links Center */}
-        <div className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'center', flex: 1, minWidth: 0 }}>
+        <div className="nav-links hidden md:flex" style={{ alignItems: 'center', gap: 2, justifyContent: 'center', flex: 1, minWidth: 0 }}>
           <NavDropdown
             label="Features"
             items={FEATURES_ITEMS}
@@ -363,7 +362,7 @@ export const TopNav = ({ inApp = false }) => {
         </div>
 
         {/* Right Section */}
-        <div className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
+        <div className="nav-links hidden md:flex" style={{ alignItems: 'center', gap: 2, flexShrink: 0 }}>
           <button
             onClick={toggleTheme}
             style={{
@@ -426,10 +425,9 @@ export const TopNav = ({ inApp = false }) => {
 
         {/* Mobile hamburger */}
         <button
-          className="nav-mobile-toggle"
+          className="nav-mobile-toggle flex md:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
           style={{
-            display: 'none',
             background: 'none', border: 'none', cursor: 'pointer',
             color: 'var(--fg-deep)', padding: 8
           }}

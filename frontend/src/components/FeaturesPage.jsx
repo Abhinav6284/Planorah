@@ -80,7 +80,7 @@ const SmallFeature = ({ icon, title, body }) => (
 
 // ─── Feature demo components ──────────────────────────────
 const SyllabusPreview = () => (
-  <div className="card" style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+  <div className="card grid grid-cols-1 md:grid-cols-2 gap-4" style={{ padding: 20 }}>
     <div style={{
       background: 'var(--light-gray)', borderRadius: 8, padding: 16,
       fontFamily: 'var(--font-mono)', fontSize: 11, lineHeight: 1.6,
@@ -213,13 +213,8 @@ const ChatDemo = () => (
 
 // ─── Feature row ──────────────────────────────────────────
 const FeatureRow = ({ eyebrow, title, body, bullets, demo, reverse }) => (
-  <div style={{
-    display: 'grid',
-    gridTemplateColumns: '1fr 1.2fr',
-    gap: 64, alignItems: 'center',
-    direction: reverse ? 'rtl' : 'ltr'
-  }}>
-    <div className={reverse ? 'reveal-right' : 'reveal-left'} style={{ direction: 'ltr' }}>
+  <div className={`grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-12 lg:gap-[64px] items-center ${reverse ? 'lg:direction-rtl' : ''}`}>
+    <div className={`${reverse ? 'reveal-right' : 'reveal-left'} order-2 ${reverse ? 'lg:order-2' : 'lg:order-1'}`} style={{ direction: 'ltr' }}>
       <div className="eyebrow" style={{ marginBottom: 16 }}>{eyebrow}</div>
       <h3 style={{ fontSize: 32, lineHeight: 1.15, marginBottom: 16 }}>{title}</h3>
       <p style={{ fontSize: 16, marginBottom: 24 }}>{body}</p>
@@ -238,7 +233,7 @@ const FeatureRow = ({ eyebrow, title, body, bullets, demo, reverse }) => (
         ))}
       </div>
     </div>
-    <div className={reverse ? 'reveal-left' : 'reveal-right'} style={{ direction: 'ltr' }}>
+    <div className={`reveal order-1 ${reverse ? 'lg:order-1' : 'lg:order-2'} ${reverse ? 'reveal-left' : 'reveal-right'}`} style={{ direction: 'ltr' }}>
       {demo}
     </div>
   </div>
@@ -338,7 +333,7 @@ export default function FeaturesPage() {
               The details that make a daily-use tool feel like yours.
             </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {smallFeatures.map((sf, i) => (
               <div key={i} className={`reveal reveal-delay-${(i % 4) + 1}`}>
                 <SmallFeature {...sf} />
