@@ -133,11 +133,11 @@ function FloatChip({ top, bottom, left, right, icon, label, tone }) {
   const colorMap = { orange: 'var(--orange-deep)', green: 'var(--tag-green)', default: 'var(--fg-deep)' };
   const delay = tone === 'green' ? '-2s' : tone === 'orange' ? '0s' : '-4s';
   return (
-    <div style={{
+    <div className="hidden md:inline-flex" style={{
       position: 'absolute', top, bottom, left, right,
       background: 'var(--surface)', boxShadow: 'var(--shadow-card)',
       borderRadius: 999, padding: '6px 12px',
-      display: 'inline-flex', alignItems: 'center', gap: 8,
+      alignItems: 'center', gap: 8,
       fontSize: 12, fontWeight: 500, color: 'var(--fg-deep)',
       animation: 'float 6s ease-in-out infinite',
       animationDelay: delay,
@@ -163,7 +163,7 @@ function FloatChip({ top, bottom, left, right, icon, label, tone }) {
 function HeroSection({ navigate }) {
   return (
     <section style={{ padding: '96px 0 64px', position: 'relative', overflow: 'hidden' }}>
-      <div className="container" style={{ display: 'grid', gridTemplateColumns: '1.05fr 1fr', gap: 72, alignItems: 'center', position: 'relative', zIndex: 1 }}>
+      <div className="container grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-[72px] items-center relative z-10">
         <div>
           <div className="reveal-fade" style={{ marginBottom: 22 }}>
             <span className="tag" style={{ boxShadow: 'var(--shadow-ring)' }}>
@@ -257,9 +257,7 @@ function ProblemSection({ navigate }) {
           </p>
         </div>
         
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(4, 1fr)', 
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4" style={{ 
           borderTop: '1px solid rgba(128,128,128,0.15)',
           borderBottom: '1px solid rgba(128,128,128,0.15)'
         }}>
@@ -267,11 +265,11 @@ function ProblemSection({ navigate }) {
             <motion.div 
               key={i} 
               onClick={() => navigate('/register?problem=' + i)}
-              className={`reveal reveal-delay-${i + 1}`} 
+              className={`reveal reveal-delay-${i + 1} border-b md:border-b-0 md:border-r last:border-0 lg:border-r lg:last:border-r-0`}
               whileHover={{ backgroundColor: 'rgba(128,128,128,0.04)' }}
               style={{
                 padding: '28px 24px 24px',
-                borderRight: i < 3 ? '1px solid rgba(128,128,128,0.15)' : 'none',
+                borderColor: 'rgba(128,128,128,0.15)',
                 cursor: 'pointer',
                 display: 'flex', flexDirection: 'column',
                 minHeight: '270px',
@@ -344,7 +342,7 @@ function SolutionSection({ navigate }) {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '12px 20px',
         borderBottom: '1px solid var(--border-subtle)',
-        background: 'var(--bg-subtle)'
+        background: 'var(--bg-subtle)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 10, height: 10, borderRadius: '50%', background: 'rgba(255,90,90,0.6)' }} />
@@ -354,14 +352,14 @@ function SolutionSection({ navigate }) {
         <div style={{ fontSize: 12, color: 'var(--fg-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.04em' }}>
           planorah.me/dashboard
         </div>
-        <div style={{ width: 60 }} />
+        <div style={{ width: 60 }} className="hidden sm:block" />
       </div>
 
       {/* Main layout */}
-      <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr 180px', minHeight: 340 }}>
+      <div className="flex flex-col lg:grid lg:grid-cols-[220px_1fr_180px]" style={{ minHeight: 340 }}>
 
         {/* Sidebar */}
-        <div style={{ borderRight: '1px solid var(--border-subtle)', padding: '20px 0' }}>
+        <div className="border-b lg:border-b-0 lg:border-r border-[var(--border-subtle)]" style={{ padding: '20px 0' }}>
           <div style={{ padding: '0 16px', marginBottom: 20 }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--fg-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>Roadmap</div>
             {[
@@ -521,7 +519,7 @@ function SolutionSection({ navigate }) {
         </div>
 
         {/* 3 callouts */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 48 }}>
+        <div className="grid grid-cols-1 md:grid-cols-3" style={{ gap: 16, marginBottom: 48 }}>
           {callouts.map((c, i) => (
             <div key={i} className={`reveal reveal-delay-${i + 1}`} style={{
               padding: '24px 20px',
@@ -683,8 +681,8 @@ function ThreeLayersSection({ navigate }) {
   const RoadmapPanel = () => (
     <div style={{ background: 'var(--surface)', borderRadius: 16, border: '1px solid var(--border-subtle)', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.12)' }}>
       <ChromeBar url="planorah.me / roadmap" />
-      <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr', minHeight: 300 }}>
-        <div style={{ borderRight: '1px solid var(--border-subtle)', padding: '14px 0', background: 'var(--bg-subtle)' }}>
+      <div className="flex flex-col md:grid md:grid-cols-[150px_1fr]" style={{ minHeight: 300 }}>
+        <div className="border-b md:border-b-0 md:border-r border-[var(--border-subtle)]" style={{ padding: '14px 0', background: 'var(--bg-subtle)' }}>
           <div style={{ padding: '0 12px', marginBottom: 10, fontSize: 10, fontWeight: 600, color: 'var(--fg-muted)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Courses</div>
           {[{ code: 'CS 331', c: 'var(--tag-blue)', bg: 'var(--tag-blue-bg)', on: true }, { code: 'PH 220', c: 'var(--tag-violet)', bg: 'var(--tag-violet-bg)' }, { code: 'EC 101', c: 'var(--tag-teal)', bg: 'var(--tag-teal-bg)' }].map((x, i) => (
             <div key={i} style={{ padding: '7px 12px', background: x.on ? x.bg : 'transparent', borderLeft: x.on ? `2px solid ${x.c}` : '2px solid transparent' }}>
@@ -736,7 +734,7 @@ function ThreeLayersSection({ navigate }) {
   const ExecutionPanel = () => (
     <div style={{ background: 'var(--surface)', borderRadius: 16, border: '1px solid var(--border-subtle)', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.12)' }}>
       <ChromeBar url="planorah.me / today" />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 130px', minHeight: 300 }}>
+      <div className="flex flex-col md:grid md:grid-cols-[1fr_130px]" style={{ minHeight: 300 }}>
         <div style={{ padding: '14px 0' }}>
           <div style={{ padding: '0 16px 12px', borderBottom: '1px solid var(--border-subtle)' }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--fg-deep)' }}>Today — Wednesday</div>
@@ -759,7 +757,7 @@ function ThreeLayersSection({ navigate }) {
             </div>
           ))}
         </div>
-        <div style={{ borderLeft: '1px solid var(--border-subtle)', padding: '14px 10px', background: 'var(--bg-subtle)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div className="border-t md:border-t-0 md:border-l border-[var(--border-subtle)]" style={{ padding: '14px 10px', background: 'var(--bg-subtle)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ fontSize: 9, color: 'var(--fg-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 12 }}>Focus</div>
           <div style={{ position: 'relative', width: 72, height: 72, marginBottom: 8 }}>
             <svg width={72} height={72} viewBox="0 0 72 72">
@@ -861,7 +859,7 @@ function ThreeLayersSection({ navigate }) {
         </div>
 
         {/* Content */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.55fr', gap: 72, alignItems: 'center' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.55fr] gap-12 lg:gap-[72px] items-center">
           {/* Left */}
           <div>
             <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--fg-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 16 }}>{cur.tag}</div>
@@ -935,7 +933,7 @@ function SocialProof() {
         </div>
 
         {/* Two-column: learnings list | quote stack */}
-        <div className="reveal" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'start' }}>
+        <div className="reveal grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-[48px] items-start">
 
           {/* Left — interview learnings, vertical list with accent line */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
@@ -1049,7 +1047,7 @@ function StackComparison() {
         </div>
 
         {/* Two-column comparison */}
-        <div className="reveal" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, maxWidth: 960, margin: '0 auto' }}>
+        <div className="reveal grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[960px] mx-auto">
 
           {/* Left — The Usual Stack */}
           <div style={{
@@ -1143,7 +1141,7 @@ function OnboardingPreview() {
   ];
   return (
     <section className="section">
-      <div className="container" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'flex-start' }}>
+      <div className="container grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-[64px] items-start">
 
         {/* Left — sharper copy, pinned to top */}
         <div className="reveal-left" style={{ paddingTop: 12 }}>
@@ -1310,7 +1308,7 @@ function FinalCTA({ navigate }) {
 
         <div style={{ position: 'relative' }}>
           <div className="eyebrow" style={{ marginBottom: 24 }}>Start today</div>
-          <h2 style={{ fontSize: 48, color: 'var(--fg-deep)', letterSpacing: '-0.025em', lineHeight: 1.1, marginBottom: 20, maxWidth: 560, margin: '0 auto 20px' }}>
+          <h2 className="text-[32px] md:text-[48px]" style={{ color: 'var(--fg-deep)', letterSpacing: '-0.025em', lineHeight: 1.1, marginBottom: 20, maxWidth: 560, margin: '0 auto 20px' }}>
             You don't need another planner.<br />You need a system that keeps moving.
           </h2>
           <p style={{ fontSize: 16, color: 'var(--fg-muted)', maxWidth: 400, margin: '0 auto 36px', lineHeight: 1.65 }}>
