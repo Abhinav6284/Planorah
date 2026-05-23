@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { BrainCircuit, Flame, Sparkles, CheckCircle2, Clock, Zap, HelpCircle } from 'lucide-react';
+import { BrainCircuit, Flame, Sparkles, CheckCircle2, Clock, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTour } from '../Tour/TourContext';
 
@@ -23,11 +23,13 @@ import { planoraService } from '../../api/planoraService';
 import { useMissionFlow } from '../../hooks/useMissionFlow';
 import api from '../../api/axios';
 
-const shellCardClass = 'rounded-2xl p-6 transition-all duration-300';
+const shellCardClass = 'rounded-[24px] p-6 transition-all duration-300 relative overflow-hidden';
 const shellCardStyle = {
-    background: 'var(--el-bg)',
-    border: '1px solid var(--el-border)',
-    boxShadow: 'var(--el-shadow-card)',
+    background: 'var(--el-glass-panel)',
+    backdropFilter: 'blur(24px)',
+    WebkitBackdropFilter: 'blur(24px)',
+    border: 'var(--el-glass-border)',
+    boxShadow: 'var(--el-glass-shadow)',
 };
 
 const getTimeBasedGreeting = () => {
@@ -182,8 +184,11 @@ const ExecutionDashboard = () => {
             setTodayTask(focusTask);
         }
 
-        setExecutionState('IN_PROGRESS');
-        await handleStartFocus(focusTask);
+        const started = await handleStartFocus(focusTask);
+        if (started) {
+            setExecutionState('IN_PROGRESS');
+        }
+        return started;
     }, [todayTask, setTodayTask, setExecutionState, handleStartFocus]);
 
     const onComplete = useCallback(async (minutes) => {
@@ -310,14 +315,13 @@ const ExecutionDashboard = () => {
     useEffect(() => {
         const todayKey = buildDateKey(new Date());
 
-        if (!scheduledTaskData.orderedDates.length) {
-            if (selectedDateKey !== todayKey) {
-                setSelectedDateKey(todayKey);
-            }
+        // Preserve explicit user selection even if that day has no tasks.
+        if (selectedDateKey) {
             return;
         }
 
-        if (selectedDateKey && scheduledTaskData.map.has(selectedDateKey)) {
+        if (!scheduledTaskData.orderedDates.length) {
+            setSelectedDateKey(todayKey);
             return;
         }
 
@@ -325,9 +329,7 @@ const ExecutionDashboard = () => {
             ? todayKey
             : (scheduledTaskData.orderedDates.find((dateKey) => dateKey >= todayKey) || scheduledTaskData.orderedDates[0]);
 
-        if (nextDateKey !== selectedDateKey) {
-            setSelectedDateKey(nextDateKey);
-        }
+        setSelectedDateKey(nextDateKey);
     }, [scheduledTaskData.orderedDates, scheduledTaskData.map, selectedDateKey]);
 
     const selectedTasks = useMemo(() => {
@@ -404,13 +406,16 @@ const ExecutionDashboard = () => {
     }, [subjects]);
 
     return (
-        <div className={`min-h-screen transition-colors duration-300`} style={{ background: currentState === 'IN_PROGRESS' ? '#000' : 'var(--el-bg)', color: 'var(--el-text)', fontFamily: "'Inter', sans-serif" }}>
+        <div className={`min-h-screen cinematic-grid relative transition-colors duration-300`} style={{ background: currentState === 'IN_PROGRESS' ? '#000' : 'var(--el-bg)', color: 'var(--el-text)', fontFamily: "'Inter', sans-serif" }}>
+            <div className="cinematic-glow" style={{ top: '5%', left: '15%', filter: 'blur(80px)', width: '60vw', height: '60vh' }} />
+            <div className="cinematic-glow" style={{ top: '40%', right: '0%', left: 'auto', width: '50vw', height: '50vh', filter: 'blur(100px)', opacity: 0.6, background: 'radial-gradient(circle, rgba(243, 107, 34, 0.04) 0%, transparent 70%)' }} />
 
             {/* Focus Mode Overlay */}
             <AnimatePresence>
                 {currentState === 'IN_PROGRESS' && (
                     <div
-                        className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 p-6 backdrop-blur-sm"
+                        className="fixed inset-0 z-50 flex flex-col items-center justify-center p-6"
+                        style={{ background: 'rgba(250, 250, 250, 0.96)' }}
                     >
                         <FocusMode
                             open={true}
@@ -423,51 +428,49 @@ const ExecutionDashboard = () => {
                 )}
             </AnimatePresence>
 
-            <div className={`mx-auto px-4 py-6 transition-all duration-500 lg:px-8 lg:py-8 ${currentState === 'IN_PROGRESS' ? 'opacity-20 blur-sm pointer-events-none' : 'opacity-100'}`} style={{ maxWidth: 1200 }}>
+            <div className={`relative z-10 mx-auto px-4 py-8 transition-all duration-500 lg:px-8 lg:py-10 ${currentState === 'IN_PROGRESS' ? 'opacity-20 blur-sm pointer-events-none' : 'opacity-100'}`} style={{ maxWidth: 1400 }}>
 
                 {/* HEADER */}
-                <div className="mb-8">
-                    <div className="flex items-start justify-between mb-4">
-                        <div>
-                            <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--el-text-muted)', marginBottom: 6 }}>My Workspace</p>
-                            <h1 style={{ fontSize: 32, fontWeight: 300, color: 'var(--el-text)', letterSpacing: '-0.04em', lineHeight: 1.1, fontFamily: "'Inter', sans-serif" }}>
-                                {getTimeBasedGreeting()}, {profile?.user?.first_name || profile?.profile?.first_name || 'there'}
-                            </h1>
+                <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+                    <h1 style={{ fontSize: 24, fontWeight: 500, color: 'var(--el-text)', letterSpacing: '-0.02em', fontFamily: "'Inter', sans-serif" }}>
+                        {getTimeBasedGreeting()}, <span style={{ fontWeight: 700 }}>{profile?.user?.first_name || profile?.profile?.first_name || 'there'}</span>
+                    </h1>
+                    
+                    <div className="flex flex-wrap items-center gap-3">
+                        {/* Stats Pills */}
+                        <div data-tour="header-stats" className="flex flex-wrap items-center gap-2">
+                            {[
+                                { icon: CheckCircle2, text: `${mergedStats.tasks_completed} done` },
+                                { icon: Clock, text: `${Math.round((mergedStats.focus_minutes || 0) / 60)}h tracked` },
+                            ].map(({ icon: Icon, text }) => (
+                                <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 12px', borderRadius: 8, border: 'var(--el-glass-border)', background: 'var(--el-glass-panel)', fontSize: 11, fontWeight: 600, color: 'var(--el-text-secondary)' }}>
+                                    <Icon style={{ width: 12, height: 12, color: 'var(--orange)' }} />
+                                    <span>{text}</span>
+                                </div>
+                            ))}
+                            {streak > 0 && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 12px', borderRadius: 8, background: 'rgba(243, 107, 34, 0.08)', border: '1px solid rgba(243, 107, 34, 0.15)', fontSize: 11, fontWeight: 700, color: 'var(--orange)' }}>
+                                    <Flame style={{ width: 12, height: 12 }} />
+                                    <span>{streak}d streak</span>
+                                </div>
+                            )}
                         </div>
-                        {/* Tour trigger button */}
+                        
+                        {/* Tour button */}
                         <button
                             onClick={startTour}
                             title="Take a guided tour"
-                            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 14px', borderRadius: 9999, border: '1px solid var(--el-border)', background: 'var(--el-bg)', fontSize: 13, fontWeight: 500, color: 'var(--el-text-secondary)', cursor: 'pointer', boxShadow: 'var(--el-shadow-inset)', transition: 'all 0.15s' }}
+                            className="hover:scale-105 active:scale-95 transition-transform"
+                            style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 12px', borderRadius: 8, border: 'var(--el-glass-border)', background: 'var(--el-glass-panel)', fontSize: 11, fontWeight: 600, color: 'var(--el-text-muted)', cursor: 'pointer' }}
                         >
-                            <HelpCircle style={{ width: 14, height: 14 }} />
-                            <span className="hidden sm:inline">Take tour</span>
+                            <HelpCircle style={{ width: 12, height: 12 }} />
+                            <span className="hidden sm:inline">Tour</span>
                         </button>
-                    </div>
-
-                    {/* Inline Stats Pills */}
-                    <div data-tour="header-stats" className="flex flex-wrap items-center gap-2">
-                        {[
-                            { icon: CheckCircle2, text: `${mergedStats.tasks_completed} done` },
-                            { icon: Clock, text: `${Math.round((mergedStats.focus_minutes || 0) / 60)}h tracked` },
-                            { icon: Zap, text: `${Math.min(100, Math.round(((mergedStats.tasks_completed || 0) / Math.max(activeTasks?.length || 1, 1)) * 100))}% efficiency` },
-                        ].map(({ icon: Icon, text }) => (
-                            <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 14px', borderRadius: 9999, border: '1px solid var(--el-border)', background: 'var(--el-bg)', fontSize: 13, fontWeight: 500, color: 'var(--el-text-secondary)', boxShadow: 'var(--el-shadow-inset)' }}>
-                                <Icon style={{ width: 14, height: 14, color: 'var(--el-text)' }} />
-                                <span>{text}</span>
-                            </div>
-                        ))}
-                        {streak > 0 && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 14px', borderRadius: 9999, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border)', fontSize: 13, fontWeight: 600, color: 'var(--el-text)', boxShadow: 'var(--el-shadow-inset)' }}>
-                                <Flame style={{ width: 14, height: 14 }} />
-                                <span>{streak}d streak</span>
-                            </div>
-                        )}
                     </div>
                 </div>
 
-                {/* HERO: TODAY'S MISSION */}
-                <div data-tour="today-mission" className="mb-8">
+                {/* HERO: HOLOGRAPHIC CORE */}
+                <div data-tour="today-mission" className="mb-12 relative">
                     <TodayExecution
                         user={profile}
                         todayTask={todayTask}
@@ -479,29 +482,12 @@ const ExecutionDashboard = () => {
                     />
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-
-                    {/* LEFT COLUMN: Main Activities */}
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 relative z-10">
+                    
+                    {/* LEFT COLUMN: Main Operational Bento (col-span-8) */}
                     <div className="space-y-6 lg:col-span-8">
-                        {/* Mode Switcher — compact */}
-                        <div data-tour="mode-switch" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '10px 16px', borderRadius: 16, background: 'var(--el-bg)', border: '1px solid var(--el-border)', boxShadow: 'var(--el-shadow-card)' }}>
-                            <div className="flex items-center gap-3">
-                                <ModeSwitch mode={mode} onChange={setMode} />
-                                <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--el-text-secondary)' }} className="hidden sm:inline">
-                                    {mode === 'learning' ? 'Learning' : 'Exam'} Mode
-                                </span>
-                            </div>
-                            <button
-                                data-tour="ai-coach-btn"
-                                onClick={openVoicePanel}
-                                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 16px', borderRadius: 9999, background: 'var(--el-text)', color: 'var(--el-bg)', fontWeight: 500, fontSize: 13, border: 'none', cursor: 'pointer', transition: 'opacity 0.15s', fontFamily: "'Inter', sans-serif" }}
-                            >
-                                <Sparkles style={{ width: 14, height: 14 }} />
-                                <span className="hidden sm:inline">AI Coach</span>
-                            </button>
-                        </div>
-
-                        {/* Schedule Section */}
+                        
+                        {/* SCHEDULE — Primary Widget */}
                         <div data-tour="schedule" className={shellCardClass} style={shellCardStyle}>
                             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 8, borderBottom: '1px solid var(--el-border-subtle)' }}>
                                 <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--el-text)' }}>Schedule</h3>
@@ -567,7 +553,7 @@ const ExecutionDashboard = () => {
                                                     background: 'var(--el-bg)', borderRadius: 10,
                                                     border: '1px solid var(--el-border)',
                                                     borderLeft: `3px solid ${card.status === 'completed' ? '#10b981' : card.status === 'in_progress' ? 'var(--el-text)' : 'var(--el-border)'}`,
-                                                    transition: 'background 0.15s',
+                                                    transition: 'background 0.15s, border-color 0.15s',
                                                 }}
                                             >
                                                 <div style={{ minWidth: 0, flex: 1 }}>
@@ -578,19 +564,71 @@ const ExecutionDashboard = () => {
                                                         {card.estimatedMinutes} min
                                                     </p>
                                                 </div>
-                                                <span style={{
-                                                    fontSize: 11, padding: '2px 8px', borderRadius: 6, fontWeight: 600, whiteSpace: 'nowrap',
-                                                    background: card.status === 'completed' ? '#ecfdf5' : 'var(--el-bg-secondary)',
-                                                    color: card.status === 'completed' ? '#059669' : card.status === 'in_progress' ? 'var(--el-text)' : 'var(--el-text-muted)',
-                                                }}>
-                                                    {getTaskStatusLabel(card.status)}
-                                                </span>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                    {card.status !== 'completed' && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={(event) => {
+                                                                event.stopPropagation();
+                                                                onStartFocus(card);
+                                                            }}
+                                                            style={{
+                                                                fontSize: 11,
+                                                                padding: '5px 10px',
+                                                                borderRadius: 8,
+                                                                fontWeight: 700,
+                                                                border: '1px solid var(--el-text)',
+                                                                background: 'var(--el-text)',
+                                                                color: 'var(--el-bg)',
+                                                                cursor: 'pointer',
+                                                                whiteSpace: 'nowrap',
+                                                            }}
+                                                        >
+                                                            Start
+                                                        </button>
+                                                    )}
+                                                    <span style={{
+                                                        fontSize: 11, padding: '2px 8px', borderRadius: 6, fontWeight: 600, whiteSpace: 'nowrap',
+                                                        background: card.status === 'completed' ? '#ecfdf5' : 'var(--el-bg-secondary)',
+                                                        color: card.status === 'completed' ? '#059669' : card.status === 'in_progress' ? 'var(--el-text)' : 'var(--el-text-muted)',
+                                                    }}>
+                                                        {getTaskStatusLabel(card.status)}
+                                                    </span>
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
                                 )}
                             </div>
                         </div>
+
+                        {/* ROW: Mode & Progress */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Mode Switcher */}
+                            <div data-tour="mode-switch" className={shellCardClass} style={{ ...shellCardStyle, padding: 16, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                                <div className="flex flex-col gap-4">
+                                    <ModeSwitch mode={mode} onChange={setMode} />
+                                </div>
+                                <button
+                                    data-tour="ai-coach-btn"
+                                    onClick={openVoicePanel}
+                                    style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '10px 0', borderRadius: 12, background: 'var(--orange-soft)', color: 'var(--orange-deep)', fontWeight: 700, fontSize: 13, border: '1px solid rgba(243,107,34,0.3)', cursor: 'pointer', transition: 'all 0.2s', fontFamily: "'Inter', sans-serif", marginTop: 16 }}
+                                    className="hover:scale-[1.02]"
+                                >
+                                    <Sparkles style={{ width: 14, height: 14 }} />
+                                    <span>Engage AI Coach</span>
+                                </button>
+                            </div>
+                            
+                            {/* PROGRESS PANEL */}
+                            <div data-tour="progress-panel" style={{ height: '100%' }}>
+                                <ProgressPanel tasks={activeTasks} stats={mergedStats} activityHeatmap={userStats?.activity_heatmap} />
+                            </div>
+                        </div>
+
+                        {/* Performance Chart */}
+                        <PerformanceChart tasks={activeTasks} chartData={chartData} />
+
 
                         {/* Mode-specific Linked Section */}
                         {mode === 'learning' ? (
@@ -650,32 +688,10 @@ const ExecutionDashboard = () => {
                                 )}
                             </div>
                         )}
-
-                        {/* Performance Chart — below the fold */}
-                        <PerformanceChart tasks={activeTasks} chartData={chartData} />
                     </div>
 
-                    {/* RIGHT COLUMN: Feed, Progress & AI */}
+                    {/* RIGHT COLUMN: Context & Social (col-span-4) */}
                     <aside className="space-y-6 lg:col-span-4">
-                        {/* 4. EXECUTION FEED */}
-                        <div data-tour="execution-feed">
-                            <ExecutionFeed
-                                tasks={activeTasks}
-                                focusOpen={currentState === 'IN_PROGRESS'}
-                                todayTask={todayTask}
-                                streak={streak}
-                                recentActivity={userStats?.recent_activity}
-                            />
-                        </div>
-
-                        {/* 5. PROGRESS PANEL */}
-                        <div data-tour="progress-panel">
-                            <ProgressPanel tasks={activeTasks} stats={mergedStats} activityHeatmap={userStats?.activity_heatmap} />
-                        </div>
-
-                        {/* Sessions Section */}
-                        <SessionsSection />
-
                         {/* AI Insight Card */}
                         <div data-tour="ai-insight" className={shellCardClass} style={{ ...shellCardStyle, padding: 20 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--el-text)', marginBottom: 10 }}>
@@ -692,6 +708,20 @@ const ExecutionDashboard = () => {
                                 Get Strategy
                             </button>
                         </div>
+
+                        {/* EXECUTION FEED */}
+                        <div data-tour="execution-feed">
+                            <ExecutionFeed
+                                tasks={activeTasks}
+                                focusOpen={currentState === 'IN_PROGRESS'}
+                                todayTask={todayTask}
+                                streak={streak}
+                                recentActivity={userStats?.recent_activity}
+                            />
+                        </div>
+
+                        {/* Sessions Section */}
+                        <SessionsSection />
                     </aside>
                 </div>
             </div>

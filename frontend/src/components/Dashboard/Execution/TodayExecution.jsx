@@ -68,13 +68,18 @@ const TodayExecution = React.memo(({
     return (
         <section 
             style={{ 
-                background: 'var(--el-bg)', 
-                border: '1px solid var(--el-border)', 
-                borderRadius: 12, 
-                padding: 24, 
-                boxShadow: 'var(--el-shadow-card)',
-                transition: 'all 0.3s ease'
+                background: 'var(--el-core-panel)', 
+                backdropFilter: 'blur(40px)',
+                WebkitBackdropFilter: 'blur(40px)',
+                border: 'var(--el-glass-border)', 
+                borderRadius: 32, 
+                padding: '48px 40px', 
+                boxShadow: 'var(--el-glass-shadow), inset 0 0 120px rgba(243, 107, 34, 0.05)',
+                transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+                position: 'relative',
+                overflow: 'hidden'
             }}
+            className="hover:shadow-[0_40px_100px_rgba(243,107,34,0.15)] group"
         >
             {/* New user empty state */}
             {isNewUser ? (
@@ -157,14 +162,16 @@ const TodayExecution = React.memo(({
                                 onClick={() => onStartFocus(todayTask)}
                                 disabled={!todayTask || loading}
                                 style={{
-                                    display: 'flex', alignItems: 'center', gap: 8, padding: '10px 28px', 
-                                    background: 'var(--el-text)', color: 'var(--el-bg)', fontSize: 13, fontWeight: 700, 
+                                    display: 'flex', alignItems: 'center', gap: 10, padding: '14px 32px', 
+                                    background: 'linear-gradient(135deg, var(--orange) 0%, var(--orange-deep) 100%)', color: '#ffffff', fontSize: 14, fontWeight: 700, 
                                     borderRadius: 9999, border: 'none', cursor: 'pointer', opacity: loading ? 0.6 : 1,
-                                    boxShadow: 'var(--el-shadow-button)'
+                                    boxShadow: '0 8px 30px rgba(243, 107, 34, 0.4), inset 0 2px 0 rgba(255,255,255,0.2)',
+                                    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
                                 }}
+                                className="hover:scale-[1.03] active:scale-95"
                             >
-                                <Play style={{ width: 15, height: 15, fill: 'currentColor' }} />
-                                Start Session
+                                <Play style={{ width: 18, height: 18, fill: 'currentColor' }} />
+                                INITIATE FOCUS
                             </button>
                             <button
                                 onClick={onChangeTask}
@@ -183,28 +190,28 @@ const TodayExecution = React.memo(({
                     </div>
 
                     {/* Right: Circular Progress Ring */}
-                    <div style={{ display: 'flex', flexDirection: 'column', items: 'center', gap: 16, textAlign: 'center' }}>
-                        <div style={{ position: 'relative', width: 120, height: 120 }}>
-                            <svg style={{ width: 120, height: 120, transform: 'rotate(-90deg)' }} viewBox="0 0 120 120">
+                    <div style={{ display: 'flex', flexDirection: 'column', items: 'center', gap: 20, textAlign: 'center' }}>
+                        <div style={{ position: 'relative', width: 160, height: 160 }}>
+                            <svg style={{ width: 160, height: 160, transform: 'rotate(-90deg)' }} viewBox="0 0 160 160">
                                 <circle
-                                    cx="60" cy="60" r="54"
-                                    stroke="var(--el-bg-secondary)" strokeWidth="8" fill="none"
+                                    cx="80" cy="80" r="74"
+                                    stroke="var(--el-border)" strokeWidth="6" fill="none"
                                 />
                                 <circle
-                                    cx="60" cy="60" r="54"
-                                    stroke="var(--el-text)" strokeWidth="8" fill="none"
+                                    cx="80" cy="80" r="74"
+                                    stroke="var(--orange)" strokeWidth="6" fill="none"
                                     strokeLinecap="round"
-                                    strokeDasharray={`${(2 * Math.PI * 54).toFixed(2)}`}
-                                    strokeDashoffset={`${(2 * Math.PI * 54 * (1 - pct / 100)).toFixed(2)}`}
-                                    style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
+                                    strokeDasharray={`${(2 * Math.PI * 74).toFixed(2)}`}
+                                    strokeDashoffset={`${(2 * Math.PI * 74 * (1 - pct / 100)).toFixed(2)}`}
+                                    style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1)', filter: 'drop-shadow(0 0 12px rgba(243,107,34,0.6))' }}
                                 />
                             </svg>
                             <div style={{ 
                                 position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', 
                                 alignItems: 'center', justifyContent: 'center' 
                             }}>
-                                <span style={{ fontSize: 28, fontWeight: 300, color: 'var(--el-text)', letterSpacing: '-0.04em' }}>{pct}%</span>
-                                <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--el-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Done</span>
+                                <span style={{ fontSize: 36, fontWeight: 300, color: 'var(--el-text)', letterSpacing: '-0.04em' }}>{pct}%</span>
+                                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--orange)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Efficiency</span>
                             </div>
                         </div>
                         {todayTask.estimated_time && (

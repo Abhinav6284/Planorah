@@ -6,6 +6,7 @@ import { executionService } from '../../../api/executionService';
 const TaskDetailModal = ({ task, isOpen, onClose, onStartFocus }) => {
     const [guidance, setGuidance] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [starting, setStarting] = useState(false);
 
     const fetchGuidance = useCallback(async () => {
         if (!task?.id) return;
@@ -45,9 +46,20 @@ const TaskDetailModal = ({ task, isOpen, onClose, onStartFocus }) => {
         }
     }, [isOpen, task?.id, fetchGuidance]);
 
-    const handleStartFocusFromModal = () => {
-        onStartFocus(task);
-        onClose();
+    const handleStartFocusFromModal = async () => {
+        if (starting) {
+            return;
+        }
+
+        setStarting(true);
+        try {
+            const started = await onStartFocus(task);
+            if (started) {
+                onClose();
+            }
+        } finally {
+            setStarting(false);
+        }
     };
 
     if (!isOpen) return null;
@@ -123,6 +135,9 @@ const TaskDetailModal = ({ task, isOpen, onClose, onStartFocus }) => {
                                                 Objective
                                             </h3>
                                         </div>
+                                        <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                                            {guidance.objective || task?.description || task?.title}
+                                        </p>
                                     </div>
 
                                     {/* Time Breakdown */}
@@ -225,14 +240,16 @@ const TaskDetailModal = ({ task, isOpen, onClose, onStartFocus }) => {
                             </button>
                             <button
                                 onClick={handleStartFocusFromModal}
+                                disabled={starting}
                                 style={{ 
                                     display: 'flex', alignItems: 'center', gap: 8, padding: '10px 24px', 
                                     borderRadius: 10, background: 'var(--el-text)', color: 'var(--el-bg)',
-                                    fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer'
+                                    fontSize: 13, fontWeight: 700, border: 'none', cursor: starting ? 'not-allowed' : 'pointer',
+                                    opacity: starting ? 0.7 : 1
                                 }}
                             >
                                 <Play style={{ width: 14, height: 14, fill: 'currentColor' }} />
-                                Start Session
+                                {starting ? 'Starting...' : 'Start Session'}
                             </button>
                         </div>
                     </motion.div>

@@ -73,12 +73,14 @@ const ExecutionFeed = React.memo(({ tasks, focusOpen, todayTask, streak, recentA
     }, [focusOpen, todayTask, streak, recentCompletions]);
 
     return (
-        <div style={{ 
-            background: 'var(--el-bg)', 
-            border: '1px solid var(--el-border)', 
-            borderRadius: 12, 
-            padding: 24, 
-            boxShadow: 'var(--el-shadow-card)',
+        <div style={{
+            background: 'var(--el-glass-panel)',
+            border: 'var(--el-glass-border)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            borderRadius: 24,
+            padding: 24,
+            boxShadow: 'var(--el-glass-shadow)',
             height: '100%'
         }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
@@ -88,11 +90,11 @@ const ExecutionFeed = React.memo(({ tasks, focusOpen, todayTask, streak, recentA
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {feed.map((item) => (
-                    <div key={item.id} style={{ 
+                    <div key={item.id} style={{
                         display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0',
                         borderBottom: '1px solid var(--el-border-subtle)'
                     }}>
-                        <div style={{ 
+                        <div style={{
                             width: 32, height: 32, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
                             background: item.type === 'active' ? 'var(--el-text)' : 'var(--el-bg-secondary)',
                             color: item.type === 'active' ? 'var(--el-bg)' : 'var(--el-text-secondary)'

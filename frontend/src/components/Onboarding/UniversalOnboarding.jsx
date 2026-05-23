@@ -1,127 +1,127 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, User, Phone, Calendar, Target, TrendingUp, Sparkles, ChevronLeft } from 'lucide-react';
+import { ArrowRight, User, Phone, Calendar, Target, TrendingUp, Sparkles, ChevronLeft, Users } from 'lucide-react';
 import api from "../../api/axios";
+import { useTheme } from "../../context/ThemeContext";
+
 const DISABLE_ONBOARDING_SUBMIT = false;
 
 // ─── Option Card ────────────────────────────────────────────────────────────────
 // ─── Premium Design System Tokens ───────────────────────────────────────────
-// ─── Premium Design System Tokens ───────────────────────────────────────────
 const PREMIUM_THEME = {
-    bg: '#0d0d0d',
-    bgGradient: 'radial-gradient(circle at 80% 20%, #1a1a1a 0%, #0d0d0d 100%)',
-    cardBg: '#141414',
-    cardSelected: 'rgba(255,255,255,0.03)',
-    border: 'rgba(255,255,255,0.06)',
-    borderHover: 'rgba(255,255,255,0.15)',
-    borderActive: 'rgba(255,255,255,0.4)',
-    textMuted: 'rgba(255,255,255,0.25)',
-    textSupport: 'rgba(255,255,255,0.45)',
-    radius: 24,
+    bg: 'var(--n-surface)',
+    bgSecondary: 'var(--n-surface-low)',
+    cardBg: 'var(--n-surface-highest)',
+    cardSelected: 'var(--n-surface-highest)',
+    border: 'var(--n-ghost-border)',
+    borderHover: 'var(--n-outline-variant)',
+    borderActive: 'var(--n-primary)',
+    text: 'var(--n-text)',
+    textSecondary: 'var(--n-text-secondary)',
+    textMuted: 'var(--n-text-muted)',
+    radius: 16,
     spacing: {
-        cinematicPadding: 80,
-        clusterGap: 24
-    }
+        cinematicPadding: 60,
+        clusterGap: 20
+    },
+    fontDisplay: 'var(--font-newsreader)',
+    fontBody: 'var(--font-manrope)',
+    fontLabel: 'var(--font-space-grotesk)',
 };
 
 // ─── Option Tile (Premium Identity Card) ────────────────────────────────────
 function OptionCard({ emoji, iconText, label, subtitle, meta, selected, onClick, index }) {
+    const [isHovered, setIsHovered] = useState(false);
+
     return (
-        <motion.button
-            type="button"
+        <motion.div
             variants={{
-                hidden: { opacity: 0, y: 24, scale: 0.97 },
-                visible: { opacity: 1, y: 0, scale: 1 }
+                hidden: { opacity: 0, x: -20 },
+                visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: [0.2, 0, 0, 1] } }
             }}
-            whileHover={{
-                borderColor: PREMIUM_THEME.borderHover,
-                y: -4,
-                background: 'rgba(255,255,255,0.02)'
-            }}
-            whileTap={{ scale: 0.98 }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
             onClick={onClick}
             style={{
                 width: '100%',
-                maxWidth: 320,
-                aspectRatio: '1 / 0.9',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'space-between',
-                padding: '32px',
-                background: selected ? PREMIUM_THEME.cardSelected : PREMIUM_THEME.cardBg,
-                border: `1px solid ${selected ? PREMIUM_THEME.borderActive : PREMIUM_THEME.border}`,
-                borderRadius: PREMIUM_THEME.radius,
+                padding: '24px 0',
+                borderBottom: '1px solid rgba(255,255,255,0.08)',
                 cursor: 'pointer',
-                transition: 'all 0.6s cubic-bezier(0.2, 0, 0, 1)',
-                textAlign: 'left',
                 position: 'relative',
-                overflow: 'hidden',
-                boxShadow: selected ? '0 20px 40px -10px rgba(0,0,0,0.6), inset 0 0 20px rgba(255,255,255,0.02)' : '0 10px 30px -10px rgba(0,0,0,0.4)'
+                fontFamily: PREMIUM_THEME.fontBody,
             }}
         >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
-                <div style={{
-                    width: 52,
-                    height: 52,
-                    borderRadius: 16,
-                    background: 'rgba(255,255,255,0.03)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 26,
-                    color: 'var(--el-text)',
-                    border: '1px solid rgba(255,255,255,0.05)',
-                }}>
-                    {iconText || emoji}
-                </div>
-                
-                {selected && (
-                    <motion.div
-                        layoutId="active-indicator"
-                        style={{
-                            width: 12, height: 12, borderRadius: 99,
-                            background: '#fff',
-                            boxShadow: '0 0 15px rgba(255,255,255,0.5)'
-                        }}
-                    />
-                )}
-            </div>
-            
-            <div>
-                <div style={{
-                    fontSize: 20,
-                    fontWeight: 500,
-                    color: 'var(--el-text)',
-                    letterSpacing: '-0.02em',
-                    marginBottom: 8
-                }}>
-                    {label}
-                </div>
-                <div style={{
-                    fontSize: 13,
-                    fontWeight: 400,
-                    color: PREMIUM_THEME.textSupport,
-                    lineHeight: 1.4,
-                    marginBottom: 12
-                }}>
-                    {subtitle}
-                </div>
-                {meta && (
-                    <div style={{
-                        fontSize: 10,
-                        fontWeight: 600,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.08em',
-                        color: PREMIUM_THEME.textMuted,
-                        borderTop: '1px solid rgba(255,255,255,0.05)',
-                        paddingTop: 12
+            <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
+                    <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.2)', fontWeight: 500, fontFamily: PREMIUM_THEME.fontLabel, width: 24 }}>
+                        0{index + 1}
+                    </span>
+                    <h3 style={{
+                        fontSize: 'clamp(20px, 3vw, 32px)',
+                        fontWeight: 300,
+                        color: selected ? '#ffffff' : (isHovered ? '#ffffff' : 'rgba(255,255,255,0.5)'),
+                        margin: 0,
+                        letterSpacing: '-0.02em',
+                        transition: 'color 0.3s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 16
                     }}>
-                        {meta}
-                    </div>
-                )}
+                        {label}
+                    </h3>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+                    {(emoji || iconText) && (
+                        <motion.div
+                            animate={{ opacity: isHovered || selected ? 1 : 0.2, scale: isHovered || selected ? 1 : 0.9 }}
+                            transition={{ duration: 0.3 }}
+                            style={{ fontSize: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', filter: (isHovered || selected) ? 'none' : 'grayscale(100%)' }}
+                        >
+                            {iconText ? <span style={{ fontSize: 20, color: '#fff', fontWeight: 500 }}>{iconText}</span> : emoji}
+                        </motion.div>
+                    )}
+                    <motion.div
+                        animate={{ x: isHovered || selected ? 0 : -10, opacity: isHovered || selected ? 1 : 0 }}
+                        transition={{ duration: 0.3 }}
+                        style={{ color: '#ffffff', display: 'flex', alignItems: 'center' }}
+                    >
+                        <ArrowRight style={{ width: 24, height: 24 }} />
+                    </motion.div>
+                </div>
             </div>
-        </motion.button>
+
+            <AnimatePresence>
+                {(isHovered || selected) && (subtitle || meta) && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: [0.2, 0, 0, 1] }}
+                        style={{ overflow: 'hidden' }}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 16, paddingTop: 16, paddingLeft: 56 }}>
+                            {subtitle && (
+                                <span style={{ fontSize: 16, color: 'rgba(255,255,255,0.6)', fontWeight: 400 }}>
+                                    {subtitle}
+                                </span>
+                            )}
+                            {meta && (
+                                <>
+                                    <div style={{ width: 4, height: 4, borderRadius: 99, background: 'rgba(255,255,255,0.2)' }} />
+                                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, fontFamily: PREMIUM_THEME.fontLabel }}>
+                                        {meta}
+                                    </span>
+                                </>
+                            )}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
     );
 }
 
@@ -462,6 +462,7 @@ const SCREENS = {
 // ─── MAIN COMPONENT ─────────────────────────────────────────────────────────────
 export default function UniversalOnboarding() {
     const navigate = useNavigate();
+    const { theme } = useTheme();
     const [stepIndex, setStepIndex] = useState(0);
     const [loading, setLoading] = useState(false);
     const [fd, setFd] = useState({
@@ -478,6 +479,8 @@ export default function UniversalOnboarding() {
         gender: "",
         name: "", phone_number: "", date_of_birth: "",
     });
+    const [hoveredStrategyRow, setHoveredStrategyRow] = useState(null);
+    const [focusedField, setFocusedField] = useState(null);
 
     const steps = useMemo(() => buildSteps(fd), [fd]);
 
@@ -559,7 +562,7 @@ export default function UniversalOnboarding() {
 
     const screen = SCREENS[currentStepId];
     const isLastStep = stepIndex === totalSteps - 1;
-    const isManualStep = currentStepId === "commitment_lock" || currentStepId === "personal";
+    const isManualStep = currentStepId === "personal";
 
     const renderCurrentStep = () => {
         if (screen) {
@@ -571,15 +574,18 @@ export default function UniversalOnboarding() {
             return (
                 <motion.div 
                     variants={{
-                        visible: { transition: { staggerChildren: 0.12, delayChildren: 0.2 } }
+                        hidden: { opacity: 0 },
+                        visible: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.2 } }
                     }}
                     initial="hidden"
                     animate="visible"
                     style={{ 
-                        display: 'grid', 
-                        gridTemplateColumns: 'repeat(2, 1fr)', 
-                        gap: PREMIUM_THEME.spacing.clusterGap,
-                        padding: '40px'
+                        display: 'flex', 
+                        flexDirection: 'column',
+                        padding: '0 20px',
+                        width: '100%',
+                        maxWidth: 720,
+                        margin: '0 auto'
                     }}
                 >
                     {optionsToRender.map((opt, i) => (
@@ -602,110 +608,317 @@ export default function UniversalOnboarding() {
         if (currentStepId === "commitment_lock") {
             const { strength, growth, direction } = buildSummary(fd);
             return (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-                    <div style={{
-                        background: 'rgba(255,255,255,0.02)',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                        borderRadius: 24,
-                        padding: 48,
-                        textAlign: 'center',
-                    }}>
-                        <div style={{ fontSize: 48, marginBottom: 24, opacity: 0.8 }}>🏆</div>
-                        <h3 style={{ fontSize: 22, fontWeight: 500, color: 'var(--el-text)', marginBottom: 40, letterSpacing: '-0.02em' }}>Personalised Strategy</h3>
-                        
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 32, textAlign: 'left' }}>
-                            {[
-                                { icon: Sparkles, label: "Strength", value: strength, color: 'rgba(255,255,255,0.6)' },
-                                { icon: TrendingUp, label: "Growth Area", value: growth, color: 'rgba(255,255,255,0.6)' },
-                                { icon: Target, label: "Focus", value: direction, color: 'rgba(255,255,255,0.6)' }
-                            ].map(({ icon: Icon, label, value, color }) => (
-                                <div key={label} style={{ display: 'flex', gap: 20 }}>
-                                    <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(255,255,255,0.05)' }}>
-                                        <Icon style={{ width: 18, height: 18, color: '#fff' }} />
-                                    </div>
-                                    <div>
-                                        <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>{label}</p>
-                                        <p style={{ fontSize: 15, fontWeight: 400, color: 'var(--el-text)', lineHeight: 1.4 }}>{value}</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 0, width: '100%', maxWidth: 640, margin: '0 auto' }}>
+                    <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                        <div style={{ fontSize: 32, marginBottom: 12, opacity: 0.9 }}>🏆</div>
+                        <h1 style={{
+                            fontSize: 'clamp(28px, 5vw, 40px)',
+                            fontWeight: 300,
+                            color: '#ffffff',
+                            letterSpacing: '-0.03em',
+                            lineHeight: 1.1,
+                            margin: '0 0 12px 0',
+                            fontFamily: PREMIUM_THEME.fontBody
+                        }}>
+                            Strategy Calibrated
+                        </h1>
+                        <p style={{
+                            fontSize: 'clamp(14px, 2.5vw, 16px)',
+                            color: 'rgba(255,255,255,0.5)',
+                            lineHeight: 1.4,
+                            margin: 0,
+                            fontFamily: PREMIUM_THEME.fontBody,
+                            fontWeight: 400
+                        }}>
+                            Review your focus areas and commit to execution.
+                        </p>
+                    </div>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                        {[
+                            { icon: Sparkles, label: "Strength", value: strength, num: "01" },
+                            { icon: TrendingUp, label: "Growth Area", value: growth, num: "02" },
+                            { icon: Target, label: "Focus", value: direction, num: "03" }
+                        ].map(({ icon: Icon, label, value, num }) => {
+                            const isHovered = hoveredStrategyRow === label;
+                            const isDimmed = hoveredStrategyRow !== null && !isHovered;
+
+                            return (
+                                <div 
+                                    key={label}
+                                    onMouseEnter={() => setHoveredStrategyRow(label)}
+                                    onMouseLeave={() => setHoveredStrategyRow(null)}
+                                    style={{
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        padding: '16px 0',
+                                        borderBottom: '1px solid rgba(255,255,255,0.08)',
+                                        opacity: isDimmed ? 0.3 : 1,
+                                        transition: 'all 0.3s ease',
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+                                            <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.2)', fontWeight: 500, fontFamily: PREMIUM_THEME.fontLabel, width: 24 }}>
+                                                {num}
+                                            </span>
+                                            <div>
+                                                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, fontFamily: PREMIUM_THEME.fontLabel, marginBottom: 4, textAlign: 'left' }}>
+                                                    {label}
+                                                </div>
+                                                <h3 style={{
+                                                    fontSize: 'clamp(16px, 3.5vw, 22px)',
+                                                    fontWeight: 300,
+                                                    color: '#ffffff',
+                                                    margin: 0,
+                                                    letterSpacing: '-0.02em',
+                                                    fontFamily: PREMIUM_THEME.fontBody,
+                                                    textAlign: 'left'
+                                                }}>
+                                                    {value}
+                                                </h3>
+                                            </div>
+                                        </div>
+                                        <div style={{ 
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                                            width: 36, height: 36, borderRadius: '50%', 
+                                            background: isHovered ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)', 
+                                            border: '1px solid rgba(255,255,255,0.1)',
+                                            transition: 'all 0.3s ease'
+                                        }}>
+                                            <Icon style={{ width: 16, height: 16, color: 'rgba(255,255,255,0.8)' }} />
+                                        </div>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    </div>
+                            );
+                        })}
 
-                    <label style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 16,
-                        padding: '24px',
-                        background: fd.committed ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)',
-                        border: fd.committed ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(255,255,255,0.08)',
-                        borderRadius: 16,
-                        cursor: 'pointer',
-                        transition: 'all 0.3s',
-                    }}>
-                        <input
-                            type="checkbox"
-                            checked={fd.committed}
-                            onChange={e => setFd(prev => ({ ...prev, committed: e.target.checked }))}
-                            style={{ width: 20, height: 20, cursor: 'pointer', accentColor: 'var(--el-text)' }}
-                        />
-                        <div>
-                            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--el-text)', margin: 0 }}>I'm ready for structured guidance</p>
-                            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', margin: '4px 0 0 0' }}>I commit to honest tracking and effort.</p>
-                        </div>
-                    </label>
+                        <motion.div 
+                            onMouseEnter={() => setHoveredStrategyRow("Commitment")}
+                            onMouseLeave={() => setHoveredStrategyRow(null)}
+                            whileHover="hover"
+                            initial="rest"
+                            onClick={() => {
+                                setFd(prev => ({ ...prev, committed: true }));
+                                setTimeout(handleContinue, 0);
+                            }}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                marginTop: 32,
+                                padding: '24px 0',
+                                borderTop: '1px solid rgba(255,255,255,0.2)',
+                                borderBottom: '1px solid rgba(255,255,255,0.2)',
+                                cursor: 'pointer',
+                                opacity: (hoveredStrategyRow !== null && hoveredStrategyRow !== "Commitment") ? 0.3 : 1,
+                                transition: 'opacity 0.3s ease'
+                            }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+                                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', fontWeight: 500, fontFamily: PREMIUM_THEME.fontLabel, width: 24 }}>
+                                    04
+                                </span>
+                                <div>
+                                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, fontFamily: PREMIUM_THEME.fontLabel, marginBottom: 4, textAlign: 'left' }}>
+                                        Commitment
+                                    </div>
+                                    <h3 style={{
+                                        fontSize: 'clamp(18px, 3.5vw, 24px)',
+                                        fontWeight: 300,
+                                        color: '#ffffff',
+                                        margin: 0,
+                                        letterSpacing: '-0.02em',
+                                        fontFamily: PREMIUM_THEME.fontBody,
+                                        textAlign: 'left'
+                                    }}>
+                                        I am ready for guidance
+                                    </h3>
+                                </div>
+                            </div>
+                            <motion.div 
+                                variants={{
+                                    rest: { opacity: 0, x: -15 },
+                                    hover: { opacity: 1, x: 0 }
+                                }}
+                                transition={{ duration: 0.4, ease: [0.2, 0, 0, 1] }}
+                                style={{ display: 'flex', alignItems: 'center', gap: 12, color: 'rgba(255,255,255,0.6)' }}
+                            >
+                                <span style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, fontFamily: PREMIUM_THEME.fontLabel }}>Accept & Continue</span>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 44, height: 44, borderRadius: '50%', background: '#ffffff', color: '#000000' }}>
+                                    <ArrowRight style={{ width: 18, height: 18 }} />
+                                </div>
+                            </motion.div>
+                        </motion.div>
+                    </div>
                 </div>
             );
         }
 
         if (currentStepId === "personal") {
             const PERSONAL_INPUTS = [
-                { label: "Full Name", field: "name", type: "text", placeholder: "e.g. John Doe", icon: User },
-                { label: "Phone Number", field: "phone_number", type: "tel", placeholder: "e.g. +91 9876543210", icon: Phone },
-                { label: "Date of Birth", field: "date_of_birth", type: "date", placeholder: "", icon: Calendar },
+                { label: "Full Name", field: "name", type: "text", placeholder: "Enter your name", icon: User, num: "01" },
+                { label: "Phone Number", field: "phone_number", type: "tel", placeholder: "Enter phone number", icon: Phone, num: "02" },
+                { label: "Date of Birth", field: "date_of_birth", type: "date", placeholder: "", icon: Calendar, num: "03" },
             ];
             return (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                    {PERSONAL_INPUTS.map(inp => (
-                        <div key={inp.field}>
-                            <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>{inp.label}</label>
-                            <div style={{ position: 'relative' }}>
-                                <div style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.2)' }}>
-                                    <inp.icon style={{ width: 14, height: 14 }} />
-                                </div>
-                                <input
-                                    type={inp.type}
-                                    value={fd[inp.field]}
-                                    onChange={e => setFd(prev => ({ ...prev, [inp.field]: e.target.value }))}
-                                    placeholder={inp.placeholder}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 24, width: '100%', maxWidth: 540, margin: '0 auto' }}>
+                    <div style={{ textAlign: 'center', marginBottom: 16 }}>
+                        <h1 style={{
+                            fontSize: 'clamp(28px, 5vw, 40px)',
+                            fontWeight: 300,
+                            color: '#ffffff',
+                            letterSpacing: '-0.03em',
+                            lineHeight: 1.1,
+                            margin: '0 0 12px 0',
+                            fontFamily: PREMIUM_THEME.fontBody
+                        }}>
+                            Final Details
+                        </h1>
+                        <p style={{
+                            fontSize: 'clamp(14px, 2.5vw, 16px)',
+                            color: 'rgba(255,255,255,0.5)',
+                            lineHeight: 1.4,
+                            margin: 0,
+                            fontFamily: PREMIUM_THEME.fontBody,
+                            fontWeight: 400
+                        }}>
+                            Please provide your basic information to complete setup.
+                        </p>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        {PERSONAL_INPUTS.map(inp => {
+                            const isFocused = focusedField === inp.field;
+                            const isDimmed = focusedField !== null && !isFocused;
+
+                            return (
+                                <div 
+                                    key={inp.field}
                                     style={{
-                                        width: '100%', padding: '14px 14px 14px 44px', borderRadius: 12,
-                                        background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)',
-                                        color: 'var(--el-text)', fontSize: 14, fontWeight: 400,
-                                        outline: 'none', transition: 'all 0.3s cubic-bezier(0.2, 0, 0, 1)',
+                                        display: 'flex',
+                                        alignItems: 'flex-start',
+                                        gap: 24,
+                                        padding: '16px 0',
+                                        borderBottom: `1px solid ${isFocused ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)'}`,
+                                        opacity: isDimmed ? 0.3 : 1,
+                                        transition: 'all 0.3s ease',
                                     }}
-                                />
-                            </div>
-                        </div>
-                    ))}
-                    <div>
-                        <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Gender</label>
-                        <select
-                            value={fd.gender}
-                            onChange={e => setFd(prev => ({ ...prev, gender: e.target.value }))}
-                            style={{
-                                width: '100%', padding: '14px', borderRadius: 12,
-                                background: 'var(--el-bg)', border: '1px solid var(--el-border)',
-                                color: 'var(--el-text)', fontSize: 15, fontWeight: 500,
-                                outline: 'none', cursor: 'pointer',
-                                boxShadow: 'var(--el-shadow-inset)',
-                            }}
-                        >
-                            <option value="">Select gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
+                                >
+                                    <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.2)', fontWeight: 500, fontFamily: PREMIUM_THEME.fontLabel, width: 24, marginTop: 4 }}>
+                                        {inp.num}
+                                    </span>
+                                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                        <label style={{ 
+                                            fontSize: 10, 
+                                            fontWeight: 600, 
+                                            color: isFocused ? '#ffffff' : 'rgba(255,255,255,0.4)', 
+                                            textTransform: 'uppercase', 
+                                            letterSpacing: '0.05em', 
+                                            fontFamily: PREMIUM_THEME.fontLabel,
+                                            textAlign: 'left',
+                                            transition: 'color 0.3s ease'
+                                        }}>
+                                            {inp.label}
+                                        </label>
+                                        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                            <input
+                                                type={inp.type}
+                                                value={fd[inp.field]}
+                                                onChange={e => setFd(prev => ({ ...prev, [inp.field]: e.target.value }))}
+                                                placeholder={inp.placeholder}
+                                                onFocus={() => setFocusedField(inp.field)}
+                                                onBlur={() => setFocusedField(null)}
+                                                style={{
+                                                    width: '100%',
+                                                    background: 'transparent',
+                                                    border: 'none',
+                                                    color: '#ffffff',
+                                                    fontSize: 18,
+                                                    fontWeight: 300,
+                                                    outline: 'none',
+                                                    padding: '4px 0',
+                                                    fontFamily: PREMIUM_THEME.fontBody,
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div style={{ color: isFocused ? '#ffffff' : 'rgba(255,255,255,0.2)', transition: 'color 0.3s ease', marginTop: 4 }}>
+                                        <inp.icon style={{ width: 16, height: 16 }} />
+                                    </div>
+                                </div>
+                            );
+                        })}
+
+                        {/* Gender Field */}
+                        {(() => {
+                            const isFocused = focusedField === "gender";
+                            const isDimmed = focusedField !== null && !isFocused;
+
+                            return (
+                                <div 
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'flex-start',
+                                        gap: 24,
+                                        padding: '16px 0',
+                                        borderBottom: `1px solid ${isFocused ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)'}`,
+                                        opacity: isDimmed ? 0.3 : 1,
+                                        transition: 'all 0.3s ease',
+                                    }}
+                                >
+                                    <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.2)', fontWeight: 500, fontFamily: PREMIUM_THEME.fontLabel, width: 24, marginTop: 4 }}>
+                                        04
+                                    </span>
+                                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                        <label style={{ 
+                                            fontSize: 10, 
+                                            fontWeight: 600, 
+                                            color: isFocused ? '#ffffff' : 'rgba(255,255,255,0.4)', 
+                                            textTransform: 'uppercase', 
+                                            letterSpacing: '0.05em', 
+                                            fontFamily: PREMIUM_THEME.fontLabel,
+                                            textAlign: 'left',
+                                            transition: 'color 0.3s ease'
+                                        }}>
+                                            Gender
+                                        </label>
+                                        <select
+                                            value={fd.gender}
+                                            onChange={e => setFd(prev => ({ ...prev, gender: e.target.value }))}
+                                            onFocus={() => setFocusedField("gender")}
+                                            onBlur={() => setFocusedField(null)}
+                                            style={{
+                                                width: '100%',
+                                                background: 'transparent',
+                                                border: 'none',
+                                                color: fd.gender ? '#ffffff' : 'rgba(255,255,255,0.3)',
+                                                fontSize: 18,
+                                                fontWeight: 300,
+                                                outline: 'none',
+                                                padding: '4px 0',
+                                                fontFamily: PREMIUM_THEME.fontBody,
+                                                cursor: 'pointer',
+                                                appearance: 'none',
+                                                backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                                                backgroundRepeat: 'no-repeat',
+                                                backgroundPosition: 'right 0 center',
+                                                backgroundSize: '16px'
+                                            }}
+                                        >
+                                            <option value="" disabled style={{ color: '#000' }}>Select gender</option>
+                                            <option value="male" style={{ color: '#000' }}>Male</option>
+                                            <option value="female" style={{ color: '#000' }}>Female</option>
+                                            <option value="other" style={{ color: '#000' }}>Other</option>
+                                        </select>
+                                    </div>
+                                    <div style={{ color: isFocused ? '#ffffff' : 'rgba(255,255,255,0.2)', transition: 'color 0.3s ease', marginTop: 4 }}>
+                                        <Users style={{ width: 16, height: 16 }} />
+                                    </div>
+                                </div>
+                            );
+                        })()}
                     </div>
                 </div>
             );
@@ -715,164 +928,190 @@ export default function UniversalOnboarding() {
     };
 
     return (
-        <div style={{
-            position: 'fixed',
-            inset: 0,
-            background: PREMIUM_THEME.bg,
-            color: 'var(--el-text)',
-            fontFamily: "'Inter', sans-serif",
-            display: 'flex',
-            overflow: 'hidden',
-            zIndex: 1000,
-        }}>
-            {/* LEFT ZONE: Context & Editorial */}
-            <div style={{
-                flex: '0 0 45%',
-                padding: PREMIUM_THEME.spacing.cinematicPadding,
+        <>
+            <style>{`
+                .onboarding-grid-bg {
+                    background-size: 40px 40px;
+                    background-image: 
+                        linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+                }
+                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--n-ghost-border); borderRadius: 10px; }
+            `}</style>
+            
+            {/* Immersive Stage Background with Grid */}
+            <div className="onboarding-grid-bg" style={{
+                position: 'fixed',
+                inset: 0,
+                background: '#0a0a0a',
+                color: 'var(--n-text)',
+                fontFamily: PREMIUM_THEME.fontBody,
                 display: 'flex',
                 flexDirection: 'column',
-                borderRight: '1px solid rgba(255,255,255,0.06)',
-                background: 'linear-gradient(160deg, #111111 0%, #0a0a0a 100%)',
-                zIndex: 10,
-                overflowY: 'auto',
+                overflow: 'hidden',
+                zIndex: 1000,
             }}>
-                <header style={{ marginBottom: 80 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginBottom: 32 }}>
-                        <button
-                            onClick={handleBack}
-                            disabled={stepIndex === 0}
-                            style={{
-                                width: 36, height: 36, borderRadius: 99,
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                background: 'transparent', border: '1px solid rgba(255,255,255,0.08)',
-                                color: 'var(--el-text)', cursor: stepIndex === 0 ? 'default' : 'pointer',
-                                opacity: stepIndex === 0 ? 0 : 0.6, transition: 'all 0.3s',
-                            }}
-                        >
-                            <ChevronLeft style={{ width: 14, height: 14 }} />
-                        </button>
-                        <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.05)' }}>
-                            <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${progress}%` }}
-                                style={{ height: '100%', background: 'var(--el-text)', opacity: 0.3 }}
-                            />
-                        </div>
+
+                {/* Minimalist Header */}
+                <header style={{
+                    position: 'absolute',
+                    top: 0, left: 0, right: 0,
+                    padding: 'clamp(16px, 4vw, 32px) clamp(20px, 5vw, 40px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    zIndex: 20
+                }}>
+                    <button
+                        onClick={handleBack}
+                        disabled={stepIndex === 0}
+                        style={{
+                            width: 44, height: 44, borderRadius: 99,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            background: 'transparent',
+                            color: '#ffffff', cursor: stepIndex === 0 ? 'default' : 'pointer',
+                            opacity: stepIndex === 0 ? 0 : 0.8,
+                            transition: 'all 0.2s ease',
+                            border: 'none',
+                        }}
+                        onMouseEnter={(e) => { if(stepIndex !== 0) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+                        onMouseLeave={(e) => { if(stepIndex !== 0) e.currentTarget.style.background = 'transparent'; }}
+                    >
+                        <ChevronLeft style={{ width: 20, height: 20 }} />
+                    </button>
+
+                    {/* Progress Indicator */}
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                        {Array.from({ length: totalSteps }).map((_, i) => (
+                            <div key={i} style={{
+                                width: i === stepIndex ? 24 : 6,
+                                height: 4,
+                                borderRadius: 99,
+                                background: i === stepIndex ? '#ffffff' : 'rgba(255,255,255,0.2)',
+                                transition: 'all 0.3s cubic-bezier(0.2, 0, 0, 1)'
+                            }} />
+                        ))}
                     </div>
-                    
-                    <div style={{ 
-                        fontSize: 10, 
-                        fontWeight: 700, 
-                        color: PREMIUM_THEME.textMuted, 
-                        letterSpacing: '0.15em',
-                        textTransform: 'uppercase',
-                        marginBottom: 12
-                    }}>
-                        {String(stepIndex + 1).padStart(2, '0')} / {String(totalSteps).padStart(2, '0')} — {screen?.micro || "USER PROFILING"}
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{ width: 4, height: 4, borderRadius: 99, background: '#fff', opacity: 0.5 }} />
-                        <span style={{ fontSize: 10, color: PREMIUM_THEME.textMuted, letterSpacing: '0.05em' }}>
-                            Adaptive roadmap variables configuring
-                        </span>
+
+                    {/* Planorah Logo */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, opacity: 0.8 }}>
+                        <div style={{ width: 16, height: 16, background: 'white', borderRadius: 3 }}></div>
+                        <span style={{ fontSize: 16, fontWeight: 700, color: 'white', letterSpacing: '-0.02em', display: 'none' }} className="sm-show">Planorah</span>
                     </div>
                 </header>
 
-                <div style={{ flex: 1 }}>
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={currentStepId}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: 20 }}
-                            transition={{ duration: 0.5, ease: [0.2, 0, 0, 1] }}
-                        >
-                            <h1 style={{
-                                fontSize: 48,
-                                fontWeight: 400,
-                                color: 'var(--el-text)',
-                                letterSpacing: '-0.05em',
-                                lineHeight: 1.05,
-                                margin: '0 0 32px 0'
-                            }}>
-                                {screen?.q}
-                            </h1>
-                            <p style={{
-                                fontSize: 16,
-                                color: PREMIUM_THEME.textSupport,
-                                lineHeight: 1.7,
-                                marginBottom: 40,
-                                maxWidth: 440
-                            }}>
-                                {screen?.sub}
-                            </p>
+                {/* Cinematic Center Stage */}
+                <main className="custom-scrollbar" style={{
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 'clamp(80px, 15vh, 140px) 24px 60px 24px',
+                    position: 'relative',
+                    zIndex: 10,
+                    overflowY: 'auto'
+                }}>
+                    <div style={{ width: '100%', maxWidth: 840, margin: '0 auto', textAlign: 'center' }}>
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={currentStepId}
+                                initial={{ opacity: 0, y: 30, scale: 0.98 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: -20, scale: 0.98 }}
+                                transition={{ duration: 0.4, ease: [0.2, 0, 0, 1] }}
+                                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+                            >
+                                {/* Only show the title section if it's not the manual steps */}
+                                {!isManualStep && screen && (
+                                    <div style={{ marginBottom: 48, maxWidth: 640 }}>
+                                        <h1 style={{
+                                            fontSize: 'clamp(40px, 8vw, 64px)',
+                                            fontWeight: 300,
+                                            color: '#ffffff',
+                                            letterSpacing: '-0.03em',
+                                            lineHeight: 1.1,
+                                            margin: '0 0 24px 0',
+                                            fontFamily: PREMIUM_THEME.fontBody
+                                        }}>
+                                            {screen.q}
+                                        </h1>
+                                        {screen.sub && (
+                                            <p style={{
+                                                fontSize: 'clamp(15px, 3vw, 18px)',
+                                                color: 'rgba(255,255,255,0.5)',
+                                                lineHeight: 1.5,
+                                                margin: 0,
+                                                fontFamily: PREMIUM_THEME.fontBody,
+                                                fontWeight: 400
+                                            }}>
+                                                {screen.sub}
+                                            </p>
+                                        )}
+                                        {screen.bullets && (
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px 24px', marginTop: 32, justifyContent: 'center' }}>
+                                                {screen.bullets.map(b => (
+                                                    <div key={b} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                        <div style={{ width: 14, height: 14, borderRadius: 99, background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                                            <svg width="8" height="6" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M1 4L3.5 6.5L9 1" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                            </svg>
+                                                        </div>
+                                                        <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', fontWeight: 400 }}>{b}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
 
-                            {screen?.bullets && (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                                    {screen.bullets.map(b => (
-                                        <div key={b} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                            <div style={{ width: 12, height: 1, background: 'rgba(255,255,255,0.2)' }} />
-                                            <span style={{ fontSize: 11, color: PREMIUM_THEME.textMuted, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{b}</span>
-                                        </div>
-                                    ))}
+                                {/* Render Options Grid or Custom Form */}
+                                <div style={{ width: '100%' }}>
+                                    {renderCurrentStep()}
                                 </div>
-                            )}
-                        </motion.div>
-                    </AnimatePresence>
-                </div>
-
-                {isManualStep && (
-                    <button
-                        onClick={handleContinue}
-                        disabled={!canProceed() || loading}
-                        style={{
-                            width: 'fit-content',
-                            padding: '14px 40px',
-                            borderRadius: 99,
-                            background: 'var(--el-text)',
-                            color: 'var(--el-bg)',
-                            fontSize: 14,
-                            fontWeight: 600,
-                            border: 'none',
-                            cursor: (canProceed() && !loading) ? 'pointer' : 'default',
-                            opacity: (canProceed() && !loading) ? 1 : 0.2,
-                            transition: 'all 0.3s cubic-bezier(0.2, 0, 0, 1)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 12,
-                        }}
-                    >
-                        {loading ? 'Processing...' : isLastStep ? 'Complete Setup' : 'Proceed'}
-                        {!loading && <ArrowRight style={{ width: 16, height: 16 }} />}
-                    </button>
-                )}
+                                
+                                {/* Centered Continue Button for Manual Steps */}
+                                {isManualStep && (
+                                    <div style={{ marginTop: 40, width: '100%', maxWidth: 480, display: 'flex', justifyContent: 'center' }}>
+                                        <button
+                                            onClick={handleContinue}
+                                            disabled={!canProceed() || loading}
+                                            style={{
+                                                width: '100%',
+                                                padding: '20px 0',
+                                                borderRadius: 16,
+                                                background: '#ffffff',
+                                                color: '#000000',
+                                                fontSize: 16,
+                                                fontWeight: 500,
+                                                border: 'none',
+                                                cursor: (canProceed() && !loading) ? 'pointer' : 'default',
+                                                opacity: (canProceed() && !loading) ? 1 : 0.4,
+                                                transition: 'all 0.3s cubic-bezier(0.2, 0, 0, 1)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: 12,
+                                                fontFamily: PREMIUM_THEME.fontBody,
+                                                boxShadow: (canProceed() && !loading) ? '0 8px 32px rgba(255, 255, 255, 0.15)' : 'none'
+                                            }}
+                                            onMouseEnter={(e) => { if(canProceed() && !loading) { e.currentTarget.style.transform = 'scale(1.02)'; e.currentTarget.style.background = '#f5f5f5'; } }}
+                                            onMouseLeave={(e) => { if(canProceed() && !loading) { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = '#ffffff'; } }}
+                                            onMouseDown={(e) => { if(canProceed() && !loading) { e.currentTarget.style.transform = 'scale(0.98)'; } }}
+                                            onMouseUp={(e) => { if(canProceed() && !loading) { e.currentTarget.style.transform = 'scale(1.02)'; } }}
+                                        >
+                                            {loading ? 'Processing...' : isLastStep ? 'Complete Setup' : 'Continue'}
+                                            {!loading && <ArrowRight style={{ width: 18, height: 18 }} />}
+                                        </button>
+                                    </div>
+                                )}
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
+                </main>
             </div>
-
-            {/* RIGHT ZONE: Decision Cluster */}
-            <div style={{
-                flex: 1,
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: PREMIUM_THEME.spacing.cinematicPadding,
-                background: 'radial-gradient(circle at 60% 40%, #161616 0%, #0d0d0d 70%)',
-                overflowY: 'auto',
-            }}>
-                <div style={{ width: '100%', maxWidth: 800 }}>
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={currentStepId}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 1.1 }}
-                            transition={{ duration: 0.6, ease: [0.2, 0, 0, 1] }}
-                        >
-                            {renderCurrentStep()}
-                        </motion.div>
-                    </AnimatePresence>
-                </div>
-            </div>
-        </div>
+        </>
     );
 }

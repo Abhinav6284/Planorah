@@ -79,16 +79,19 @@ const ProgressPanel = React.memo(({ tasks, stats, activityHeatmap }) => {
     }, [tasks, activityHeatmap, stats]);
 
     return (
-        <div style={{ 
-            background: 'var(--el-bg)', 
-            border: '1px solid var(--el-border)', 
-            borderRadius: 16, 
-            padding: 24, 
-            boxShadow: 'var(--el-shadow-card)',
+        <div style={{
+            background: 'var(--el-glass-panel)',
+            border: 'var(--el-glass-border)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            borderRadius: 24,
+            padding: 24,
+            boxShadow: 'var(--el-glass-shadow)',
             color: 'var(--el-text)',
             display: 'flex',
             flexDirection: 'column',
-            gap: 24
+            gap: 24,
+            height: '100%'
         }}>
             {/* Header: Level + XP */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -114,12 +117,12 @@ const ProgressPanel = React.memo(({ tasks, stats, activityHeatmap }) => {
                     </div>
                     <div style={{ height: 6, background: 'var(--el-bg-secondary)', borderRadius: 10, overflow: 'hidden' }}>
                         <div
-                            style={{ 
-                                height: '100%', 
-                                background: 'var(--el-text)', 
-                                borderRadius: 10, 
+                            style={{
+                                height: '100%',
+                                background: 'var(--el-text)',
+                                borderRadius: 10,
                                 width: `${xpData.percent}%`,
-                                transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' 
+                                transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)'
                             }}
                         />
                     </div>
@@ -127,9 +130,9 @@ const ProgressPanel = React.memo(({ tasks, stats, activityHeatmap }) => {
             )}
 
             {/* Missions Info */}
-            <div style={{ 
-                padding: '12px 16px', borderRadius: 12, background: 'var(--el-bg-secondary)', 
-                display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: 'var(--el-text-secondary)' 
+            <div style={{
+                padding: '12px 16px', borderRadius: 12, background: 'var(--el-bg-secondary)',
+                display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: 'var(--el-text-secondary)'
             }}>
                 <span style={{ fontWeight: 800, color: 'var(--el-text)' }}>{todayData.completed}/{todayData.total}</span>
                 <span>Missions completed today</span>
@@ -144,7 +147,7 @@ const ProgressPanel = React.memo(({ tasks, stats, activityHeatmap }) => {
                             <div
                                 title={`${day.count} task${day.count !== 1 ? 's' : ''} on ${day.iso}`}
                                 style={{
-                                    width: '100%', height: 24, borderRadius: 4, 
+                                    width: '100%', height: 24, borderRadius: 4,
                                     background: day.count > 0 ? 'var(--el-text)' : 'var(--el-bg-secondary)',
                                     opacity: day.count > 0 ? Math.min(1, 0.3 + (day.count * 0.2)) : 1,
                                     transition: 'all 0.2s'

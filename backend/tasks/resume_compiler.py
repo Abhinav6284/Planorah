@@ -121,7 +121,7 @@ class ResumeCompiler:
         """Create default resume template."""
         template = ResumeSectionTemplate.objects.create(
             name="Standard Technical Resume",
-            description="Default template for technical resumes",
+            description="Balanced template with skills, projects, and achievements.",
             is_default=True,
             sections=[
                 {
@@ -131,13 +131,13 @@ class ResumeCompiler:
                     "sort_by": "weight"
                 },
                 {
-                    "name": "Projects",
+                    "name": "Featured Projects",
                     "entry_type": "project",
                     "max_entries": 5,
                     "sort_by": "weight"
                 },
                 {
-                    "name": "Achievements",
+                    "name": "Key Achievements",
                     "entry_type": "achievement",
                     "max_entries": 8,
                     "sort_by": "score"
@@ -214,11 +214,25 @@ class ResumeCompiler:
         - GitHub repos → projects
         - Quizzes → skills/certifications
         - File uploads → projects/achievements
+        - Tags 'certification' → certification
         """
+        # Check tags first
+        tags = [t.lower() for t in task.tags] if isinstance(task.tags, list) else []
+        
+        if 'certification' in tags:
+            return 'certification'
+        
+        if 'skill' in tags:
+            return 'skill'
+
         if task.proof_type == 'GITHUB_REPO':
             return 'project'
         elif task.proof_type == 'QUIZ':
             return 'skill'
+        elif task.proof_type == 'URL':
+            if 'project' in tags:
+                return 'project'
+            return 'achievement'
         else:
             # Default to achievement
             return 'achievement'

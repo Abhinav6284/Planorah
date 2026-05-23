@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Manrope:wght@200..800&family=Space+Grotesk:wght@300..700&display=swap');
 :root {
   /* Colors — dark theme by default */
   --white: #0c0c0d;
@@ -77,6 +77,31 @@
   --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-body: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  
+  /* Planorah Nocturne Fonts */
+  --font-newsreader: 'Newsreader', serif;
+  --font-manrope: 'Manrope', sans-serif;
+  --font-space-grotesk: 'Space Grotesk', sans-serif;
+
+  /* Planorah Nocturne Color Tokens */
+  --n-surface: #131313;
+  --n-surface-lowest: #0e0e0e;
+  --n-surface-low: #1c1b1b;
+  --n-surface-highest: #353534;
+  --n-primary: #a4c8ff;
+  --n-primary-container: #4d9fff;
+  --n-on-primary: #00315d;
+  --n-outline-variant: #414752;
+  --n-accent-gold: #efbf5f;
+  
+  --n-text: #f4f4f4;
+  --n-text-secondary: #a1a1a1;
+  --n-text-muted: #717171;
+
+  /* Planorah Nocturne Component Tokens */
+  --n-ghost-border: rgba(65, 71, 82, 0.15); /* outline_variant at 15% */
+  --n-ghost-border-active: rgba(164, 200, 255, 0.40); /* primary at 40% */
+  --n-glow-primary: rgba(164, 200, 255, 0.10); /* soft outer blue glow 10% */
 
   /* ── ElevenLabs Dashboard Tokens (Light - Default) ── */
   --el-bg: #fafafa;
@@ -111,10 +136,24 @@
     0 4px 8px rgba(0, 0, 0, 0.04);
   --el-shadow-warm: 0 12px 32px rgba(78, 50, 23, 0.06);
   --el-shadow-inset: inset 0 1px 1px rgba(0, 0, 0, 0.02);
+
+  /* Spatial Glass Tokens (Light) */
+  --el-glass-panel: rgba(255, 255, 255, 0.90);
+  --el-glass-border: 1px solid rgba(0, 0, 0, 0.08);
+  --el-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03);
+  --el-core-panel: #ffffff;
 }
 
 /* ── ElevenLabs Dashboard Tokens (Dark) ── */
 .dark, [data-theme="dark"] {
+  /* Roles */
+  --bg: var(--white);
+  --bg-subtle: var(--light-gray);
+  --fg: var(--charcoal);
+  --fg-deep: var(--midnight);
+  --fg-muted: var(--mid-gray);
+  --surface: var(--white);
+
   --el-bg: #0c0c0d;
   --el-bg-secondary: #161617;
   --el-warm-stone: rgba(22, 22, 23, 0.8);
@@ -146,6 +185,12 @@
     0 2px 4px rgba(0, 0, 0, 0.2);
   --el-shadow-warm: 0 12px 32px rgba(0, 0, 0, 0.5);
   --el-shadow-inset: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+
+  /* Spatial Glass Tokens (Dark) */
+  --el-glass-panel: rgba(19, 19, 19, 0.55);
+  --el-glass-border: 1px solid rgba(255, 255, 255, 0.08);
+  --el-glass-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  --el-core-panel: rgba(19, 19, 19, 0.75);
 }
 
 .light, [data-theme="light"] {
@@ -157,6 +202,14 @@
   --mid-gray: #898989;
   --border-subtle: rgba(34, 42, 53, 0.08);
   --border-hairline: rgba(34, 42, 53, 0.10);
+
+  /* Roles */
+  --bg: var(--white);
+  --bg-subtle: var(--light-gray);
+  --fg: var(--charcoal);
+  --fg-deep: var(--midnight);
+  --fg-muted: var(--mid-gray);
+  --surface: var(--white);
 
   /* Planorah accent */
   --orange: #F36B22;
@@ -193,6 +246,12 @@
     rgba(19, 19, 22, 0.7) 0px 1px 5px -4px;
   --shadow-ring:
     rgba(34, 42, 53, 0.10) 0px 0px 0px 1px;
+
+  /* Spatial Glass Tokens (Light) */
+  --el-glass-panel: rgba(255, 255, 255, 0.90);
+  --el-glass-border: 1px solid rgba(0, 0, 0, 0.08);
+  --el-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03);
+  --el-core-panel: #ffffff;
 }
 
 * { box-sizing: border-box; }
@@ -779,4 +838,44 @@ input, textarea, select {
   .lp-nav-links.desktop-links { display: none !important; }
   .lp-mobile-menu-btn { display: inline-flex !important; }
   .always-show { display: none !important; }
+}
+
+/* ============================================================
+   PREMIUM CINEMATIC UTILITIES
+   ============================================================ */
+.cinematic-grid {
+  background-image: radial-gradient(rgba(243, 107, 34, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  position: relative;
+}
+
+.cinematic-glow {
+  position: absolute;
+  top: 15%;
+  left: 30%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(243, 107, 34, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(40px);
+}
+
+.btn-glowing-orange {
+  background: linear-gradient(135deg, var(--orange) 0%, var(--orange-deep) 100%);
+  color: #ffffff !important;
+  box-shadow: 0 0 15px rgba(243, 107, 34, 0.25), inset 0 1px 1px rgba(255,255,255,0.15);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+
+.btn-glowing-orange:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 25px rgba(243, 107, 34, 0.45), 0 4px 12px rgba(243, 107, 34, 0.2), inset 0 1px 1px rgba(255,255,255,0.2);
+  filter: brightness(1.05);
+}
+
+.btn-glowing-orange:active {
+  transform: translateY(0.5px);
+  box-shadow: 0 0 10px rgba(243, 107, 34, 0.2), inset 0 1px 2px rgba(0,0,0,0.2);
 }

@@ -38,14 +38,6 @@ const calendarMessages = {
     noEventsInRange: "No events in this range.",
 };
 
-const palette = ["#4f46e5", "#7c3aed", "#0ea5e9", "#10b981", "#f59e0b", "#ef4444"];
-
-const getColorById = (idLike) => {
-    const source = String(idLike || "calendar-event");
-    const sum = source.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return palette[sum % palette.length];
-};
-
 const normalizeEvents = (payload) => {
     const source = Array.isArray(payload)
         ? payload
@@ -119,15 +111,14 @@ const FullCalendar = ({ onEventClick }) => {
         fetchEvents();
     }, [fetchEvents]);
 
-    const eventPropGetter = useCallback((event) => {
-        const color = getColorById(event?.resource?.id || event?.id || event?.title);
+    const eventPropGetter = useCallback(() => {
         return {
             style: {
-                backgroundColor: color,
-                border: "none",
-                borderRadius: "10px",
+                backgroundColor: "#1f1f1f",
+                border: "1px solid rgba(255, 255, 255, 0.15)",
+                borderRadius: "8px",
                 color: "#fff",
-                boxShadow: "0 8px 18px -12px rgba(0, 0, 0, 0.45)",
+                boxShadow: "0 3px 10px rgba(0, 0, 0, 0.22)",
                 fontWeight: 600,
                 fontSize: "12px",
             },
@@ -143,10 +134,10 @@ const FullCalendar = ({ onEventClick }) => {
             style={{
                 height: '100%',
                 minHeight: 680,
-                borderRadius: 16,
+                borderRadius: 12,
                 border: '1px solid var(--el-border)',
                 background: 'var(--el-bg-secondary)',
-                padding: 12,
+                padding: 10,
                 position: 'relative',
             }}
         >
@@ -180,7 +171,7 @@ const FullCalendar = ({ onEventClick }) => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    borderRadius: 16,
+                    borderRadius: 12,
                     background: 'color-mix(in srgb, var(--el-bg-secondary) 85%, transparent)',
                     fontSize: 13,
                     fontWeight: 500,

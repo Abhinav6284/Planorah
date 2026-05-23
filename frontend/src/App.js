@@ -16,13 +16,36 @@ import Register from "./components/Register";
 import Layout from './components/Layout';
 import MarketingLayout from './components/MarketingLayout';
 
+const lazyWithChunkRetry = (importer, retryKey) =>
+  lazy(async () => {
+    try {
+      const module = await importer();
+      sessionStorage.removeItem(`lazy-retried-${retryKey}`);
+      return module;
+    } catch (error) {
+      const isChunkError = /ChunkLoadError|Loading chunk [^\s]+ failed/i.test(error?.message || '');
+      const storageKey = `lazy-retried-${retryKey}`;
+      const hasRetried = sessionStorage.getItem(storageKey) === 'true';
+
+      if (isChunkError && !hasRetried) {
+        sessionStorage.setItem(storageKey, 'true');
+        window.location.reload();
+
+        // Keep suspense pending while the page reloads.
+        return new Promise(() => {});
+      }
+
+      throw error;
+    }
+  });
+
 // Lazy-loaded (non-critical, code-split)
 const WelcomePage = lazy(() => import("./components/WelcomePage"));
 const LandingPage = lazy(() => import("./components/LandingPage"));
 const PlanorahBlogsPage = lazy(() => import("./components/blogs/PlanorahBlogsPage"));
 const CompleteProfile = lazy(() => import("./components/CompleteProfile"));
 const VerifyOtp = lazy(() => import("./components/VerifyOTP"));
-const Dashboard = lazy(() => import("./components/Dashboard/Dashboard"));
+const Dashboard = lazyWithChunkRetry(() => import("./components/Dashboard/Dashboard"), "dashboard");
 const Scheduler = lazy(() => import("./components/Scheduler/Scheduler"));
 const ForgotPassword = lazy(() => import("./components/ForgotPassword"));
 const VerifyResetOTP = lazy(() => import("./components/VerifyResetOTP"));
@@ -44,6 +67,7 @@ const UniversalOnboarding = lazy(() => import('./components/Onboarding/Universal
 const ResumeBuilder = lazy(() => import('./components/Resume/ResumeBuilder'));
 const ResumeList = lazy(() => import('./components/Resume/ResumeList'));
 const ATSScanner = lazy(() => import('./components/Resume/ATSScanner'));
+const LinkedInAnalyzer = lazy(() => import('./components/Resume/LinkedInAnalyzer'));
 const CompiledResumeView = lazy(() => import('./components/Resume/CompiledResumeView'));
 const CompiledResumeList = lazy(() => import('./components/Resume/CompiledResumeList'));
 const JobFinder = lazy(() => import('./components/Jobs/JobFinder'));
@@ -61,10 +85,10 @@ const PortfolioEditor = lazy(() => import('./components/Portfolio').then(m => ({
 const ProjectManager = lazy(() => import('./components/Portfolio').then(m => ({ default: m.ProjectManager })));
 const PublicPortfolio = lazy(() => import('./components/Portfolio').then(m => ({ default: m.PublicPortfolio })));
 // Planora – AI-powered study platform
-const PlanoraDashboard = lazy(() => import('./components/Planora/PlanoraDashboard'));
-const SubjectDetail = lazy(() => import('./components/Planora/SubjectDetail'));
-const TopicDetail = lazy(() => import('./components/Planora/TopicDetail'));
-const StudyPlanner = lazy(() => import('./components/Planora/StudyPlanner'));
+const PlanoraDashboard = lazyWithChunkRetry(() => import('./components/Planora/PlanoraDashboard'), 'planora-dashboard');
+const SubjectDetail = lazyWithChunkRetry(() => import('./components/Planora/SubjectDetail'), 'planora-subject-detail');
+const TopicDetail = lazyWithChunkRetry(() => import('./components/Planora/TopicDetail'), 'planora-topic-detail');
+const StudyPlanner = lazyWithChunkRetry(() => import('./components/Planora/StudyPlanner'), 'planora-study-planner');
 // New SEO Marketing Pages
 const FeaturesPage = lazy(() => import('./components/FeaturesPage'));
 const PricingPublicPage = lazy(() => import('./components/PricingPublicPage'));
@@ -218,6 +242,7 @@ function AppInner() {
               <Route path="/resume/compiled" element={<CompiledResumeList />} />
               <Route path="/resume/compiled/:versionId" element={<CompiledResumeView />} />
               <Route path="/ats" element={<ATSScanner />} />
+              <Route path="/linkedin-analyzer" element={<LinkedInAnalyzer />} />
               <Route path="/jobs" element={<JobFinder />} />
               <Route path="/interview" element={<MockInterviewComingSoon />} />
               <Route path="/roadmap/:id" element={<RoadmapView />} />

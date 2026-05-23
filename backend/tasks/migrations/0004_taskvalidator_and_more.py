@@ -47,7 +47,12 @@ def _sqlite_rebuild_fk_field(apps, schema_editor, app_label, model_name, field_n
     Rebuild a FK column on SQLite using Django schema editor so indexes and
     constraints are recreated consistently.
     """
-    model = apps.get_model(app_label, model_name)
+    try:
+        model = apps.get_model(app_label, model_name)
+    except LookupError:
+        # Some migration orders may not include this app/model in the historical
+        # app registry yet. Skip safely and continue with available models.
+        return
     field = model._meta.get_field(field_name)
     schema_editor.remove_field(model, field)
     schema_editor.add_field(model, field)

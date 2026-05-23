@@ -187,21 +187,28 @@ export default function Scheduler() {
 
     return (
         <>
-            <div className="flex h-full min-h-full flex-col bg-gray-50 dark:bg-charcoalDark font-sans transition-colors duration-200">
-                <div className="border-b border-gray-200 dark:border-charcoalMuted bg-white dark:bg-charcoal px-4 py-4 md:px-8 md:py-6">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                        <h1 className="text-xl font-serif font-bold text-gray-900 dark:text-white md:text-2xl">Schedule</h1>
+            <div className="flex h-full min-h-full flex-col bg-[var(--el-bg)] font-sans">
+                <div className="border-b border-[var(--el-border)] bg-[var(--el-bg-secondary)] px-4 py-4 md:px-8 md:py-5">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <h1 className="text-xl md:text-2xl font-semibold text-[var(--el-text)]">
+                                Calendar
+                            </h1>
+                            <p className="mt-1 text-xs text-[var(--el-text-muted)]">
+                                Plan roadmap tasks and keep your weekly schedule clear.
+                            </p>
+                        </div>
 
                         <div className="flex flex-wrap items-center gap-2 md:gap-3">
                             {roadmaps.length > 0 && (
-                                <>
+                                <div className="flex flex-wrap items-center gap-2 md:border-r md:border-[var(--el-border)] md:pr-3">
                                     <select
                                         value={selectedRoadmap}
                                         onChange={(e) => setSelectedRoadmap(e.target.value)}
-                                        className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-700 dark:border-charcoalMuted dark:bg-charcoalMuted dark:text-white md:text-sm"
+                                        className="bg-[var(--el-bg-secondary)] border border-[var(--el-border)] text-[var(--el-text)] py-2 px-3 text-sm rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-[rgba(0,0,0,0.12)] max-w-[220px]"
                                     >
                                         {roadmaps.map((roadmap) => (
-                                            <option key={roadmap.id} value={String(roadmap.id)}>
+                                            <option key={roadmap.id} value={String(roadmap.id)} className="bg-[#ffffff] text-[#1a1a1a]">
                                                 {roadmap.title}
                                             </option>
                                         ))}
@@ -213,43 +220,42 @@ export default function Scheduler() {
                                                 handleScheduleRoadmap(roadmap.id, roadmap.title);
                                             }
                                         }}
-                                        className="rounded-xl bg-indigo-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-indigo-700 md:text-sm"
+                                        className="bg-[#111111] hover:bg-[#000000] text-white px-4 py-2 text-sm font-medium transition-colors rounded-lg"
                                     >
-                                        Schedule Roadmap
+                                        Schedule
                                     </button>
-                                </>
+                                </div>
                             )}
 
                             <button
                                 onClick={connectGoogleCalendar}
-                                className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-charcoalMuted dark:bg-charcoalMuted dark:text-white dark:hover:bg-charcoalMuted md:px-4 md:text-sm"
+                                className="flex items-center gap-2 bg-[var(--el-bg-secondary)] hover:bg-[var(--el-bg)] border border-[var(--el-border)] px-4 py-2 text-sm text-[var(--el-text)] transition-colors rounded-lg"
                             >
                                 <FaGoogle className="text-red-500" />
-                                <span className="hidden sm:inline">Connect Calendar</span>
-                                <span className="sm:hidden">Connect</span>
+                                <span>Connect Calendar</span>
                             </button>
 
                             <button
                                 onClick={syncCalendar}
                                 disabled={syncing}
-                                className={`rounded-xl p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-charcoalMuted dark:hover:text-white ${syncing ? 'animate-spin' : ''}`}
+                                className={`text-[var(--el-text-muted)] hover:text-[var(--el-text)] transition-colors p-2 ${syncing ? 'animate-spin' : ''}`}
                                 title="Sync with Google Calendar"
                             >
-                                <FaSync />
+                                <FaSync size={14} />
                             </button>
 
                             <button
                                 onClick={clearAllEvents}
-                                className="rounded-xl p-2 text-gray-500 transition-colors hover:bg-red-100 hover:text-red-600 dark:text-gray-400 dark:hover:bg-red-900/30 dark:hover:text-red-400"
+                                className="text-[var(--el-text-muted)] hover:text-red-600 transition-colors p-2"
                                 title="Clear All Events"
                             >
-                                <FaTrash />
+                                <FaTrash size={14} />
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-auto p-3 md:p-6">
+                <div className="flex-1 overflow-auto p-3 md:p-5 bg-transparent">
                     <FullCalendar key={calendarKey} onEventClick={handleEventClick} />
                 </div>
             </div>
@@ -261,80 +267,80 @@ export default function Scheduler() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                        className="fixed inset-0 bg-black/45 z-50 flex items-center justify-center p-4"
                         onClick={(e) => { if (e.target === e.currentTarget) setScheduleModal(null); }}
                     >
                         <motion.div
-                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            initial={{ scale: 0.95, opacity: 0, y: 15 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className="bg-white dark:bg-charcoal rounded-2xl shadow-2xl w-full max-w-md p-6"
+                            exit={{ scale: 0.95, opacity: 0, y: 15 }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+                            className="bg-[var(--el-bg-secondary)] border border-[var(--el-border)] rounded-2xl w-full max-w-md p-6 shadow-[0_20px_42px_rgba(0,0,0,0.2)] relative"
                         >
                             <div className="flex items-center justify-between mb-5">
                                 <div>
-                                    <h2 className="text-lg font-bold text-gray-900 dark:text-white">Schedule Roadmap</h2>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 truncate max-w-xs">{scheduleModal.roadmapTitle}</p>
+                                    <h2 className="text-lg font-semibold text-[var(--el-text)]">Schedule Roadmap</h2>
+                                    <p className="text-xs text-[var(--el-text-muted)] mt-1 truncate max-w-xs">{scheduleModal.roadmapTitle}</p>
                                 </div>
                                 <button
                                     onClick={() => setScheduleModal(null)}
-                                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-charcoalMuted text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                                    className="p-1.5 text-gray-500 hover:text-[var(--el-text)] transition-colors"
                                 >
-                                    <FaTimes />
+                                    <FaTimes size={12} />
                                 </button>
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-5">
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                                        📅 Start Date
+                                    <label className="block text-xs font-semibold text-[var(--el-text-secondary)] mb-1.5">
+                                        Start Date
                                     </label>
                                     <input
                                         type="date"
                                         value={scheduleForm.startDate}
                                         min={new Date().toISOString().split('T')[0]}
                                         onChange={e => setScheduleForm(f => ({ ...f, startDate: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-charcoalMuted bg-gray-50 dark:bg-charcoalMuted text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                                        className="w-full py-2.5 px-3 bg-[var(--el-bg)] border border-[var(--el-border)] focus:border-[rgba(0,0,0,0.35)] text-[var(--el-text)] focus:outline-none text-sm rounded-lg"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                                        🕐 Daily Start Time
+                                    <label className="block text-xs font-semibold text-[var(--el-text-secondary)] mb-1.5">
+                                        Daily Start Time
                                     </label>
                                     <input
                                         type="time"
                                         value={scheduleForm.startTime}
                                         onChange={e => setScheduleForm(f => ({ ...f, startTime: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-charcoalMuted bg-gray-50 dark:bg-charcoalMuted text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                                        className="w-full py-2.5 px-3 bg-[var(--el-bg)] border border-[var(--el-border)] focus:border-[rgba(0,0,0,0.35)] text-[var(--el-text)] focus:outline-none text-sm rounded-lg"
                                     />
-                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1.5">Tasks will be scheduled starting from this time each day.</p>
+                                    <p className="text-xs text-[var(--el-text-muted)] mt-1.5">Tasks will be scheduled starting from this time each day.</p>
                                 </div>
 
-                                <div className="flex items-start gap-2 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl">
-                                    <FaGoogle className="text-indigo-500 mt-0.5 flex-shrink-0" />
-                                    <p className="text-xs text-indigo-700 dark:text-indigo-300">
+                                <div className="flex items-start gap-3 p-4 border border-[var(--el-border)] bg-[var(--el-bg)] rounded-xl">
+                                    <FaGoogle className="text-[var(--el-text-secondary)] mt-0.5 flex-shrink-0" size={12} />
+                                    <p className="text-xs text-[var(--el-text-secondary)] leading-relaxed">
                                         If Google Calendar is connected, tasks will also be added there automatically.
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="flex gap-3 mt-6">
+                            <div className="flex gap-3 mt-7">
                                 <button
                                     onClick={() => setScheduleModal(null)}
-                                    className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-charcoalMuted text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoalMuted font-medium text-sm transition-colors"
+                                    className="flex-1 py-2.5 border border-[var(--el-border)] text-[var(--el-text-secondary)] hover:text-[var(--el-text)] text-sm font-medium transition-colors rounded-lg"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={confirmScheduleRoadmap}
                                     disabled={scheduling || !scheduleForm.startDate || !scheduleForm.startTime}
-                                    className="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                                    className="flex-1 py-2.5 bg-[#111111] hover:bg-[#000000] text-white disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium transition-colors rounded-lg flex items-center justify-center gap-2"
                                 >
                                     {scheduling ? (
                                         <><FaSync className="animate-spin" /> Scheduling...</>
                                     ) : (
-                                        '📅 Schedule'
+                                        'Schedule'
                                     )}
                                 </button>
                             </div>

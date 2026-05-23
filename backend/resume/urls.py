@@ -9,5 +9,6 @@ urlpatterns = [
     path('<int:pk>/delete/', views.delete_resume, name='delete-resume'),
     path('import/', views.import_resume, name='import-resume'),
     path('analyze-ats/', views.analyze_ats, name='analyze-ats'),
+    path('analyze-linkedin/', views.analyze_linkedin, name='analyze-linkedin'),
 ]
 

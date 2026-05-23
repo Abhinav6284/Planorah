@@ -18,7 +18,10 @@ import {
   Globe,
   CheckSquare,
   Calendar,
+  Sun,
+  Moon,
 } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 /**
  * ElevenLabs-inspired dark sidebar navigation
@@ -66,6 +69,51 @@ const getActiveNavPath = (pathname) => {
   const matched = allPaths.filter((p) => isPathMatch(pathname, p));
   if (!matched.length) return null;
   return matched.sort((a, b) => b.length - a.length)[0];
+};
+
+// ─── ThemeToggleButton ────────────────────────────────────────────────────────
+const ThemeToggleButton = () => {
+  const { theme, toggleTheme } = useTheme();
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <button
+      type="button"
+      onClick={toggleTheme}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: '7px 10px',
+        borderRadius: 7,
+        fontSize: 13.5,
+        fontWeight: 400,
+        fontFamily: "'Inter', sans-serif",
+        border: 'none',
+        background: hovered ? 'var(--el-sidebar-hover-bg)' : 'transparent',
+        color: hovered ? 'var(--el-sidebar-active)' : 'var(--el-sidebar-text)',
+        cursor: 'pointer',
+        width: '100%',
+        textAlign: 'left',
+        transition: 'color 0.15s, background 0.15s',
+      }}
+      aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+    >
+      {theme === 'light' ? (
+        <>
+          <Moon style={{ width: 15, height: 15, opacity: 0.65 }} />
+          <span>Dark Mode</span>
+        </>
+      ) : (
+        <>
+          <Sun style={{ width: 15, height: 15, opacity: 0.65 }} />
+          <span>Light Mode</span>
+        </>
+      )}
+    </button>
+  );
 };
 
 // ─── SettingsLink ────────────────────────────────────────────────────────────
@@ -312,8 +360,9 @@ const SidebarContent = ({ onNavClick = () => { }, user = null }) => {
         borderTop: '1px solid var(--el-sidebar-border)',
         display: 'flex',
         flexDirection: 'column',
-        gap: 1,
+        gap: 4,
       }}>
+        <ThemeToggleButton />
         <SettingsLink onNavClick={onNavClick} />
       </div>
     </div>

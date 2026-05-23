@@ -159,27 +159,23 @@ const FocusMode = ({ open, task, onClose, onComplete, embedded = false }) => {
     const guidanceTips = guidance?.quick_tips?.length ? guidance.quick_tips : guidance?.best_practices || [];
 
     const panel = (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             {/* Header Area */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
                 <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                        <span style={{ 
-                            width: 8, height: 8, borderRadius: '50%', background: '#ef4444', 
-                            boxShadow: '0 0 10px rgba(239, 68, 68, 0.4)' 
-                        }} />
-                        <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--el-text-muted)' }}>Focus Session Active</span>
-                    </div>
-                    <h2 style={{ fontSize: 28, fontWeight: 800, color: 'var(--el-text)', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-                        {task?.title || 'Execution'}
+                    <h2 style={{ fontSize: 24, fontWeight: 700, color: 'var(--el-text)', letterSpacing: '-0.01em', lineHeight: 1.2 }}>
+                        Focus Session
                     </h2>
+                    <p style={{ marginTop: 8, fontSize: 14, color: 'var(--el-text-secondary)', maxWidth: 680, lineHeight: 1.5 }}>
+                        {task?.title || 'Deep work on your current task.'}
+                    </p>
                 </div>
                 <button 
                     onClick={onClose} 
                     style={{ 
-                        padding: '10px 20px', borderRadius: 10, fontSize: 13, fontWeight: 700,
+                        padding: '9px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600,
                         background: 'var(--el-bg)', border: '1px solid var(--el-border)', 
-                        color: 'var(--el-text-secondary)', cursor: 'pointer', transition: 'all 0.1s'
+                        color: 'var(--el-text-secondary)', cursor: 'pointer', transition: 'all 0.1s', whiteSpace: 'nowrap'
                     }}
                 >
                     End Session
@@ -187,53 +183,53 @@ const FocusMode = ({ open, task, onClose, onComplete, embedded = false }) => {
             </div>
 
             {/* Timer Area */}
-            <div style={{ padding: 40, borderRadius: 20, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border-subtle)', textAlign: 'center' }}>
-                <div style={{ fontSize: 80, fontWeight: 800, color: 'var(--el-text)', letterSpacing: '-0.04em', lineHeight: 1, marginBottom: 24 }}>
+            <div style={{ padding: 32, borderRadius: 14, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border)', textAlign: 'center' }}>
+                <div style={{ fontSize: 72, fontWeight: 700, color: 'var(--el-text)', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: 20 }}>
                     {minutes}<span style={{ opacity: 0.3 }}>:</span>{seconds}
                 </div>
                 
-                <div style={{ height: 6, width: '100%', maxWidth: 400, margin: '0 auto', background: 'var(--el-border)', borderRadius: 3, overflow: 'hidden' }}>
+                <div style={{ height: 5, width: '100%', maxWidth: 360, margin: '0 auto', background: 'var(--el-border)', borderRadius: 999, overflow: 'hidden' }}>
                     <div style={{ height: '100%', width: `${progress}%`, background: 'var(--el-text)', transition: 'width 1s linear' }} />
                 </div>
 
-                <div style={{ marginTop: 32, display: 'flex', justifyContent: 'center', gap: 12 }}>
+                <div style={{ marginTop: 22, display: 'flex', justifyContent: 'center', gap: 10 }}>
                     {durationOptions.map((option) => (
                         <button
                             key={option}
                             onClick={() => setDuration(option)}
                             style={{
-                                padding: '8px 16px', borderRadius: 8, fontSize: 12, fontWeight: 700,
+                                padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
                                 cursor: 'pointer', transition: 'all 0.1s',
                                 background: duration === option ? 'var(--el-text)' : 'var(--el-bg)',
                                 color: duration === option ? 'var(--el-bg)' : 'var(--el-text-secondary)',
                                 border: duration === option ? 'none' : '1px solid var(--el-border)'
                             }}
                         >
-                            {option}m
+                            {option} min
                         </button>
                     ))}
                 </div>
             </div>
 
             {/* Content Grid */}
-            <div style={{ display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
+            <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
                 {/* Guidance */}
-                <div style={{ padding: 24, borderRadius: 16, border: '1px solid var(--el-border)', background: 'var(--el-bg)' }}>
-                    <h4 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: 'var(--el-text-muted)', marginBottom: 16 }}>Guidance</h4>
+                <div style={{ padding: 20, borderRadius: 12, border: '1px solid var(--el-border)', background: 'var(--el-bg)' }}>
+                    <h4 style={{ fontSize: 13, fontWeight: 600, color: 'var(--el-text-muted)', marginBottom: 14 }}>Guidance</h4>
                     
                     {guidanceLoading ? (
                         <p style={{ fontSize: 13, color: 'var(--el-text-muted)' }}>Fetching strategic advice...</p>
                     ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--el-text)', lineHeight: 1.5 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--el-text)', lineHeight: 1.45 }}>
                                 {guidance?.objective || task?.reason}
                             </p>
                             
                             {guidance?.time_breakdown?.length > 0 && (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                                     {guidance.time_breakdown.map((item, idx) => (
-                                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, borderRadius: 10, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border-subtle)' }}>
-                                            <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--el-text)', minWidth: 40 }}>{item.duration}</span>
+                                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 10, borderRadius: 8, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border-subtle)' }}>
+                                            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--el-text)', minWidth: 48 }}>{item.duration}</span>
                                             <span style={{ fontSize: 13, color: 'var(--el-text-secondary)' }}>{item.activity}</span>
                                         </div>
                                     ))}
@@ -244,10 +240,10 @@ const FocusMode = ({ open, task, onClose, onComplete, embedded = false }) => {
                 </div>
 
                 {/* Checklist */}
-                <div style={{ padding: 24, borderRadius: 16, border: '1px solid var(--el-border)', background: 'var(--el-bg)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                        <h4 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: 'var(--el-text-muted)' }}>Checklist</h4>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--el-text)' }}>{stepCompletion}/{steps.length}</span>
+                <div style={{ padding: 20, borderRadius: 12, border: '1px solid var(--el-border)', background: 'var(--el-bg)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                        <h4 style={{ fontSize: 13, fontWeight: 600, color: 'var(--el-text-muted)' }}>Checklist</h4>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--el-text)' }}>{stepCompletion}/{steps.length}</span>
                     </div>
 
                     {guidanceLoading ? (
@@ -277,7 +273,7 @@ const FocusMode = ({ open, task, onClose, onComplete, embedded = false }) => {
                                                 {done && <span style={{ color: '#fff', fontSize: 12 }}>✓</span>}
                                             </div>
                                             <div>
-                                                <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--el-text)', textDecoration: done ? 'line-through' : 'none' }}>{step.title}</p>
+                                                <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--el-text)', textDecoration: done ? 'line-through' : 'none' }}>{step.title}</p>
                                                 {step.description && !done && <p style={{ fontSize: 12, color: 'var(--el-text-muted)', marginTop: 2 }}>{step.description}</p>}
                                             </div>
                                         </div>
@@ -288,8 +284,8 @@ const FocusMode = ({ open, task, onClose, onComplete, embedded = false }) => {
                     )}
 
                     {guidanceTips.length > 0 && (
-                        <div style={{ marginTop: 24, padding: 16, borderRadius: 12, background: 'var(--el-bg-secondary)', borderLeft: '4px solid var(--el-text)' }}>
-                            <p style={{ fontSize: 12, color: 'var(--el-text)', fontWeight: 700 }}>Pro Tip</p>
+                        <div style={{ marginTop: 16, padding: 14, borderRadius: 10, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border-subtle)' }}>
+                            <p style={{ fontSize: 12, color: 'var(--el-text)', fontWeight: 700 }}>Tip</p>
                             <p style={{ fontSize: 13, color: 'var(--el-text-secondary)', marginTop: 4 }}>{guidanceTips[0]}</p>
                         </div>
                     )}
@@ -304,8 +300,8 @@ const FocusMode = ({ open, task, onClose, onComplete, embedded = false }) => {
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
                 style={{ 
-                    width: '100%', maxWidth: 900, margin: '0 auto', 
-                    padding: 32, borderRadius: 24, background: 'var(--el-bg)', border: '1px solid var(--el-border)',
+                    width: '100%', maxWidth: 960, margin: '0 auto', 
+                    padding: 24, borderRadius: 16, background: 'var(--el-bg)', border: '1px solid var(--el-border)',
                     boxShadow: 'var(--el-shadow-card)'
                 }}
             >
@@ -315,14 +311,14 @@ const FocusMode = ({ open, task, onClose, onComplete, embedded = false }) => {
     }
 
     return (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 130, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', padding: 16 }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 130, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.45)', padding: 16 }}>
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 style={{ 
-                    width: '100%', maxWidth: 900, maxHeight: '90vh', overflowY: 'auto',
-                    padding: 40, borderRadius: 24, background: 'var(--el-bg)', border: '1px solid var(--el-border)',
-                    boxShadow: '0 40px 100px rgba(0,0,0,0.3)'
+                    width: '100%', maxWidth: 960, maxHeight: '90vh', overflowY: 'auto',
+                    padding: 24, borderRadius: 16, background: 'var(--el-bg)', border: '1px solid var(--el-border)',
+                    boxShadow: '0 24px 64px rgba(0,0,0,0.22)'
                 }}
             >
                 {panel}

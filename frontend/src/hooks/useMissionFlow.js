@@ -24,7 +24,10 @@ export const useMissionFlow = ({
 
     const handleStartFocus = useCallback(async (taskOverride = null) => {
         const taskToFocus = taskOverride || todayTask;
-        if (!taskToFocus?.id) return;
+        if (!taskToFocus?.id) {
+            toast.error('This task is missing an ID. Please refresh and try again.');
+            return false;
+        }
 
         try {
             setActiveTask(taskToFocus);
@@ -32,8 +35,10 @@ export const useMissionFlow = ({
             const session = await createFocusSession({ task: taskToFocus.id, planned_minutes: plannedMinutes });
             setFocusSession(session);
             setFocusOpen(true);
+            return true;
         } catch (error) {
             toast.error('Unable to start focus mode. Please retry.');
+            return false;
         }
     }, [todayTask, createFocusSession, toast]);
 

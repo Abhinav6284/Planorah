@@ -90,8 +90,8 @@ function RequestModal({ onClose }) {
                                 onChange={(e) => setDescription(e.target.value)}
                                 placeholder="Describe what you'd like to discuss..."
                                 style={{
-                                    width: '100%', borderRadius: 12, border: '1px solid var(--el-border)', 
-                                    background: 'var(--el-bg-secondary)', color: 'var(--el-text)', padding: 16, 
+                                    width: '100%', borderRadius: 12, border: '1px solid var(--el-border)',
+                                    background: 'var(--el-bg-secondary)', color: 'var(--el-text)', padding: 16,
                                     fontSize: 14, minHeight: 100, resize: 'none', outline: 'none'
                                 }}
                             />
@@ -134,19 +134,21 @@ export default function SessionsSection() {
     const visibleSessions = expanded ? sessions : sessions.slice(0, 3);
 
     return (
-        <div style={{ 
-            background: 'var(--el-bg)', 
-            border: '1px solid var(--el-border)', 
-            borderRadius: 16, 
-            padding: 24, 
-            boxShadow: 'var(--el-shadow-card)',
+        <div style={{
+            background: 'var(--el-glass-panel)',
+            border: 'var(--el-glass-border)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            borderRadius: 24,
+            padding: 24,
+            boxShadow: 'var(--el-glass-shadow)',
             color: 'var(--el-text)'
         }}>
             {notifications.map((notif) => (
                 <div
                     key={notif.id}
-                    style={{ 
-                        display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', 
+                    style={{
+                        display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
                         borderRadius: 12, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border)',
                         marginBottom: 20
                     }}
@@ -201,7 +203,7 @@ export default function SessionsSection() {
                             return (
                                 <div
                                     key={session.id}
-                                    style={{ 
+                                    style={{
                                         padding: 16, borderRadius: 12, border: '1px solid var(--el-border-subtle)',
                                         background: 'var(--el-bg)', display: 'flex', justifyContent: 'space-between', gap: 12
                                     }}
@@ -209,9 +211,9 @@ export default function SessionsSection() {
                                     <div style={{ flex: 1, minWidth: 0 }}>
                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
                                             {session.topic_tags?.map(tag => (
-                                                <span key={tag} style={{ 
-                                                    fontSize: 10, fontWeight: 700, textTransform: 'uppercase', 
-                                                    padding: '2px 8px', borderRadius: 4, background: 'var(--el-bg-secondary)', color: 'var(--el-text-muted)' 
+                                                <span key={tag} style={{
+                                                    fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
+                                                    padding: '2px 8px', borderRadius: 4, background: 'var(--el-bg-secondary)', color: 'var(--el-text-muted)'
                                                 }}>{tag}</span>
                                             ))}
                                         </div>
@@ -233,7 +235,7 @@ export default function SessionsSection() {
                                             </div>
                                         )}
                                     </div>
-                                    <div style={{ 
+                                    <div style={{
                                         height: 'fit-content', padding: '4px 10px', borderRadius: 8, fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
                                         background: session.status === 'confirmed' ? '#dcfce7' : 'var(--el-bg-secondary)',
                                         color: session.status === 'confirmed' ? '#166534' : 'var(--el-text-secondary)'
@@ -248,8 +250,8 @@ export default function SessionsSection() {
                     {sessions.length > 3 && (
                         <button
                             onClick={() => setExpanded((v) => !v)}
-                            style={{ 
-                                marginTop: 16, width: '100%', background: 'none', border: 'none', 
+                            style={{
+                                marginTop: 16, width: '100%', background: 'none', border: 'none',
                                 cursor: 'pointer', fontSize: 12, fontWeight: 600, color: 'var(--el-text-muted)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4
                             }}

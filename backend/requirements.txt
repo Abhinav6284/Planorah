@@ -11,7 +11,7 @@ django-filter==25.2
 djangorestframework==3.16.1
 djangorestframework_simplejwt==5.5.1
 google-ai-generativelanguage==0.6.15
-google-api-core==2.30.0
+google-api-core==2.25.2
 google-api-python-client==2.192.0
 google-auth==2.49.0
 google-auth-httplib2==0.3.0

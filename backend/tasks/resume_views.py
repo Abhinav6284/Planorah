@@ -32,7 +32,7 @@ class ResumeEntrySerializer(serializers.ModelSerializer):
 
 
 class ResumeVersionSerializer(serializers.ModelSerializer):
-    """Serializer for resume versions."""
+    """Serializer for resume versions with compiled entries."""
 
     entries = ResumeEntrySerializer(many=True, read_only=True)
 
@@ -40,11 +40,27 @@ class ResumeVersionSerializer(serializers.ModelSerializer):
         model = ResumeVersion
         fields = [
             'version_id', 'version_number', 'generated_at',
-            'was_eligible', 'eligibility_snapshot',
-            'compiled_content', 'total_tasks_completed',
-            'core_tasks_completed', 'average_score',
+            'was_eligible', 'eligibility_snapshot', 'compiled_content',
+            'total_tasks_completed', 'core_tasks_completed', 'average_score',
             'is_latest', 'entries'
         ]
+
+
+class ResumeSectionTemplateSerializer(serializers.ModelSerializer):
+    """Serializer for resume section templates."""
+
+    class Meta:
+        model = ResumeSectionTemplate
+        fields = ['template_id', 'name', 'description', 'sections', 'is_default']
+
+
+class ResumeTemplateViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Read-only access to resume templates.
+    """
+    permission_classes = [IsAuthenticated]
+    queryset = ResumeSectionTemplate.objects.all()
+    serializer_class = ResumeSectionTemplateSerializer
 
 
 class ResumeGenerateView(views.APIView):

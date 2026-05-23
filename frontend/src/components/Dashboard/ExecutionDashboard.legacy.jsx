@@ -448,7 +448,7 @@ const ExecutionDashboard = () => {
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
                     <section className="space-y-4 lg:col-span-8">
                         {focusOpen && (
-                            <div className={`${shellCardClass} border-slate-700 bg-[#111111] dark:bg-[#111111]`}>
+                            <div className={shellCardClass}>
                                 <FocusMode
                                     open={focusOpen}
                                     task={todayTask}

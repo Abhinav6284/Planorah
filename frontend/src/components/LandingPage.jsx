@@ -7,6 +7,7 @@ import {
 } from './shared/Icons';
 import { Button } from './shared/Primitives';
 import { motion } from 'framer-motion';
+
 // ─── Scroll reveal ────────────────────────────────────────
 function useScrollReveal() {
   useEffect(() => {
@@ -571,7 +572,7 @@ function HowItWorksSection({ navigate }) {
   };
 
   return (
-    <section style={{ background: 'var(--bg-subtle)', padding: '96px 0' }}>
+    <section style={{ background: 'var(--bg-subtle)', padding: '96px 0', transition: 'background 0.3s ease' }}>
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -631,17 +632,18 @@ function HowItWorksSection({ navigate }) {
 
                 {/* Content card */}
                 <motion.div
-                  whileHover={{ x: 6, backgroundColor: 'var(--bg)', boxShadow: '0 12px 30px rgba(0,0,0,0.06)', borderColor: 'var(--fg-muted)' }}
+                  whileHover={{ y: -5, backgroundColor: 'var(--surface)', boxShadow: 'var(--shadow-card-lg)', borderColor: 'var(--fg-muted)' }}
                   style={{
-                    padding: '24px 28px',
+                    padding: '28px 32px',
                     background: 'var(--surface)',
-                    borderRadius: 16,
+                    borderRadius: 20,
                     border: '1px solid var(--border-subtle)',
-                    transition: 'all 0.2s ease',
+                    transition: 'background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease',
+                    boxShadow: 'var(--shadow-card)'
                   }}
                 >
-                  <div style={{ fontSize: 17, fontWeight: 600, color: 'var(--fg-deep)', marginBottom: 8, letterSpacing: '-0.01em' }}>{s.title}</div>
-                  <div style={{ fontSize: 15, color: 'var(--fg-muted)', lineHeight: 1.6 }}>{s.body}</div>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--fg-deep)', marginBottom: 10, letterSpacing: '-0.02em' }}>{s.title}</div>
+                  <div style={{ fontSize: 15, color: 'var(--fg-muted)', lineHeight: 1.65 }}>{s.body}</div>
                 </motion.div>
               </motion.div>
             ))}

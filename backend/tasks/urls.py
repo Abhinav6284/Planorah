@@ -8,7 +8,7 @@ from .admin_views import (
     EligibilityOverrideViewSet,
     RemediationViewSet
 )
-from .resume_views import ResumeGenerateView, ResumeViewSet
+from .resume_views import ResumeGenerateView, ResumeViewSet, ResumeTemplateViewSet
 
 router = DefaultRouter()
 router.register(r'tasks', TaskViewSet, basename='task')
@@ -18,6 +18,7 @@ router.register(r'remediations', RemediationViewSet, basename='remediation')
 router.register(r'admin/eligibility-overrides',
                 EligibilityOverrideViewSet, basename='admin-override')
 router.register(r'resume', ResumeViewSet, basename='resume')
+router.register(r'resume-templates', ResumeTemplateViewSet, basename='resume-template')
 
 urlpatterns = [
     path('', include(router.urls)),

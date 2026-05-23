@@ -6,13 +6,13 @@ const ChartTooltip = ({ active, payload, isApiData }) => {
   if (!active || !payload?.length) return null;
   const entry = payload[0]?.payload;
   return (
-    <div style={{ 
-        background: 'var(--el-bg)', 
-        border: '1px solid var(--el-border)', 
-        borderRadius: 12, 
-        padding: '12px 16px', 
-        boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-        backdropFilter: 'blur(8px)'
+    <div style={{
+      background: 'var(--el-bg)',
+      border: '1px solid var(--el-border)',
+      borderRadius: 12,
+      padding: '12px 16px',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+      backdropFilter: 'blur(8px)'
     }}>
       <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--el-text-muted)', textTransform: 'uppercase', marginBottom: 4 }}>{entry?.day}</p>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -49,7 +49,7 @@ const PerformanceChart = ({ tasks = [], chartData: apiChartData = null }) => {
 
       const completed = (tasks || []).filter(
         (t) => t.status === 'completed' &&
-        String(t.completed_at || t.updated_at || '').slice(0, 10) === iso
+          String(t.completed_at || t.updated_at || '').slice(0, 10) === iso
       ).length;
 
       const scheduled = (tasks || []).filter(
@@ -75,13 +75,15 @@ const PerformanceChart = ({ tasks = [], chartData: apiChartData = null }) => {
   }, [data]);
 
   return (
-    <div style={{ 
-        background: 'var(--el-bg)', 
-        border: '1px solid var(--el-border)', 
-        borderRadius: 16, 
-        padding: 24, 
-        boxShadow: 'var(--el-shadow-card)',
-        color: 'var(--el-text)'
+    <div style={{
+      background: 'var(--el-glass-panel)',
+      border: 'var(--el-glass-border)',
+      backdropFilter: 'blur(24px)',
+      WebkitBackdropFilter: 'blur(24px)',
+      borderRadius: 24,
+      padding: 24,
+      boxShadow: 'var(--el-glass-shadow)',
+      color: 'var(--el-text)'
     }}>
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
@@ -90,9 +92,9 @@ const PerformanceChart = ({ tasks = [], chartData: apiChartData = null }) => {
             Performance Metrics
           </h3>
         </div>
-        <div style={{ 
-            fontSize: 11, fontWeight: 600, color: 'var(--el-text-secondary)',
-            background: 'var(--el-bg-secondary)', padding: '4px 10px', borderRadius: 8
+        <div style={{
+          fontSize: 11, fontWeight: 600, color: 'var(--el-text-secondary)',
+          background: 'var(--el-bg-secondary)', padding: '4px 10px', borderRadius: 8
         }}>
           {dateRangeLabel}
         </div>
@@ -123,8 +125,8 @@ const PerformanceChart = ({ tasks = [], chartData: apiChartData = null }) => {
               tickLine={false}
               width={30}
             />
-            <Tooltip 
-              content={<ChartTooltip isApiData={!!apiChartData} />} 
+            <Tooltip
+              content={<ChartTooltip isApiData={!!apiChartData} />}
               cursor={{ stroke: 'var(--el-border)', strokeWidth: 1 }}
             />
             <Area
@@ -142,9 +144,9 @@ const PerformanceChart = ({ tasks = [], chartData: apiChartData = null }) => {
       </div>
 
       {/* Legend */}
-      <div style={{ 
-          display: 'flex', gap: 20, marginTop: 20, paddingTop: 20, 
-          borderTop: '1px solid var(--el-border-subtle)' 
+      <div style={{
+        display: 'flex', gap: 20, marginTop: 20, paddingTop: 20,
+        borderTop: '1px solid var(--el-border-subtle)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--el-text)' }} />

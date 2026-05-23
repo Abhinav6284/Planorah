@@ -1,352 +1,624 @@
-// Resume Templates - Professional, ATS-friendly designs
+const resumeJsonSchema = {
+    type: "object",
+    required: ["personal", "education", "experience", "skills", "projects", "links"],
+    properties: {
+        personal: {
+            type: "object",
+            properties: {
+                first_name: { type: "string" },
+                last_name: { type: "string" },
+                job_title: { type: "string" },
+                summary: { type: "string" },
+                email: { type: "string" },
+                phone: { type: "string" },
+                address: { type: "string" }
+            }
+        },
+        education: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    institution: { type: "string" },
+                    degree: { type: "string" },
+                    field: { type: "string" },
+                    start_date: { type: "string" },
+                    end_date: { type: "string" },
+                    score_type: { type: "string", enum: ["percentage", "cgpa"] },
+                    percentage: { type: "string" },
+                    cgpa: { type: "string" }
+                }
+            }
+        },
+        experience: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    company: { type: "string" },
+                    title: { type: "string" },
+                    location: { type: "string" },
+                    start_date: { type: "string" },
+                    end_date: { type: "string" },
+                    description: { type: "string" }
+                }
+            }
+        },
+        skills: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    category: { type: "string" },
+                    items: { type: "string" }
+                }
+            }
+        },
+        projects: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    name: { type: "string" },
+                    technologies: { type: "string" },
+                    description: { type: "string" },
+                    link: { type: "string" }
+                }
+            }
+        },
+        certifications: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    name: { type: "string" },
+                    issuer: { type: "string" },
+                    year: { type: "string" },
+                    link: { type: "string" }
+                }
+            }
+        },
+        achievements: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    title: { type: "string" },
+                    detail: { type: "string" }
+                }
+            }
+        },
+        links: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    type: { type: "string" },
+                    url: { type: "string" }
+                }
+            }
+        }
+    }
+};
+
+const exampleDataBase = {
+    personal: {
+        first_name: "Aarav",
+        last_name: "Mehta",
+        job_title: "Senior Software Engineer",
+        summary:
+            "Product-focused engineer with 6+ years building low-latency platforms, data products, and growth-facing user experiences.",
+        email: "aarav.mehta@planorah.com",
+        phone: "+1 415 555 0129",
+        address: "San Francisco, CA"
+    },
+    education: [
+        {
+            institution: "Indian Institute of Technology Bombay",
+            degree: "B.Tech",
+            field: "Computer Science",
+            start_date: "2014",
+            end_date: "2018",
+            score_type: "cgpa",
+            cgpa: "9.1/10"
+        }
+    ],
+    experience: [
+        {
+            company: "Stripe",
+            title: "Senior Software Engineer",
+            location: "San Francisco, CA",
+            start_date: "2022",
+            end_date: "Present",
+            description:
+                "Built event-driven payout reconciliation pipeline reducing failed payouts by 38%.\nMentored 4 engineers and improved release confidence with contract testing."
+        },
+        {
+            company: "Atlassian",
+            title: "Software Engineer",
+            location: "Bengaluru, India",
+            start_date: "2018",
+            end_date: "2022",
+            description:
+                "Scaled search ranking service for 8M monthly users.\nImproved dashboard render performance by 42% through bundle and cache optimization."
+        }
+    ],
+    skills: [
+        { category: "Languages", items: "Python, TypeScript, Go, SQL" },
+        { category: "Frameworks", items: "React, Next.js, Django, FastAPI" },
+        { category: "Cloud", items: "AWS, Docker, Kubernetes, Terraform" }
+    ],
+    projects: [
+        {
+            name: "Planorah ATS Optimizer",
+            technologies: "React, Python, LLMs",
+            description:
+                "Built AI resume recommendation flow with contextual scoring, increasing interview callbacks by 29%.",
+            link: "github.com/planorah/ats-optimizer"
+        }
+    ],
+    certifications: [
+        {
+            name: "AWS Solutions Architect Professional",
+            issuer: "Amazon Web Services",
+            year: "2024",
+            link: "credly.com/aarav-mehta"
+        }
+    ],
+    achievements: [
+        {
+            title: "Patent",
+            detail: "Co-inventor on adaptive ranking patent filed in US market."
+        },
+        {
+            title: "Hackathon Winner",
+            detail: "Won internal ML hackathon among 200+ participants."
+        }
+    ],
+    links: [
+        { type: "LinkedIn", url: "linkedin.com/in/aarav-mehta" },
+        { type: "GitHub", url: "github.com/aaravmehta" },
+        { type: "Portfolio", url: "aaravmehta.dev" }
+    ]
+};
+
+const escapeHtml = (value) =>
+    String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
+const splitBullets = (text) =>
+    String(text || "")
+        .split("\n")
+        .map((line) => line.replace(/^\s*[-\u2022]\s*/, "").trim())
+        .filter(Boolean);
 
 const getEducationScoreText = (educationItem = {}) => {
-    const percentage = educationItem?.percentage ? String(educationItem.percentage).trim() : '';
-    const cgpa = educationItem?.cgpa ? String(educationItem.cgpa).trim() : '';
+    const percentage = educationItem?.percentage ? String(educationItem.percentage).trim() : "";
+    const cgpa = educationItem?.cgpa ? String(educationItem.cgpa).trim() : "";
 
     if (percentage && cgpa) {
-        return `${percentage} • CGPA: ${cgpa}`;
+        return `${percentage} | CGPA ${cgpa}`;
     }
     if (cgpa) {
-        return `CGPA: ${cgpa}`;
+        return `CGPA ${cgpa}`;
     }
     return percentage;
 };
 
-export const TEMPLATES = {
-    professional: {
-        id: 'professional',
-        name: 'Professional Classic',
-        description: 'Traditional format, perfect for corporate roles',
-        thumbnail: '📋',
-        render: (data) => {
-            const { personal, education, experience, skills, projects, links } = data;
-            return `
-                <div style="font-family: 'Times New Roman', Georgia, serif; padding: 40px; max-width: 100%; color: #1a1a1a; line-height: 1.4;">
-                    <!-- Header -->
-                    <div style="text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #2c3e50;">
-                        <h1 style="font-size: 28px; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 3px; color: #2c3e50;">
-                            ${personal?.first_name || 'First'} ${personal?.last_name || 'Last'}
-                        </h1>
-                        <p style="font-size: 14px; color: #555; margin: 8px 0; font-style: italic;">
-                            ${personal?.job_title || 'Software Developer'}
-                        </p>
-                        <p style="font-size: 11px; color: #666; margin: 5px 0;">
-                            ${[personal?.email, personal?.phone, personal?.address].filter(Boolean).join(' • ') || 'email@example.com • +91 1234567890 • City, Country'}
-                        </p>
-                        ${links?.filter(l => l.url).length > 0 ? `
-                            <p style="font-size: 11px; color: #3498db; margin: 5px 0;">
-                                ${links.filter(l => l.url).map(l => `${l.type}: ${l.url}`).join(' | ')}
-                            </p>
-                        ` : ''}
-                    </div>
+const renderList = (items, className = "") => {
+    if (!items.length) {
+        return "";
+    }
 
-                    <!-- Education -->
-                    ${education?.some(e => e.institution) ? `
-                        <div style="margin-bottom: 20px;">
-                            <h2 style="font-size: 13px; font-weight: bold; text-transform: uppercase; color: #2c3e50; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px; margin-bottom: 12px; letter-spacing: 2px;">
-                                Education
-                            </h2>
-                            ${education.filter(e => e.institution).map(edu => `
-                                <div style="margin-bottom: 10px;">
-                                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                                        <strong style="font-size: 13px; color: #2c3e50;">${edu.institution}</strong>
-                                        <span style="font-size: 11px; color: #7f8c8d;">${edu.start_date || ''} - ${edu.end_date || 'Present'}</span>
-                                    </div>
-                                    <p style="font-size: 12px; color: #444; margin: 3px 0;">
-                                        ${edu.degree || ''}${edu.field ? ` in ${edu.field}` : ''}
-                                        ${getEducationScoreText(edu) ? ` • ${getEducationScoreText(edu)}` : ''}
-                                    </p>
-                                </div>
-                            `).join('')}
-                        </div>
-                    ` : ''}
+    return `<ul class="${className}">${items
+        .map((item) => `<li>${escapeHtml(item)}</li>`)
+        .join("")}</ul>`;
+};
 
-                    <!-- Experience -->
-                    ${experience?.some(e => e.company) ? `
-                        <div style="margin-bottom: 20px;">
-                            <h2 style="font-size: 13px; font-weight: bold; text-transform: uppercase; color: #2c3e50; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px; margin-bottom: 12px; letter-spacing: 2px;">
-                                Professional Experience
-                            </h2>
-                            ${experience.filter(e => e.company).map(exp => `
-                                <div style="margin-bottom: 14px;">
-                                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                                        <strong style="font-size: 13px; color: #2c3e50;">${exp.company}</strong>
-                                        <span style="font-size: 11px; color: #7f8c8d;">${exp.start_date || ''} - ${exp.end_date || 'Present'}</span>
-                                    </div>
-                                    <p style="font-size: 12px; font-style: italic; color: #555; margin: 2px 0;">
-                                        ${exp.title || ''}${exp.location ? ` • ${exp.location}` : ''}
-                                    </p>
-                                    ${exp.description ? `
-                                        <ul style="font-size: 11px; margin: 6px 0 0 18px; padding: 0; color: #444;">
-                                            ${exp.description.split('\n').filter(Boolean).map(line => `<li style="margin-bottom: 3px;">${line}</li>`).join('')}
-                                        </ul>
-                                    ` : ''}
-                                </div>
-                            `).join('')}
-                        </div>
-                    ` : ''}
-
-                    <!-- Projects -->
-                    ${projects?.some(p => p.name) ? `
-                        <div style="margin-bottom: 20px;">
-                            <h2 style="font-size: 13px; font-weight: bold; text-transform: uppercase; color: #2c3e50; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px; margin-bottom: 12px; letter-spacing: 2px;">
-                                Projects
-                            </h2>
-                            ${projects.filter(p => p.name).map(proj => `
-                                <div style="margin-bottom: 10px;">
-                                    <strong style="font-size: 12px; color: #2c3e50;">${proj.name}</strong>
-                                    ${proj.technologies ? `<span style="font-size: 10px; color: #7f8c8d;"> (${proj.technologies})</span>` : ''}
-                                    ${proj.description ? `<p style="font-size: 11px; margin: 3px 0 0 0; color: #444;">${proj.description}</p>` : ''}
-                                </div>
-                            `).join('')}
-                        </div>
-                    ` : ''}
-
-                    <!-- Skills -->
-                    ${skills?.some(s => s.items) ? `
-                        <div style="margin-bottom: 20px;">
-                            <h2 style="font-size: 13px; font-weight: bold; text-transform: uppercase; color: #2c3e50; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px; margin-bottom: 12px; letter-spacing: 2px;">
-                                Skills
-                            </h2>
-                            ${skills.filter(s => s.items).map(skill => `
-                                <p style="font-size: 11px; margin: 5px 0; color: #444;">
-                                    <strong style="color: #2c3e50;">${skill.category}:</strong> ${skill.items}
-                                </p>
-                            `).join('')}
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-        }
+const styleByTemplate = {
+    "faang-minimal": {
+        font: "Inter, Arial, sans-serif",
+        accent: "#111827",
+        muted: "#374151",
+        headingSpacing: "1.5px",
+        headerRule: "2px solid #111827"
     },
-
-    modern: {
-        id: 'modern',
-        name: 'Modern Minimal',
-        description: 'Clean and contemporary design with accent colors',
-        thumbnail: '✨',
-        render: (data) => {
-            const { personal, education, experience, skills, projects, links } = data;
-            return `
-                <div style="font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; padding: 40px; max-width: 100%; color: #333; line-height: 1.5;">
-                    <!-- Header -->
-                    <div style="margin-bottom: 30px;">
-                        <h1 style="font-size: 32px; font-weight: 300; margin: 0; color: #1a1a1a;">
-                            ${personal?.first_name || 'First'} <strong>${personal?.last_name || 'Last'}</strong>
-                        </h1>
-                        <p style="font-size: 16px; color: #10b981; margin: 8px 0 0 0; font-weight: 500;">
-                            ${personal?.job_title || 'Software Developer'}
-                        </p>
-                        <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 12px; font-size: 12px; color: #666;">
-                            ${personal?.email ? `<span>📧 ${personal.email}</span>` : ''}
-                            ${personal?.phone ? `<span>📱 ${personal.phone}</span>` : ''}
-                            ${personal?.address ? `<span>📍 ${personal.address}</span>` : ''}
-                        </div>
-                        ${links?.filter(l => l.url).length > 0 ? `
-                            <div style="display: flex; gap: 15px; margin-top: 8px; font-size: 11px;">
-                                ${links.filter(l => l.url).map(l => `<span style="color: #10b981;">🔗 ${l.type}</span>`).join('')}
-                            </div>
-                        ` : ''}
-                    </div>
-
-                    <!-- Experience -->
-                    ${experience?.some(e => e.company) ? `
-                        <div style="margin-bottom: 25px;">
-                            <h2 style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: #10b981; margin-bottom: 15px; letter-spacing: 1px;">
-                                Experience
-                            </h2>
-                            ${experience.filter(e => e.company).map(exp => `
-                                <div style="margin-bottom: 18px; padding-left: 15px; border-left: 3px solid #10b981;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <h3 style="font-size: 14px; font-weight: 600; margin: 0; color: #1a1a1a;">${exp.title || 'Role'}</h3>
-                                        <span style="font-size: 11px; color: #888; background: #f5f5f5; padding: 2px 8px; border-radius: 10px;">
-                                            ${exp.start_date || ''} - ${exp.end_date || 'Present'}
-                                        </span>
-                                    </div>
-                                    <p style="font-size: 13px; color: #555; margin: 4px 0;">
-                                        ${exp.company}${exp.location ? ` • ${exp.location}` : ''}
-                                    </p>
-                                    ${exp.description ? `
-                                        <ul style="font-size: 12px; margin: 8px 0 0 15px; padding: 0; color: #444;">
-                                            ${exp.description.split('\n').filter(Boolean).map(line => `<li style="margin-bottom: 4px;">${line}</li>`).join('')}
-                                        </ul>
-                                    ` : ''}
-                                </div>
-                            `).join('')}
-                        </div>
-                    ` : ''}
-
-                    <!-- Education -->
-                    ${education?.some(e => e.institution) ? `
-                        <div style="margin-bottom: 25px;">
-                            <h2 style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: #10b981; margin-bottom: 15px; letter-spacing: 1px;">
-                                Education
-                            </h2>
-                            ${education.filter(e => e.institution).map(edu => `
-                                <div style="margin-bottom: 12px; padding-left: 15px; border-left: 3px solid #e5e5e5;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <h3 style="font-size: 14px; font-weight: 600; margin: 0; color: #1a1a1a;">${edu.institution}</h3>
-                                        <span style="font-size: 11px; color: #888;">${edu.start_date || ''} - ${edu.end_date || ''}</span>
-                                    </div>
-                                    <p style="font-size: 12px; color: #555; margin: 3px 0;">
-                                        ${edu.degree || ''}${edu.field ? ` in ${edu.field}` : ''}
-                                        ${getEducationScoreText(edu) ? ` • ${getEducationScoreText(edu)}` : ''}
-                                    </p>
-                                </div>
-                            `).join('')}
-                        </div>
-                    ` : ''}
-
-                    <!-- Projects -->
-                    ${projects?.some(p => p.name) ? `
-                        <div style="margin-bottom: 25px;">
-                            <h2 style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: #10b981; margin-bottom: 15px; letter-spacing: 1px;">
-                                Projects
-                            </h2>
-                            <div style="display: grid; gap: 12px;">
-                                ${projects.filter(p => p.name).map(proj => `
-                                    <div style="padding: 12px; background: #f9fafb; border-radius: 8px;">
-                                        <h3 style="font-size: 13px; font-weight: 600; margin: 0; color: #1a1a1a;">${proj.name}</h3>
-                                        ${proj.technologies ? `<p style="font-size: 10px; color: #10b981; margin: 4px 0 0 0;">${proj.technologies}</p>` : ''}
-                                        ${proj.description ? `<p style="font-size: 11px; color: #555; margin: 6px 0 0 0;">${proj.description}</p>` : ''}
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    ` : ''}
-
-                    <!-- Skills -->
-                    ${skills?.some(s => s.items) ? `
-                        <div style="margin-bottom: 20px;">
-                            <h2 style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: #10b981; margin-bottom: 15px; letter-spacing: 1px;">
-                                Skills
-                            </h2>
-                            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                                ${skills.filter(s => s.items).flatMap(s => s.items.split(',').map(item => item.trim())).filter(Boolean).map(skill => `
-                                    <span style="font-size: 11px; padding: 4px 12px; background: #ecfdf5; color: #059669; border-radius: 15px;">${skill}</span>
-                                `).join('')}
-                            </div>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-        }
+    "modern-executive": {
+        font: "Manrope, Inter, Arial, sans-serif",
+        accent: "#0f172a",
+        muted: "#334155",
+        headingSpacing: "2px",
+        headerRule: "2px solid #0f172a"
     },
-
-    creative: {
-        id: 'creative',
-        name: 'Creative Bold',
-        description: 'Eye-catching design for creative professionals',
-        thumbnail: '🎨',
-        render: (data) => {
-            const { personal, education, experience, skills, projects, links } = data;
-            return `
-                <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 100%; color: #333; line-height: 1.5;">
-                    <!-- Header with gradient -->
-                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; color: white;">
-                        <h1 style="font-size: 36px; font-weight: 700; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">
-                            ${personal?.first_name || 'First'} ${personal?.last_name || 'Last'}
-                        </h1>
-                        <p style="font-size: 18px; margin: 10px 0 0 0; opacity: 0.9;">
-                            ${personal?.job_title || 'Software Developer'}
-                        </p>
-                        <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px; font-size: 13px; opacity: 0.9;">
-                            ${personal?.email ? `<span>✉️ ${personal.email}</span>` : ''}
-                            ${personal?.phone ? `<span>📞 ${personal.phone}</span>` : ''}
-                            ${personal?.address ? `<span>📍 ${personal.address}</span>` : ''}
-                        </div>
-                        ${links?.filter(l => l.url).length > 0 ? `
-                            <div style="display: flex; gap: 15px; margin-top: 12px; font-size: 12px;">
-                                ${links.filter(l => l.url).map(l => `<span style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 15px;">🔗 ${l.type}</span>`).join('')}
-                            </div>
-                        ` : ''}
-                    </div>
-
-                    <div style="padding: 30px 40px;">
-                        <!-- Skills Badges at top -->
-                        ${skills?.some(s => s.items) ? `
-                            <div style="margin-bottom: 30px;">
-                                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                                    ${skills.filter(s => s.items).flatMap(s => s.items.split(',').map(item => item.trim())).filter(Boolean).slice(0, 10).map(skill => `
-                                        <span style="font-size: 12px; padding: 6px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 20px; font-weight: 500;">${skill}</span>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        ` : ''}
-
-                        <!-- Experience -->
-                        ${experience?.some(e => e.company) ? `
-                            <div style="margin-bottom: 30px;">
-                                <h2 style="font-size: 18px; font-weight: 700; color: #667eea; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                                    <span style="width: 30px; height: 3px; background: linear-gradient(90deg, #667eea, #764ba2);"></span>
-                                    Experience
-                                </h2>
-                                ${experience.filter(e => e.company).map(exp => `
-                                    <div style="margin-bottom: 20px; position: relative; padding-left: 20px;">
-                                        <div style="position: absolute; left: 0; top: 8px; width: 10px; height: 10px; background: #667eea; border-radius: 50%;"></div>
-                                        <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;">
-                                            <h3 style="font-size: 15px; font-weight: 600; margin: 0; color: #1a1a1a;">${exp.title || 'Role'}</h3>
-                                            <span style="font-size: 12px; color: #764ba2; font-weight: 500;">${exp.start_date || ''} - ${exp.end_date || 'Present'}</span>
-                                        </div>
-                                        <p style="font-size: 13px; color: #667eea; margin: 4px 0; font-weight: 500;">${exp.company}${exp.location ? ` • ${exp.location}` : ''}</p>
-                                        ${exp.description ? `
-                                            <ul style="font-size: 12px; margin: 8px 0 0 15px; padding: 0; color: #555;">
-                                                ${exp.description.split('\n').filter(Boolean).map(line => `<li style="margin-bottom: 4px;">${line}</li>`).join('')}
-                                            </ul>
-                                        ` : ''}
-                                    </div>
-                                `).join('')}
-                            </div>
-                        ` : ''}
-
-                        <!-- Education & Projects Side by Side -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-                            <!-- Education -->
-                            ${education?.some(e => e.institution) ? `
-                                <div>
-                                    <h2 style="font-size: 16px; font-weight: 700; color: #667eea; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                                        <span style="width: 20px; height: 3px; background: linear-gradient(90deg, #667eea, #764ba2);"></span>
-                                        Education
-                                    </h2>
-                                    ${education.filter(e => e.institution).map(edu => `
-                                        <div style="margin-bottom: 15px; padding: 15px; background: #f8f9ff; border-radius: 10px; border-left: 4px solid #667eea;">
-                                            <h3 style="font-size: 13px; font-weight: 600; margin: 0; color: #1a1a1a;">${edu.institution}</h3>
-                                            <p style="font-size: 12px; color: #555; margin: 4px 0 0 0;">
-                                                ${edu.degree || ''}${edu.field ? ` in ${edu.field}` : ''}
-                                            </p>
-                                            <p style="font-size: 11px; color: #764ba2; margin: 4px 0 0 0;">
-                                                ${edu.start_date || ''} - ${edu.end_date || ''}
-                                                ${getEducationScoreText(edu) ? ` • ${getEducationScoreText(edu)}` : ''}
-                                            </p>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            ` : '<div></div>'}
-
-                            <!-- Projects -->
-                            ${projects?.some(p => p.name) ? `
-                                <div>
-                                    <h2 style="font-size: 16px; font-weight: 700; color: #667eea; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                                        <span style="width: 20px; height: 3px; background: linear-gradient(90deg, #667eea, #764ba2);"></span>
-                                        Projects
-                                    </h2>
-                                    ${projects.filter(p => p.name).map(proj => `
-                                        <div style="margin-bottom: 15px; padding: 15px; background: #f8f9ff; border-radius: 10px; border-left: 4px solid #764ba2;">
-                                            <h3 style="font-size: 13px; font-weight: 600; margin: 0; color: #1a1a1a;">${proj.name}</h3>
-                                            ${proj.technologies ? `<p style="font-size: 10px; color: #764ba2; margin: 4px 0 0 0;">${proj.technologies}</p>` : ''}
-                                            ${proj.description ? `<p style="font-size: 11px; color: #555; margin: 6px 0 0 0;">${proj.description}</p>` : ''}
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            ` : '<div></div>'}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
+    "software-engineer-ats": {
+        font: "IBM Plex Sans, Inter, Arial, sans-serif",
+        accent: "#0b1220",
+        muted: "#334155",
+        headingSpacing: "1.2px",
+        headerRule: "2px solid #0b1220"
+    },
+    "product-manager-elite": {
+        font: "Manrope, Inter, Arial, sans-serif",
+        accent: "#111827",
+        muted: "#475569",
+        headingSpacing: "1.8px",
+        headerRule: "2px solid #111827"
+    },
+    "data-scientist-clean": {
+        font: "IBM Plex Sans, Inter, Arial, sans-serif",
+        accent: "#1f2937",
+        muted: "#475569",
+        headingSpacing: "1.3px",
+        headerRule: "2px solid #1f2937"
+    },
+    "student-fresher-ats": {
+        font: "Inter, Arial, sans-serif",
+        accent: "#111827",
+        muted: "#4b5563",
+        headingSpacing: "1.3px",
+        headerRule: "2px solid #111827"
+    },
+    "luxury-minimal-bw": {
+        font: "IBM Plex Sans, Arial, sans-serif",
+        accent: "#000000",
+        muted: "#333333",
+        headingSpacing: "2.4px",
+        headerRule: "3px solid #000000"
+    },
+    "startup-founder-style": {
+        font: "Manrope, Inter, Arial, sans-serif",
+        accent: "#111827",
+        muted: "#334155",
+        headingSpacing: "1.7px",
+        headerRule: "2px solid #111827"
+    },
+    "google-clean": {
+        font: "Inter, Arial, sans-serif",
+        accent: "#202124",
+        muted: "#3c4043",
+        headingSpacing: "1.2px",
+        headerRule: "2px solid #202124"
+    },
+    "harvard-ats": {
+        font: "IBM Plex Serif, Georgia, Times New Roman, serif",
+        accent: "#111111",
+        muted: "#333333",
+        headingSpacing: "2.2px",
+        headerRule: "2px solid #111111"
     }
 };
 
-export const getTemplateById = (id) => TEMPLATES[id] || TEMPLATES.professional;
+const createTemplateRenderer = (templateId) => {
+    return (data, options = {}) => {
+        const style = styleByTemplate[templateId] || styleByTemplate["faang-minimal"];
+        const sectionOrder =
+            options.sectionOrder && options.sectionOrder.length
+                ? options.sectionOrder
+                : ["experience", "projects", "skills", "education", "certifications", "achievements", "links"];
+
+        const accent = options.accentColor || style.accent;
+        const fontFamily = options.fontFamily || style.font;
+
+        const personal = data.personal || {};
+        const experience = (data.experience || []).filter((entry) => entry.company || entry.title);
+        const projects = (data.projects || []).filter((entry) => entry.name);
+        const education = (data.education || []).filter((entry) => entry.institution);
+        const skills = (data.skills || []).filter((entry) => entry.items);
+        const links = (data.links || []).filter((entry) => entry.url);
+        const certifications = (data.certifications || []).filter((entry) => entry.name);
+        const achievements = (data.achievements || []).filter((entry) => entry.title || entry.detail);
+
+        const sectionTitle = (label) => `
+            <h2 style="
+                font-size: 12px;
+                text-transform: uppercase;
+                letter-spacing: ${style.headingSpacing};
+                color: ${accent};
+                margin: 0 0 8px;
+                padding-bottom: 4px;
+                border-bottom: 1px solid #d1d5db;
+            ">${label}</h2>
+        `;
+
+        const sectionMap = {
+            experience: experience.length
+                ? `
+                    <section style="margin-bottom: 14px;">
+                        ${sectionTitle("Experience")}
+                        ${experience
+                            .map((exp) => {
+                                const bullets = splitBullets(exp.description);
+                                return `
+                                    <article style="margin-bottom: 10px;">
+                                        <div style="display: flex; justify-content: space-between; gap: 8px; align-items: baseline;">
+                                            <strong style="font-size: 12.5px; color: ${style.accent};">${escapeHtml(exp.title || "Role")}</strong>
+                                            <span style="font-size: 10.5px; color: ${style.muted};">${escapeHtml(exp.start_date)} - ${escapeHtml(exp.end_date || "Present")}</span>
+                                        </div>
+                                        <div style="font-size: 11px; color: ${style.muted}; margin: 2px 0 4px;">
+                                            ${escapeHtml(exp.company || "")} ${exp.location ? `| ${escapeHtml(exp.location)}` : ""}
+                                        </div>
+                                        ${renderList(bullets, "resume-bullets")}
+                                    </article>
+                                `;
+                            })
+                            .join("")}
+                    </section>
+                `
+                : "",
+            projects: projects.length
+                ? `
+                    <section style="margin-bottom: 14px;">
+                        ${sectionTitle("Projects")}
+                        ${projects
+                            .map((project) => `
+                                <article style="margin-bottom: 10px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px;">
+                                        <strong style="font-size: 12px; color: ${style.accent};">${escapeHtml(project.name)}</strong>
+                                        <span style="font-size: 10px; color: ${style.muted};">${escapeHtml(project.technologies || "")}</span>
+                                    </div>
+                                    <p style="font-size: 11px; margin: 2px 0; color: ${style.muted};">${escapeHtml(project.description || "")}</p>
+                                    ${project.link ? `<p style="font-size: 10px; margin: 0; color: ${style.muted};">Link: ${escapeHtml(project.link)}</p>` : ""}
+                                </article>
+                            `)
+                            .join("")}
+                    </section>
+                `
+                : "",
+            skills: skills.length
+                ? `
+                    <section style="margin-bottom: 14px;">
+                        ${sectionTitle("Skills")}
+                        ${skills
+                            .map(
+                                (skill) => `
+                                    <p style="margin: 0 0 4px; font-size: 11px; color: ${style.muted};">
+                                        <strong style="color: ${style.accent};">${escapeHtml(skill.category)}:</strong>
+                                        ${escapeHtml(skill.items)}
+                                    </p>
+                                `
+                            )
+                            .join("")}
+                    </section>
+                `
+                : "",
+            education: education.length
+                ? `
+                    <section style="margin-bottom: 14px;">
+                        ${sectionTitle("Education")}
+                        ${education
+                            .map(
+                                (edu) => `
+                                    <article style="margin-bottom: 8px;">
+                                        <div style="display: flex; justify-content: space-between; gap: 8px; align-items: baseline;">
+                                            <strong style="font-size: 12px; color: ${style.accent};">${escapeHtml(edu.institution)}</strong>
+                                            <span style="font-size: 10px; color: ${style.muted};">${escapeHtml(edu.start_date)} - ${escapeHtml(edu.end_date)}</span>
+                                        </div>
+                                        <p style="margin: 2px 0; font-size: 11px; color: ${style.muted};">
+                                            ${escapeHtml(edu.degree || "")}${edu.field ? ` in ${escapeHtml(edu.field)}` : ""}
+                                            ${getEducationScoreText(edu) ? ` | ${escapeHtml(getEducationScoreText(edu))}` : ""}
+                                        </p>
+                                    </article>
+                                `
+                            )
+                            .join("")}
+                    </section>
+                `
+                : "",
+            certifications: certifications.length
+                ? `
+                    <section style="margin-bottom: 14px;">
+                        ${sectionTitle("Certifications")}
+                        ${certifications
+                            .map(
+                                (cert) => `
+                                    <p style="margin: 0 0 4px; font-size: 11px; color: ${style.muted};">
+                                        <strong style="color: ${style.accent};">${escapeHtml(cert.name)}</strong>
+                                        ${cert.issuer ? ` | ${escapeHtml(cert.issuer)}` : ""}
+                                        ${cert.year ? ` | ${escapeHtml(cert.year)}` : ""}
+                                    </p>
+                                `
+                            )
+                            .join("")}
+                    </section>
+                `
+                : "",
+            achievements: achievements.length
+                ? `
+                    <section style="margin-bottom: 14px;">
+                        ${sectionTitle("Achievements")}
+                        ${achievements
+                            .map(
+                                (achievement) => `
+                                    <p style="margin: 0 0 4px; font-size: 11px; color: ${style.muted};">
+                                        <strong style="color: ${style.accent};">${escapeHtml(achievement.title)}:</strong>
+                                        ${escapeHtml(achievement.detail || "")}
+                                    </p>
+                                `
+                            )
+                            .join("")}
+                    </section>
+                `
+                : "",
+            links: links.length
+                ? `
+                    <section style="margin-bottom: 0;">
+                        ${sectionTitle("Links")}
+                        <p style="margin: 0; font-size: 11px; color: ${style.muted};">
+                            ${links
+                                .map((link) => `${escapeHtml(link.type)}: ${escapeHtml(link.url)}`)
+                                .join(" | ")}
+                        </p>
+                    </section>
+                `
+                : ""
+        };
+
+        return `
+            <div style="
+                width: 21cm;
+                min-height: 29.7cm;
+                box-sizing: border-box;
+                padding: 20mm 17mm;
+                margin: 0 auto;
+                background: #ffffff;
+                color: ${style.accent};
+                font-family: ${fontFamily};
+                line-height: 1.35;
+            ">
+                <style>
+                    .resume-bullets {
+                        margin: 4px 0 0 16px;
+                        padding: 0;
+                        font-size: 11px;
+                        color: ${style.muted};
+                    }
+                    .resume-bullets li { margin-bottom: 2px; }
+                    @media print {
+                        .resume-bullets li { page-break-inside: avoid; }
+                    }
+                </style>
+
+                <header style="margin-bottom: 14px; padding-bottom: 8px; border-bottom: ${style.headerRule};">
+                    <h1 style="margin: 0; font-size: 28px; letter-spacing: 0.4px;">${escapeHtml(personal.first_name || "First")} ${escapeHtml(personal.last_name || "Last")}</h1>
+                    <p style="margin: 4px 0 6px; font-size: 13px; color: ${style.muted}; text-transform: uppercase; letter-spacing: 1.2px;">${escapeHtml(personal.job_title || "Professional")}</p>
+                    <p style="margin: 0; font-size: 11px; color: ${style.muted};">
+                        ${[personal.email, personal.phone, personal.address].filter(Boolean).map(escapeHtml).join(" | ")}
+                    </p>
+                </header>
+
+                ${personal.summary ? `<section style="margin-bottom: 14px;"><p style="margin: 0; font-size: 11px; color: ${style.muted};">${escapeHtml(personal.summary)}</p></section>` : ""}
+
+                ${sectionOrder.map((sectionKey) => sectionMap[sectionKey] || "").join("")}
+            </div>
+        `;
+    };
+};
+
+const withTemplateMeta = (template) => ({
+    ...template,
+    jsonSchema: resumeJsonSchema,
+    exampleData: {
+        ...exampleDataBase,
+        personal: {
+            ...exampleDataBase.personal,
+            job_title: template.sampleRole
+        }
+    }
+});
+
+export const TEMPLATES = {
+    "faang-minimal": withTemplateMeta({
+        id: "faang-minimal",
+        name: "FAANG Minimal",
+        description: "High-density, zero-distraction layout optimized for engineering screens.",
+        designPhilosophy: "Dense signal over decorative noise for top-tier technical recruiting.",
+        atsScore: 99,
+        bestRoles: ["Software Engineer", "Backend Engineer", "Staff Engineer"],
+        sampleRole: "Senior Software Engineer",
+        render: createTemplateRenderer("faang-minimal")
+    }),
+    "modern-executive": withTemplateMeta({
+        id: "modern-executive",
+        name: "Modern Executive",
+        description: "Premium leadership style balancing clarity and authority.",
+        designPhilosophy: "Executive-grade hierarchy with concise storytelling.",
+        atsScore: 97,
+        bestRoles: ["Engineering Manager", "Director", "VP Product"],
+        sampleRole: "Engineering Director",
+        render: createTemplateRenderer("modern-executive")
+    }),
+    "software-engineer-ats": withTemplateMeta({
+        id: "software-engineer-ats",
+        name: "Software Engineer ATS",
+        description: "Project-forward format with measurable engineering outcomes.",
+        designPhilosophy: "Technical outcomes and impact metrics first.",
+        atsScore: 99,
+        bestRoles: ["Full Stack Engineer", "Platform Engineer", "SRE"],
+        sampleRole: "Software Engineer",
+        render: createTemplateRenderer("software-engineer-ats")
+    }),
+    "product-manager-elite": withTemplateMeta({
+        id: "product-manager-elite",
+        name: "Product Manager Elite",
+        description: "Outcome-focused PM format emphasizing product impact and scope.",
+        designPhilosophy: "Business impact and roadmap ownership made scannable.",
+        atsScore: 96,
+        bestRoles: ["Product Manager", "Senior PM", "Group PM"],
+        sampleRole: "Senior Product Manager",
+        render: createTemplateRenderer("product-manager-elite")
+    }),
+    "data-scientist-clean": withTemplateMeta({
+        id: "data-scientist-clean",
+        name: "Data Scientist Clean",
+        description: "Model, experiment, and metrics-centric clean profile.",
+        designPhilosophy: "Prioritize statistical impact and experimentation evidence.",
+        atsScore: 97,
+        bestRoles: ["Data Scientist", "ML Engineer", "Applied Scientist"],
+        sampleRole: "Senior Data Scientist",
+        render: createTemplateRenderer("data-scientist-clean")
+    }),
+    "student-fresher-ats": withTemplateMeta({
+        id: "student-fresher-ats",
+        name: "Student / Fresher ATS",
+        description: "Internship-ready template optimized for new graduates.",
+        designPhilosophy: "Potential, projects, and skill depth for early-career profiles.",
+        atsScore: 95,
+        bestRoles: ["Intern", "Graduate Engineer", "Associate PM"],
+        sampleRole: "Software Engineer Intern",
+        render: createTemplateRenderer("student-fresher-ats")
+    }),
+    "luxury-minimal-bw": withTemplateMeta({
+        id: "luxury-minimal-bw",
+        name: "Luxury Minimal Black & White",
+        description: "Monochrome premium format with refined typography rhythm.",
+        designPhilosophy: "Luxury feel using typography and white space only.",
+        atsScore: 98,
+        bestRoles: ["Principal Engineer", "Head of Product", "Consultant"],
+        sampleRole: "Principal Engineer",
+        render: createTemplateRenderer("luxury-minimal-bw")
+    }),
+    "startup-founder-style": withTemplateMeta({
+        id: "startup-founder-style",
+        name: "Startup Founder Style",
+        description: "Velocity-centric profile for builders and startup leaders.",
+        designPhilosophy: "Demonstrate ownership, momentum, and shipped outcomes.",
+        atsScore: 96,
+        bestRoles: ["Founder", "Founding Engineer", "Growth Lead"],
+        sampleRole: "Founder & Product Engineer",
+        render: createTemplateRenderer("startup-founder-style")
+    }),
+    "google-clean": withTemplateMeta({
+        id: "google-clean",
+        name: "Google-like Clean",
+        description: "Simple, legible, and precise format inspired by modern Google style.",
+        designPhilosophy: "Clarity and scannability with strict content discipline.",
+        atsScore: 99,
+        bestRoles: ["Software Engineer", "TPM", "Program Manager"],
+        sampleRole: "Software Engineer",
+        render: createTemplateRenderer("google-clean")
+    }),
+    "harvard-ats": withTemplateMeta({
+        id: "harvard-ats",
+        name: "Harvard-inspired ATS",
+        description: "Classic elite format tuned for modern ATS readability.",
+        designPhilosophy: "Traditional authority with machine-readable section clarity.",
+        atsScore: 98,
+        bestRoles: ["Consulting", "Finance", "Operations", "MBA hiring"],
+        sampleRole: "Product Strategy Manager",
+        render: createTemplateRenderer("harvard-ats")
+    })
+};
+
+export const DEFAULT_TEMPLATE_ID = "faang-minimal";
+
+export const getTemplateById = (id) => TEMPLATES[id] || TEMPLATES[DEFAULT_TEMPLATE_ID];
+
 export const getAllTemplates = () => Object.values(TEMPLATES);
+
+export const getTemplateSchema = (id) => getTemplateById(id).jsonSchema;
+
+export const getTemplateExampleData = (id) => getTemplateById(id).exampleData;

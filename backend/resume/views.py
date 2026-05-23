@@ -524,3 +524,98 @@ def analyze_ats(request):
         })
     except Exception as e:
         return Response({"error": f"Analysis failed: {str(e)}"}, status=500)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def analyze_linkedin(request):
+    """
+    Analyze a LinkedIn profile using Apify and Gemini.
+    """
+    try:
+        import google.generativeai as genai
+        from apify_client import ApifyClient
+    except (ImportError, TypeError):
+        return Response({"error": "Services unavailable"}, status=503)
+
+    linkedin_url = request.data.get('linkedin_url')
+    if not linkedin_url:
+        return Response({"error": "LinkedIn URL is required"}, status=400)
+
+    try:
+        apify_token = os.environ.get("APIFY_API_TOKEN")
+        if not apify_token:
+            return Response({"error": "Apify API Key missing in environment"}, status=500)
+
+        # Initialize the ApifyClient
+        client = ApifyClient(apify_token)
+
+        # Run the Actor and wait for it to finish
+        run_input = {
+            "profileUrls": [linkedin_url],
+        }
+        run = client.actor("rocky_scraper/linkedin-profile-scraper").call(run_input=run_input)
+
+        # Fetch Actor results
+        dataset_items = list(client.dataset(run["defaultDatasetId"]).iterate_items())
+        
+        if not dataset_items:
+            return Response({"error": "Could not extract data from the provided LinkedIn URL."}, status=400)
+            
+        profile_data = dataset_items[0]
+
+        # Use Gemini to generate improvements
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            return Response({"error": "Gemini API Key missing"}, status=500)
+
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('gemini-2.5-flash')
+
+        prompt = f"""
+        You are an expert Career Coach and LinkedIn Profile Optimizer.
+        Analyze the following extracted LinkedIn profile data and provide actionable suggestions to improve it.
+        
+        Return ONLY valid JSON in this exact format:
+        {{
+            "profile_summary": "A brief summary of their current profile strength",
+            "overall_score": 85,
+            "strengths": ["List of 3 strengths"],
+            "weaknesses": ["List of 3 areas to improve"],
+            "suggestions": [
+                {{"section": "Headline", "current": "...", "suggestion": "..."}},
+                {{"section": "About", "current": "...", "suggestion": "..."}},
+                {{"section": "Experience", "current": "...", "suggestion": "..."}}
+            ]
+        }}
+        
+        LINKEDIN PROFILE DATA:
+        {json.dumps(profile_data, indent=2)[:8000]}
+        """
+
+        response = model.generate_content(prompt)
+        response_text = response.text.strip()
+
+        # Clean up JSON
+        if response_text.startswith("```"):
+            response_text = response_text.split("```")[1]
+            if response_text.startswith("json"):
+                response_text = response_text[4:]
+        response_text = response_text.strip()
+
+        analysis = json.loads(response_text)
+        
+        # Include raw profile data in the response for the UI to display
+        analysis["raw_profile"] = {
+            "fullName": profile_data.get("fullName", ""),
+            "headline": profile_data.get("headline", ""),
+            "summary": profile_data.get("summary", ""),
+            "profilePicture": profile_data.get("profilePicture", "")
+        }
+
+        return Response(analysis)
+
+    except json.JSONDecodeError:
+        return Response({"error": "Failed to parse AI analysis"}, status=500)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
