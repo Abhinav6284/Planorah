@@ -45,6 +45,8 @@ urlpatterns = [
     path('api/github/', include('github_integration.urls')),
     path('api/billing/', include('billing.urls')),
     path('api/analytics/', include('analytics.urls')),
+    # Behavioral Intelligence System
+    path('api/intelligence/', include('intelligence.urls')),
     # AI outbound calls (onboarding guide + call logs)
     path('api/ai-calls/', include('ai_calls.urls')),
     # Reusable AI Mentoring Engine

@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from django.contrib.auth import get_user_model
 from subscriptions.models import Subscription
 from .models import SessionRequest, Notification
 from .serializers import (
@@ -21,6 +22,22 @@ def _sessions_used_this_month(user, month_year):
         user=user,
         month_year=month_year,
     ).exclude(status=SessionRequest.STATUS_CANCELLED).count()
+
+
+def _notify_staff_for_session_request(session):
+    User = get_user_model()
+    staff_users = User.objects.filter(is_staff=True, is_active=True).only('id')
+    if not staff_users.exists():
+        return
+
+    user_label = session.user.get_full_name().strip() or session.user.username or session.user.email
+    topic_label = ', '.join(session.topic_tags) if session.topic_tags else 'general'
+    message = f'New mentorship session request from {user_label} ({topic_label}).'
+
+    Notification.objects.bulk_create([
+        Notification(user=staff, session=session, message=message)
+        for staff in staff_users
+    ])
 
 
 @api_view(['POST'])
@@ -51,6 +68,7 @@ def request_session(request):
         month_year=month_year,
         status=SessionRequest.STATUS_REQUESTED,
     )
+    _notify_staff_for_session_request(session)
     return Response(SessionRequestListSerializer(session).data, status=status.HTTP_201_CREATED)
 
 

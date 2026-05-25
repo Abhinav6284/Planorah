@@ -19,6 +19,15 @@ from users.models import UserProfile
 
 from .ai_service import generate_coach_recommendation, generate_exam_plan
 from .models import DailySummary, Task, ExecutionTask, FocusSession, UserStats, XPLog, Streak, ExamPlan
+
+# Behavioral Intelligence System integration
+def _track_behavior_event(user, event_type, metadata=None):
+    """Silently track a behavioral event — never disrupts existing flows."""
+    try:
+        from intelligence.services.event_service import BehaviorEventService
+        BehaviorEventService.track_event(user, event_type, metadata)
+    except Exception:
+        pass
 from .serializers import (
     DailySummarySerializer,
     TaskSerializer,
@@ -192,7 +201,244 @@ def _build_onboarding_highlights(snapshot):
     return [item for item in highlights if item][:6]
 
 
-def _build_rule_based_guidance(snapshot):
+def _clamp_score(value, minimum=0, maximum=100):
+    return max(minimum, min(maximum, int(round(value))))
+
+
+def _safe_percentage(numerator, denominator):
+    if denominator <= 0:
+        return 0
+    return round((numerator / denominator) * 100)
+
+
+def _label_from_map(value, mapping):
+    return mapping.get(value, _humanize_value(value)) if value else ""
+
+
+def _extract_emotional_onboarding_answers(snapshot):
+    onboarding_data = snapshot.get("onboarding_data") or {}
+
+    pressure_label = _label_from_map(onboarding_data.get("pressure_response"), {
+        "overthink": "tends to overthink under pressure",
+        "panic_but_act": "acts even when pressure spikes",
+        "shut_down": "shuts down under pressure",
+        "stay_calm": "stays calm under pressure",
+    })
+    mock_response = _label_from_map(onboarding_data.get("mock_test_response"), {
+        "try_harder": "pushes harder when work gets difficult",
+        "check_soln": "looks for guided explanations when blocked",
+        "feel_stressed": "stress rises when work gets difficult",
+        "avoid": "avoids difficult work for a while",
+    })
+    effort_gap = _label_from_map(onboarding_data.get("dream_vs_effort"), {
+        "aligned": "ambition and effort feel aligned",
+        "needs_work": "ambition is ahead of current execution",
+        "far_apart": "goal ambition is much higher than current execution",
+    })
+    time_preference = _label_from_map(onboarding_data.get("daily_time"), {
+        "less_1hr": "has under 1 hour per day",
+        "1_2hrs": "works best in 1 to 2 hour windows",
+        "2_4hrs": "can sustain 2 to 4 focused hours",
+        "4plus": "has high daily time availability",
+    })
+
+    signals = [
+        pressure_label,
+        mock_response,
+        effort_gap,
+        time_preference,
+    ]
+    return [signal for signal in signals if signal]
+
+
+def _resolve_active_hours(session_hours):
+    if not session_hours:
+        return "Mixed"
+
+    buckets = {
+        "Morning": 0,
+        "Afternoon": 0,
+        "Evening": 0,
+        "Night": 0,
+    }
+    for hour in session_hours:
+        if 5 <= hour < 12:
+            buckets["Morning"] += 1
+        elif 12 <= hour < 17:
+            buckets["Afternoon"] += 1
+        elif 17 <= hour < 21:
+            buckets["Evening"] += 1
+        else:
+            buckets["Night"] += 1
+
+    return max(buckets, key=buckets.get)
+
+
+def _build_behavioral_context(user, snapshot):
+    from roadmap_ai.models import Roadmap
+
+    now = dj_timezone.now()
+    recent_cutoff = now - timedelta(days=14)
+    previous_cutoff = now - timedelta(days=28)
+    profile = UserProfile.objects.filter(user=user).first()
+    execution_stats = UserStats.objects.filter(user=user).first()
+
+    recent_tasks_qs = ExecutionTask.objects.filter(user=user, created_at__gte=recent_cutoff)
+    previous_tasks_qs = ExecutionTask.objects.filter(
+        user=user,
+        created_at__lt=recent_cutoff,
+        created_at__gte=previous_cutoff,
+    )
+
+    recent_sessions = list(FocusSession.objects.filter(user=user, started_at__gte=recent_cutoff).order_by('-started_at')[:40])
+    previous_sessions = list(FocusSession.objects.filter(
+        user=user,
+        started_at__lt=recent_cutoff,
+        started_at__gte=previous_cutoff,
+    ).order_by('-started_at')[:40])
+
+    recent_completed = recent_tasks_qs.filter(status='completed').count()
+    recent_skipped = recent_tasks_qs.filter(status='skipped').count()
+    recent_total = recent_tasks_qs.count()
+    previous_completed = previous_tasks_qs.filter(status='completed').count()
+
+    recent_completion_rate = _safe_percentage(recent_completed, max(1, recent_completed + recent_skipped))
+
+    avg_session_minutes = 0
+    session_lengths = []
+    active_hours = []
+    for session in recent_sessions:
+        minutes = int(session.actual_minutes or session.planned_minutes or 0)
+        if minutes > 0:
+            session_lengths.append(minutes)
+        if session.started_at:
+            active_hours.append(session.started_at.hour)
+    if session_lengths:
+        avg_session_minutes = round(sum(session_lengths) / len(session_lengths))
+
+    recent_active_days = {
+        session.started_at.date().isoformat()
+        for session in recent_sessions
+        if session.started_at
+    }
+    previous_active_days = {
+        session.started_at.date().isoformat()
+        for session in previous_sessions
+        if session.started_at
+    }
+
+    if len(recent_active_days) >= len(previous_active_days) + 2:
+        consistency_trend = 'rising'
+    elif len(recent_active_days) + 2 <= len(previous_active_days):
+        consistency_trend = 'falling'
+    else:
+        consistency_trend = 'stable'
+
+    long_recent_tasks = list(recent_tasks_qs.filter(estimated_minutes__gte=45))
+    short_recent_tasks = list(recent_tasks_qs.filter(estimated_minutes__lt=45))
+    long_skip_rate = _safe_percentage(
+        sum(1 for task in long_recent_tasks if task.status == 'skipped'),
+        len(long_recent_tasks),
+    )
+    short_skip_rate = _safe_percentage(
+        sum(1 for task in short_recent_tasks if task.status == 'skipped'),
+        len(short_recent_tasks),
+    )
+
+    hard_tasks = list(recent_tasks_qs.filter(difficulty='hard'))
+    hard_skip_rate = _safe_percentage(
+        sum(1 for task in hard_tasks if task.status == 'skipped'),
+        len(hard_tasks),
+    )
+
+    current_streak = int(
+        getattr(execution_stats, 'current_streak', 0)
+        or getattr(profile, 'streak_count', 0)
+        or 0
+    )
+    consistency_score = float(getattr(profile, 'consistency_score', 0.0) or 0.0)
+    latest_roadmap = Roadmap.objects.filter(user=user).order_by('-updated_at').first()
+    roadmap_type = _humanize_value(getattr(latest_roadmap, 'category', '') or snapshot.get('goal_type') or 'general')
+    roadmap_difficulty = _humanize_value(getattr(latest_roadmap, 'difficulty_level', '') or '')
+
+    emotional_answers = _extract_emotional_onboarding_answers(snapshot)
+    stress_signal = any('stress' in answer or 'pressure' in answer or 'shuts down' in answer for answer in emotional_answers)
+
+    momentum_score = _clamp_score(
+        current_streak * 7
+        + recent_completion_rate * 0.35
+        + len(recent_active_days) * 4
+        + consistency_score * 0.25
+        - recent_skipped * 3
+    )
+    burnout_risk = _clamp_score(
+        (20 if stress_signal else 0)
+        + (15 if avg_session_minutes >= 50 else 6 if avg_session_minutes >= 35 else 0)
+        + (16 if consistency_trend == 'falling' else 0)
+        + (14 if snapshot.get('weekly_hours', 0) >= 20 else 0)
+        + max(0, recent_skipped - recent_completed) * 4
+    )
+    dropoff_risk = _clamp_score(
+        55
+        - current_streak * 4
+        + recent_skipped * 5
+        + (18 if consistency_trend == 'falling' else 0)
+        + (10 if len(recent_active_days) <= 2 else 0)
+        - min(recent_completed, 6) * 3
+    )
+    recovery_speed = _clamp_score(
+        50 + ((recent_completed - previous_completed) * 10) + ((len(recent_active_days) - len(previous_active_days)) * 8)
+    )
+    procrastination_index = _clamp_score((long_skip_rate * 0.55) + (hard_skip_rate * 0.45))
+
+    behavioral_loops = []
+    if long_skip_rate >= short_skip_rate + 20 and long_skip_rate >= 40:
+        behavioral_loops.append('Long tasks are creating friction; shorter execution blocks should improve completion.')
+    if hard_skip_rate >= 45:
+        behavioral_loops.append('Difficult work is triggering avoidance, so challenge needs better ramping.')
+    if _resolve_active_hours(active_hours) == 'Night' and recent_completed >= 3:
+        behavioral_loops.append('Late-evening work is currently your most reliable execution window.')
+    if current_streak >= 3 and consistency_trend == 'rising':
+        behavioral_loops.append('Small wins are rebuilding discipline and increasing recovery speed.')
+    if not behavioral_loops:
+        behavioral_loops.append('Your current pattern is mixed, so the system should optimize for clarity before intensity.')
+
+    return {
+        'behavioral_inputs': {
+            'streaks': current_streak,
+            'completed_tasks': recent_completed,
+            'skipped_tasks': recent_skipped,
+            'roadmap_type': roadmap_type,
+            'roadmap_difficulty': roadmap_difficulty,
+            'active_hours': _resolve_active_hours(active_hours),
+            'consistency_trend': consistency_trend,
+            'emotional_onboarding_answers': emotional_answers,
+            'session_duration': avg_session_minutes,
+            'user_goals': snapshot.get('goal_statement') or snapshot.get('target_role') or 'Not set',
+        },
+        'behavioral_metrics': {
+            'momentum_score': momentum_score,
+            'burnout_risk': burnout_risk,
+            'dropoff_risk': dropoff_risk,
+            'recovery_speed': recovery_speed,
+            'procrastination_index': procrastination_index,
+            'completion_rate': recent_completion_rate,
+            'consistency_score': _clamp_score(consistency_score),
+        },
+        'behavioral_loops': behavioral_loops[:4],
+    }
+
+
+def _build_rule_based_guidance(snapshot, behavior=None):
+    behavior = behavior or {
+        'behavioral_inputs': {},
+        'behavioral_metrics': {},
+        'behavioral_loops': [],
+    }
+    inputs = behavior.get('behavioral_inputs') or {}
+    metrics = behavior.get('behavioral_metrics') or {}
+    loops = behavior.get('behavioral_loops') or []
+
     if not snapshot.get("has_profile"):
         return {
             "identity_tag": "New User",
@@ -213,6 +459,40 @@ def _build_rule_based_guidance(snapshot):
             ],
             "reflection_prompt": "What outcome do you want in the next 30 days?",
             "priority_focus": "Finish onboarding",
+            "identity_type": "Explorer",
+            "insight_card": {
+                "type": "Identity Insight",
+                "title": "Your behavior model is still forming",
+                "description": "Planorah needs onboarding signals before it can predict execution risks or adapt your roadmap.",
+                "action_label": "Complete onboarding",
+                "confidence": 28,
+            },
+            "prediction": {
+                "title": "Prediction pending",
+                "description": "Once onboarding is complete, the engine will start modeling your execution risks and momentum.",
+                "confidence": 24,
+            },
+            "strategy": {
+                "headline": "Start with identity before optimization",
+                "tactics": [
+                    "Finish onboarding so the system knows your goal, pace, and pressure pattern.",
+                    "Set one weekly target you can actually finish.",
+                    "Create your first roadmap so future adaptations have structure.",
+                ],
+            },
+            "roadmap_adaptation": {
+                "status": "waiting_for_signal",
+                "reason": "There is not enough behavioral data to safely adapt the roadmap yet.",
+                "changes": [
+                    "Keep the initial roadmap short and simple.",
+                    "Delay aggressive pacing until the first week of activity is recorded.",
+                ],
+            },
+            "future_self": {
+                "current_path": "Generic planning without behavioral signal.",
+                "optimized_path": "A personalized execution system after onboarding is complete.",
+            },
+            "behavioral_loops": loops,
             "source": "rule_based",
         }
 
@@ -223,6 +503,108 @@ def _build_rule_based_guidance(snapshot):
     goal_statement = snapshot.get("goal_statement") or snapshot.get(
         "target_role") or "a clear short-term outcome"
     readiness = snapshot.get("readiness_score", 0)
+    momentum_score = metrics.get('momentum_score', 0)
+    burnout_risk = metrics.get('burnout_risk', 0)
+    dropoff_risk = metrics.get('dropoff_risk', 0)
+    recovery_speed = metrics.get('recovery_speed', 0)
+    procrastination_index = metrics.get('procrastination_index', 0)
+    active_hours = inputs.get('active_hours') or 'Mixed'
+    roadmap_type = inputs.get('roadmap_type') or 'General'
+
+    if burnout_risk >= 68:
+        insight_card = {
+            "type": "Prediction Insight",
+            "title": "Burnout risk is starting to rise",
+            "description": f"Your recent pattern suggests load is outrunning recovery. Keep sessions tighter and reduce unnecessary volume this week.",
+            "action_label": "Prevent Burnout",
+            "confidence": max(65, burnout_risk),
+        }
+        prediction = {
+            "title": "7-day overload warning",
+            "description": "If the current load stays unchanged, disengagement risk will increase over the next week.",
+            "confidence": max(60, burnout_risk - 4),
+        }
+        roadmap_adaptation = {
+            "status": "recommended",
+            "reason": "The roadmap pace is too aggressive for the current recovery pattern.",
+            "changes": [
+                "Reduce this week's task count by 20-30%.",
+                "Insert one lighter recovery block before the hardest milestone.",
+                "Keep high-focus work under 30 minutes until momentum stabilizes.",
+            ],
+        }
+    elif dropoff_risk >= 68:
+        insight_card = {
+            "type": "Roadmap Insight",
+            "title": "This roadmap is likely to lose you soon",
+            "description": f"Your completion and skip pattern suggests the current roadmap pacing is too heavy for your behavior loop.",
+            "action_label": "Rebalance Plan",
+            "confidence": max(64, dropoff_risk),
+        }
+        prediction = {
+            "title": "Drop-off risk detected",
+            "description": "Without shorter milestones, roadmap abandonment risk is elevated over the next 10 days.",
+            "confidence": max(60, dropoff_risk - 3),
+        }
+        roadmap_adaptation = {
+            "status": "recommended",
+            "reason": "The user is more likely to continue if milestones become shorter and more visible.",
+            "changes": [
+                "Break the next milestone into smaller proof-based tasks.",
+                "Move one demanding task into a later slot.",
+                "Front-load one quick win inside the next roadmap block.",
+            ],
+        }
+    elif momentum_score >= 72:
+        insight_card = {
+            "type": "Momentum Insight",
+            "title": "You are in a high-consistency window",
+            "description": f"Execution is stabilizing right now. Protect the pattern instead of increasing ambition too fast.",
+            "action_label": "Lock Momentum",
+            "confidence": max(62, momentum_score),
+        }
+        prediction = {
+            "title": "Momentum can compound",
+            "description": "If this rhythm holds for another week, readiness and roadmap progress should rise meaningfully.",
+            "confidence": max(58, momentum_score - 6),
+        }
+        roadmap_adaptation = {
+            "status": "light_adjustment",
+            "reason": "Momentum is strong enough to increase structure, not workload shock.",
+            "changes": [
+                "Preserve the current session pattern instead of lengthening every task.",
+                "Add one stretch task, not a full extra workload block.",
+                "Keep visible progress markers in the next roadmap phase.",
+            ],
+        }
+    else:
+        insight_card = {
+            "type": "Behavioral Insight",
+            "title": "Your system needs less friction, not more pressure",
+            "description": "The current data suggests progress improves when execution is simpler and more concrete.",
+            "action_label": "Optimize Tasks",
+            "confidence": max(52, 100 - procrastination_index),
+        }
+        prediction = {
+            "title": "Consistency is still fragile",
+            "description": "Without a clearer execution rhythm, results will stay uneven even if motivation spikes.",
+            "confidence": 56,
+        }
+        roadmap_adaptation = {
+            "status": "recommended",
+            "reason": "Too much ambiguity is reducing reliable execution.",
+            "changes": [
+                "Rewrite the next roadmap task as a single visible outcome.",
+                "Shorten tasks that regularly cross 45 minutes.",
+                "Place practical work before passive review sessions.",
+            ],
+        }
+
+    strategy_tactics = [
+        f"Work in your strongest window: {active_hours.lower()} sessions are currently the best fit.",
+        f"Shape the next week around {roadmap_type.lower()} progress, not random task volume.",
+        loops[0] if loops else "Protect small wins because they are stabilizing your execution loop.",
+    ]
 
     action_points = [
         f"Block {max(3, weekly_hours)} focused hours this week across 3-5 sessions.",
@@ -268,6 +650,24 @@ def _build_rule_based_guidance(snapshot):
         ],
         "reflection_prompt": "Which single task this week would make your goal visibly closer?",
         "priority_focus": "Consistent weekly execution",
+        "identity_type": (
+            "Recovery Fighter" if recovery_speed >= 68 and momentum_score < 72
+            else "Consistency Architect" if momentum_score >= 72
+            else "Sprint Performer" if active_hours in ("Evening", "Night")
+            else "Momentum Builder"
+        ),
+        "insight_card": insight_card,
+        "prediction": prediction,
+        "strategy": {
+            "headline": f"Design your week around behavioral fit, not pressure.",
+            "tactics": strategy_tactics,
+        },
+        "roadmap_adaptation": roadmap_adaptation,
+        "future_self": {
+            "current_path": f"At the current pace, progress on {goal_statement} will stay inconsistent.",
+            "optimized_path": "With shorter loops and adaptive pacing, readiness should climb faster and feel more sustainable.",
+        },
+        "behavioral_loops": loops,
         "source": "rule_based",
     }
 
@@ -294,7 +694,7 @@ def _call_gemini_for_onboarding(snapshot):
 
     prompt = f"""
 You are Planorah's elite learning strategist. You deeply understand students, their stage, goals, risks and execution gaps.
-Analyse the user's onboarding profile below and return a RICH, evolving, personalised intelligence report.
+Analyse the user's onboarding profile and behavioral data below and return a RICH, evolving, personalised intelligence report.
 
 Onboarding profile:
 {json.dumps(snapshot, indent=2)}
@@ -305,6 +705,39 @@ Return ONLY valid JSON with this exact structure:
   "summary": "2-3 sentence honest summary of where this person stands. Not motivational fluff. Be real. Max 280 chars.",
   "today_action": "The single most important thing they should do TODAY. Be extremely specific. Max 120 chars.",
   "priority_focus": "One short phrase - the theme for this week. Max 60 chars.",
+    "identity_type": "One of: Momentum Builder, Deep Focus Learner, Sprint Performer, Recovery Fighter, Chaos Explorer, Consistency Architect",
+    "insight_card": {
+        "type": "Behavioral Insight | Prediction Insight | Momentum Insight | Roadmap Insight | Identity Insight",
+        "title": "Sharp card title. Max 70 chars.",
+        "description": "1-2 sentences that explain WHY the user is succeeding or failing. Max 180 chars.",
+        "action_label": "CTA label like Optimize Tasks / Prevent Burnout / Rebalance Plan / Lock Momentum",
+        "confidence": 78
+    },
+    "prediction": {
+        "title": "Short predictive headline. Max 60 chars.",
+        "description": "Specific forward-looking outcome tied to current behavior. Max 160 chars.",
+        "confidence": 74
+    },
+    "strategy": {
+        "headline": "One-line summary of the user's optimized strategy. Max 100 chars.",
+        "tactics": [
+            "3 specific optimization tactics based on time, task pattern, and psychology. Max 120 chars each."
+        ]
+    },
+    "roadmap_adaptation": {
+        "status": "recommended | light_adjustment | stable",
+        "reason": "Why the roadmap should adapt. Max 140 chars.",
+        "changes": [
+            "2-3 roadmap changes the system should make automatically. Max 120 chars each."
+        ]
+    },
+    "future_self": {
+        "current_path": "What happens if current behavior continues. Max 120 chars.",
+        "optimized_path": "What happens if the optimized behavior strategy is followed. Max 120 chars."
+    },
+    "behavioral_loops": [
+        "2-4 short descriptions of behavior loops or execution patterns. Max 120 chars each."
+    ],
   "action_points": [
     "3-5 concrete weekly actions. Each must be specific to their stage, goal, and hours. Max 130 chars each."
   ],
@@ -330,6 +763,7 @@ Return ONLY valid JSON with this exact structure:
 
 Critical rules:
 - Every field must reference the user's actual data (stage, goal, weekly_hours, domain).
+- Use the behavioral inputs and metrics to explain patterns, predict failure or momentum, and adapt the roadmap.
 - No generic advice. No filler. No empty encouragement.
 - week_plan hours must sum to <= weekly_hours.
 - Be the mentor they never had, not a chatbot.
@@ -387,6 +821,37 @@ Critical rules:
         "summary": summary,
         "today_action": str(parsed.get("today_action", "")).strip(),
         "priority_focus": str(parsed.get("priority_focus", "Weekly execution")).strip(),
+        "identity_type": str(parsed.get("identity_type", parsed.get("identity_tag", ""))).strip(),
+        "insight_card": {
+            "type": str((parsed.get("insight_card") or {}).get("type", "Behavioral Insight")).strip(),
+            "title": str((parsed.get("insight_card") or {}).get("title", "Behavior pattern detected")).strip(),
+            "description": str((parsed.get("insight_card") or {}).get("description", summary)).strip(),
+            "action_label": str((parsed.get("insight_card") or {}).get("action_label", "Get Strategy")).strip(),
+            "confidence": _clamp_score((parsed.get("insight_card") or {}).get("confidence", 72)),
+        },
+        "prediction": {
+            "title": str((parsed.get("prediction") or {}).get("title", "Behavior forecast")).strip(),
+            "description": str((parsed.get("prediction") or {}).get("description", "Your recent behavior is shaping your next outcome.")).strip(),
+            "confidence": _clamp_score((parsed.get("prediction") or {}).get("confidence", 70)),
+        },
+        "strategy": {
+            "headline": str((parsed.get("strategy") or {}).get("headline", "Optimize around your real working pattern.")).strip(),
+            "tactics": [
+                str(item).strip() for item in ((parsed.get("strategy") or {}).get("tactics") or []) if str(item).strip()
+            ][:4],
+        },
+        "roadmap_adaptation": {
+            "status": str((parsed.get("roadmap_adaptation") or {}).get("status", "stable")).strip(),
+            "reason": str((parsed.get("roadmap_adaptation") or {}).get("reason", "Your roadmap can stay steady for now.")).strip(),
+            "changes": [
+                str(item).strip() for item in ((parsed.get("roadmap_adaptation") or {}).get("changes") or []) if str(item).strip()
+            ][:4],
+        },
+        "future_self": {
+            "current_path": str((parsed.get("future_self") or {}).get("current_path", "Current behavior will keep shaping progress.")).strip(),
+            "optimized_path": str((parsed.get("future_self") or {}).get("optimized_path", "Optimized behavior should improve results faster.")).strip(),
+        },
+        "behavioral_loops": _clean_list("behavioral_loops", max_items=4),
         "action_points": action_points,
         "strengths": _clean_list("strengths", max_items=3),
         "risks": _clean_list("risks", max_items=3),
@@ -509,7 +974,12 @@ def get_onboarding_insights(request):
     Falls back to rule-based guidance when AI is unavailable.
     """
     snapshot = _serialize_onboarding_snapshot(request.user)
-    fallback = _build_rule_based_guidance(snapshot)
+    behavioral_context = _build_behavioral_context(request.user, snapshot)
+    fallback = _build_rule_based_guidance(snapshot, behavioral_context)
+    analysis_snapshot = {
+        **snapshot,
+        **behavioral_context,
+    }
 
     response_payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -527,14 +997,24 @@ def get_onboarding_insights(request):
         "pros": [],
         "cons": [],
         "week_plan": [],
+        "behavioral_inputs": {},
+        "behavioral_metrics": {},
+        "behavioral_loops": [],
+        "identity_type": "",
+        "insight_card": {},
+        "prediction": {},
+        "strategy": {},
+        "roadmap_adaptation": {},
+        "future_self": {},
     }
+    response_payload.update(behavioral_context)
+    response_payload.update(fallback)
 
     try:
-        ai_result = _call_gemini_for_onboarding(snapshot)
+        ai_result = _call_gemini_for_onboarding(analysis_snapshot)
         response_payload.update(ai_result)
         return Response(response_payload, status=status.HTTP_200_OK)
     except Exception:
-        response_payload.update(fallback)
         return Response(response_payload, status=status.HTTP_200_OK)
 
 
@@ -1064,6 +1544,25 @@ def execution_tasks(request):
                     updated_task.completed_at = dj_timezone.now()
                     updated_task.save(update_fields=['completed_at'])
                     _apply_completion_rewards(request.user, updated_task)
+                    _track_behavior_event(request.user, 'task_completed', {
+                        'task_id': str(updated_task.id),
+                        'task_title': updated_task.title,
+                        'difficulty': updated_task.difficulty,
+                        'task_type': updated_task.task_type,
+                        'estimated_minutes': updated_task.estimated_minutes,
+                    })
+                elif updated_task.status == 'skipped' and not was_completed:
+                    _track_behavior_event(request.user, 'task_skipped', {
+                        'task_id': str(updated_task.id),
+                        'task_title': updated_task.title,
+                        'difficulty': updated_task.difficulty,
+                        'task_type': updated_task.task_type,
+                    })
+                elif updated_task.status == 'in_progress':
+                    _track_behavior_event(request.user, 'task_started', {
+                        'task_id': str(updated_task.id),
+                        'task_title': updated_task.title,
+                    })
                 _sync_execution_status_to_roadmap_task(
                     request.user, updated_task)
 
@@ -1095,6 +1594,11 @@ def focus_session(request):
         serializer = FocusSessionSerializer(data=request.data)
         if serializer.is_valid():
             session = serializer.save(user=request.user, status='active')
+            _track_behavior_event(request.user, 'session_started', {
+                'session_id': str(session.id),
+                'planned_minutes': session.planned_minutes,
+                'started_hour': dj_timezone.now().hour,
+            })
             return Response(FocusSessionSerializer(session).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1120,6 +1624,17 @@ def focus_session(request):
             stats.focus_minutes += int(
                 updated.actual_minutes or updated.planned_minutes or 0)
             stats.save(update_fields=['focus_minutes', 'updated_at'])
+            _track_behavior_event(request.user, 'session_ended', {
+                'session_id': str(updated.id),
+                'planned_minutes': updated.planned_minutes,
+                'actual_minutes': updated.actual_minutes or 0,
+            })
+        elif updated.status == 'cancelled':
+            _track_behavior_event(request.user, 'session_quit', {
+                'session_id': str(updated.id),
+                'planned_minutes': updated.planned_minutes,
+                'actual_minutes': updated.actual_minutes or 0,
+            })
 
         return Response(FocusSessionSerializer(updated).data, status=status.HTTP_200_OK)
 

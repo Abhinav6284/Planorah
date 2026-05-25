@@ -13,6 +13,7 @@ urlpatterns = [
     path('users/', api_views.users_list, name='admin_api_users'),
     path('users/<int:user_id>/', api_views.user_detail, name='admin_api_user_detail'),
     path('users/<int:user_id>/action/', api_views.user_action, name='admin_api_user_action'),
+    path('users/<int:user_id>/onboarding/', api_views.update_user_onboarding, name='admin_api_user_onboarding_update'),
 
     # Subscriptions
     path('subscriptions/', api_views.subscriptions_list, name='admin_api_subscriptions'),

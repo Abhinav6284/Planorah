@@ -3,9 +3,43 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { TOUR_STEPS, useTour } from './TourContext';
 
 // Constants
-const SPOTLIGHT_PAD = 12;
-const TOOLTIP_W = 348;
+const SPOTLIGHT_PAD = 6;
+const TOOLTIP_W = 352;
 const TOOLTIP_GAP = 18;
+
+const INTRO_POINTS = [
+    {
+        title: 'Where to start',
+        description: 'The dashboard points to the next thing that matters.',
+        icon: '1',
+    },
+    {
+        title: 'What needs attention',
+        description: 'Scan progress and spot pressure at a glance.',
+        icon: '2',
+    },
+    {
+        title: 'How to act',
+        description: 'Open the coach or switch modes when you need a move.',
+        icon: '3',
+    },
+];
+
+const TOUR_THEME = {
+    panel: 'var(--el-core-panel)',
+    panelBorder: 'var(--el-border)',
+    panelShadow: '0 18px 48px rgba(0, 0, 0, 0.18), var(--el-shadow-card)',
+    accent: 'var(--orange)',
+    accentDeep: 'var(--orange-deep)',
+    accentSoft: 'color-mix(in srgb, var(--orange) 14%, transparent)',
+    text: 'var(--el-text)',
+    textSecondary: 'var(--el-text-secondary)',
+    textMuted: 'var(--el-text-muted)',
+    outline: 'color-mix(in srgb, var(--orange) 28%, transparent)',
+    subtleBorder: 'var(--el-border-subtle)',
+    softPanel: 'var(--el-bg-secondary)',
+    overlay: 'rgba(10, 10, 12, 0.58)',
+};
 
 // Get target element rect
 function getTargetRect(selector) {
@@ -62,20 +96,6 @@ function computeTooltipStyle(rect, position, vw, vh) {
     }
 
     return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
-}
-
-// Arrow indicator
-function ArrowIndicator({ position }) {
-    if (!position || position === 'center') return null;
-
-    const arrowStyles = {
-        bottom: { top: -7, left: '50%', transform: 'translateX(-50%)', borderBottom: '7px solid rgba(217,108,74,0.5)', borderLeft: '7px solid transparent', borderRight: '7px solid transparent' },
-        top: { bottom: -7, left: '50%', transform: 'translateX(-50%) rotate(180deg)', borderBottom: '7px solid rgba(217,108,74,0.5)', borderLeft: '7px solid transparent', borderRight: '7px solid transparent' },
-        left: { right: -7, top: '50%', transform: 'translateY(-50%) rotate(-90deg)', borderBottom: '7px solid rgba(217,108,74,0.5)', borderLeft: '7px solid transparent', borderRight: '7px solid transparent' },
-        right: { left: -7, top: '50%', transform: 'translateY(-50%) rotate(90deg)', borderBottom: '7px solid rgba(217,108,74,0.5)', borderLeft: '7px solid transparent', borderRight: '7px solid transparent' },
-    };
-
-    return <div style={{ position: 'absolute', width: 0, height: 0, ...arrowStyles[position] }} />;
 }
 
 export default function GuidedTour() {
@@ -141,6 +161,7 @@ export default function GuidedTour() {
     const isCenter = !currentStep?.target || currentStep?.position === 'center';
     const isFirst = step === 0;
     const isLast = step === totalSteps - 1;
+    const isWelcomeStep = currentStep?.id === 'welcome';
     const progressPct = ((step + 1) / totalSteps) * 100;
     const tooltipStyle = computeTooltipStyle(rect, currentStep?.position, vSize.w, vSize.h);
 
@@ -152,10 +173,10 @@ export default function GuidedTour() {
             width: rect.width + SPOTLIGHT_PAD * 2,
             height: rect.height + SPOTLIGHT_PAD * 2,
             zIndex: 9993,
-            borderRadius: 16,
+            borderRadius: Math.min(18, Math.max(12, rect.height / 3)),
             pointerEvents: 'none',
             willChange: 'transform, opacity',
-            boxShadow: `0 0 0 9999px rgba(5,5,5,0.78), 0 0 0 2px rgba(217,108,74,0.85), 0 0 40px rgba(217,108,74,0.3)`,
+            boxShadow: `0 0 0 9999px ${TOUR_THEME.overlay}, 0 0 0 1px ${TOUR_THEME.outline}, 0 10px 28px color-mix(in srgb, var(--orange) 20%, transparent)`,
         }
         : null;
 
@@ -176,8 +197,8 @@ export default function GuidedTour() {
                                 position: 'fixed',
                                 inset: 0,
                                 zIndex: 9990,
-                                background: 'rgba(5,5,5,0.82)',
-                                backdropFilter: 'blur(3px)',
+                                background: TOUR_THEME.overlay,
+                                backdropFilter: 'blur(8px)',
                             }}
                         />
                     )}
@@ -204,81 +225,114 @@ export default function GuidedTour() {
                         style={{
                             position: 'fixed',
                             zIndex: 9999,
-                            width: TOOLTIP_W,
+                            width: `min(${TOOLTIP_W}px, calc(100vw - 32px))`,
+                            maxHeight: 'calc(100vh - 32px)',
                             ...tooltipStyle,
                             willChange: 'transform, opacity',
                         }}
                     >
-                        {!isCenter && <ArrowIndicator position={currentStep?.position} />}
-
                         <div style={{
-                            background: 'var(--el-bg-secondary)',
-                            border: '1px solid rgba(217,108,74,0.35)',
-                            borderRadius: 22,
+                            background: TOUR_THEME.panel,
+                            border: `1px solid ${TOUR_THEME.panelBorder}`,
+                            borderRadius: 20,
                             overflow: 'hidden',
-                            boxShadow: 'var(--el-shadow-card)',
-                            backdropFilter: 'blur(4px)',
+                            boxShadow: TOUR_THEME.panelShadow,
+                            backdropFilter: 'blur(20px)',
+                            maxHeight: 'calc(100vh - 32px)',
+                            display: 'flex',
+                            flexDirection: 'column',
                         }}>
                             {/* Progress Bar */}
-                            <div style={{ height: 2.5, background: 'var(--el-border)' }}>
+                            <div style={{ height: 3, background: TOUR_THEME.softPanel }}>
                                 <motion.div
                                     initial={{ width: `${((step) / totalSteps) * 100}%` }}
                                     animate={{ width: `${progressPct}%` }}
                                     transition={{ duration: 0.24, ease: 'easeOut' }}
                                     style={{
                                         height: '100%',
-                                        background: 'linear-gradient(90deg, #c45b3a 0%, #D96C4A 50%, #e8955f 100%)',
-                                        boxShadow: '0 0 12px rgba(217,108,74,0.5)',
+                                        background: 'linear-gradient(90deg, var(--orange-deep) 0%, var(--orange) 55%, color-mix(in srgb, var(--orange) 72%, white) 100%)',
+                                        boxShadow: '0 0 14px color-mix(in srgb, var(--orange) 35%, transparent)',
                                         willChange: 'width',
                                     }}
                                 />
                             </div>
 
                             {/* Content */}
-                            <div style={{ padding: '20px 24px 22px' }}>
-                                {/* Header */}
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(217,108,74,0.85)' }}>
-                                        {step + 1} / {totalSteps}
-                                    </span>
-                                    <button onClick={skip} style={{ fontSize: 11, fontWeight: 500, color: 'var(--el-text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: '3px 8px', borderRadius: 6, transition: 'color 0.1s' }} onMouseEnter={e => e.target.style.color = 'var(--el-text-secondary)'} onMouseLeave={e => e.target.style.color = 'var(--el-text-muted)'}>
+                            <div style={{ padding: '18px 20px 16px', display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 18 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 10px', borderRadius: 999, border: `1px solid ${TOUR_THEME.subtleBorder}`, background: 'var(--el-bg-secondary)', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: TOUR_THEME.textMuted, whiteSpace: 'nowrap' }}>
+                                            {isWelcomeStep ? 'Student overview guide' : 'Overview step'}
+                                        </span>
+                                        <span style={{ fontSize: 11, fontWeight: 700, color: TOUR_THEME.textMuted, whiteSpace: 'nowrap' }}>
+                                            {step + 1} of {totalSteps}
+                                        </span>
+                                    </div>
+
+                                    <button
+                                        onClick={skip}
+                                        style={{ fontSize: 11, fontWeight: 600, color: TOUR_THEME.textMuted, background: 'transparent', border: `1px solid ${TOUR_THEME.subtleBorder}`, cursor: 'pointer', padding: '5px 10px', borderRadius: 999, transition: 'all 0.14s ease', whiteSpace: 'nowrap', flexShrink: 0 }}
+                                        onMouseEnter={e => { e.currentTarget.style.color = TOUR_THEME.text; e.currentTarget.style.borderColor = TOUR_THEME.panelBorder; e.currentTarget.style.background = 'var(--el-bg-secondary)'; }}
+                                        onMouseLeave={e => { e.currentTarget.style.color = TOUR_THEME.textMuted; e.currentTarget.style.borderColor = TOUR_THEME.subtleBorder; e.currentTarget.style.background = 'transparent'; }}
+                                    >
                                         Skip tour ✕
                                     </button>
                                 </div>
 
                                 {/* Title + Icon */}
-                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 14 }}>
-                                    <motion.div key={`icon-${step}`} initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.03, duration: 0.14, ease: 'easeOut' }} style={{ width: 44, height: 44, borderRadius: 13, background: 'linear-gradient(135deg, rgba(217,108,74,0.15) 0%, rgba(217,108,74,0.06) 100%)', border: '1px solid rgba(217,108,74,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                                    <motion.div key={`icon-${step}`} initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.03, duration: 0.14, ease: 'easeOut' }} style={{ width: 42, height: 42, borderRadius: 14, background: `linear-gradient(135deg, ${TOUR_THEME.accentSoft} 0%, var(--el-bg-secondary) 100%)`, border: `1px solid color-mix(in srgb, var(--orange) 16%, var(--el-border) 84%)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
                                         {currentStep?.icon}
                                     </motion.div>
-                                    <motion.div key={`title-${step}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.02, duration: 0.14, ease: 'easeOut' }} style={{ paddingTop: 3 }}>
-                                        <h3 style={{ margin: 0, fontSize: 15.5, fontWeight: 700, color: 'var(--el-text)', lineHeight: 1.35, letterSpacing: '-0.015em' }}>
+                                    <motion.div key={`title-${step}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.02, duration: 0.14, ease: 'easeOut' }} style={{ display: 'flex', alignItems: 'center', minHeight: 42 }}>
+                                        <h3 style={{ margin: 0, fontSize: 15, fontWeight: 750, color: TOUR_THEME.text, lineHeight: 1.32, letterSpacing: '-0.02em', fontFamily: 'var(--font-display)' }}>
                                             {currentStep?.title}
                                         </h3>
                                     </motion.div>
                                 </div>
 
                                 {/* Description */}
-                                <motion.p key={`desc-${step}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.06, duration: 0.14, ease: 'easeOut' }} style={{ margin: '0 0 20px', fontSize: 13, lineHeight: 1.75, color: 'var(--el-text-secondary)' }}>
+                                <motion.p key={`desc-${step}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.06, duration: 0.14, ease: 'easeOut' }} style={{ margin: '0 0 16px', fontSize: 13, lineHeight: 1.7, color: TOUR_THEME.textSecondary }}>
                                     {currentStep?.description}
                                 </motion.p>
 
-                                {/* Dots */}
-                                <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginBottom: 22 }}>
-                                    {TOUR_STEPS.map((_, i) => (
-                                        <motion.div
-                                            key={i}
-                                            animate={{ width: i === step ? 24 : 6, background: i === step ? '#D96C4A' : i < step ? 'rgba(217,108,74,0.5)' : 'var(--el-border)', boxShadow: i === step ? '0 0 12px rgba(217,108,74,0.6)' : 'none' }}
-                                            transition={{ duration: 0.16, ease: 'easeOut' }}
-                                            style={{ height: 6, borderRadius: 3, willChange: 'width, background, box-shadow' }}
-                                        />
-                                    ))}
-                                </div>
+                                {isWelcomeStep && (
+                                    <div style={{ display: 'grid', gap: 8, marginBottom: 14 }}>
+                                        {INTRO_POINTS.map((point) => (
+                                            <div key={point.title} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '9px 11px', borderRadius: 14, background: 'var(--el-bg-secondary)', border: `1px solid ${TOUR_THEME.subtleBorder}` }}>
+                                                <div style={{ width: 22, height: 22, borderRadius: 999, background: TOUR_THEME.accentSoft, color: TOUR_THEME.accentDeep, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 10.5, fontWeight: 800 }}>
+                                                    {point.icon}
+                                                </div>
+                                                <div style={{ minWidth: 0 }}>
+                                                    <div style={{ fontSize: 12, fontWeight: 750, color: TOUR_THEME.text, marginBottom: 2 }}>
+                                                        {point.title}
+                                                    </div>
+                                                    <div style={{ fontSize: 11.5, lineHeight: 1.45, color: TOUR_THEME.textSecondary }}>
+                                                        {point.description}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {!isWelcomeStep && (
+                                    <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginBottom: 18 }}>
+                                        {TOUR_STEPS.map((_, i) => (
+                                            <motion.div
+                                                key={i}
+                                                animate={{ width: i === step ? 24 : 6, background: i === step ? TOUR_THEME.accent : i < step ? 'color-mix(in srgb, var(--orange) 40%, transparent)' : TOUR_THEME.softPanel, boxShadow: i === step ? '0 0 12px color-mix(in srgb, var(--orange) 40%, transparent)' : 'none' }}
+                                                transition={{ duration: 0.16, ease: 'easeOut' }}
+                                                style={{ height: 6, borderRadius: 3, willChange: 'width, background, box-shadow' }}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
 
                                 {/* Buttons */}
                                 <div style={{ display: 'flex', gap: 8 }}>
                                     {!isFirst && (
-                                        <button onClick={back} style={{ padding: '9px 16px', borderRadius: 11, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', border: '1px solid var(--el-border)', background: 'var(--el-bg)', color: 'var(--el-text-secondary)', transition: 'all 0.12s' }} onMouseEnter={e => { e.currentTarget.style.background = 'var(--el-bg-secondary)'; e.currentTarget.style.color = 'var(--el-text)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'var(--el-bg)'; e.currentTarget.style.color = 'var(--el-text-secondary)'; }}>
+                                        <button onClick={back} style={{ padding: '10px 14px', borderRadius: 12, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', border: `1px solid ${TOUR_THEME.subtleBorder}`, background: TOUR_THEME.softPanel, color: TOUR_THEME.textSecondary, transition: 'all 0.12s', boxShadow: 'var(--el-shadow-button)' }} onMouseEnter={e => { e.currentTarget.style.background = 'var(--el-bg)'; e.currentTarget.style.color = TOUR_THEME.text; e.currentTarget.style.borderColor = TOUR_THEME.panelBorder; }} onMouseLeave={e => { e.currentTarget.style.background = TOUR_THEME.softPanel; e.currentTarget.style.color = TOUR_THEME.textSecondary; e.currentTarget.style.borderColor = TOUR_THEME.subtleBorder; }}>
                                             ← Back
                                         </button>
                                     )}
@@ -289,25 +343,26 @@ export default function GuidedTour() {
                                         whileTap={{ scale: 0.98 }}
                                         style={{
                                             flex: 1,
-                                            padding: '11px 22px',
-                                            borderRadius: 12,
+                                            padding: '12px 22px',
+                                            borderRadius: 14,
                                             fontSize: 13,
-                                            fontWeight: 700,
+                                            fontWeight: 800,
                                             cursor: 'pointer',
-                                            border: 'none',
-                                            background: 'linear-gradient(135deg, #c45b3a 0%, #D96C4A 50%, #e19060 100%)',
+                                            border: '1px solid color-mix(in srgb, var(--orange) 38%, transparent)',
+                                            background: 'linear-gradient(135deg, var(--orange-deep) 0%, var(--orange) 52%, color-mix(in srgb, var(--orange) 70%, white) 100%)',
                                             color: '#fff',
-                                            boxShadow: '0 6px 20px rgba(217,108,74,0.5), inset 0 1px 0 rgba(255,255,255,0.2)',
+                                            boxShadow: '0 10px 24px color-mix(in srgb, var(--orange) 22%, transparent), inset 0 1px 0 rgba(255,255,255,0.18)',
                                             transition: 'all 0.12s cubic-bezier(0.16, 1, 0.3, 1)',
                                             willChange: 'transform, box-shadow',
+                                            fontFamily: 'var(--font-display)',
                                         }}
                                     >
-                                        {isLast ? "Let's go! 🚀" : 'Next →'}
+                                        {isLast ? "Start exploring" : isFirst ? 'Begin the overview →' : 'Next →'}
                                     </motion.button>
                                 </div>
 
                                 {/* Hint */}
-                                <p style={{ margin: '12px 0 0', textAlign: 'center', fontSize: 10.5, color: 'var(--el-text-muted)', opacity: 0.6 }}>
+                                <p style={{ margin: '10px 0 0', textAlign: 'center', fontSize: 10.5, color: TOUR_THEME.textMuted, flexShrink: 0 }}>
                                     ← → arrow keys to navigate · Esc to exit
                                 </p>
                             </div>

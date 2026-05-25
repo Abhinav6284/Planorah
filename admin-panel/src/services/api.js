@@ -93,7 +93,7 @@ export async function loginWithCredentials(email, password) {
 
   // Fetch current admin user info
   const user = await apiFetch('/api/admin/me/')
-  if (!user.role) {
+  if (!['admin', 'superadmin'].includes(user.role)) {
     clearTokens()
     throw new Error('Access denied: not a staff account')
   }
@@ -131,6 +131,11 @@ export const adminApi = {
     return apiFetch(`/api/admin/users/?${q}`)
   },
   getUserDetail: (id) => apiFetch(`/api/admin/users/${id}/`),
+  updateUserOnboarding: (id, payload) =>
+    apiFetch(`/api/admin/users/${id}/onboarding/`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
   userAction: (id, action) =>
     apiFetch(`/api/admin/users/${id}/action/`, {
       method: 'POST',
@@ -156,6 +161,13 @@ export const adminApi = {
   // Logs
   getLogs: (limit = 20) =>
     apiFetch(`/api/admin/logs/?limit=${limit}`),
+
+  // Notifications
+  getNotifications: () => apiFetch('/api/sessions/notifications/'),
+  markNotificationRead: (id) =>
+    apiFetch(`/api/sessions/notifications/${id}/read/`, {
+      method: 'PATCH',
+    }),
 
   // Profile
   updateMe: (data) =>

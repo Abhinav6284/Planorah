@@ -13,7 +13,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from saas_admin import services
 from saas_admin.models import FeatureFlag, AdminLog
-from users.models import CustomUser
+from users.models import CustomUser, UserProfile
 from subscriptions.models import Subscription
 from billing.models import Payment
 from plans.models import Plan
@@ -215,6 +215,73 @@ def user_detail(request, user_id):
         'total_paid': detail['total_paid'],
         'subscriptions': subs,
         'payments': payments,
+        'onboarding': {
+            'education_stage': getattr(u.profile, 'education_stage', None) if hasattr(u, 'profile') else None,
+            'validation_mode': getattr(u.profile, 'validation_mode', None) if hasattr(u, 'profile') else None,
+            'weekly_hours': getattr(u.profile, 'weekly_hours', None) if hasattr(u, 'profile') else None,
+            'goal_statement': getattr(u.profile, 'goal_statement', None) if hasattr(u, 'profile') else None,
+            'onboarding_accepted_terms': bool(getattr(u.profile, 'onboarding_accepted_terms', False)) if hasattr(u, 'profile') else False,
+            'onboarding_complete': bool(getattr(u.profile, 'onboarding_complete', False)) if hasattr(u, 'profile') else False,
+            'onboarding_data': getattr(u.profile, 'onboarding_data', {}) if hasattr(u, 'profile') else {},
+        },
+    })
+
+
+@api_view(['PATCH'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def update_user_onboarding(request, user_id):
+    """Update onboarding fields for a user from admin panel."""
+    if not request.user.is_staff:
+        return Response({'detail': 'Staff access required.'}, status=status.HTTP_403_FORBIDDEN)
+
+    try:
+        user = CustomUser.objects.get(pk=user_id)
+    except CustomUser.DoesNotExist:
+        return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+    data = request.data or {}
+
+    education_stage = data.get('education_stage', profile.education_stage)
+    validation_mode = data.get('validation_mode', profile.validation_mode)
+    weekly_hours = data.get('weekly_hours', profile.weekly_hours)
+    goal_statement = data.get('goal_statement', profile.goal_statement)
+    onboarding_accepted_terms = data.get(
+        'onboarding_accepted_terms', profile.onboarding_accepted_terms
+    )
+    onboarding_data = data.get('onboarding_data', profile.onboarding_data)
+
+    if onboarding_data is None:
+        onboarding_data = {}
+    if not isinstance(onboarding_data, dict):
+        return Response({'detail': 'onboarding_data must be an object.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        weekly_hours = int(weekly_hours) if weekly_hours is not None else profile.weekly_hours
+    except (TypeError, ValueError):
+        return Response({'detail': 'weekly_hours must be a number.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    profile.education_stage = education_stage
+    profile.validation_mode = validation_mode
+    profile.weekly_hours = weekly_hours
+    profile.goal_statement = goal_statement
+    profile.onboarding_accepted_terms = bool(onboarding_accepted_terms)
+    profile.onboarding_data = onboarding_data
+    profile.onboarding_complete = bool(onboarding_data) and bool(goal_statement)
+    profile.save()
+
+    return Response({
+        'detail': 'Onboarding data updated successfully.',
+        'onboarding': {
+            'education_stage': profile.education_stage,
+            'validation_mode': profile.validation_mode,
+            'weekly_hours': profile.weekly_hours,
+            'goal_statement': profile.goal_statement,
+            'onboarding_accepted_terms': profile.onboarding_accepted_terms,
+            'onboarding_complete': profile.onboarding_complete,
+            'onboarding_data': profile.onboarding_data,
+        }
     })
 
 

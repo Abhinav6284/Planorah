@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { BrainCircuit, Flame, Sparkles, CheckCircle2, Clock, HelpCircle } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Flame, Sparkles, CheckCircle2, Clock, HelpCircle } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTour } from '../Tour/TourContext';
 
 import AIVoicePanel from '../Mentoring/AIVoicePanel';
@@ -15,6 +15,7 @@ import ProgressPanel from './Execution/ProgressPanel';
 import TaskDetailModal from './Execution/TaskDetailModal';
 import PerformanceChart from './Execution/PerformanceChart';
 import SessionsSection from '../Sessions/SessionsSection';
+import BehavioralIntelligencePanel from './Intelligence/BehavioralIntelligencePanel';
 
 import { useExecutionStore } from '../../store/useExecutionStore';
 import { userService } from '../../api/userService';
@@ -112,11 +113,11 @@ const normalizeDisplayTitle = (title) => {
 };
 
 const ExecutionDashboard = () => {
+    const navigate = useNavigate();
     const {
         mode,
         setMode,
         todayTask,
-        coach,
         tasks,
         examTasks,
         progress,
@@ -140,24 +141,27 @@ const ExecutionDashboard = () => {
     const [subjects, setSubjects] = useState([]);
     const [userStats, setUserStats] = useState(null);
     const [chartData, setChartData] = useState(null);
+    const [behavioralInsight, setBehavioralInsight] = useState(null);
     const [isTaskGuideOpen, setIsTaskGuideOpen] = useState(false);
     const [selectedGuideTask, setSelectedGuideTask] = useState(null);
 
     useEffect(() => {
         bootstrap();
-        // Batch all 5 API calls in parallel — React 18 batches the setState calls automatically
+        // Batch dashboard queries in parallel so the first meaningful state is coherent.
         Promise.all([
             userService.getProfile(),
             userService.getStatistics(),
             api.get('analytics/activity_chart/', { params: { days: 7 } }),
             roadmapService.getUserRoadmaps(),
             planoraService.getSubjects(),
-        ]).then(([profileData, statsData, chartRes, roadmapsData, subjectsData]) => {
+            api.get('dashboard/onboarding-insights/'),
+        ]).then(([profileData, statsData, chartRes, roadmapsData, subjectsData, insightRes]) => {
             setProfile(profileData);
             setUserStats(statsData);
             setChartData(chartRes?.data ?? null);
             setRoadmaps(Array.isArray(roadmapsData) ? roadmapsData : []);
             setSubjects(Array.isArray(subjectsData) ? subjectsData : []);
+            setBehavioralInsight(insightRes?.data ?? null);
         }).catch(() => null);
     }, [bootstrap]);
 
@@ -233,6 +237,8 @@ const ExecutionDashboard = () => {
 
     const openVoicePanel = useCallback(() => setVoicePanelOpen(true), []);
     const closeVoicePanel = useCallback(() => setVoicePanelOpen(false), []);
+
+    const insightCard = behavioralInsight?.insight_card || null;
 
     const { start: startTour } = useTour();
 
@@ -692,21 +698,9 @@ const ExecutionDashboard = () => {
 
                     {/* RIGHT COLUMN: Context & Social (col-span-4) */}
                     <aside className="space-y-6 lg:col-span-4">
-                        {/* AI Insight Card */}
-                        <div data-tour="ai-insight" className={shellCardClass} style={{ ...shellCardStyle, padding: 20 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--el-text)', marginBottom: 10 }}>
-                                <BrainCircuit style={{ width: 16, height: 16 }} />
-                                <span style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>AI Insight</span>
-                            </div>
-                            <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--el-text-secondary)', letterSpacing: '0.14px' }}>
-                                {coach?.reason || "Consistency is your superpower. One focused session today beats zero."}
-                            </p>
-                            <button
-                                onClick={openVoicePanel}
-                                style={{ marginTop: 16, width: '100%', padding: '10px 16px', borderRadius: 9999, background: 'var(--el-text)', color: 'var(--el-bg)', fontSize: 13, fontWeight: 500, border: 'none', cursor: 'pointer', transition: 'opacity 0.15s', fontFamily: "'Inter', sans-serif" }}
-                            >
-                                Get Strategy
-                            </button>
+                        {/* Behavioral Intelligence Panel */}
+                        <div data-tour="ai-insight">
+                            <BehavioralIntelligencePanel />
                         </div>
 
                         {/* EXECUTION FEED */}

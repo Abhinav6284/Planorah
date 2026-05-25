@@ -18,7 +18,7 @@ export default function Modal({ open, onClose, title, children, width = 'max-w-x
   return (
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-3 sm:p-4 overflow-y-auto">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -33,13 +33,13 @@ export default function Modal({ open, onClose, title, children, width = 'max-w-x
             exit={{   opacity: 0, scale: 0.96, y: 10 }}
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
             className={[
-              'relative w-full bg-[var(--bg-card)] rounded-xl overflow-hidden',
+              'relative w-full bg-[var(--bg-card)] rounded-xl overflow-hidden flex flex-col max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-2rem)]',
               'shadow-level-2-card',
               width,
             ].join(' ')}
           >
             {/* header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0">
               <h2 className="font-cal-sans font-semibold text-base text-[var(--text-primary)] tracking-tight">
                 {title}
               </h2>
@@ -51,7 +51,7 @@ export default function Modal({ open, onClose, title, children, width = 'max-w-x
               </button>
             </div>
             {/* body */}
-            <div className="px-6 py-5">{children}</div>
+            <div className="px-6 py-5 overflow-y-auto min-h-0">{children}</div>
           </motion.div>
         </div>
       )}

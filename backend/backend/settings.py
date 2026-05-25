@@ -103,6 +103,7 @@ INSTALLED_APPS = [
     'ai_mentoring',  # Reusable AI Mentoring Engine
     'saas_admin',    # SaaS Admin Panel
     'sessions',      # Session booking
+    'intelligence',  # Behavioral Intelligence System
 ]
 
 # WSGI Application (using WSGI for development instead of ASGI due to Python 3.13 compatibility)

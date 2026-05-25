@@ -9,6 +9,7 @@ import Subscriptions from './pages/Subscriptions'
 import Analytics from './pages/Analytics'
 import Logs from './pages/Logs'
 import Settings from './pages/Settings'
+import Notifications from './pages/Notifications'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -35,6 +36,7 @@ export default function App() {
           <Route path="subscriptions" element={<Subscriptions />} />
           <Route path="analytics"     element={<Analytics />} />
           <Route path="logs"          element={<Logs />} />
+          <Route path="notifications" element={<Notifications />} />
           <Route path="settings"      element={<Settings />} />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

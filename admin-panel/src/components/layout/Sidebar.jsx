@@ -4,6 +4,7 @@ import {
   LayoutDashboard, Users, CreditCard, BarChart3,
   Settings, ChevronLeft, ChevronRight, Zap, LogOut,
   Shield, ScrollText,
+  Bell,
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
@@ -13,6 +14,7 @@ const NAV = [
   { to: '/subscriptions', icon: CreditCard,      label: 'Subscriptions' },
   { to: '/analytics',     icon: BarChart3,       label: 'Analytics'     },
   { to: '/logs',          icon: ScrollText,      label: 'Admin Logs'    },
+  { to: '/notifications', icon: Bell,            label: 'Notifications' },
   { to: '/settings',      icon: Settings,        label: 'Settings'      },
 ]
 

@@ -31,8 +31,19 @@ const PREMIUM_THEME = {
 };
 
 // ─── Option Tile (Premium Identity Card) ────────────────────────────────────
-function OptionCard({ emoji, iconText, label, subtitle, meta, selected, onClick, index }) {
+function OptionCard({ emoji, iconText, label, subtitle, meta, selected, onClick, index, isDark }) {
     const [isHovered, setIsHovered] = useState(false);
+    const palette = {
+        rowBorder: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.16)',
+        index: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(15,23,42,0.5)',
+        titleDefault: isDark ? 'rgba(255,255,255,0.58)' : 'rgba(15,23,42,0.72)',
+        titleActive: isDark ? '#ffffff' : '#0f172a',
+        iconText: isDark ? '#ffffff' : '#111827',
+        arrow: isDark ? '#ffffff' : '#0f172a',
+        subtitle: isDark ? 'rgba(255,255,255,0.68)' : 'rgba(15,23,42,0.78)',
+        metaDot: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(15,23,42,0.34)',
+        metaText: isDark ? 'rgba(255,255,255,0.48)' : 'rgba(15,23,42,0.58)',
+    };
 
     return (
         <motion.div
@@ -48,7 +59,7 @@ function OptionCard({ emoji, iconText, label, subtitle, meta, selected, onClick,
                 display: 'flex',
                 flexDirection: 'column',
                 padding: '24px 0',
-                borderBottom: '1px solid rgba(255,255,255,0.08)',
+                borderBottom: `1px solid ${palette.rowBorder}`,
                 cursor: 'pointer',
                 position: 'relative',
                 fontFamily: PREMIUM_THEME.fontBody,
@@ -56,13 +67,13 @@ function OptionCard({ emoji, iconText, label, subtitle, meta, selected, onClick,
         >
             <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-                    <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.2)', fontWeight: 500, fontFamily: PREMIUM_THEME.fontLabel, width: 24 }}>
+                    <span style={{ fontSize: 14, color: palette.index, fontWeight: 500, fontFamily: PREMIUM_THEME.fontLabel, width: 24 }}>
                         0{index + 1}
                     </span>
                     <h3 style={{
                         fontSize: 'clamp(20px, 3vw, 32px)',
                         fontWeight: 300,
-                        color: selected ? '#ffffff' : (isHovered ? '#ffffff' : 'rgba(255,255,255,0.5)'),
+                        color: selected ? palette.titleActive : (isHovered ? palette.titleActive : palette.titleDefault),
                         margin: 0,
                         letterSpacing: '-0.02em',
                         transition: 'color 0.3s ease',
@@ -81,13 +92,13 @@ function OptionCard({ emoji, iconText, label, subtitle, meta, selected, onClick,
                             transition={{ duration: 0.3 }}
                             style={{ fontSize: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', filter: (isHovered || selected) ? 'none' : 'grayscale(100%)' }}
                         >
-                            {iconText ? <span style={{ fontSize: 20, color: '#fff', fontWeight: 500 }}>{iconText}</span> : emoji}
+                            {iconText ? <span style={{ fontSize: 20, color: palette.iconText, fontWeight: 500 }}>{iconText}</span> : emoji}
                         </motion.div>
                     )}
                     <motion.div
                         animate={{ x: isHovered || selected ? 0 : -10, opacity: isHovered || selected ? 1 : 0 }}
                         transition={{ duration: 0.3 }}
-                        style={{ color: '#ffffff', display: 'flex', alignItems: 'center' }}
+                        style={{ color: palette.arrow, display: 'flex', alignItems: 'center' }}
                     >
                         <ArrowRight style={{ width: 24, height: 24 }} />
                     </motion.div>
@@ -105,14 +116,14 @@ function OptionCard({ emoji, iconText, label, subtitle, meta, selected, onClick,
                     >
                         <div style={{ display: 'flex', alignItems: 'center', gap: 16, paddingTop: 16, paddingLeft: 56 }}>
                             {subtitle && (
-                                <span style={{ fontSize: 16, color: 'rgba(255,255,255,0.6)', fontWeight: 400 }}>
+                                <span style={{ fontSize: 16, color: palette.subtitle, fontWeight: 400 }}>
                                     {subtitle}
                                 </span>
                             )}
                             {meta && (
                                 <>
-                                    <div style={{ width: 4, height: 4, borderRadius: 99, background: 'rgba(255,255,255,0.2)' }} />
-                                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, fontFamily: PREMIUM_THEME.fontLabel }}>
+                                    <div style={{ width: 4, height: 4, borderRadius: 99, background: palette.metaDot }} />
+                                    <span style={{ fontSize: 12, color: palette.metaText, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, fontFamily: PREMIUM_THEME.fontLabel }}>
                                         {meta}
                                     </span>
                                 </>
@@ -463,6 +474,34 @@ const SCREENS = {
 export default function UniversalOnboarding() {
     const navigate = useNavigate();
     const { theme } = useTheme();
+    const isDark = theme === "dark";
+    const palette = useMemo(() => ({
+        pageBg: isDark ? '#0a0a0a' : '#f8fafc',
+        pageText: isDark ? '#f4f4f4' : '#0f172a',
+        gridLine: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(15,23,42,0.06)',
+        primaryText: isDark ? '#ffffff' : '#0f172a',
+        secondaryText: isDark ? 'rgba(255,255,255,0.62)' : 'rgba(15,23,42,0.74)',
+        tertiaryText: isDark ? 'rgba(255,255,255,0.42)' : 'rgba(15,23,42,0.58)',
+        mutedText: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(15,23,42,0.52)',
+        faintText: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(15,23,42,0.46)',
+        rowBorder: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(15,23,42,0.16)',
+        rowBorderStrong: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(15,23,42,0.24)',
+        iconBubbleBg: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.08)',
+        iconBubbleBgHover: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(15,23,42,0.14)',
+        iconBubbleBorder: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(15,23,42,0.16)',
+        iconColor: isDark ? 'rgba(255,255,255,0.8)' : 'rgba(15,23,42,0.75)',
+        backHover: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.12)',
+        progressActive: isDark ? '#ffffff' : '#111827',
+        progressInactive: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(15,23,42,0.28)',
+        logoSquare: isDark ? '#ffffff' : '#111827',
+        logoText: isDark ? '#ffffff' : '#111827',
+        checkIconStroke: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(15,23,42,0.7)',
+        selectArrowStroke: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(15,23,42,0.5)',
+        ctaBg: isDark ? '#ffffff' : '#111827',
+        ctaBgHover: isDark ? '#f5f5f5' : '#1f2937',
+        ctaText: isDark ? '#000000' : '#ffffff',
+        ctaShadow: isDark ? '0 8px 32px rgba(255, 255, 255, 0.15)' : '0 8px 28px rgba(15, 23, 42, 0.2)',
+    }), [isDark]);
     const [stepIndex, setStepIndex] = useState(0);
     const [loading, setLoading] = useState(false);
     const [fd, setFd] = useState({
@@ -486,7 +525,6 @@ export default function UniversalOnboarding() {
 
     const currentStepId = steps[stepIndex] || "life_stage";
     const totalSteps = steps.length;
-    const progress = totalSteps > 1 ? (stepIndex / (totalSteps - 1)) * 100 : 0;
 
     const set = (field, value) => {
         if (field === "life_stage") {
@@ -599,6 +637,7 @@ export default function UniversalOnboarding() {
                             meta={opt.meta}
                             selected={fd[screen.field] === opt.value}
                             onClick={() => pick(screen.field, opt.value)}
+                            isDark={isDark}
                         />
                     ))}
                 </motion.div>
@@ -614,7 +653,7 @@ export default function UniversalOnboarding() {
                         <h1 style={{
                             fontSize: 'clamp(28px, 5vw, 40px)',
                             fontWeight: 300,
-                            color: '#ffffff',
+                            color: palette.primaryText,
                             letterSpacing: '-0.03em',
                             lineHeight: 1.1,
                             margin: '0 0 12px 0',
@@ -624,7 +663,7 @@ export default function UniversalOnboarding() {
                         </h1>
                         <p style={{
                             fontSize: 'clamp(14px, 2.5vw, 16px)',
-                            color: 'rgba(255,255,255,0.5)',
+                            color: palette.secondaryText,
                             lineHeight: 1.4,
                             margin: 0,
                             fontFamily: PREMIUM_THEME.fontBody,
@@ -653,24 +692,24 @@ export default function UniversalOnboarding() {
                                         display: 'flex',
                                         flexDirection: 'column',
                                         padding: '16px 0',
-                                        borderBottom: '1px solid rgba(255,255,255,0.08)',
+                                        borderBottom: `1px solid ${palette.rowBorder}`,
                                         opacity: isDimmed ? 0.3 : 1,
                                         transition: 'all 0.3s ease',
                                     }}
                                 >
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-                                            <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.2)', fontWeight: 500, fontFamily: PREMIUM_THEME.fontLabel, width: 24 }}>
+                                            <span style={{ fontSize: 13, color: palette.faintText, fontWeight: 500, fontFamily: PREMIUM_THEME.fontLabel, width: 24 }}>
                                                 {num}
                                             </span>
                                             <div>
-                                                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, fontFamily: PREMIUM_THEME.fontLabel, marginBottom: 4, textAlign: 'left' }}>
+                                                <div style={{ fontSize: 11, color: palette.tertiaryText, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, fontFamily: PREMIUM_THEME.fontLabel, marginBottom: 4, textAlign: 'left' }}>
                                                     {label}
                                                 </div>
                                                 <h3 style={{
                                                     fontSize: 'clamp(16px, 3.5vw, 22px)',
                                                     fontWeight: 300,
-                                                    color: '#ffffff',
+                                                    color: palette.primaryText,
                                                     margin: 0,
                                                     letterSpacing: '-0.02em',
                                                     fontFamily: PREMIUM_THEME.fontBody,
@@ -683,11 +722,11 @@ export default function UniversalOnboarding() {
                                         <div style={{ 
                                             display: 'flex', alignItems: 'center', justifyContent: 'center', 
                                             width: 36, height: 36, borderRadius: '50%', 
-                                            background: isHovered ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)', 
-                                            border: '1px solid rgba(255,255,255,0.1)',
+                                            background: isHovered ? palette.iconBubbleBgHover : palette.iconBubbleBg,
+                                            border: `1px solid ${palette.iconBubbleBorder}`,
                                             transition: 'all 0.3s ease'
                                         }}>
-                                            <Icon style={{ width: 16, height: 16, color: 'rgba(255,255,255,0.8)' }} />
+                                            <Icon style={{ width: 16, height: 16, color: palette.iconColor }} />
                                         </div>
                                     </div>
                                 </div>
@@ -709,25 +748,25 @@ export default function UniversalOnboarding() {
                                 justifyContent: 'space-between',
                                 marginTop: 32,
                                 padding: '24px 0',
-                                borderTop: '1px solid rgba(255,255,255,0.2)',
-                                borderBottom: '1px solid rgba(255,255,255,0.2)',
+                                borderTop: `1px solid ${palette.rowBorderStrong}`,
+                                borderBottom: `1px solid ${palette.rowBorderStrong}`,
                                 cursor: 'pointer',
                                 opacity: (hoveredStrategyRow !== null && hoveredStrategyRow !== "Commitment") ? 0.3 : 1,
                                 transition: 'opacity 0.3s ease'
                             }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-                                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', fontWeight: 500, fontFamily: PREMIUM_THEME.fontLabel, width: 24 }}>
+                                <span style={{ fontSize: 13, color: palette.tertiaryText, fontWeight: 500, fontFamily: PREMIUM_THEME.fontLabel, width: 24 }}>
                                     04
                                 </span>
                                 <div>
-                                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, fontFamily: PREMIUM_THEME.fontLabel, marginBottom: 4, textAlign: 'left' }}>
+                                    <div style={{ fontSize: 11, color: palette.secondaryText, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, fontFamily: PREMIUM_THEME.fontLabel, marginBottom: 4, textAlign: 'left' }}>
                                         Commitment
                                     </div>
                                     <h3 style={{
                                         fontSize: 'clamp(18px, 3.5vw, 24px)',
                                         fontWeight: 300,
-                                        color: '#ffffff',
+                                        color: palette.primaryText,
                                         margin: 0,
                                         letterSpacing: '-0.02em',
                                         fontFamily: PREMIUM_THEME.fontBody,
@@ -743,10 +782,10 @@ export default function UniversalOnboarding() {
                                     hover: { opacity: 1, x: 0 }
                                 }}
                                 transition={{ duration: 0.4, ease: [0.2, 0, 0, 1] }}
-                                style={{ display: 'flex', alignItems: 'center', gap: 12, color: 'rgba(255,255,255,0.6)' }}
+                                style={{ display: 'flex', alignItems: 'center', gap: 12, color: palette.secondaryText }}
                             >
                                 <span style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, fontFamily: PREMIUM_THEME.fontLabel }}>Accept & Continue</span>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 44, height: 44, borderRadius: '50%', background: '#ffffff', color: '#000000' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 44, height: 44, borderRadius: '50%', background: palette.ctaBg, color: palette.ctaText }}>
                                     <ArrowRight style={{ width: 18, height: 18 }} />
                                 </div>
                             </motion.div>
@@ -768,7 +807,7 @@ export default function UniversalOnboarding() {
                         <h1 style={{
                             fontSize: 'clamp(28px, 5vw, 40px)',
                             fontWeight: 300,
-                            color: '#ffffff',
+                            color: palette.primaryText,
                             letterSpacing: '-0.03em',
                             lineHeight: 1.1,
                             margin: '0 0 12px 0',
@@ -778,7 +817,7 @@ export default function UniversalOnboarding() {
                         </h1>
                         <p style={{
                             fontSize: 'clamp(14px, 2.5vw, 16px)',
-                            color: 'rgba(255,255,255,0.5)',
+                            color: palette.secondaryText,
                             lineHeight: 1.4,
                             margin: 0,
                             fontFamily: PREMIUM_THEME.fontBody,
@@ -801,19 +840,19 @@ export default function UniversalOnboarding() {
                                         alignItems: 'flex-start',
                                         gap: 24,
                                         padding: '16px 0',
-                                        borderBottom: `1px solid ${isFocused ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)'}`,
+                                        borderBottom: `1px solid ${isFocused ? palette.rowBorderStrong : palette.rowBorder}`,
                                         opacity: isDimmed ? 0.3 : 1,
                                         transition: 'all 0.3s ease',
                                     }}
                                 >
-                                    <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.2)', fontWeight: 500, fontFamily: PREMIUM_THEME.fontLabel, width: 24, marginTop: 4 }}>
+                                    <span style={{ fontSize: 13, color: palette.faintText, fontWeight: 500, fontFamily: PREMIUM_THEME.fontLabel, width: 24, marginTop: 4 }}>
                                         {inp.num}
                                     </span>
                                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
                                         <label style={{ 
                                             fontSize: 10, 
                                             fontWeight: 600, 
-                                            color: isFocused ? '#ffffff' : 'rgba(255,255,255,0.4)', 
+                                            color: isFocused ? palette.primaryText : palette.tertiaryText, 
                                             textTransform: 'uppercase', 
                                             letterSpacing: '0.05em', 
                                             fontFamily: PREMIUM_THEME.fontLabel,
@@ -834,7 +873,7 @@ export default function UniversalOnboarding() {
                                                     width: '100%',
                                                     background: 'transparent',
                                                     border: 'none',
-                                                    color: '#ffffff',
+                                                    color: palette.primaryText,
                                                     fontSize: 18,
                                                     fontWeight: 300,
                                                     outline: 'none',
@@ -844,7 +883,7 @@ export default function UniversalOnboarding() {
                                             />
                                         </div>
                                     </div>
-                                    <div style={{ color: isFocused ? '#ffffff' : 'rgba(255,255,255,0.2)', transition: 'color 0.3s ease', marginTop: 4 }}>
+                                    <div style={{ color: isFocused ? palette.primaryText : palette.faintText, transition: 'color 0.3s ease', marginTop: 4 }}>
                                         <inp.icon style={{ width: 16, height: 16 }} />
                                     </div>
                                 </div>
@@ -863,19 +902,19 @@ export default function UniversalOnboarding() {
                                         alignItems: 'flex-start',
                                         gap: 24,
                                         padding: '16px 0',
-                                        borderBottom: `1px solid ${isFocused ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)'}`,
+                                        borderBottom: `1px solid ${isFocused ? palette.rowBorderStrong : palette.rowBorder}`,
                                         opacity: isDimmed ? 0.3 : 1,
                                         transition: 'all 0.3s ease',
                                     }}
                                 >
-                                    <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.2)', fontWeight: 500, fontFamily: PREMIUM_THEME.fontLabel, width: 24, marginTop: 4 }}>
+                                    <span style={{ fontSize: 13, color: palette.faintText, fontWeight: 500, fontFamily: PREMIUM_THEME.fontLabel, width: 24, marginTop: 4 }}>
                                         04
                                     </span>
                                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
                                         <label style={{ 
                                             fontSize: 10, 
                                             fontWeight: 600, 
-                                            color: isFocused ? '#ffffff' : 'rgba(255,255,255,0.4)', 
+                                            color: isFocused ? palette.primaryText : palette.tertiaryText, 
                                             textTransform: 'uppercase', 
                                             letterSpacing: '0.05em', 
                                             fontFamily: PREMIUM_THEME.fontLabel,
@@ -893,7 +932,7 @@ export default function UniversalOnboarding() {
                                                 width: '100%',
                                                 background: 'transparent',
                                                 border: 'none',
-                                                color: fd.gender ? '#ffffff' : 'rgba(255,255,255,0.3)',
+                                                color: fd.gender ? palette.primaryText : palette.mutedText,
                                                 fontSize: 18,
                                                 fontWeight: 300,
                                                 outline: 'none',
@@ -901,7 +940,7 @@ export default function UniversalOnboarding() {
                                                 fontFamily: PREMIUM_THEME.fontBody,
                                                 cursor: 'pointer',
                                                 appearance: 'none',
-                                                backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                                                backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='${encodeURIComponent(palette.selectArrowStroke)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
                                                 backgroundRepeat: 'no-repeat',
                                                 backgroundPosition: 'right 0 center',
                                                 backgroundSize: '16px'
@@ -913,7 +952,7 @@ export default function UniversalOnboarding() {
                                             <option value="other" style={{ color: '#000' }}>Other</option>
                                         </select>
                                     </div>
-                                    <div style={{ color: isFocused ? '#ffffff' : 'rgba(255,255,255,0.2)', transition: 'color 0.3s ease', marginTop: 4 }}>
+                                    <div style={{ color: isFocused ? palette.primaryText : palette.faintText, transition: 'color 0.3s ease', marginTop: 4 }}>
                                         <Users style={{ width: 16, height: 16 }} />
                                     </div>
                                 </div>
@@ -933,8 +972,8 @@ export default function UniversalOnboarding() {
                 .onboarding-grid-bg {
                     background-size: 40px 40px;
                     background-image: 
-                        linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+                        linear-gradient(to right, ${palette.gridLine} 1px, transparent 1px),
+                        linear-gradient(to bottom, ${palette.gridLine} 1px, transparent 1px);
                 }
                 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -945,8 +984,8 @@ export default function UniversalOnboarding() {
             <div className="onboarding-grid-bg" style={{
                 position: 'fixed',
                 inset: 0,
-                background: '#0a0a0a',
-                color: 'var(--n-text)',
+                background: palette.pageBg,
+                color: palette.pageText,
                 fontFamily: PREMIUM_THEME.fontBody,
                 display: 'flex',
                 flexDirection: 'column',
@@ -971,12 +1010,12 @@ export default function UniversalOnboarding() {
                             width: 44, height: 44, borderRadius: 99,
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             background: 'transparent',
-                            color: '#ffffff', cursor: stepIndex === 0 ? 'default' : 'pointer',
+                            color: palette.primaryText, cursor: stepIndex === 0 ? 'default' : 'pointer',
                             opacity: stepIndex === 0 ? 0 : 0.8,
                             transition: 'all 0.2s ease',
                             border: 'none',
                         }}
-                        onMouseEnter={(e) => { if(stepIndex !== 0) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+                        onMouseEnter={(e) => { if(stepIndex !== 0) e.currentTarget.style.background = palette.backHover; }}
                         onMouseLeave={(e) => { if(stepIndex !== 0) e.currentTarget.style.background = 'transparent'; }}
                     >
                         <ChevronLeft style={{ width: 20, height: 20 }} />
@@ -989,7 +1028,7 @@ export default function UniversalOnboarding() {
                                 width: i === stepIndex ? 24 : 6,
                                 height: 4,
                                 borderRadius: 99,
-                                background: i === stepIndex ? '#ffffff' : 'rgba(255,255,255,0.2)',
+                                background: i === stepIndex ? palette.progressActive : palette.progressInactive,
                                 transition: 'all 0.3s cubic-bezier(0.2, 0, 0, 1)'
                             }} />
                         ))}
@@ -997,8 +1036,8 @@ export default function UniversalOnboarding() {
 
                     {/* Planorah Logo */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, opacity: 0.8 }}>
-                        <div style={{ width: 16, height: 16, background: 'white', borderRadius: 3 }}></div>
-                        <span style={{ fontSize: 16, fontWeight: 700, color: 'white', letterSpacing: '-0.02em', display: 'none' }} className="sm-show">Planorah</span>
+                        <div style={{ width: 16, height: 16, background: palette.logoSquare, borderRadius: 3 }}></div>
+                        <span style={{ fontSize: 16, fontWeight: 700, color: palette.logoText, letterSpacing: '-0.02em', display: 'none' }} className="sm-show">Planorah</span>
                     </div>
                 </header>
 
@@ -1030,7 +1069,7 @@ export default function UniversalOnboarding() {
                                         <h1 style={{
                                             fontSize: 'clamp(40px, 8vw, 64px)',
                                             fontWeight: 300,
-                                            color: '#ffffff',
+                                            color: palette.primaryText,
                                             letterSpacing: '-0.03em',
                                             lineHeight: 1.1,
                                             margin: '0 0 24px 0',
@@ -1041,7 +1080,7 @@ export default function UniversalOnboarding() {
                                         {screen.sub && (
                                             <p style={{
                                                 fontSize: 'clamp(15px, 3vw, 18px)',
-                                                color: 'rgba(255,255,255,0.5)',
+                                                color: palette.secondaryText,
                                                 lineHeight: 1.5,
                                                 margin: 0,
                                                 fontFamily: PREMIUM_THEME.fontBody,
@@ -1054,12 +1093,12 @@ export default function UniversalOnboarding() {
                                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px 24px', marginTop: 32, justifyContent: 'center' }}>
                                                 {screen.bullets.map(b => (
                                                     <div key={b} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                        <div style={{ width: 14, height: 14, borderRadius: 99, background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                                        <div style={{ width: 14, height: 14, borderRadius: 99, background: palette.iconBubbleBg, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${palette.iconBubbleBorder}` }}>
                                                             <svg width="8" height="6" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                <path d="M1 4L3.5 6.5L9 1" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                                <path d="M1 4L3.5 6.5L9 1" stroke={palette.checkIconStroke} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                                                             </svg>
                                                         </div>
-                                                        <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', fontWeight: 400 }}>{b}</span>
+                                                        <span style={{ fontSize: 14, color: palette.secondaryText, fontWeight: 400 }}>{b}</span>
                                                     </div>
                                                 ))}
                                             </div>
@@ -1082,8 +1121,8 @@ export default function UniversalOnboarding() {
                                                 width: '100%',
                                                 padding: '20px 0',
                                                 borderRadius: 16,
-                                                background: '#ffffff',
-                                                color: '#000000',
+                                                background: palette.ctaBg,
+                                                color: palette.ctaText,
                                                 fontSize: 16,
                                                 fontWeight: 500,
                                                 border: 'none',
@@ -1095,10 +1134,10 @@ export default function UniversalOnboarding() {
                                                 justifyContent: 'center',
                                                 gap: 12,
                                                 fontFamily: PREMIUM_THEME.fontBody,
-                                                boxShadow: (canProceed() && !loading) ? '0 8px 32px rgba(255, 255, 255, 0.15)' : 'none'
+                                                boxShadow: (canProceed() && !loading) ? palette.ctaShadow : 'none'
                                             }}
-                                            onMouseEnter={(e) => { if(canProceed() && !loading) { e.currentTarget.style.transform = 'scale(1.02)'; e.currentTarget.style.background = '#f5f5f5'; } }}
-                                            onMouseLeave={(e) => { if(canProceed() && !loading) { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = '#ffffff'; } }}
+                                            onMouseEnter={(e) => { if(canProceed() && !loading) { e.currentTarget.style.transform = 'scale(1.02)'; e.currentTarget.style.background = palette.ctaBgHover; } }}
+                                            onMouseLeave={(e) => { if(canProceed() && !loading) { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = palette.ctaBg; } }}
                                             onMouseDown={(e) => { if(canProceed() && !loading) { e.currentTarget.style.transform = 'scale(0.98)'; } }}
                                             onMouseUp={(e) => { if(canProceed() && !loading) { e.currentTarget.style.transform = 'scale(1.02)'; } }}
                                         >

@@ -1,17 +1,23 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import { Search, Bell, ChevronDown, Shield, LogOut, User, X, Sun, Moon } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
+import { useToast } from '../../context/ToastContext'
+import { adminApi } from '../../services/api'
 import { mockUsers } from '../../services/mockData'
 
 export default function Navbar({ sidebarWidth }) {
   const { user, logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
+  const { addToast } = useToast()
   const [searchOpen,  setSearchOpen]  = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [profileOpen, setProfileOpen] = useState(false)
   const [notifOpen,   setNotifOpen]   = useState(false)
+  const [notifLoading, setNotifLoading] = useState(true)
+  const [notifications, setNotifications] = useState([])
   const searchRef  = useRef(null)
   const profileRef = useRef(null)
 
@@ -30,11 +36,42 @@ export default function Navbar({ sidebarWidth }) {
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  const NOTIFS = [
-    { id: 1, text: 'Aurora Reed just signed up',   time: '2m ago', type: 'success' },
-    { id: 2, text: 'Payment of ₹999 received',     time: '1h ago', type: 'success' },
-    { id: 3, text: 'Subscription canceled — Aria', time: '3h ago', type: 'warning' },
-  ]
+  useEffect(() => {
+    let active = true
+    adminApi.getNotifications()
+      .then(data => {
+        if (!active) return
+        setNotifications(Array.isArray(data) ? data : [])
+      })
+      .catch(e => addToast(e.message, 'error'))
+      .finally(() => {
+        if (active) setNotifLoading(false)
+      })
+
+    return () => { active = false }
+  }, []) // eslint-disable-line
+
+  const unreadCount = notifications.filter(n => !n.is_read).length
+
+  function timeAgo(iso) {
+    if (!iso) return 'now'
+    const diff = Date.now() - new Date(iso).getTime()
+    const mins = Math.max(1, Math.floor(diff / 60000))
+    if (mins < 60) return `${mins}m ago`
+    const hrs = Math.floor(mins / 60)
+    if (hrs < 24) return `${hrs}h ago`
+    const days = Math.floor(hrs / 24)
+    return `${days}d ago`
+  }
+
+  async function markAsRead(id) {
+    try {
+      await adminApi.markNotificationRead(id)
+      setNotifications(prev => prev.map(n => (n.id === id ? { ...n, is_read: true } : n)))
+    } catch (e) {
+      addToast(e.message, 'error')
+    }
+  }
 
   return (
     <motion.header
@@ -126,7 +163,14 @@ export default function Navbar({ sidebarWidth }) {
             style={{ color: 'var(--text-primary)' }}
           >
             <Bell size={17} />
-            <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 rounded-full bg-charcoal" />
+            {unreadCount > 0 && (
+              <>
+                <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 rounded-full bg-charcoal" />
+                <span className="absolute -top-0.5 -right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-charcoal text-white text-[10px] font-bold leading-4">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              </>
+            )}
           </button>
 
           <AnimatePresence>
@@ -141,22 +185,46 @@ export default function Navbar({ sidebarWidth }) {
                   className="absolute top-full right-0 mt-3 w-80 rounded-lg overflow-hidden shadow-level-2-card z-50"
                   style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}
                 >
-                  <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                  <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
                     <p className="text-sm font-cal-sans font-semibold" style={{ color: 'var(--text-primary)' }}>Notifications</p>
+                    <p className="text-xs font-inter" style={{ color: 'var(--text-secondary)' }}>{unreadCount} unread</p>
                   </div>
-                  {NOTIFS.map(n => (
-                    <div
-                      key={n.id}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-[var(--bg-elevated)] cursor-pointer transition-colors"
-                      style={{ borderBottom: '1px solid var(--border)' }}
-                    >
-                      <div className={`w-2 h-2 mt-1.5 rounded-full flex-shrink-0 ${n.type === 'success' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-inter" style={{ color: 'var(--text-primary)' }}>{n.text}</p>
-                        <p className="text-xs font-inter mt-0.5" style={{ color: 'var(--text-secondary)' }}>{n.time}</p>
-                      </div>
+
+                  {notifLoading ? (
+                    <div className="p-3 flex flex-col gap-2">
+                      {[0, 1, 2].map(i => (
+                        <div key={i} className="h-12 rounded-lg bg-[var(--bg-elevated)] animate-pulse" />
+                      ))}
                     </div>
-                  ))}
+                  ) : notifications.length === 0 ? (
+                    <div className="px-4 py-7 text-center text-sm font-inter" style={{ color: 'var(--text-secondary)' }}>
+                      No notifications
+                    </div>
+                  ) : (
+                    notifications.slice(0, 5).map(n => (
+                      <button
+                        key={n.id}
+                        onClick={() => markAsRead(n.id)}
+                        className="w-full text-left flex items-start gap-3 px-4 py-3 hover:bg-[var(--bg-elevated)] cursor-pointer transition-colors"
+                        style={{ borderBottom: '1px solid var(--border)' }}
+                      >
+                        <div className={`w-2 h-2 mt-1.5 rounded-full flex-shrink-0 ${n.is_read ? 'bg-slate-300' : 'bg-emerald-500'}`} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-inter" style={{ color: 'var(--text-primary)' }}>{n.message}</p>
+                          <p className="text-xs font-inter mt-0.5" style={{ color: 'var(--text-secondary)' }}>{timeAgo(n.created_at)}</p>
+                        </div>
+                      </button>
+                    ))
+                  )}
+
+                  <Link
+                    to="/notifications"
+                    onClick={() => setNotifOpen(false)}
+                    className="block px-4 py-2.5 text-center text-xs font-inter font-medium hover:bg-[var(--bg-elevated)] transition-colors"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    View all notifications
+                  </Link>
                 </motion.div>
               </>
             )}
