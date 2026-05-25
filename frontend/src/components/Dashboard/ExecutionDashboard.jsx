@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Flame, Sparkles, CheckCircle2, Clock, HelpCircle } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTour } from '../Tour/TourContext';
 
 import AIVoicePanel from '../Mentoring/AIVoicePanel';
@@ -113,7 +113,6 @@ const normalizeDisplayTitle = (title) => {
 };
 
 const ExecutionDashboard = () => {
-    const navigate = useNavigate();
     const {
         mode,
         setMode,
@@ -141,7 +140,6 @@ const ExecutionDashboard = () => {
     const [subjects, setSubjects] = useState([]);
     const [userStats, setUserStats] = useState(null);
     const [chartData, setChartData] = useState(null);
-    const [behavioralInsight, setBehavioralInsight] = useState(null);
     const [isTaskGuideOpen, setIsTaskGuideOpen] = useState(false);
     const [selectedGuideTask, setSelectedGuideTask] = useState(null);
 
@@ -154,14 +152,12 @@ const ExecutionDashboard = () => {
             api.get('analytics/activity_chart/', { params: { days: 7 } }),
             roadmapService.getUserRoadmaps(),
             planoraService.getSubjects(),
-            api.get('dashboard/onboarding-insights/'),
-        ]).then(([profileData, statsData, chartRes, roadmapsData, subjectsData, insightRes]) => {
+        ]).then(([profileData, statsData, chartRes, roadmapsData, subjectsData]) => {
             setProfile(profileData);
             setUserStats(statsData);
             setChartData(chartRes?.data ?? null);
             setRoadmaps(Array.isArray(roadmapsData) ? roadmapsData : []);
             setSubjects(Array.isArray(subjectsData) ? subjectsData : []);
-            setBehavioralInsight(insightRes?.data ?? null);
         }).catch(() => null);
     }, [bootstrap]);
 
@@ -237,8 +233,6 @@ const ExecutionDashboard = () => {
 
     const openVoicePanel = useCallback(() => setVoicePanelOpen(true), []);
     const closeVoicePanel = useCallback(() => setVoicePanelOpen(false), []);
-
-    const insightCard = behavioralInsight?.insight_card || null;
 
     const { start: startTour } = useTour();
 
