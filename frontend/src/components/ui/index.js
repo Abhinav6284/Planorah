@@ -6,3 +6,6 @@ export { Input, Textarea, Select } from './Field';
 export { Skeleton, Spinner } from './Skeleton';
 export { EmptyState } from './EmptyState';
 export { PageHeader } from './PageHeader';
+export { Menu } from './Menu';
+export { Dialog } from './Dialog';
+export { Tabs } from './Tabs';
