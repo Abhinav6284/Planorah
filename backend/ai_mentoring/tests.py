@@ -74,3 +74,14 @@ class MentoringAPITest(TestCase):
             'transcript': 'Hello',
         }))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class VoiceTokenTest(TestCase):
+    def test_roundtrip_expiry_and_tamper(self):
+        from ai_mentoring.voice_token import make_token, verify_token, TOKEN_TTL_SECONDS
+        token = make_token(42, now=1000)
+        self.assertEqual(verify_token(token, now=1000), '42')
+        self.assertIsNone(verify_token(token, now=1000 + TOKEN_TTL_SECONDS + 1))
+        self.assertIsNone(verify_token(token.replace('42:', '43:', 1), now=1000))
+        self.assertIsNone(verify_token('', now=1000))
+        self.assertIsNone(verify_token('garbage', now=1000))

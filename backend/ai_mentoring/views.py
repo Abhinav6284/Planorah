@@ -1,6 +1,7 @@
 import logging
 import os
 from typing import Any, Dict, List
+from urllib.parse import quote
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -10,6 +11,7 @@ from .models import StudentSession
 from .serializers import SessionRequestSerializer, StudentSessionSerializer
 from .services.memory_service import get_recent_sessions
 from .services.gemini_service import get_mentor_response
+from .voice_token import make_token
 
 logger = logging.getLogger(__name__)
 
@@ -135,8 +137,8 @@ def _build_auto_intro_prompt(context: Dict[str, Any]) -> str:
     return (
         f'The user {first_name} just completed onboarding and landed on the dashboard. '
         f'Use this context: {details}. '
-        'Start speaking now. In 4 short conversational sentences: '
-        'welcome them to Planora, explain Dashboard + Roadmap + Tasks + AI mentor support, '
+        'Start speaking now. In 2-3 short conversational sentences: '
+        'welcome them to Planorah, explain Dashboard + Roadmap + Tasks + AI mentor support, '
         'then ask one clear question about what they want to focus on today.'
     )
 
@@ -261,8 +263,11 @@ def voice_config(request):
     onboarding_context = _build_onboarding_context(request.user)
     auto_intro_prompt = _build_auto_intro_prompt(onboarding_context)
 
+    separator = '&' if '?' in public_url else '?'
+    ws_url = f'{public_url}{separator}token={quote(make_token(request.user.pk))}'
+
     return Response({
-        'ws_url': public_url,
+        'ws_url': ws_url,
         'session_memory': session_memory,
         'onboarding_context': onboarding_context,
         'auto_intro_prompt': auto_intro_prompt,
