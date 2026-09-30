@@ -75,37 +75,6 @@ export const schedulerService = {
         return response.data;
     },
 
-    // Spotify
-    getSpotifyAuthUrl: async () => {
-        const response = await api.get("scheduler/spotify/auth-url/");
-        return response.data;
-    },
-
-    handleSpotifyCallback: async (code) => {
-        const response = await api.post("scheduler/spotify/callback/", { code });
-        return response.data;
-    },
-
-    getCurrentSong: async () => {
-        const response = await api.get("scheduler/spotify/current/");
-        return response.data;
-    },
-
-    controlSpotify: async (action) => {
-        const response = await api.post("scheduler/spotify/control/", { action });
-        return response.data;
-    },
-
-    getQueue: async () => {
-        const response = await api.get("scheduler/spotify/queue/");
-        return response.data;
-    },
-
-    getDashboardStats: async () => {
-        const response = await api.get("dashboard/stats/");
-        return response.data;
-    },
-
     getOnboardingInsights: async () => {
         const response = await api.get("dashboard/onboarding-insights/");
         return response.data;

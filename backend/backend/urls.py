@@ -21,8 +21,6 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path('api/users/', include('users.urls')),
     path('api/resume/', include('resume.urls')),
-    path('api/ats/', include('ats.urls')),
-    path('api/interview/', include('interview.urls')),
     path('api/dashboard/', include('dashboard.urls')),
     path('api/today-task/', dashboard_views.get_today_task,
          name='api_today_task_alias'),
@@ -33,8 +31,6 @@ urlpatterns = [
     path('api/scheduler/', include('scheduler.urls')),
     path('api/', include('tasks.urls')),  # Tasks and Notes API
     path('api/assistant/', include('assistant.urls')),  # AI Assistant Chat
-    # Music Integration (Spotify/YouTube)
-    path('api/music/', include('music.urls')),
     # Phase-gating and Lifecycle
     path('api/lifecycle/', include('user_lifecycle.urls')),
     # Career execution platform modules

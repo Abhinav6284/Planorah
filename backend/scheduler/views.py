@@ -1,10 +1,8 @@
-from . import spotify
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny
 from django.shortcuts import redirect  # Added missing import
 from datetime import timedelta
 from django.utils import timezone
-from .models import SpotifyCredential
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -199,144 +197,6 @@ def sync_calendar(request):
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# --- Spotify Endpoints ---
-
-from . import spotify
-from .models import SpotifyCredential
-from django.utils import timezone
-from datetime import timedelta
-from django.shortcuts import redirect  # Added missing import
-
-from rest_framework.permissions import AllowAny
-from django.contrib.auth import get_user_model
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def spotify_auth_url(request):
-    # Sign the user ID to create a secure state parameter
-    state = signing.dumps(request.user.id)
-    url = spotify.get_auth_url(state=state)
-    return Response({"url": url})
-
-
-@api_view(['GET'])
-@permission_classes([AllowAny])  # Allow callback without JWT header
-def spotify_callback(request):
-    code = request.GET.get('code')
-    state = request.GET.get('state')
-
-    if not code or not state:
-        return Response({"error": "Code and state are required"}, status=status.HTTP_400_BAD_REQUEST)
-
-    try:
-        # Verify state to get user ID
-        user_id = signing.loads(state, max_age=600)  # 10 minutes expiry
-        User = get_user_model()
-        user = User.objects.get(id=user_id)
-
-        token_data = spotify.get_token(code)
-
-        # Save credential
-        SpotifyCredential.objects.update_or_create(
-            user=user,
-            defaults={
-                "access_token": token_data['access_token'],
-                "refresh_token": token_data.get('refresh_token'),
-                "expires_in": timezone.now() + timedelta(seconds=token_data['expires_in']),
-                "token_type": token_data['token_type']
-            }
-        )
-        return redirect("http://localhost:3000/dashboard")
-    except signing.BadSignature:
-        logger.warning("Spotify Callback Error: Invalid state signature")
-        return Response({"error": "Invalid or expired state"}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        logger.exception("Spotify Callback Error: %s", e)
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_current_song(request):
-    try:
-        cred = SpotifyCredential.objects.get(user=request.user)
-
-        # Simple refresh check (should be more robust in prod)
-        if cred.expires_in and timezone.now() > cred.expires_in:
-            token_data = spotify.refresh_token(cred.refresh_token)
-            cred.access_token = token_data['access_token']
-            cred.expires_in = timezone.now(
-            ) + timedelta(seconds=token_data['expires_in'])
-            cred.save()
-
-        data = spotify.get_current_song(cred.access_token)
-        return Response(data)
-    except SpotifyCredential.DoesNotExist:
-        return Response({"error": "Not connected"}, status=status.HTTP_404_NOT_FOUND)
-    except requests.exceptions.HTTPError as e:
-        if e.response.status_code == 403:
-            # Suppress 403 Forbidden errors (common for non-premium users)
-            pass
-        else:
-            logger.error("Spotify API Error (Current Song): %s", e)
-        return Response({"error": str(e)}, status=e.response.status_code)
-    except Exception as e:
-        logger.exception("Spotify Internal Error (Current Song): %s", e)
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_queue(request):
-    try:
-        cred = SpotifyCredential.objects.get(user=request.user)
-        # Refresh token check (simplified)
-        if cred.expires_in and timezone.now() > cred.expires_in:
-            token_data = spotify.refresh_token(cred.refresh_token)
-            cred.access_token = token_data['access_token']
-            cred.expires_in = timezone.now(
-            ) + timedelta(seconds=token_data['expires_in'])
-            cred.save()
-
-        data = spotify.get_queue(cred.access_token)
-        return Response(data)
-    except SpotifyCredential.DoesNotExist:
-        return Response({"error": "Not connected"}, status=status.HTTP_404_NOT_FOUND)
-    except requests.exceptions.HTTPError as e:
-        if e.response.status_code == 403:
-            # Suppress 403 Forbidden errors (common for non-premium users)
-            pass
-        else:
-            logger.error("Spotify API Error (Queue): %s", e)
-        return Response({"error": str(e)}, status=e.response.status_code)
-    except Exception as e:
-        logger.exception("Spotify Internal Error (Queue): %s", e)
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def spotify_control(request):
-    action = request.data.get('action')
-    try:
-        cred = SpotifyCredential.objects.get(user=request.user)
-        if action == 'play':
-            spotify.play(cred.access_token)
-        elif action == 'pause':
-            spotify.pause(cred.access_token)
-        elif action == 'next':
-            spotify.next_track(cred.access_token)
-        elif action == 'prev':
-            spotify.previous_track(cred.access_token)
-        return Response({"status": "success"})
-    except requests.exceptions.HTTPError as e:
-        return Response({"error": str(e), "spotify_error": e.response.json().get('error', {})}, status=e.response.status_code)
-    except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-# --- Safe OAuth Status Endpoints (no token exposure) ---
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def google_status(request):
@@ -359,23 +219,3 @@ def google_status(request):
         })
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def spotify_status(request):
-    """
-    Get Spotify connection status.
-    SAFE: Returns only metadata, never exposes tokens.
-    """
-    try:
-        credential = SpotifyCredential.objects.get(user=request.user)
-        from .serializers import SpotifyCredentialStatusSerializer
-        serializer = SpotifyCredentialStatusSerializer(credential)
-        return Response({
-            'connected': True,
-            **serializer.data
-        })
-    except SpotifyCredential.DoesNotExist:
-        return Response({
-            'connected': False,
-            'message': 'Spotify not connected'
-        })

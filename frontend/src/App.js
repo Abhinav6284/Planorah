@@ -54,15 +54,10 @@ const RoadmapGenerator = lazy(() => import("./components/Roadmap/RoadmapGenerato
 const RoadmapView = lazy(() => import("./components/Roadmap/RoadmapView"));
 const RoadmapList = lazy(() => import('./components/Roadmap/RoadmapList'));
 const RoadmapProjects = lazy(() => import('./components/Roadmap/RoadmapProjects'));
-const LabHub = lazy(() => import('./components/Lab/LabHub'));
-const CodeSpace = lazy(() => import('./components/Lab/CodeSpace'));
-const ResourceHub = lazy(() => import('./components/Lab/ResourceHub'));
-const PublishResearch = lazy(() => import('./components/Lab/PublishResearch'));
 const TaskList = lazy(() => import('./components/Tasks/TaskList'));
 const DayTimeline = lazy(() => import('./components/Tasks/DayTimeline'));
 const FocusMode = lazy(() => import('./components/Tasks/FocusMode'));
 const Analytics = lazy(() => import('./components/Tasks/Analytics'));
-const StepForm = lazy(() => import('./components/Onboarding/StepForm'));
 const UniversalOnboarding = lazy(() => import('./components/Onboarding/UniversalOnboarding'));
 const ResumeBuilder = lazy(() => import('./components/Resume/ResumeBuilder'));
 const ResumeList = lazy(() => import('./components/Resume/ResumeList'));
@@ -70,14 +65,10 @@ const ATSScanner = lazy(() => import('./components/Resume/ATSScanner'));
 const LinkedInAnalyzer = lazy(() => import('./components/Resume/LinkedInAnalyzer'));
 const CompiledResumeView = lazy(() => import('./components/Resume/CompiledResumeView'));
 const CompiledResumeList = lazy(() => import('./components/Resume/CompiledResumeList'));
-const JobFinder = lazy(() => import('./components/Jobs/JobFinder'));
-const MockInterviewComingSoon = lazy(() => import('./components/Interview/MockInterviewComingSoon'));
 const Settings = lazy(() => import('./components/Settings/Settings'));
 const GitHubCallback = lazy(() => import('./components/GitHubCallback'));
 const AIAssistant = lazy(() => import('./components/Assistant/AIAssistant'));
 const SupportPage = lazy(() => import('./components/Support/SupportPage'));
-const SpotifyCallback = lazy(() => import('./components/Auth/SpotifyCallback'));
-const YouTubeCallback = lazy(() => import('./components/Auth/YouTubeCallback'));
 // Subscription & Billing Components
 const CheckoutPage = lazy(() => import('./components/Billing/CheckoutPage'));
 // Portfolio - lazy imported individually since barrel export doesn't support lazy
@@ -218,15 +209,12 @@ function AppInner() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/onboarding" element={<UniversalOnboarding />} />
-            <Route path="/onboarding/legacy" element={<StepForm />} />
             <Route path="/complete-profile" element={<CompleteProfile />} />
             <Route path="/verify-otp" element={<VerifyOtp />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/verify-reset-otp" element={<VerifyResetOTP />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/auth/github/callback" element={<GitHubCallback />} />
-            <Route path="/auth/spotify/callback" element={<SpotifyCallback />} />
-            <Route path="/auth/youtube/callback" element={<YouTubeCallback />} />
 
             {/* Public Portfolio Route - No Auth Required */}
             <Route path="/p/:slug" element={<PublicPortfolio />} />
@@ -243,16 +231,9 @@ function AppInner() {
               <Route path="/resume/compiled/:versionId" element={<CompiledResumeView />} />
               <Route path="/ats" element={<ATSScanner />} />
               <Route path="/linkedin-analyzer" element={<LinkedInAnalyzer />} />
-              <Route path="/jobs" element={<JobFinder />} />
-              <Route path="/interview" element={<MockInterviewComingSoon />} />
               <Route path="/roadmap/:id" element={<RoadmapView />} />
               <Route path="/roadmap/list" element={<RoadmapList />} />
               <Route path="/roadmap/projects" element={<RoadmapProjects />} />
-              <Route path="/lab" element={<LabHub />} />
-              <Route path="/lab/code" element={<Navigate to="/lab/codespace" replace />} />
-              <Route path="/lab/codespace" element={<CodeSpace />} />
-              <Route path="/lab/resources" element={<ResourceHub />} />
-              <Route path="/lab/publish" element={<PublishResearch />} />
               <Route path="/tasks" element={<TaskList />} />
               <Route path="/tasks/day" element={<DayTimeline />} />
               <Route path="/tasks/focus" element={<FocusMode />} />

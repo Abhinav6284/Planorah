@@ -13,7 +13,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.utils import timezone as dj_timezone
 
-from ats.models import ATSAnalysis
 from resume.models import Resume
 from users.models import UserProfile
 
@@ -926,10 +925,8 @@ def get_dashboard_stats(request):
 
         # Resume & ATS counts
         resume_count = Resume.objects.filter(user=user).count()
-        ats_scans = ATSAnalysis.objects.filter(user=user).count()
-        latest_ats = ATSAnalysis.objects.filter(
-            user=user).order_by('-created_at').first()
-        ats_score = latest_ats.match_score if latest_ats else 0
+        ats_scans = 0  # legacy ats app removed; ATS runs via resume/analyze-ats
+        ats_score = 0
 
         response_data = {
             "profile": {

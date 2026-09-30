@@ -85,10 +85,7 @@ INSTALLED_APPS = [
     'roadmap_ai',
     'tasks',
     'resume',
-    'ats',
-    'interview',
     'assistant',
-    'music',
     # Career execution platform modules
     'plans',
     'subscriptions',
@@ -98,7 +95,6 @@ INSTALLED_APPS = [
     'analytics',
     'planora',  # AI-powered study platform
     'projects',  # User projects from CodeSpace
-    'codespace',  # Real terminal / IDE backend
     'ai_calls',   # AI outbound call system (onboarding guide)
     'ai_mentoring',  # Reusable AI Mentoring Engine
     'saas_admin',    # SaaS Admin Panel

@@ -20,10 +20,7 @@ const getContextSource = (pathname) => {
     if (pathname.startsWith('/tasks')) return 'tasks';
     if (pathname.startsWith('/scheduler')) return 'scheduler';
     if (pathname.startsWith('/resume')) return 'resume';
-    if (pathname.startsWith('/lab')) return 'lab';
     if (pathname.startsWith('/ats')) return 'ats';
-    if (pathname.startsWith('/jobs')) return 'jobs';
-    if (pathname.startsWith('/interview')) return 'interview';
     if (pathname.startsWith('/portfolio')) return 'portfolio';
     if (pathname.startsWith('/projects')) return 'projects';
     if (pathname.startsWith('/planora')) return 'planora';
