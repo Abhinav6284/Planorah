@@ -66,20 +66,17 @@ const TodayExecution = React.memo(({
     const isNewUser = !loading && (!tasks || tasks.length === 0);
 
     return (
-        <section 
-            style={{ 
-                background: 'var(--el-core-panel)', 
-                backdropFilter: 'blur(40px)',
-                WebkitBackdropFilter: 'blur(40px)',
-                border: 'var(--el-glass-border)', 
-                borderRadius: 32, 
-                padding: '48px 40px', 
-                boxShadow: 'var(--el-glass-shadow), inset 0 0 120px rgba(243, 107, 34, 0.05)',
-                transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+        <section
+            style={{
+                background: 'var(--el-core-panel)',
+                border: 'var(--el-glass-border)',
+                borderRadius: 24,
+                padding: '40px 36px',
+                boxShadow: 'var(--el-shadow-card)',
+                transition: 'all 0.3s ease',
                 position: 'relative',
-                overflow: 'hidden'
+                overflow: 'hidden',
             }}
-            className="hover:shadow-[0_40px_100px_rgba(243,107,34,0.15)] group"
         >
             {/* New user empty state */}
             {isNewUser ? (
@@ -162,16 +159,20 @@ const TodayExecution = React.memo(({
                                 onClick={() => onStartFocus(todayTask)}
                                 disabled={!todayTask || loading}
                                 style={{
-                                    display: 'flex', alignItems: 'center', gap: 10, padding: '14px 32px', 
-                                    background: 'linear-gradient(135deg, var(--orange) 0%, var(--orange-deep) 100%)', color: '#ffffff', fontSize: 14, fontWeight: 700, 
-                                    borderRadius: 9999, border: 'none', cursor: 'pointer', opacity: loading ? 0.6 : 1,
-                                    boxShadow: '0 8px 30px rgba(243, 107, 34, 0.4), inset 0 2px 0 rgba(255,255,255,0.2)',
-                                    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                                    display: 'flex', alignItems: 'center', gap: 10, padding: '12px 28px',
+                                    background: 'var(--el-text)', color: 'var(--el-bg)',
+                                    fontSize: 13, fontWeight: 600, letterSpacing: '-0.01em',
+                                    borderRadius: 9999, border: 'none', cursor: 'pointer',
+                                    opacity: loading ? 0.5 : 1,
+                                    boxShadow: 'var(--el-shadow-button)',
+                                    transition: 'opacity 0.15s ease',
+                                    fontFamily: "'Inter', sans-serif",
                                 }}
-                                className="hover:scale-[1.03] active:scale-95"
+                                onMouseEnter={e => { e.currentTarget.style.opacity = '0.82'; }}
+                                onMouseLeave={e => { e.currentTarget.style.opacity = loading ? '0.5' : '1'; }}
                             >
-                                <Play style={{ width: 18, height: 18, fill: 'currentColor' }} />
-                                INITIATE FOCUS
+                                <Play style={{ width: 14, height: 14, fill: 'currentColor' }} />
+                                Start Focus
                             </button>
                             <button
                                 onClick={onChangeTask}
@@ -199,19 +200,19 @@ const TodayExecution = React.memo(({
                                 />
                                 <circle
                                     cx="80" cy="80" r="74"
-                                    stroke="var(--orange)" strokeWidth="6" fill="none"
+                                    stroke="var(--el-text)" strokeWidth="5" fill="none"
                                     strokeLinecap="round"
                                     strokeDasharray={`${(2 * Math.PI * 74).toFixed(2)}`}
                                     strokeDashoffset={`${(2 * Math.PI * 74 * (1 - pct / 100)).toFixed(2)}`}
-                                    style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1)', filter: 'drop-shadow(0 0 12px rgba(243,107,34,0.6))' }}
+                                    style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1)' }}
                                 />
                             </svg>
-                            <div style={{ 
-                                position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', 
-                                alignItems: 'center', justifyContent: 'center' 
+                            <div style={{
+                                position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
+                                alignItems: 'center', justifyContent: 'center'
                             }}>
-                                <span style={{ fontSize: 36, fontWeight: 300, color: 'var(--el-text)', letterSpacing: '-0.04em' }}>{pct}%</span>
-                                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--orange)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Efficiency</span>
+                                <span style={{ fontSize: 34, fontWeight: 300, color: 'var(--el-text)', letterSpacing: '-0.04em' }}>{pct}%</span>
+                                <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--el-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>done</span>
                             </div>
                         </div>
                         {todayTask.estimated_time && (

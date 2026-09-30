@@ -30,12 +30,12 @@ class FutureProjectionEngine:
 
         if velocity <= 0:
             return {
-                'title': 'Stalled Progress',
+                'title': 'Drifting Trajectory',
                 'completion_estimate': 'Unclear',
                 'probability': 20,
                 'description': (
-                    'At current execution rate, progress is effectively stalled. '
-                    'Without regular task completion, roadmap goals will not be met.'
+                    'At your current rhythm, progress is slowing down. '
+                    'Without regular task completion, roadmap goals will drift further away.'
                 ),
                 'risks': [
                     'Goals will drift further away',
@@ -71,7 +71,7 @@ class FutureProjectionEngine:
             risks = ['High probability of roadmap abandonment', 'Skill gaps will widen']
 
         return {
-            'title': 'Current Path',
+            'title': 'Current Trajectory',
             'completion_estimate': estimate,
             'probability': prob,
             'description': desc,
@@ -104,11 +104,11 @@ class FutureProjectionEngine:
             prob = 35
 
         return {
-            'title': 'Optimized Path',
+            'title': 'Flow Trajectory',
             'completion_estimate': estimate,
             'probability': prob,
             'description': (
-                'With 25% more consistency — adding 1-2 active days per week '
+                'With slightly more consistency — adding 1-2 active days per week '
                 'and maintaining shorter, focused sessions — your trajectory '
                 'improves significantly. Small behavioral changes compound fast.'
             ),
@@ -150,7 +150,7 @@ class FutureProjectionEngine:
             )
 
         return {
-            'title': 'Burnout Path',
+            'title': 'Overload Trajectory',
             'completion_estimate': estimate,
             'probability': prob,
             'description': desc,

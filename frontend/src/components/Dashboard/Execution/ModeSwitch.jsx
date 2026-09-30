@@ -1,31 +1,62 @@
 import React from 'react';
+import { BookOpen, GraduationCap } from 'lucide-react';
 
-const ModeSwitch = ({ mode, onChange }) => {
-    return (
-        <div style={{ 
-            display: 'inline-flex', alignItems: 'center', borderRadius: 12, 
-            border: '1px solid var(--el-border)', background: 'var(--el-bg-secondary)', padding: 4
-        }}>
-            {['learning', 'exam'].map((item) => {
-                const active = mode === item;
-                return (
-                    <button
-                        key={item}
-                        onClick={() => onChange(item)}
-                        style={{
-                            padding: '6px 14px', borderRadius: 10, fontSize: 13, fontWeight: 700,
-                            textTransform: 'capitalize', border: 'none', cursor: 'pointer',
-                            background: active ? 'var(--el-text)' : 'transparent',
+const MODES = [
+    { id: 'learning', label: 'Learning', Icon: BookOpen,      desc: 'Roadmap-driven skill building' },
+    { id: 'exam',     label: 'Exam',     Icon: GraduationCap, desc: 'Structured exam preparation'  },
+];
+
+const ModeSwitch = ({ mode, onChange }) => (
+    <div style={{ display: 'flex', gap: 6 }}>
+        {MODES.map(({ id, label, Icon, desc }) => {
+            const active = mode === id;
+            return (
+                <button
+                    key={id}
+                    type="button"
+                    onClick={() => onChange(id)}
+                    style={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        gap: 8,
+                        padding: '11px 13px',
+                        borderRadius: 10,
+                        border: active
+                            ? '1px solid var(--el-text)'
+                            : '1px solid var(--el-border)',
+                        background: active ? 'var(--el-text)' : 'var(--el-bg-secondary)',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                        textAlign: 'left',
+                        fontFamily: "'Inter', sans-serif",
+                    }}
+                >
+                    <Icon style={{
+                        width: 14, height: 14,
+                        color: active ? 'var(--el-bg)' : 'var(--el-text-muted)',
+                        transition: 'color 0.15s',
+                    }} />
+                    <div>
+                        <p style={{
+                            fontSize: 12, fontWeight: 600, margin: 0,
+                            letterSpacing: '-0.01em',
                             color: active ? 'var(--el-bg)' : 'var(--el-text-secondary)',
-                            transition: 'all 0.2s'
-                        }}
-                    >
-                        {item}
-                    </button>
-                );
-            })}
-        </div>
-    );
-};
+                        }}>
+                            {label}
+                        </p>
+                        <p style={{
+                            fontSize: 10, margin: '2px 0 0', lineHeight: 1.4,
+                            color: active ? 'rgba(255,255,255,0.55)' : 'var(--el-text-muted)',
+                        }}>
+                            {desc}
+                        </p>
+                    </div>
+                </button>
+            );
+        })}
+    </div>
+);
 
 export default React.memo(ModeSwitch);

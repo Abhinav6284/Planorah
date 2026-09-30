@@ -10,6 +10,7 @@ from django.core.cache import cache
 from .models import CustomUser
 from tasks.models import Task
 from roadmap_ai.models import Roadmap, Milestone
+from dashboard.models import ExecutionTask
 
 
 @api_view(['GET'])
@@ -26,12 +27,17 @@ def get_user_statistics(request):
     if cached:
         return Response(cached, status=status.HTTP_200_OK)
     
-    # Task Statistics
-    total_tasks = Task.objects.filter(user=user).count()
-    completed_tasks = Task.objects.filter(user=user, status='completed').count()
-    in_progress_tasks = Task.objects.filter(user=user, status='in_progress').count()
-    pending_tasks = Task.objects.filter(user=user, status='not_started').count()
-    
+    # Task Statistics — union of roadmap Tasks + ExecutionTasks
+    # Separate tables with no link between them, so counts add up.
+    exec_tasks = ExecutionTask.objects.filter(user=user)
+    total_tasks = Task.objects.filter(user=user).count() + exec_tasks.count()
+    completed_tasks = (Task.objects.filter(user=user, status='completed').count()
+                       + exec_tasks.filter(status='completed').count())
+    in_progress_tasks = (Task.objects.filter(user=user, status='in_progress').count()
+                         + exec_tasks.filter(status='in_progress').count())
+    pending_tasks = (Task.objects.filter(user=user, status='not_started').count()
+                     + exec_tasks.filter(status='pending').count())
+
     completion_rate = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
     
     # Roadmap Statistics
@@ -99,25 +105,44 @@ def get_user_statistics(request):
             'completed_at': task.completed_at.isoformat() if task.completed_at else None
         })
     
-    # Activity Heatmap Data (last 365 days)
+    # Activity Heatmap Data (last 365 days) — merged from Task + ExecutionTask
     one_year_ago = timezone.now() - timedelta(days=365)
+    activity_heatmap = {}
     try:
         from django.db.models.functions import TruncDate
-        daily_activity = Task.objects.filter(
+
+        # Roadmap tasks
+        roadmap_activity = Task.objects.filter(
             user=user,
             completed_at__gte=one_year_ago,
             status='completed'
-        ).annotate(date=TruncDate('completed_at')).values('date').annotate(
-            count=Count('id')
-        )
-        activity_heatmap = {item['date'].isoformat(): item['count'] for item in daily_activity if item['date']}
+        ).annotate(date=TruncDate('completed_at')).values('date').annotate(count=Count('id'))
+        for item in roadmap_activity:
+            if item['date']:
+                key = item['date'].isoformat()
+                activity_heatmap[key] = activity_heatmap.get(key, 0) + item['count']
+
+        # Execution tasks (dashboard completions)
+        exec_activity = ExecutionTask.objects.filter(
+            user=user,
+            completed_at__gte=one_year_ago,
+            status='completed'
+        ).annotate(date=TruncDate('completed_at')).values('date').annotate(count=Count('id'))
+        for item in exec_activity:
+            if item['date']:
+                key = item['date'].isoformat()
+                activity_heatmap[key] = activity_heatmap.get(key, 0) + item['count']
     except Exception:
-        pass # Error logging removed
         activity_heatmap = {}
-    
-    # Weekly Stats (last 7 days)
+
+    # Weekly Stats (last 7 days) — union of both task sources
     seven_days_ago = timezone.now() - timedelta(days=7)
     weekly_completed = Task.objects.filter(
+        user=user,
+        status='completed',
+        completed_at__gte=seven_days_ago
+    ).count()
+    weekly_completed += ExecutionTask.objects.filter(
         user=user,
         status='completed',
         completed_at__gte=seven_days_ago

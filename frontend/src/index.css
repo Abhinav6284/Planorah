@@ -4,6 +4,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Manrope:wght@200..800&family=Space+Grotesk:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
 :root {
   /* Colors — dark theme by default */
   --white: #0c0c0d;
@@ -16,10 +17,10 @@
 
   --link-blue: #0099ff;
 
-  /* Planorah accent */
-  --orange: #F36B22;
-  --orange-deep: #D95A17;
-  --orange-soft: rgba(243, 107, 34, 0.15);
+  /* Planorah brand accent — terracotta */
+  --orange: #D96C4A;
+  --orange-deep: #C45B3A;
+  --orange-soft: rgba(217, 108, 74, 0.12);
 
   /* Tag backgrounds - dark */
   --tag-blue-bg: oklch(0.22 0.04 240);
@@ -103,45 +104,61 @@
   --n-ghost-border-active: rgba(164, 200, 255, 0.40); /* primary at 40% */
   --n-glow-primary: rgba(164, 200, 255, 0.10); /* soft outer blue glow 10% */
 
-  /* ── ElevenLabs Dashboard Tokens (Light - Default) ── */
-  --el-bg: #fafafa;
-  --el-bg-secondary: #ffffff;
-  --el-warm-stone: rgba(245, 242, 239, 0.4);
-  --el-text: #1a1a1a;
-  --el-text-secondary: #525252;
-  --el-text-muted: #8c8c8c;
-  --el-border: #e5e5e5;
-  --el-border-subtle: rgba(0, 0, 0, 0.04);
-  --el-sidebar-bg: #f0f0f0;
-  --el-sidebar-text: rgba(0, 0, 0, 0.5);
-  --el-sidebar-active: #0d0d0d;
-  --el-sidebar-hover-bg: rgba(0, 0, 0, 0.04);
-  --el-sidebar-section: rgba(0, 0, 0, 0.35);
-  --el-sidebar-border: rgba(0, 0, 0, 0.08);
-  --el-sidebar-item-active-bg: rgba(0, 0, 0, 0.06);
-  --el-sidebar-item-active-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.04);
-  --el-sidebar-btn-bg: rgba(0, 0, 0, 0.04);
-  --el-sidebar-btn-border: rgba(0, 0, 0, 0.08);
-  --el-sidebar-ws-icon-bg: #1a1a1a;
-  --el-sidebar-ws-icon-color: #ffffff;
-  --el-sidebar-logo-filter: none;
-  /* Premium Layered Shadows (ElevenLabs/Cal.com style) */
-  --el-shadow-card: 
-    0 0 0 1px rgba(0, 0, 0, 0.04),
-    0 2px 4px rgba(0, 0, 0, 0.02),
-    0 8px 16px rgba(0, 0, 0, 0.04);
-  --el-shadow-button: 
-    0 0 0 1px rgba(0, 0, 0, 0.08),
-    0 1px 1px rgba(0, 0, 0, 0.04),
-    0 4px 8px rgba(0, 0, 0, 0.04);
-  --el-shadow-warm: 0 12px 32px rgba(78, 50, 23, 0.06);
-  --el-shadow-inset: inset 0 1px 1px rgba(0, 0, 0, 0.02);
+  /* ── Planorah Dashboard — Lora editorial + DM Sans warmth (Light) ── */
+  --el-bg:            #F5F3EE;
+  --el-bg-secondary:  #FFFFFF;
+  --el-bg-tertiary:   #EFEDE7;
+  --el-warm-stone:    rgba(245, 243, 238, 0.9);
 
-  /* Spatial Glass Tokens (Light) */
-  --el-glass-panel: rgba(255, 255, 255, 0.90);
-  --el-glass-border: 1px solid rgba(0, 0, 0, 0.08);
-  --el-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03);
-  --el-core-panel: #ffffff;
+  --el-text:          #1C1917;
+  --el-text-secondary:#57534E;
+  --el-text-muted:    #A8A29E;
+
+  --el-border:        #E7E4DC;
+  --el-border-subtle: rgba(28, 25, 23, 0.06);
+
+  /* Terracotta accent — used sparingly */
+  --el-accent:        #C96442;
+  --el-accent-soft:   rgba(201, 100, 66, 0.07);
+  --el-accent-border: rgba(201, 100, 66, 0.18);
+
+  /* Dashboard typography */
+  --el-font-display:  'Lora', Georgia, serif;
+  --el-font-ui:       'DM Sans', system-ui, sans-serif;
+
+  /* Sidebar — parchment drawer */
+  --el-sidebar-bg:             #EDE9E0;
+  --el-sidebar-text:           rgba(28, 25, 23, 0.42);
+  --el-sidebar-active:         #1C1917;
+  --el-sidebar-hover-bg:       rgba(28, 25, 23, 0.055);
+  --el-sidebar-section:        rgba(28, 25, 23, 0.28);
+  --el-sidebar-border:         rgba(28, 25, 23, 0.08);
+  --el-sidebar-item-active-bg: rgba(28, 25, 23, 0.08);
+  --el-sidebar-item-active-shadow: none;
+  --el-sidebar-btn-bg:         rgba(28, 25, 23, 0.04);
+  --el-sidebar-btn-border:     rgba(28, 25, 23, 0.08);
+  --el-sidebar-ws-icon-bg:     #1C1917;
+  --el-sidebar-ws-icon-color:  #F5F3EE;
+  --el-sidebar-logo-filter:    none;
+
+  /* Shadows — document-soft */
+  --el-shadow-card:
+    0 0 0 1px rgba(28, 25, 23, 0.07),
+    0 1px 3px rgba(28, 25, 23, 0.05),
+    0 4px 16px rgba(28, 25, 23, 0.04);
+  --el-shadow-button:
+    0 0 0 1px rgba(28, 25, 23, 0.12),
+    0 1px 2px rgba(28, 25, 23, 0.08);
+  --el-shadow-warm:   0 8px 32px rgba(28, 25, 23, 0.07);
+  --el-shadow-inset:  inset 0 1px 2px rgba(28, 25, 23, 0.05);
+
+  /* Cards — pure white on parchment */
+  --el-glass-panel:   #FFFFFF;
+  --el-glass-border:  1px solid #E7E4DC;
+  --el-glass-shadow:
+    0 0 0 1px rgba(28, 25, 23, 0.06),
+    0 2px 8px rgba(28, 25, 23, 0.04);
+  --el-core-panel:    #FFFFFF;
 }
 
 /* ── ElevenLabs Dashboard Tokens (Dark) ── */
@@ -211,10 +228,10 @@
   --fg-muted: var(--mid-gray);
   --surface: var(--white);
 
-  /* Planorah accent */
-  --orange: #F36B22;
-  --orange-deep: #D95A17;
-  --orange-soft: oklch(0.95 0.04 50);
+  /* Planorah brand accent — terracotta (light mode) */
+  --orange: #D96C4A;
+  --orange-deep: #C45B3A;
+  --orange-soft: rgba(217, 108, 74, 0.10);
 
   --tag-blue-bg: oklch(0.96 0.02 240);
   --tag-green-bg: oklch(0.96 0.02 150);
@@ -248,10 +265,18 @@
     rgba(34, 42, 53, 0.10) 0px 0px 0px 1px;
 
   /* Spatial Glass Tokens (Light) */
-  --el-glass-panel: rgba(255, 255, 255, 0.90);
-  --el-glass-border: 1px solid rgba(0, 0, 0, 0.08);
-  --el-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03);
-  --el-core-panel: #ffffff;
+  --el-glass-panel:   #FFFFFF;
+  --el-glass-border:  1px solid #E7E4DC;
+  --el-glass-shadow:
+    0 0 0 1px rgba(28, 25, 23, 0.06),
+    0 2px 8px rgba(28, 25, 23, 0.04);
+  --el-core-panel:    #FFFFFF;
+
+  --el-accent:        #C96442;
+  --el-accent-soft:   rgba(201, 100, 66, 0.07);
+  --el-accent-border: rgba(201, 100, 66, 0.18);
+  --el-font-display:  'Lora', Georgia, serif;
+  --el-font-ui:       'DM Sans', system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -844,9 +869,13 @@ input, textarea, select {
    PREMIUM CINEMATIC UTILITIES
    ============================================================ */
 .cinematic-grid {
-  background-image: radial-gradient(rgba(243, 107, 34, 0.04) 1px, transparent 1px);
+  /* Subtle warm dot grid — works in both light and dark */
+  background-image: radial-gradient(rgba(25, 25, 25, 0.055) 1px, transparent 1px);
   background-size: 24px 24px;
   position: relative;
+}
+.dark .cinematic-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
 }
 
 .cinematic-glow {
@@ -855,10 +884,14 @@ input, textarea, select {
   left: 30%;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(243, 107, 34, 0.05) 0%, transparent 70%);
+  /* No orange glow in light mode — keep it neutral */
+  background: radial-gradient(circle, rgba(224, 122, 95, 0.04) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
   filter: blur(40px);
+}
+.dark .cinematic-glow {
+  background: radial-gradient(circle, rgba(224, 122, 95, 0.06) 0%, transparent 70%);
 }
 
 .btn-glowing-orange {

@@ -4,6 +4,7 @@ Handles prompt construction, API calls, and strict JSON response parsing.
 """
 import json
 import logging
+import re
 import requests
 from django.conf import settings
 
@@ -14,7 +15,7 @@ GEMINI_API_URL = (
     'gemini-2.5-flash-lite:generateContent'
 )
 
-SYSTEM_PROMPT = """You are an empathetic, highly skilled AI mentor for students and professionals.
+SYSTEM_PROMPT = """You are Planorah's empathetic, highly skilled AI mentor for students and professionals.
 Your role is to:
 - Understand the student's current situation from their transcript
 - Provide clear, actionable guidance
@@ -32,12 +33,35 @@ You MUST respond with a valid JSON object (no markdown, no code fences) with the
 }
 
 Rules:
-- mentor_message should be warm, personal, and actionable (150-300 words)
-- action_items should have 2-5 specific, achievable items
+- mentor_message should be warm, personal, and actionable in 2-3 short sentences (about 40-90 words)
+- Keep language simple and direct. Avoid long deep explanations.
+- action_items should have 1-3 specific, achievable items
 - Adapt emotional_tone based on the student's mood and context
 - Use session history to show continuity and track growth
 - NEVER output anything outside the JSON object
 """
+
+
+MAX_MENTOR_MESSAGE_CHARS = 420
+MAX_MENTOR_MESSAGE_SENTENCES = 3
+
+
+def _limit_mentor_message(message):
+    """Force concise mentor replies even if the model drifts verbose."""
+    text = str(message or '').strip()
+    if not text:
+        return ''
+
+    sentence_parts = re.split(r'(?<=[.!?])\s+', text)
+    trimmed = ' '.join(sentence_parts[:MAX_MENTOR_MESSAGE_SENTENCES]).strip()
+
+    if len(trimmed) > MAX_MENTOR_MESSAGE_CHARS:
+        trimmed = trimmed[:MAX_MENTOR_MESSAGE_CHARS].rstrip()
+        if ' ' in trimmed:
+            trimmed = trimmed.rsplit(' ', 1)[0]
+        trimmed = f"{trimmed}..."
+
+    return trimmed
 
 
 def build_prompt(transcript, context_source, student_goal, current_progress, session_history):
@@ -90,7 +114,7 @@ def parse_ai_response(text):
 
     # Validate and sanitise required fields
     return {
-        'mentor_message': str(data.get('mentor_message', '')),
+        'mentor_message': _limit_mentor_message(data.get('mentor_message', '')),
         'emotional_tone': _validate_tone(data.get('emotional_tone', 'neutral')),
         'confidence_level': _clamp_float(data.get('confidence_level', 0.5)),
         'clarity_level': _clamp_float(data.get('clarity_level', 0.5)),
@@ -102,7 +126,7 @@ def parse_ai_response(text):
 def get_fallback_response(raw_text=''):
     """Return a safe fallback when AI response is malformed."""
     return {
-        'mentor_message': raw_text if raw_text else (
+        'mentor_message': _limit_mentor_message(raw_text) if raw_text else (
             "I'm here to help! Could you share more about what you're working on "
             "so I can give you better guidance?"
         ),
@@ -164,7 +188,7 @@ def get_mentor_response(transcript, context_source, student_goal, current_progre
         'generationConfig': {
             'temperature': 0.7,
             'topP': 0.9,
-            'maxOutputTokens': 1024,
+            'maxOutputTokens': 384,
         },
     }
 

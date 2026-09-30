@@ -43,12 +43,70 @@ const pillStyle = (color = 'var(--el-text-muted)') => ({
     background: `${color}08`,
 });
 
-const metricColor = (value, inverted = false) => {
-    const v = inverted ? 100 - value : value;
-    if (v >= 75) return '#10b981';
-    if (v >= 50) return 'var(--orange)';
-    if (v >= 30) return '#f59e0b';
-    return '#ef4444';
+const deriveExecutionStates = (metrics) => {
+    if (!metrics) return [];
+    const states = [];
+
+    const flow = metrics.momentum_score ?? 50;
+    let flowState = { label: 'Stable', color: '#10b981', type: 'strength' };
+    if (flow >= 75) flowState = { label: 'Strong', color: '#10b981', type: 'strength' };
+    else if (flow >= 50) flowState = { label: 'Stable', color: '#10b981', type: 'strength' };
+    else if (flow >= 35) flowState = { label: 'Drifting', color: '#f59e0b', type: 'warning' };
+    else flowState = { label: 'Strained', color: '#ef4444', type: 'warning' };
+    states.push({ id: 'flow', label: 'Flow', value: flowState.label, color: flowState.color, type: flowState.type, score: flow });
+
+    const focus = 100 - (metrics.dropoff_risk ?? 50);
+    let focusState = { label: 'Stable', color: '#10b981', type: 'strength' };
+    if (focus >= 75) focusState = { label: 'Strong', color: '#10b981', type: 'strength' };
+    else if (focus >= 50) focusState = { label: 'Stable', color: '#10b981', type: 'strength' };
+    else if (focus >= 35) focusState = { label: 'Drifting', color: '#f59e0b', type: 'warning' };
+    else focusState = { label: 'Needs Attention', color: '#ef4444', type: 'warning' };
+    states.push({ id: 'focus', label: 'Focus', value: focusState.label, color: focusState.color, type: focusState.type, score: focus });
+
+    const energy = 100 - (metrics.burnout_risk ?? 50);
+    let energyState = { label: 'Healthy', color: '#10b981', type: 'strength' };
+    if (energy >= 70) energyState = { label: 'Healthy', color: '#10b981', type: 'strength' };
+    else if (energy >= 45) energyState = { label: 'Stable', color: '#10b981', type: 'strength' };
+    else if (energy >= 30) energyState = { label: 'Recovering', color: 'var(--orange)', type: 'neutral' };
+    else energyState = { label: 'Strained', color: '#ef4444', type: 'warning' };
+    states.push({ id: 'energy', label: 'Energy', value: energyState.label, color: energyState.color, type: energyState.type, score: energy });
+
+    const conf = 100 - (metrics.procrastination_index ?? 50);
+    let confState = { label: 'Growing', color: '#10b981', type: 'strength' };
+    if (conf >= 75) confState = { label: 'Strong', color: '#10b981', type: 'strength' };
+    else if (conf >= 55) confState = { label: 'Growing', color: '#10b981', type: 'strength' };
+    else if (conf >= 40) confState = { label: 'Stable', color: '#10b981', type: 'strength' };
+    else confState = { label: 'Shaky', color: '#f59e0b', type: 'warning' };
+    states.push({ id: 'confidence', label: 'Confidence', value: confState.label, color: confState.color, type: confState.type, score: conf });
+
+    return states;
+};
+
+const getPrioritizedStates = (states) => {
+    if (!states || states.length === 0) return [];
+    const flow = states.find(s => s.id === 'flow');
+    const others = states.filter(s => s.id !== 'flow');
+    
+    const warnings = others.filter(s => s.type === 'warning').sort((a, b) => a.score - b.score);
+    const strengths = others.filter(s => s.type === 'strength').sort((a, b) => b.score - a.score);
+    
+    const display = [flow];
+    if (warnings.length > 0) display.push(warnings[0]);
+    if (strengths.length > 0) {
+        const topStrength = strengths.find(s => !display.includes(s));
+        if (topStrength) display.push(topStrength);
+    }
+    
+    if (display.length < 3) {
+        for (const s of others) {
+            if (!display.includes(s)) {
+                display.push(s);
+                if (display.length >= 3) break;
+            }
+        }
+    }
+    
+    return display.filter(Boolean);
 };
 
 const riskLevelColor = (level) => {
@@ -69,54 +127,6 @@ const insightToneIcon = (tone) => {
         neutral: Activity,
     };
     return icons[tone] || Activity;
-};
-
-const MetricGauge = ({ label, value, inverted = false, size = 'normal' }) => {
-    const color = metricColor(value, inverted);
-    const displayValue = typeof value === 'number' ? Math.round(value) : '--';
-    const barWidth = typeof value === 'number' ? Math.min(100, Math.max(0, value)) : 0;
-    const isSmall = size === 'small';
-
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{
-                    fontSize: isSmall ? 10 : 11,
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.06em',
-                    color: 'var(--el-text-muted)',
-                }}>
-                    {label}
-                </span>
-                <span style={{
-                    fontSize: isSmall ? 16 : 20,
-                    fontWeight: 800,
-                    color,
-                    fontFamily: "'Inter', monospace",
-                }}>
-                    {displayValue}
-                </span>
-            </div>
-            <div style={{
-                height: isSmall ? 4 : 5,
-                borderRadius: 9999,
-                background: 'var(--el-bg-secondary)',
-                overflow: 'hidden',
-            }}>
-                <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${barWidth}%` }}
-                    transition={{ duration: 0.8, ease: 'easeOut' }}
-                    style={{
-                        height: '100%',
-                        borderRadius: 9999,
-                        background: `linear-gradient(90deg, ${color}88, ${color})`,
-                    }}
-                />
-            </div>
-        </div>
-    );
 };
 
 const InsightCard = ({ insight, onDismiss }) => {
@@ -141,11 +151,6 @@ const InsightCard = ({ insight, onDismiss }) => {
                 <span style={pillStyle('var(--el-text-muted)')}>
                     {insight.type || 'behavioral'}
                 </span>
-                {typeof insight.confidence === 'number' && (
-                    <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--orange)', marginLeft: 'auto' }}>
-                        {insight.confidence}%
-                    </span>
-                )}
                 {onDismiss && (
                     <button
                         onClick={() => onDismiss(insight.id)}
@@ -233,13 +238,8 @@ const AdaptationCard = ({ adaptation, onApply }) => {
                     textTransform: 'uppercase',
                     color: 'var(--el-text-muted)',
                 }}>
-                    {(adaptation.change_type || adaptation.display_type || '').replace(/_/g, ' ')}
+                    {(adaptation.display_type || adaptation.change_type || '').replace(/_/g, ' ')}
                 </span>
-                {typeof adaptation.confidence === 'number' && (
-                    <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--orange)', marginLeft: 'auto' }}>
-                        {adaptation.confidence}% confident
-                    </span>
-                )}
             </div>
             <p style={{ fontSize: 13, lineHeight: 1.5, color: 'var(--el-text-secondary)', margin: '0 0 10px' }}>
                 {adaptation.description}
@@ -269,7 +269,7 @@ const AdaptationCard = ({ adaptation, onApply }) => {
                         fontFamily: "'Inter', sans-serif",
                     }}
                 >
-                    Apply Adaptation
+                    Shift Strategy
                 </button>
             )}
         </div>
@@ -308,16 +308,6 @@ const IdentityBadge = ({ identity }) => {
                     {identity.description}
                 </div>
             </div>
-            {typeof identity.confidence === 'number' && (
-                <span style={{
-                    marginLeft: 'auto',
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: 'var(--orange)',
-                }}>
-                    {identity.confidence}%
-                </span>
-            )}
         </div>
     );
 };
@@ -360,9 +350,9 @@ const BehavioralIntelligencePanel = () => {
 
     const tabs = [
         { key: 'overview', label: 'Overview', icon: Eye },
-        { key: 'insights', label: 'Insights', icon: BrainCircuit },
-        { key: 'risks', label: 'Predictions', icon: AlertTriangle },
-        { key: 'adapt', label: 'Adapt', icon: Target },
+        { key: 'insights', label: 'Observations', icon: BrainCircuit },
+        { key: 'risks', label: 'Trajectories', icon: AlertTriangle },
+        { key: 'adapt', label: 'Strategy', icon: Target },
     ];
 
     if (loading && !metrics) {
@@ -413,12 +403,7 @@ const BehavioralIntelligencePanel = () => {
                 </button>
             </div>
 
-            {/* Narrative */}
-            {overallNarrative && (
-                <p style={{ fontSize: 13, lineHeight: 1.6, color: 'var(--el-text-secondary)', marginBottom: 16, letterSpacing: '0.14px' }}>
-                    {overallNarrative}
-                </p>
-            )}
+
 
             {/* Identity Badge */}
             <div style={{ marginBottom: 16 }}>
@@ -470,56 +455,88 @@ const BehavioralIntelligencePanel = () => {
 
             {/* Tab Content */}
             <AnimatePresence mode="wait">
-                {activeTab === 'overview' && (
-                    <motion.div
-                        key="overview"
-                        initial={{ opacity: 0, y: 4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -4 }}
-                        style={{ display: 'grid', gap: 12 }}
-                    >
-                        {/* Metrics Grid */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
-                            <MetricGauge label="Momentum" value={metrics?.momentum_score} />
-                            <MetricGauge label="Consistency" value={metrics?.consistency_score} />
-                            <MetricGauge label="Burnout Risk" value={metrics?.burnout_risk} inverted />
-                            <MetricGauge label="Drop-off Risk" value={metrics?.dropoff_risk} inverted />
-                        </div>
-
-                        {/* Additional Metrics Row */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-                            <MetricGauge label="Recovery" value={metrics?.recovery_speed} size="small" />
-                            <MetricGauge label="Avoidance" value={metrics?.procrastination_index} size="small" inverted />
-                            <MetricGauge label="Completion" value={metrics?.completion_rate} size="small" />
-                        </div>
-
-                        {/* Loops */}
-                        {loops?.length > 0 && (
+                {activeTab === 'overview' && (() => {
+                    const allStates = deriveExecutionStates(metrics);
+                    const displayStates = getPrioritizedStates(allStates);
+                    return (
+                        <motion.div
+                            key="overview"
+                            initial={{ opacity: 0, y: 4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -4 }}
+                            style={{ display: 'grid', gap: 10 }}
+                        >
                             <div style={{
-                                padding: '12px 14px',
-                                borderRadius: 16,
-                                background: 'rgba(245, 158, 11, 0.04)',
-                                border: '1px solid rgba(245, 158, 11, 0.12)',
+                                fontSize: 10,
+                                fontWeight: 800,
+                                letterSpacing: '0.1em',
+                                textTransform: 'uppercase',
+                                color: 'var(--el-text-muted)',
+                                paddingLeft: 4,
                             }}>
-                                <div style={{
-                                    fontSize: 10,
-                                    fontWeight: 800,
-                                    letterSpacing: '0.1em',
-                                    textTransform: 'uppercase',
-                                    color: '#f59e0b',
-                                    marginBottom: 8,
-                                }}>
-                                    Detected Loops
-                                </div>
-                                {loops.slice(0, 2).map((loop, i) => (
-                                    <div key={i} style={{ fontSize: 12.5, lineHeight: 1.5, color: 'var(--el-text-secondary)', marginBottom: i < loops.length - 1 ? 6 : 0 }}>
-                                        {loop.description}
+                                Today's Execution State
+                            </div>
+                            
+                            <div style={{ display: 'grid', gap: 8 }}>
+                                {displayStates.map(state => (
+                                    <div key={state.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderRadius: 16, background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border-subtle)' }}>
+                                        <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--el-text)' }}>{state.label}</span>
+                                        <span style={{ fontSize: 12, fontWeight: 700, color: state.color }}>
+                                            {state.value}
+                                        </span>
                                     </div>
                                 ))}
                             </div>
-                        )}
-                    </motion.div>
-                )}
+
+                            {overallNarrative && (
+                                <div style={{
+                                    marginTop: 4,
+                                    padding: '14px 16px',
+                                    borderRadius: 16,
+                                    background: 'linear-gradient(135deg, rgba(243, 107, 34, 0.04) 0%, rgba(243, 107, 34, 0.01) 100%)',
+                                    border: '1px solid rgba(243, 107, 34, 0.1)',
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                                        <Sparkles style={{ width: 14, height: 14, color: 'var(--orange)' }} />
+                                        <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--orange)' }}>
+                                            Insight
+                                        </span>
+                                    </div>
+                                    <p style={{ fontSize: 13, lineHeight: 1.5, color: 'var(--el-text-secondary)', margin: 0 }}>
+                                        "{overallNarrative}"
+                                    </p>
+                                </div>
+                            )}
+                            
+                            {/* Loops */}
+                            {loops?.length > 0 && (
+                                <div style={{
+                                    marginTop: 4,
+                                    padding: '12px 14px',
+                                    borderRadius: 16,
+                                    background: 'rgba(245, 158, 11, 0.04)',
+                                    border: '1px solid rgba(245, 158, 11, 0.12)',
+                                }}>
+                                    <div style={{
+                                        fontSize: 10,
+                                        fontWeight: 800,
+                                        letterSpacing: '0.1em',
+                                        textTransform: 'uppercase',
+                                        color: '#f59e0b',
+                                        marginBottom: 8,
+                                    }}>
+                                        Detected Loops
+                                    </div>
+                                    {loops.slice(0, 2).map((loop, i) => (
+                                        <div key={i} style={{ fontSize: 12.5, lineHeight: 1.5, color: 'var(--el-text-secondary)', marginBottom: i < loops.length - 1 ? 6 : 0 }}>
+                                            {loop.description}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </motion.div>
+                    );
+                })()}
 
                 {activeTab === 'insights' && (
                     <motion.div
@@ -549,9 +566,9 @@ const BehavioralIntelligencePanel = () => {
                         exit={{ opacity: 0, y: -4 }}
                         style={{ display: 'grid', gap: 10 }}
                     >
-                        <RiskPrediction label="Burnout Forecast" risk={risks?.burnout} />
-                        <RiskPrediction label="Drop-off Forecast" risk={risks?.dropoff} />
-                        <RiskPrediction label="Roadmap Friction" risk={risks?.roadmap_friction} />
+                        <RiskPrediction label="Energy Forecast" risk={risks?.burnout} />
+                        <RiskPrediction label="Focus Trajectory" risk={risks?.dropoff} />
+                        <RiskPrediction label="Execution Friction" risk={risks?.roadmap_friction} />
 
                         {/* Future Projections */}
                         {projections && (

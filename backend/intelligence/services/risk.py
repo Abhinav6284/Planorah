@@ -66,7 +66,7 @@ class RiskPredictionEngine:
         else:
             risk_level = 'low'
             timeline = 'Not expected in near term'
-            reasoning = 'Current workload appears sustainable.'
+            reasoning = 'Current energy feels stable and sustainable.'
 
         return {
             'risk_level': risk_level,
@@ -102,7 +102,7 @@ class RiskPredictionEngine:
             risk_level = 'high'
             timeline = '1-2 weeks without intervention'
             reasoning = (
-                'Declining activity and rising skip rates suggest the roadmap '
+                'Declining focus and rising skip rates suggest the roadmap '
                 'is losing relevance. Simplification may help.'
             )
         elif probability >= THRESHOLDS['dropoff_moderate']:
@@ -115,7 +115,7 @@ class RiskPredictionEngine:
         else:
             risk_level = 'low'
             timeline = 'Not expected in near term'
-            reasoning = 'Engagement patterns are healthy.'
+            reasoning = 'Focus and engagement patterns are healthy.'
 
         return {
             'risk_level': risk_level,
@@ -137,7 +137,7 @@ class RiskPredictionEngine:
         # Session duration vs task estimates mismatch
         if avg_session < 15 and completion_rate < 50:
             friction_score += 30
-            friction_reasons.append('Sessions are too short to complete assigned tasks.')
+            friction_reasons.append('Sessions are too short to comfortably handle the assigned complexity.')
 
         # Hard task avoidance = friction
         if hard_skip_rate >= 40:
@@ -166,7 +166,7 @@ class RiskPredictionEngine:
         return {
             'friction_level': level,
             'score': round(friction_score, 1),
-            'reasons': friction_reasons if friction_reasons else ['Roadmap pacing appears compatible.'],
+            'reasons': friction_reasons if friction_reasons else ['Execution flow is smooth without friction.'],
         }
 
     def _predict_readiness(self):

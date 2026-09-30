@@ -98,9 +98,9 @@ class AdaptiveRoadmapEngine:
 
         return {
             'change_type': 'workload_reduction',
+            'display_type': 'Lighten the Load',
             'description': (
-                'Burnout risk is elevated and momentum is weakening. '
-                'Reducing workload pressure should prevent cognitive overload '
+                'Energy is highly strained. Easing the pressure should prevent overload '
                 'and allow natural recovery.'
             ),
             'suggested_changes': suggested,
@@ -127,10 +127,10 @@ class AdaptiveRoadmapEngine:
 
         return {
             'change_type': 'challenge_increase',
+            'display_type': 'Deepen the Challenge',
             'description': (
-                'Your momentum is strong and consistency is solid. '
-                'Increasing challenge slightly will keep you in the growth zone '
-                'and prevent stagnation.'
+                'Your execution flow is remarkably strong. Increasing the challenge slightly '
+                'will keep you in the growth zone and prevent stagnation.'
             ),
             'suggested_changes': suggested,
             'trigger_metrics': {
@@ -156,9 +156,10 @@ class AdaptiveRoadmapEngine:
 
         return {
             'change_type': 'easy_win_injection',
+            'display_type': 'Momentum Boost',
             'description': (
-                'Engagement is declining and momentum is fragile. '
-                'Quick wins rebuild confidence and re-establish the completion habit.'
+                'Focus is drifting. Quick wins will help rebuild confidence '
+                'and re-establish your execution rhythm.'
             ),
             'suggested_changes': suggested,
             'trigger_metrics': {
@@ -184,9 +185,10 @@ class AdaptiveRoadmapEngine:
 
         return {
             'change_type': 'theory_practical_rebalance',
+            'display_type': 'Shift to Practice',
             'description': (
-                'Difficult and theory-heavy tasks are being skipped at a high rate. '
-                'Increasing practical, hands-on work should improve completion rates.'
+                'Difficult theory tasks are creating execution friction. '
+                'Increasing practical, hands-on work should improve momentum.'
             ),
             'suggested_changes': suggested,
             'trigger_metrics': {
@@ -203,6 +205,7 @@ class AdaptiveRoadmapEngine:
             change = AdaptiveChange.objects.create(
                 user=self.user,
                 change_type=adaptation['change_type'],
+                display_type=adaptation.get('display_type', adaptation['change_type']),
                 description=adaptation['description'],
                 suggested_changes=adaptation.get('suggested_changes', []),
                 trigger_metrics=adaptation.get('trigger_metrics', {}),

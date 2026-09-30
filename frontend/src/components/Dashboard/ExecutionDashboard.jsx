@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Flame, Sparkles, CheckCircle2, Clock, HelpCircle } from 'lucide-react';
+import { Flame, Sparkles, CheckCircle2, Clock, HelpCircle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTour } from '../Tour/TourContext';
 
@@ -24,14 +24,14 @@ import { planoraService } from '../../api/planoraService';
 import { useMissionFlow } from '../../hooks/useMissionFlow';
 import api from '../../api/axios';
 
-const shellCardClass = 'rounded-[24px] p-6 transition-all duration-300 relative overflow-hidden';
-const shellCardStyle = {
-    background: 'var(--el-glass-panel)',
-    backdropFilter: 'blur(24px)',
-    WebkitBackdropFilter: 'blur(24px)',
-    border: 'var(--el-glass-border)',
-    boxShadow: 'var(--el-glass-shadow)',
+const CARD = {
+    background: 'var(--el-bg-secondary)',
+    border: '1px solid var(--el-border)',
+    borderRadius: 14,
+    boxShadow: '0 1px 3px rgba(28,25,23,0.06), 0 0 0 1px rgba(28,25,23,0.05)',
 };
+
+const CARD_PAD = { ...CARD, padding: 24 };
 
 const getTimeBasedGreeting = () => {
     const hour = new Date().getHours();
@@ -407,8 +407,8 @@ const ExecutionDashboard = () => {
 
     return (
         <div className={`min-h-screen cinematic-grid relative transition-colors duration-300`} style={{ background: currentState === 'IN_PROGRESS' ? '#000' : 'var(--el-bg)', color: 'var(--el-text)', fontFamily: "'Inter', sans-serif" }}>
-            <div className="cinematic-glow" style={{ top: '5%', left: '15%', filter: 'blur(80px)', width: '60vw', height: '60vh' }} />
-            <div className="cinematic-glow" style={{ top: '40%', right: '0%', left: 'auto', width: '50vw', height: '50vh', filter: 'blur(100px)', opacity: 0.6, background: 'radial-gradient(circle, rgba(243, 107, 34, 0.04) 0%, transparent 70%)' }} />
+            <div className="cinematic-glow" style={{ top: '5%', left: '15%', filter: 'blur(80px)', width: '60vw', height: '60vh', opacity: 0.6 }} />
+            <div className="cinematic-glow" style={{ top: '40%', right: '0%', left: 'auto', width: '50vw', height: '50vh', filter: 'blur(100px)', opacity: 0.4 }} />
 
             {/* Focus Mode Overlay */}
             <AnimatePresence>
@@ -443,13 +443,13 @@ const ExecutionDashboard = () => {
                                 { icon: CheckCircle2, text: `${mergedStats.tasks_completed} done` },
                                 { icon: Clock, text: `${Math.round((mergedStats.focus_minutes || 0) / 60)}h tracked` },
                             ].map(({ icon: Icon, text }) => (
-                                <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 12px', borderRadius: 8, border: 'var(--el-glass-border)', background: 'var(--el-glass-panel)', fontSize: 11, fontWeight: 600, color: 'var(--el-text-secondary)' }}>
-                                    <Icon style={{ width: 12, height: 12, color: 'var(--orange)' }} />
+                                <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 12px', borderRadius: 8, border: '1px solid var(--el-border)', background: 'var(--el-bg-secondary)', fontSize: 11, fontWeight: 500, color: 'var(--el-text-secondary)' }}>
+                                    <Icon style={{ width: 12, height: 12, color: 'var(--el-text-muted)' }} />
                                     <span>{text}</span>
                                 </div>
                             ))}
                             {streak > 0 && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 12px', borderRadius: 8, background: 'rgba(243, 107, 34, 0.08)', border: '1px solid rgba(243, 107, 34, 0.15)', fontSize: 11, fontWeight: 700, color: 'var(--orange)' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 12px', borderRadius: 8, background: 'var(--el-accent-soft)', border: '1px solid var(--el-accent-border)', fontSize: 11, fontWeight: 600, color: 'var(--el-accent)' }}>
                                     <Flame style={{ width: 12, height: 12 }} />
                                     <span>{streak}d streak</span>
                                 </div>
@@ -488,7 +488,7 @@ const ExecutionDashboard = () => {
                     <div className="space-y-6 lg:col-span-8">
                         
                         {/* SCHEDULE — Primary Widget */}
-                        <div data-tour="schedule" className={shellCardClass} style={shellCardStyle}>
+                        <div data-tour="schedule" style={CARD_PAD}>
                             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 8, borderBottom: '1px solid var(--el-border-subtle)' }}>
                                 <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--el-text)' }}>Schedule</h3>
                                 <span style={{ fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--el-text-muted)' }}>Days</span>
@@ -605,17 +605,85 @@ const ExecutionDashboard = () => {
                         {/* ROW: Mode & Progress */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Mode Switcher */}
-                            <div data-tour="mode-switch" className={shellCardClass} style={{ ...shellCardStyle, padding: 16, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                                <div className="flex flex-col gap-4">
-                                    <ModeSwitch mode={mode} onChange={setMode} />
+                            <div data-tour="mode-switch" style={{ ...CARD, padding: 20, height: '100%', display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+                                {/* Card header */}
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 12, borderBottom: '1px solid var(--el-border-subtle)' }}>
+                                    <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--el-text-muted)', margin: 0 }}>Mode</p>
+                                    <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--el-text-muted)', background: 'var(--el-bg-secondary)', border: '1px solid var(--el-border)', borderRadius: 6, padding: '2px 8px' }}>
+                                        {activeTasks.length} task{activeTasks.length !== 1 ? 's' : ''}
+                                    </span>
                                 </div>
+
+                                {/* Full-width mode toggle cards */}
+                                <ModeSwitch mode={mode} onChange={setMode} />
+
+                                {/* Divider */}
+                                <div style={{ height: 1, background: 'var(--el-border-subtle)' }} />
+
+                                {/* Task stat row — neutral, no accent color */}
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                                    {[
+                                        { label: 'Pending', value: activeTasks.filter(t => t.status !== 'completed').length, dot: 'var(--el-text-muted)' },
+                                        { label: 'Done', value: activeTasks.filter(t => t.status === 'completed').length, dot: '#10b981' },
+                                    ].map(({ label, value, dot }) => (
+                                        <div key={label} style={{
+                                            display: 'flex', flexDirection: 'column', gap: 4,
+                                            padding: '10px 12px', borderRadius: 12,
+                                            background: 'var(--el-bg-secondary)',
+                                            border: '1px solid var(--el-border)',
+                                        }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                                                <span style={{ width: 5, height: 5, borderRadius: '50%', background: dot, display: 'inline-block', flexShrink: 0 }} />
+                                                <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--el-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</span>
+                                            </div>
+                                            <span style={{ fontSize: 22, fontWeight: 300, color: 'var(--el-text)', letterSpacing: '-0.04em', lineHeight: 1 }}>{value}</span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Quick-jump link */}
+                                <Link
+                                    to={mode === 'learning' ? '/roadmap/generate' : '/planora'}
+                                    style={{
+                                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                        padding: '9px 14px', borderRadius: 10,
+                                        border: '1px solid var(--el-border)',
+                                        background: 'transparent',
+                                        textDecoration: 'none',
+                                        fontSize: 12, fontWeight: 600,
+                                        color: 'var(--el-text-secondary)',
+                                        transition: 'color 0.15s, border-color 0.15s, background 0.15s',
+                                    }}
+                                    onMouseEnter={e => { e.currentTarget.style.color = 'var(--el-text)'; e.currentTarget.style.background = 'var(--el-bg-secondary)'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.color = 'var(--el-text-secondary)'; e.currentTarget.style.background = 'transparent'; }}
+                                >
+                                    <span>{mode === 'learning' ? 'Generate a Roadmap' : 'Open Study Platform'}</span>
+                                    <ArrowRight style={{ width: 13, height: 13 }} />
+                                </Link>
+
+                                {/* AI Coach CTA — filled black, Notion-style primary action */}
                                 <button
                                     data-tour="ai-coach-btn"
                                     onClick={openVoicePanel}
-                                    style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '10px 0', borderRadius: 12, background: 'var(--orange-soft)', color: 'var(--orange-deep)', fontWeight: 700, fontSize: 13, border: '1px solid rgba(243,107,34,0.3)', cursor: 'pointer', transition: 'all 0.2s', fontFamily: "'Inter', sans-serif", marginTop: 16 }}
-                                    className="hover:scale-[1.02]"
+                                    style={{
+                                        marginTop: 'auto',
+                                        display: 'flex', width: '100%',
+                                        alignItems: 'center', justifyContent: 'center', gap: 8,
+                                        padding: '11px 0', borderRadius: 10,
+                                        background: 'var(--el-text)',
+                                        color: 'var(--el-bg)',
+                                        fontWeight: 600, fontSize: 12,
+                                        border: '1px solid var(--el-text)',
+                                        cursor: 'pointer',
+                                        transition: 'opacity 0.15s',
+                                        fontFamily: "'Inter', sans-serif",
+                                        letterSpacing: '-0.01em',
+                                    }}
+                                    onMouseEnter={e => { e.currentTarget.style.opacity = '0.82'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
                                 >
-                                    <Sparkles style={{ width: 14, height: 14 }} />
+                                    <Sparkles style={{ width: 13, height: 13 }} />
                                     <span>Engage AI Coach</span>
                                 </button>
                             </div>
@@ -632,7 +700,7 @@ const ExecutionDashboard = () => {
 
                         {/* Mode-specific Linked Section */}
                         {mode === 'learning' ? (
-                            <div data-tour="linked-section" className={shellCardClass} style={shellCardStyle}>
+                            <div data-tour="linked-section" style={CARD_PAD}>
                                 <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 8, borderBottom: '1px solid var(--el-border-subtle)' }}>
                                     <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--el-text)' }}>Learning Path Roadmaps</h3>
                                     <Link to="/roadmap/list" style={{ fontSize: 12, fontWeight: 500, color: 'var(--el-text-muted)', textDecoration: 'none' }}>
@@ -659,7 +727,7 @@ const ExecutionDashboard = () => {
                                 )}
                             </div>
                         ) : (
-                            <div data-tour="linked-section" className={shellCardClass} style={shellCardStyle}>
+                            <div data-tour="linked-section" style={CARD_PAD}>
                                 <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 8, borderBottom: '1px solid var(--el-border-subtle)' }}>
                                     <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--el-text)' }}>Exam Subjects & Topics</h3>
                                     <Link to="/planora" style={{ fontSize: 12, fontWeight: 500, color: 'var(--el-text-muted)', textDecoration: 'none' }}>

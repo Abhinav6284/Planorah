@@ -190,6 +190,7 @@ class AdaptiveChange(models.Model):
         help_text='FK reference to roadmap (UUID to avoid cross-app FK)',
     )
     change_type = models.CharField(max_length=50, choices=ADAPTATION_TYPE_CHOICES)
+    display_type = models.CharField(max_length=50, blank=True)
     description = models.TextField()
     suggested_changes = models.JSONField(default=list, blank=True)
     before_state = models.JSONField(default=dict, blank=True)

@@ -99,6 +99,13 @@ CRITICAL RULES:
 - You do NOT compute any metrics. All numbers are already calculated.
 - Use ONLY the provided data. Do NOT hallucinate analytics.
 - Output STRICT JSON only. No markdown, no text outside JSON.
+- DO NOT use numbers for scores in your insights (e.g., do not say "Momentum is 73").
+- Use human, emotionally intuitive terminology:
+  * "Flow" (execution rhythm / momentum)
+  * "Focus" (attention stability / engagement)
+  * "Energy" (mental load / burnout risk)
+  * "Confidence" (challenge readiness / procrastination)
+- Use states instead of metrics: Strong, Stable, Rising, Drifting, Strained, Recovering.
 - Use evolving, emotionally aware language — NOT generic advice.
 - Reference the user's actual behavioral patterns.
 - Language should feel observant and adaptive, not dashboard-like.
@@ -302,30 +309,37 @@ Be the mentor they never had, not a dashboard."""
         }
 
     def _build_narrative(self, metrics, identity, context):
-        """Build a 2-3 sentence behavioral summary."""
+        """Build a 2-3 sentence behavioral summary using emotional state language."""
         momentum = metrics.get('momentum_score', 50)
         burnout = metrics.get('burnout_risk', 0)
+        dropoff = metrics.get('dropoff_risk', 0)
         trend = context.get('consistency_trend', 'stable')
-        active_days = context.get('active_days', 0)
-        identity_name = identity.get('display_name', 'learner')
 
         parts = []
 
-        if momentum >= 60:
-            parts.append(f'Your momentum is strong at {momentum:.0f}/100.')
+        # Flow
+        if momentum >= 75:
+            parts.append('Your execution flow is remarkably strong.')
+        elif momentum >= 50:
+            parts.append('Your execution flow remains stable.')
         elif momentum >= 35:
-            parts.append(f'Your momentum is moderate at {momentum:.0f}/100.')
+            parts.append('Your execution flow is drifting.')
         else:
-            parts.append(f'Your momentum is low at {momentum:.0f}/100.')
+            parts.append('Your execution flow is currently strained.')
 
+        # Rhythm/Trend
         if trend == 'improving':
-            parts.append('Consistency is trending upward.')
+            parts.append('Consistency rhythm is naturally rising.')
         elif trend == 'declining':
-            parts.append('Consistency has been declining — focus on small wins.')
+            parts.append('Rhythm is dipping — small wins will help you bounce back.')
 
-        if burnout >= 65:
-            parts.append('Burnout risk needs attention.')
-        elif active_days >= 5:
-            parts.append(f'{active_days} active days shows solid engagement.')
+        # Energy & Focus
+        if burnout >= 70:
+            parts.append('Energy load is highly strained, which may impact your focus.')
+        elif burnout >= 45:
+            parts.append('Energy is stable, but be mindful of overload.')
+            
+        if dropoff >= 70:
+            parts.append('Focus is drifting significantly.')
 
         return ' '.join(parts[:3])
