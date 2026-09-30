@@ -31,7 +31,9 @@ each area.
 
 Defined once as CSS variables in `src/styles/tokens.css`. Dark is default (`:root`);
 light overrides under `.light` (existing `ThemeContext` toggles `dark`/`light` on `<html>`).
-Tailwind `theme.colors` maps to these variables, replacing the old Cal.com/indigo config.
+Tailwind `theme.colors` maps to these variables. Variables are prefixed `--p-` (e.g. `--p-bg`)
+because the old `index.css` already defines `--bg`, `--surface`, `--font-mono`; the old variables
+and Tailwind colors stay until step 10 so un-rebuilt screens keep working, then are deleted.
 
 | Token | Dark | Light | Use |
 |---|---|---|---|
