@@ -7,11 +7,12 @@
   --p-border-strong: #2E2E2E;
   --p-text: #FAFAFA;
   --p-text-muted: #A3A3A3;
-  --p-text-faint: #737373;
+  --p-text-faint: #8A8A8A;
   --p-accent: #BEF264;
   --p-accent-fg: #000000;
   --p-accent-text: #BEF264;
   --p-accent-soft: rgba(190, 242, 100, 0.12);
+  --p-focus: #BEF264;
   --p-danger: #F87171;
   --p-warning: #FBBF24;
   --p-info: #60A5FA;
@@ -30,9 +31,10 @@ html.light {
   --p-border-strong: #D4D4D4;
   --p-text: #0A0A0A;
   --p-text-muted: #525252;
-  --p-text-faint: #A3A3A3;
+  --p-text-faint: #737373;
   --p-accent-text: #4D7C0F;
   --p-accent-soft: rgba(77, 124, 15, 0.10);
+  --p-focus: #4D7C0F;
   --p-danger: #DC2626;
   --p-warning: #B45309;
   --p-info: #2563EB;

@@ -14,7 +14,7 @@ import { userService } from "./api/userService";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import AppLayout from './components/shell/AppLayout';
-import RedirectWithParams from './routes/RedirectWithParams';
+import { legacyRedirectRoutes } from './routes/legacyRedirects';
 import HomeRoute from './routes/HomeRoute';
 import MarketingLayout from './components/MarketingLayout';
 
@@ -257,36 +257,10 @@ function AppInner() {
               <Route path="/billing/checkout" element={<CheckoutPage />} />
 
               {/* Redirects from old URLs */}
-              <Route path="/dashboard" element={<Navigate to="/today" replace />} />
-              <Route path="/tasks" element={<Navigate to="/today/tasks" replace />} />
-              <Route path="/tasks/day" element={<Navigate to="/today/timeline" replace />} />
-              <Route path="/tasks/focus" element={<Navigate to="/today/focus" replace />} />
-              <Route path="/tasks/analytics" element={<Navigate to="/progress" replace />} />
-              <Route path="/scheduler" element={<Navigate to="/today/calendar" replace />} />
-              <Route path="/roadmap/list" element={<Navigate to="/path" replace />} />
-              <Route path="/roadmap/generate" element={<Navigate to="/path/new" replace />} />
-              <Route path="/roadmap/projects" element={<Navigate to="/path/projects" replace />} />
-              <Route path="/roadmap/:id" element={<RedirectWithParams to="/path/roadmap/:id" />} />
-              <Route path="/planora" element={<Navigate to="/path/exam" replace />} />
-              <Route path="/planora/subject/:subjectId" element={<RedirectWithParams to="/path/exam/subject/:subjectId" />} />
-              <Route path="/planora/subject/:subjectId/plan" element={<RedirectWithParams to="/path/exam/subject/:subjectId/plan" />} />
-              <Route path="/planora/topic/:topicId/notes" element={<RedirectWithParams to="/path/exam/topic/:topicId/notes" />} />
-              <Route path="/planora/topic/:topicId/guide" element={<RedirectWithParams to="/path/exam/topic/:topicId/guide" />} />
-              <Route path="/assistant" element={<Navigate to="/mentor" replace />} />
-              <Route path="/resume" element={<Navigate to="/career/resume" replace />} />
-              <Route path="/resume/new" element={<Navigate to="/career/resume/new" replace />} />
-              <Route path="/resume/compiled" element={<Navigate to="/career/resume/compiled" replace />} />
-              <Route path="/resume/compiled/:versionId" element={<RedirectWithParams to="/career/resume/compiled/:versionId" />} />
-              <Route path="/resume/:id" element={<RedirectWithParams to="/career/resume/:id" />} />
-              <Route path="/ats" element={<Navigate to="/career/ats" replace />} />
-              <Route path="/linkedin-analyzer" element={<Navigate to="/career/linkedin" replace />} />
-              <Route path="/portfolio/edit" element={<Navigate to="/career/portfolio" replace />} />
-              <Route path="/projects" element={<Navigate to="/career/portfolio/projects" replace />} />
-              <Route path="/profile" element={<Navigate to="/settings#profile" replace />} />
-              <Route path="/subscription/plans" element={<Navigate to="/settings#plans" replace />} />
-              <Route path="/subscription" element={<Navigate to="/settings#subscription" replace />} />
-              <Route path="/billing/history" element={<Navigate to="/settings#billing" replace />} />
+              {legacyRedirectRoutes()}
             </Route>
+            {/* Unknown URLs: back home instead of a blank page */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
         <VercelAnalytics />

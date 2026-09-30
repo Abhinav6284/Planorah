@@ -434,19 +434,6 @@ export default function RoadmapProjects() {
                                                                     </span>
                                                                     <FaArrowRight />
                                                                 </button>
-                                                                <button
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        navigate('/codespace');
-                                                                    }}
-                                                                    className="w-full flex items-center justify-between px-4 py-3 bg-gray-100 dark:bg-charcoalMuted text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-charcoalMuted transition-all"
-                                                                >
-                                                                    <span className="flex items-center gap-2">
-                                                                        <FaCode />
-                                                                        Open CodeSpace
-                                                                    </span>
-                                                                    <FaArrowRight />
-                                                                </button>
                                                             </div>
                                                         </div>
                                                     </div>

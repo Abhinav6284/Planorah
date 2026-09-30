@@ -1,4 +1,4 @@
-import { FileText, Globe, Linkedin, CreditCard, Settings, LifeBuoy, Sun, Moon, LogOut } from 'lucide-react';
+import { FileText, Files, ScanSearch, Globe, Linkedin, CreditCard, Settings, LifeBuoy, Sun, Moon, LogOut } from 'lucide-react';
 import { Menu } from '../ui';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuthStore } from '../../stores/authStore';
@@ -24,6 +24,8 @@ export default function AvatarMenu({ user, side = 'top', compact = false }) {
 
   const items = [
     { label: 'Resume', icon: FileText, to: '/career/resume' },
+    { label: 'Compiled resumes', icon: Files, to: '/career/resume/compiled' },
+    { label: 'Find your fit', icon: ScanSearch, to: '/career/ats' },
     { label: 'Portfolio', icon: Globe, to: '/career/portfolio' },
     { label: 'LinkedIn check', icon: Linkedin, to: '/career/linkedin' },
     'divider',
@@ -47,7 +49,7 @@ export default function AvatarMenu({ user, side = 'top', compact = false }) {
           {...props}
           className={cx(
             'flex items-center gap-2.5 rounded-md text-left text-sm text-muted hover:bg-surface-hover hover:text-fg',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
             compact ? 'p-1' : 'w-full px-2 py-1.5',
           )}
         >

@@ -19,6 +19,7 @@ module.exports = {
         'accent-fg': 'var(--p-accent-fg)',
         'accent-text': 'var(--p-accent-text)',
         'accent-soft': 'var(--p-accent-soft)',
+        focus: 'var(--p-focus)',
         danger: 'var(--p-danger)',
         warn: 'var(--p-warning)',
         info: 'var(--p-info)',

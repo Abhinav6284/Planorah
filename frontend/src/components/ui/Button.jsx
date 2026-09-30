@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { cx } from '../../utils/cx';
 import { Spinner } from './Skeleton';
 
-const FOCUS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas';
+const FOCUS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-canvas';
 
 const VARIANTS = {
   primary: 'bg-accent text-accent-fg hover:brightness-95',

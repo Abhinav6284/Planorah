@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import MobileNav from './MobileNav';
+import SectionNav from './SectionNav';
 import AvatarMenu from './AvatarMenu';
 import AIVoicePanel from '../Mentoring/AIVoicePanel';
 import WelcomeCoach from '../Onboarding/WelcomeCoach';
@@ -49,6 +50,7 @@ export default function AppLayout() {
             <Link to="/today" className="text-[15px] font-semibold tracking-[-0.02em]">planorah</Link>
             <AvatarMenu user={user} side="bottom" compact />
           </header>
+          <SectionNav />
           <main className="flex-1 pb-16 md:pb-0">
             <Outlet />
           </main>

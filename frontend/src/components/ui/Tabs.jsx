@@ -26,7 +26,7 @@ export function Tabs({ tabs, value, onChange }) {
             onKeyDown={(e) => onKeyDown(e, i)}
             className={cx(
               '-mb-px border-b-2 pb-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:text-fg',
-              selected ? 'border-accent text-fg' : 'border-transparent text-muted hover:text-fg',
+              selected ? 'border-focus text-fg' : 'border-transparent text-muted hover:text-fg',
             )}
           >
             {tab.label}

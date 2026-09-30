@@ -18,11 +18,11 @@ export default function Sidebar({ user }) {
               aria-current={active ? 'page' : undefined}
               className={cx(
                 'relative flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
                 active ? 'bg-surface-hover text-fg' : 'text-muted hover:bg-surface-hover hover:text-fg',
               )}
             >
-              {active && <span aria-hidden="true" className="absolute -left-3 top-1.5 bottom-1.5 w-0.5 rounded-full bg-accent" />}
+              {active && <span aria-hidden="true" className="absolute -left-3 top-1.5 bottom-1.5 w-0.5 rounded-full bg-focus" />}
               <Icon size={16} strokeWidth={1.75} aria-hidden="true" />
               {label}
             </Link>

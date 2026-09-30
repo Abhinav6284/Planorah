@@ -72,3 +72,22 @@ test('Tabs select on click and move with arrow keys', () => {
   expect(screen.getByRole('tab', { name: 'Exams' })).toHaveAttribute('aria-selected', 'true');
   expect(screen.getByRole('tab', { name: 'Exams' })).toHaveFocus();
 });
+
+function DialogWithInput() {
+  const [open, setOpen] = useState(true);
+  const [value, setValue] = useState('');
+  return (
+    <Dialog open={open} onClose={() => setOpen(false)} title="Rename">
+      <input aria-label="Name" value={value} onChange={(e) => setValue(e.target.value)} />
+    </Dialog>
+  );
+}
+
+test('Dialog keeps focus in a controlled input while typing (inline onClose)', () => {
+  render(<DialogWithInput />);
+  const input = screen.getByLabelText('Name');
+  userEvent.click(input);
+  userEvent.type(input, 'abc');
+  expect(input).toHaveValue('abc');
+  expect(input).toHaveFocus();
+});

@@ -5,13 +5,16 @@ import { X } from 'lucide-react';
 export function Dialog({ open, onClose, title, children, footer }) {
   const titleId = useId();
   const panelRef = useRef(null);
+  // Ref so an inline onClose doesn't re-run the effect (which would steal focus) every render.
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     if (!open) return undefined;
     const previous = document.activeElement;
     panelRef.current?.focus();
     const onKey = (e) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') onCloseRef.current();
       if (e.key === 'Tab') {
         const nodes = panelRef.current.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
         if (!nodes.length) return;
@@ -23,12 +26,12 @@ export function Dialog({ open, onClose, title, children, footer }) {
     };
     document.addEventListener('keydown', onKey);
     return () => { document.removeEventListener('keydown', onKey); previous?.focus?.(); };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60" onClick={onClose} aria-hidden="true" />
+      <div className="absolute inset-0 bg-black/60" onClick={() => onCloseRef.current()} aria-hidden="true" />
       <div
         ref={panelRef}
         role="dialog"
