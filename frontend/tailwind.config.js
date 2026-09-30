@@ -5,6 +5,23 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // ── Planorah Mono + Lime (redesign) ──
+        canvas: 'var(--p-bg)',
+        subtle: 'var(--p-bg-subtle)',
+        surface: 'var(--p-surface)',
+        'surface-hover': 'var(--p-surface-hover)',
+        line: 'var(--p-border)',
+        'line-strong': 'var(--p-border-strong)',
+        fg: 'var(--p-text)',
+        muted: 'var(--p-text-muted)',
+        faint: 'var(--p-text-faint)',
+        accent: 'var(--p-accent)',
+        'accent-fg': 'var(--p-accent-fg)',
+        'accent-text': 'var(--p-accent-text)',
+        'accent-soft': 'var(--p-accent-soft)',
+        danger: 'var(--p-danger)',
+        warn: 'var(--p-warning)',
+        info: 'var(--p-info)',
         // ── Cal.com design system tokens ────────────────────────
         charcoal:     '#242424',
         'mid-gray':   '#898989',
@@ -58,6 +75,8 @@ module.exports = {
       },
 
       fontFamily: {
+        sans: ['var(--p-font-sans)'],
+        mono: ['var(--p-font-mono)'],
         // ── Cal.com fonts ────────────────────────────────────────
         'cal-sans': ['Cal Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         inter:      ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
@@ -85,6 +104,7 @@ module.exports = {
       },
 
       boxShadow: {
+        pop: 'var(--p-shadow-pop)',
         // ── Cal.com multi-layer shadows ───────────────────────────
         'level-2-card':
           'rgba(19,19,22,0.7) 0px 1px 5px -4px, rgba(34,42,53,0.08) 0px 0px 0px 1px, rgba(34,42,53,0.05) 0px 4px 8px 0px',
