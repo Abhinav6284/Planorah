@@ -1,4 +1,10 @@
 export const getContextSourceFromPath = (pathname = '') => {
+  if (pathname.startsWith('/today')) return 'dashboard';
+  if (pathname.startsWith('/path/exam')) return 'planora';
+  if (pathname.startsWith('/path')) return 'roadmap';
+  if (pathname.startsWith('/career/portfolio')) return 'portfolio';
+  if (pathname.startsWith('/career')) return 'resume';
+  if (pathname.startsWith('/mentor')) return 'assistant';
   if (pathname.startsWith('/roadmap')) return 'roadmap';
   if (pathname.startsWith('/dashboard')) return 'dashboard';
   if (pathname.startsWith('/tasks')) return 'tasks';

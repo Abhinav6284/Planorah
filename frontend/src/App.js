@@ -13,7 +13,9 @@ import { userService } from "./api/userService";
 // Eagerly loaded (critical auth path)
 import Login from "./components/Login";
 import Register from "./components/Register";
-import Layout from './components/Layout';
+import AppLayout from './components/shell/AppLayout';
+import RedirectWithParams from './routes/RedirectWithParams';
+import HomeRoute from './routes/HomeRoute';
 import MarketingLayout from './components/MarketingLayout';
 
 const lazyWithChunkRetry = (importer, retryKey) =>
@@ -181,7 +183,7 @@ function AppInner() {
           <Routes>
             {/* Marketing / Public Routes */}
             <Route element={<MarketingLayout />}>
-              <Route path="/" element={<LandingPage />} />
+              <Route path="/" element={<HomeRoute><LandingPage /></HomeRoute>} />
               <Route path="/support" element={<SupportPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/careers" element={<CareersPage />} />
@@ -220,40 +222,70 @@ function AppInner() {
             <Route path="/p/:slug" element={<PublicPortfolio />} />
 
             {/* Protected App Routes */}
-            <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/scheduler" element={<Scheduler />} />
-              <Route path="/roadmap/generate" element={<RoadmapGenerator />} />
-              <Route path="/resume" element={<ResumeList />} />
-              <Route path="/resume/new" element={<ResumeBuilder />} />
-              <Route path="/resume/:id" element={<ResumeBuilder />} />
-              <Route path="/resume/compiled" element={<CompiledResumeList />} />
-              <Route path="/resume/compiled/:versionId" element={<CompiledResumeView />} />
-              <Route path="/ats" element={<ATSScanner />} />
-              <Route path="/linkedin-analyzer" element={<LinkedInAnalyzer />} />
-              <Route path="/roadmap/:id" element={<RoadmapView />} />
-              <Route path="/roadmap/list" element={<RoadmapList />} />
-              <Route path="/roadmap/projects" element={<RoadmapProjects />} />
-              <Route path="/tasks" element={<TaskList />} />
-              <Route path="/tasks/day" element={<DayTimeline />} />
-              <Route path="/tasks/focus" element={<FocusMode />} />
-              <Route path="/tasks/analytics" element={<Analytics />} />
+            <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+              {/* Today */}
+              <Route path="/today" element={<Dashboard />} />
+              <Route path="/today/tasks" element={<TaskList />} />
+              <Route path="/today/timeline" element={<DayTimeline />} />
+              <Route path="/today/focus" element={<FocusMode />} />
+              <Route path="/today/calendar" element={<Scheduler />} />
+              {/* Path */}
+              <Route path="/path" element={<RoadmapList />} />
+              <Route path="/path/new" element={<RoadmapGenerator />} />
+              <Route path="/path/roadmap/:id" element={<RoadmapView />} />
+              <Route path="/path/projects" element={<RoadmapProjects />} />
+              <Route path="/path/exam" element={<PlanoraDashboard />} />
+              <Route path="/path/exam/subject/:subjectId" element={<SubjectDetail />} />
+              <Route path="/path/exam/subject/:subjectId/plan" element={<StudyPlanner />} />
+              <Route path="/path/exam/topic/:topicId/notes" element={<TopicDetail />} />
+              <Route path="/path/exam/topic/:topicId/guide" element={<TopicDetail />} />
+              {/* Mentor / Progress */}
+              <Route path="/mentor" element={<AIAssistant />} />
+              <Route path="/progress" element={<Analytics />} />
+              {/* Career (avatar menu) */}
+              <Route path="/career/resume" element={<ResumeList />} />
+              <Route path="/career/resume/new" element={<ResumeBuilder />} />
+              <Route path="/career/resume/compiled" element={<CompiledResumeList />} />
+              <Route path="/career/resume/compiled/:versionId" element={<CompiledResumeView />} />
+              <Route path="/career/resume/:id" element={<ResumeBuilder />} />
+              <Route path="/career/ats" element={<ATSScanner />} />
+              <Route path="/career/linkedin" element={<LinkedInAnalyzer />} />
+              <Route path="/career/portfolio" element={<PortfolioEditor />} />
+              <Route path="/career/portfolio/projects" element={<ProjectManager />} />
+              {/* Account */}
               <Route path="/settings" element={<Settings />} />
+              <Route path="/billing/checkout" element={<CheckoutPage />} />
+
+              {/* Redirects from old URLs */}
+              <Route path="/dashboard" element={<Navigate to="/today" replace />} />
+              <Route path="/tasks" element={<Navigate to="/today/tasks" replace />} />
+              <Route path="/tasks/day" element={<Navigate to="/today/timeline" replace />} />
+              <Route path="/tasks/focus" element={<Navigate to="/today/focus" replace />} />
+              <Route path="/tasks/analytics" element={<Navigate to="/progress" replace />} />
+              <Route path="/scheduler" element={<Navigate to="/today/calendar" replace />} />
+              <Route path="/roadmap/list" element={<Navigate to="/path" replace />} />
+              <Route path="/roadmap/generate" element={<Navigate to="/path/new" replace />} />
+              <Route path="/roadmap/projects" element={<Navigate to="/path/projects" replace />} />
+              <Route path="/roadmap/:id" element={<RedirectWithParams to="/path/roadmap/:id" />} />
+              <Route path="/planora" element={<Navigate to="/path/exam" replace />} />
+              <Route path="/planora/subject/:subjectId" element={<RedirectWithParams to="/path/exam/subject/:subjectId" />} />
+              <Route path="/planora/subject/:subjectId/plan" element={<RedirectWithParams to="/path/exam/subject/:subjectId/plan" />} />
+              <Route path="/planora/topic/:topicId/notes" element={<RedirectWithParams to="/path/exam/topic/:topicId/notes" />} />
+              <Route path="/planora/topic/:topicId/guide" element={<RedirectWithParams to="/path/exam/topic/:topicId/guide" />} />
+              <Route path="/assistant" element={<Navigate to="/mentor" replace />} />
+              <Route path="/resume" element={<Navigate to="/career/resume" replace />} />
+              <Route path="/resume/new" element={<Navigate to="/career/resume/new" replace />} />
+              <Route path="/resume/compiled" element={<Navigate to="/career/resume/compiled" replace />} />
+              <Route path="/resume/compiled/:versionId" element={<RedirectWithParams to="/career/resume/compiled/:versionId" />} />
+              <Route path="/resume/:id" element={<RedirectWithParams to="/career/resume/:id" />} />
+              <Route path="/ats" element={<Navigate to="/career/ats" replace />} />
+              <Route path="/linkedin-analyzer" element={<Navigate to="/career/linkedin" replace />} />
+              <Route path="/portfolio/edit" element={<Navigate to="/career/portfolio" replace />} />
+              <Route path="/projects" element={<Navigate to="/career/portfolio/projects" replace />} />
               <Route path="/profile" element={<Navigate to="/settings#profile" replace />} />
-              <Route path="/assistant" element={<AIAssistant />} />
-              {/* Subscription & Billing Routes */}
               <Route path="/subscription/plans" element={<Navigate to="/settings#plans" replace />} />
               <Route path="/subscription" element={<Navigate to="/settings#subscription" replace />} />
-              <Route path="/billing/checkout" element={<CheckoutPage />} />
               <Route path="/billing/history" element={<Navigate to="/settings#billing" replace />} />
-              <Route path="/portfolio/edit" element={<PortfolioEditor />} />
-              <Route path="/projects" element={<ProjectManager />} />
-              {/* Planora – AI Study Platform */}
-              <Route path="/planora" element={<PlanoraDashboard />} />
-              <Route path="/planora/subject/:subjectId" element={<SubjectDetail />} />
-              <Route path="/planora/subject/:subjectId/plan" element={<StudyPlanner />} />
-              <Route path="/planora/topic/:topicId/notes" element={<TopicDetail />} />
-              <Route path="/planora/topic/:topicId/guide" element={<TopicDetail />} />
             </Route>
           </Routes>
         </Suspense>
