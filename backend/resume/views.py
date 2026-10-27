@@ -553,15 +553,17 @@ def analyze_linkedin(request):
         run_input = {
             "profileUrls": [linkedin_url],
         }
-        run = client.actor("rocky_scraper/linkedin-profile-scraper").call(run_input=run_input)
+        run = client.actor("johnvc/linkedin-profile-api").call(run_input=run_input)
 
         # Fetch Actor results
         dataset_items = list(client.dataset(run["defaultDatasetId"]).iterate_items())
         
-        if not dataset_items:
+        # Skip error rows (they carry error_message instead of profile fields)
+        profiles = [item for item in dataset_items if not item.get("error_message")]
+        if not profiles:
             return Response({"error": "Could not extract data from the provided LinkedIn URL."}, status=400)
             
-        profile_data = dataset_items[0]
+        profile_data = profiles[0]
 
         # Use Gemini to generate improvements
         api_key = os.environ.get("GEMINI_API_KEY")
@@ -606,10 +608,10 @@ def analyze_linkedin(request):
         
         # Include raw profile data in the response for the UI to display
         analysis["raw_profile"] = {
-            "fullName": profile_data.get("fullName", ""),
+            "fullName": profile_data.get("name", ""),
             "headline": profile_data.get("headline", ""),
-            "summary": profile_data.get("summary", ""),
-            "profilePicture": profile_data.get("profilePicture", "")
+            "summary": profile_data.get("about") or profile_data.get("summary", ""),
+            "profilePicture": profile_data.get("avatar", "")
         }
 
         return Response(analysis)
